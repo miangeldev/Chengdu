@@ -1,10 +1,9 @@
 import { defineCommand, nextPage, pageArguments } from '../interfaces/whatsapp/command.js';
-import { card, characterIcon, rarityIcon, rarityName, roleName, section, statsText } from '../interfaces/whatsapp/format.js';
+import { card, characterIcon, displayName, rarityIcon, rarityName, roleName } from '../interfaces/whatsapp/format.js';
 
 export const { command, run, createRun } = defineCommand('ctucatalogo', async ({ game, args, prefix, cmd }) => {
   const page = await game.characters.listCharacters(pageArguments(args));
-  return card('📚 *Catálogo de personajes*', page.items.length ? page.items.map(c => section(
-    `${characterIcon(c.id)} *${c.name}*`,
-    `${rarityIcon(c.rarity)} Rareza: ${rarityName(c.rarity)}\n🎯 Rol: ${roleName(c.role)}\n\n${statsText(c.baseStats)}\n\n${c.starterEligible ? '🎁 Disponible como starter\n' : ''}${c.obtainable ? '✅ Emisión abierta' : '🔒 Emisión cerrada'}\n📦 Supply: ${c.supply.type === 'limited' ? c.supply.max : 'Ilimitado'}`
-  )) : ['No hay personajes en esta página.'], nextPage(page, 'ctucatalogo', prefix) || `👉 Elegir tu primer personaje:\n${cmd('ctustarter')}`);
+  return card('CATÁLOGO', page.items.length ? page.items.map(c =>
+    `${characterIcon(c.id)} *${displayName(c.name)}*\n${rarityIcon(c.rarity)} ${rarityName(c.rarity)} · ${roleName(c.role)}${!c.obtainable ? ' · 🔒 Emisión cerrada' : c.starterEligible ? ' · 🎁 Starter' : ''}\n↳ ${cmd('ctuficha', c.id)}`
+  ) : ['📚 No hay personajes en esta página.'], nextPage(page, 'ctucatalogo', prefix) || `🎁 Elegir starter: ${cmd('ctustarter')}`);
 });

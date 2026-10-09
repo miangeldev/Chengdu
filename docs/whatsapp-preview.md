@@ -6,555 +6,233 @@ Los asteriscos muestran el formato de negrita que aplica WhatsApp.
 ## Registro
 
 ```text
-========================
-🎴 *CHENGDÚ CARDS*
-✅ *Registro completado*
-========================
+🃏 *CHENGDÚ CARDS | REGISTRO*
+━━━━━━━━━━━━━━
+✅ Registro completado
+¡Bienvenido, *Miguel*!
 
-¡Bienvenido, Miguel!
-Tu aventura en Chengdú comienza aquí.
+🌱 Nivel 1 · 💰 0 ChengCoins
 
-------------------------
-
-👤 *Tu cuenta*
-
-Nombre: Miguel
-🆔 ID de jugador:
-USR-649fb7fc-d364-4b26-9bbb-97761212e172
-
-🌱 Nivel inicial: 1
-💰 ChengCoins: 0
-
-------------------------
-
-🎁 *Tu primer personaje te espera*
-
-Elige entre Panda Guerrero, Mago Carmesí y Lobo Sombrío.
-Cada unidad tiene un ID y serial propios.
-
-------------------------
-
-👉 *Siguiente paso*
-
-.ctustarter
-
-📖 Todos los comandos:
-.ctuayuda
-
-========================
+🎁 Elige tu primer personaje:
+👉 *.ctustarter*
 ```
 
 ## Elección de starter
 
 ```text
-========================
-🎴 *CHENGDÚ CARDS*
-🎁 *Elige tu personaje inicial*
-========================
+🃏 *CHENGDÚ CARDS | STARTER*
+━━━━━━━━━━━━━━
+🎁 Elige tu primer personaje. Solo puedes reclamar uno.
 
-1. 🐼 *Panda Guerrero*
+🐼 *Panda Guerrero* · Tanque
+👉 *.ctustarter panda*
 
-🎯 Tanque
+🔥 *Mago Carmesí* · Atacante
+👉 *.ctustarter mago*
 
-❤️ Vida: 120
-⚔️ Ataque: 24
-🛡️ Defensa: 22
-💨 Velocidad: 8
+🐺 *Lobo Sombrío* · Velocista
+👉 *.ctustarter lobo*
 
-👉 Elegir:
-.ctustarter panda
+🔎 Comparar stats: .ctuficha panda, .ctuficha mago o .ctuficha lobo
+```
 
-------------------------
+## Comparar un personaje antes de elegir
 
-2. 🔥 *Mago Carmesí*
+```text
+🃏 *CHENGDÚ CARDS | FICHA*
+━━━━━━━━━━━━━━
+🐼 *Panda Guerrero*
+🆔 panda_guerrero
+⚪ Común · Tanque
+📦 Emisión: Ilimitada
+📚 Estadísticas base
+❤️ Vida: 120/120 HP
+⚔️ Ataque: 24 · 🛡️ Defensa: 22 · 💨 Velocidad: 8
 
-🎯 Atacante
+1️⃣ *Golpe de Bambú* · Físico
+Potencia: 25 POT · Precisión: 100%
 
-❤️ Vida: 95
-⚔️ Ataque: 32
-🛡️ Defensa: 14
-💨 Velocidad: 10
+2️⃣ *Impacto del Panda* · Físico
+Potencia: 40 POT · Precisión: 80%
 
-👉 Elegir:
-.ctustarter mago
-
-------------------------
-
-3. 🐺 *Lobo Sombrío*
-
-🎯 Velocista
-
-❤️ Vida: 90
-⚔️ Ataque: 27
-🛡️ Defensa: 16
-💨 Velocidad: 16
-
-👉 Elegir:
-.ctustarter lobo
-
-------------------------
-
-📌 Puedes reclamar un solo starter.
-Elige el estilo que más te guste.
-
-========================
+💡 Daño: potencia + ataque − defensa (mín. 1).
+Fallar consume el turno.
 ```
 
 ## Starter reclamado
 
 ```text
-========================
-🎴 *CHENGDÚ CARDS*
-🎉 *¡Tu primer personaje está listo!*
-========================
+🃏 *CHENGDÚ CARDS | STARTER*
+━━━━━━━━━━━━━━
+🎉 ¡Tu primer personaje está listo!
 
-🐼 *Panda Guerrero #0001*
+🐼 *Panda Guerrero*
+⚪ Común · Nivel 1
 
-🆔 PAND-000001
-⚪ Rareza: Común
-🎯 Rol: Tanque
-🌱 Nivel: 1
-
-------------------------
-
-📊 *Estadísticas individuales*
-
-❤️ Vida: 120
-⚔️ Ataque: 24
-🛡️ Defensa: 22
-💨 Velocidad: 8
-
-------------------------
-
-✅ Esta unidad ahora te pertenece.
-Su ID y serial se conservan durante toda su historia.
-
-------------------------
-
-🛡️ Preparar tu equipo:
-.ctuequipo usar PAND-000001
-
-🔎 Ver ficha completa:
-.ctuunidad PAND-000001
-
-🎴 Ver colección:
-.ctupersonajes
-
-========================
+🛡️ Preparar equipo:
+👉 *.ctuequipo usar PAND-000001*
 ```
 
 ## Perfil
 
 ```text
-========================
-🎴 *CHENGDÚ CARDS*
-👤 *Perfil de Miguel*
-========================
+🃏 *CHENGDÚ CARDS | PERFIL*
+━━━━━━━━━━━━━━
+👤 *Miguel* · Nivel 1
+✨ 0 XP · 💰 0 ChengCoins
+🎴 1 unidad
 
-🪪 *Identidad*
+⚔️ 0 combates
+🏆 0 victorias · 💔 0 derrotas · ⚖️ 0 sin ganador
 
-🆔 USR-649fb7fc-d364-4b26-9bbb-97761212e172
-📅 Registro: 8 de octubre de 2026
-
-------------------------
-
-🌱 *Progreso y colección*
-
-Nivel: 1
-✨ XP: 0
-💰 ChengCoins: 0
-🎴 Unidades: 1
-
-------------------------
-
-⚔️ *Historial de combate*
-
-🏆 Victorias: 0
-💔 Derrotas: 0
-⚖️ Sin ganador: 0
-🎮 Combates completados: 0
-
-------------------------
-
-🎁 *Personaje inicial*
-
-✅ Starter reclamado
-PAND-000001
-
-------------------------
-
-👉 Ver tu colección:
-.ctupersonajes
-
-📖 Ver comandos:
-.ctuayuda
-
-========================
+👉 Tu colección: *.ctupersonajes*
 ```
 
 ## Colección
 
 ```text
-========================
-🎴 *CHENGDÚ CARDS*
-🎴 *Colección de Miguel*
-========================
+🃏 *CHENGDÚ CARDS | COLECCIÓN*
+━━━━━━━━━━━━━━
+🎴 *Miguel*
 
-🐼 *Panda Guerrero #0001*
+🐼 *Panda Guerrero* · Nv. 1
+⚪ Común · ✅ Disponible
+↳ .ctuequipo usar PAND-000001
 
-🆔 PAND-000001
-⚪ Común
-🌱 Nivel: 1 | ✨ XP: 0
-🏆 Victorias: 0
-✅ Disponible
-
-🔎 Ver ficha:
-.ctuunidad PAND-000001
-
-------------------------
-
-📚 Explorar personajes:
-.ctucatalogo
-
-========================
+🔎 Detalles: .ctuficha ID
 ```
 
 ## Ficha de unidad
 
 ```text
-========================
-🎴 *CHENGDÚ CARDS*
-🔎 *Ficha de unidad*
-========================
-
+🃏 *CHENGDÚ CARDS | UNIDAD*
+━━━━━━━━━━━━━━
 🐼 *Panda Guerrero #0001*
-
 🆔 PAND-000001
-⚪ Rareza: Común
-🎯 Rol: Tanque
-✨ Variante: Normal
+⚪ Común · Tanque · Normal
 
-------------------------
+👤 Propietario: Miguel
+🪪 USR-3d4cd2c7-3938-4196-9630-87a6a8a1b0bb
+✅ Disponible
 
-👤 *Propiedad*
+🌱 Nivel 1 · ✨ 0 XP
+🏆 0 victorias · 💔 0 derrotas
 
-Propietario: Miguel
-🪪 ID de jugador:
-USR-649fb7fc-d364-4b26-9bbb-97761212e172
+📜 Personaje inicial · 8 de octubre de 2026
 
-✅ Estado: Disponible
-
-------------------------
-
-📊 *Estadísticas individuales*
-
-❤️ Vida: 120
-⚔️ Ataque: 24
-🛡️ Defensa: 22
-💨 Velocidad: 8
-
-🌱 Nivel: 1
-✨ XP: 0
-🏆 Victorias: 0
-💔 Derrotas: 0
-
-------------------------
-
-📜 *Procedencia*
-
-🎁 Origen: Personaje inicial
-📅 Creación: 8 de octubre de 2026
-
-------------------------
-
-🎴 Ver tu colección:
-.ctupersonajes
-
-========================
+🔎 Stats y ataques: *.ctuficha PAND-000001*
 ```
 
 ## Catálogo
 
 ```text
-========================
-🎴 *CHENGDÚ CARDS*
-📚 *Catálogo de personajes*
-========================
-
+🃏 *CHENGDÚ CARDS | CATÁLOGO*
+━━━━━━━━━━━━━━
 🌙 *Bruja Lunar*
-
-🟣 Rareza: Épico
-🎯 Rol: Control
-
-❤️ Vida: 96
-⚔️ Ataque: 26
-🛡️ Defensa: 17
-💨 Velocidad: 12
-
-✅ Emisión abierta
-📦 Supply: Ilimitado
-
-------------------------
+🟣 Épico · Control
+↳ .ctuficha bruja_lunar
 
 🐉 *Dragón Carmesí*
-
-🟡 Rareza: Legendario
-🎯 Rol: Atacante
-
-❤️ Vida: 110
-⚔️ Ataque: 30
-🛡️ Defensa: 17
-💨 Velocidad: 9
-
-✅ Emisión abierta
-📦 Supply: 500
-
-------------------------
+🟡 Legendario · Atacante
+↳ .ctuficha dragon_carmesi
 
 🎋 *Espíritu Bambú*
-
-🟣 Rareza: Épico
-🎯 Rol: Soporte
-
-❤️ Vida: 105
-⚔️ Ataque: 22
-🛡️ Defensa: 21
-💨 Velocidad: 12
-
-✅ Emisión abierta
-📦 Supply: Ilimitado
-
-------------------------
+🟣 Épico · Soporte
+↳ .ctuficha espiritu_bambu
 
 🛡️ *Guardián Jade*
-
-🔵 Rareza: Raro
-🎯 Rol: Tanque
-
-❤️ Vida: 125
-⚔️ Ataque: 20
-🛡️ Defensa: 26
-💨 Velocidad: 7
-
-✅ Emisión abierta
-📦 Supply: Ilimitado
-
-------------------------
+🔵 Raro · Tanque
+↳ .ctuficha guardian_jade
 
 🐺 *Lobo Sombrío*
+⚪ Común · Velocista · 🎁 Starter
+↳ .ctuficha lobo_sombrio
 
-⚪ Rareza: Común
-🎯 Rol: Velocista
+📄 Siguiente: .ctucatalogo eyJzY29wZSI6ImNhdGFsb2ciLCJrZXkiOlsiIiwibG9ib19zb21icmlvIl19
+```
 
-❤️ Vida: 90
-⚔️ Ataque: 27
-🛡️ Defensa: 16
-💨 Velocidad: 16
+## Catálogo: siguiente página
 
-🎁 Disponible como starter
-✅ Emisión abierta
-📦 Supply: Ilimitado
-
-------------------------
-
+```text
+🃏 *CHENGDÚ CARDS | CATÁLOGO*
+━━━━━━━━━━━━━━
 🔥 *Mago Carmesí*
-
-⚪ Rareza: Común
-🎯 Rol: Atacante
-
-❤️ Vida: 95
-⚔️ Ataque: 32
-🛡️ Defensa: 14
-💨 Velocidad: 10
-
-🎁 Disponible como starter
-✅ Emisión abierta
-📦 Supply: Ilimitado
-
-------------------------
+⚪ Común · Atacante · 🎁 Starter
+↳ .ctuficha mago_carmesi
 
 🧘 *Monje Celestial*
-
-🔵 Rareza: Raro
-🎯 Rol: Equilibrado
-
-❤️ Vida: 108
-⚔️ Ataque: 25
-🛡️ Defensa: 20
-💨 Velocidad: 11
-
-✅ Emisión abierta
-📦 Supply: Ilimitado
-
-------------------------
+🔵 Raro · Equilibrado
+↳ .ctuficha monje_celestial
 
 🐼 *Panda Guerrero*
+⚪ Común · Tanque · 🎁 Starter
+↳ .ctuficha panda_guerrero
 
-⚪ Rareza: Común
-🎯 Rol: Tanque
-
-❤️ Vida: 120
-⚔️ Ataque: 24
-🛡️ Defensa: 22
-💨 Velocidad: 8
-
-🎁 Disponible como starter
-✅ Emisión abierta
-📦 Supply: Ilimitado
-
-------------------------
-
-👉 Elegir tu primer personaje:
-.ctustarter
-
-========================
+🎁 Elegir starter: .ctustarter
 ```
 
 ## Guía de comandos
 
 ```text
-========================
-🎴 *CHENGDÚ CARDS*
-📖 *Guía del jugador*
-========================
+🃏 *CHENGDÚ CARDS | AYUDA*
+━━━━━━━━━━━━━━
+🌱 *Empezar*
+.cturegistro Nombre · Registro
+.ctustarter · Primer personaje
 
-🌱 *Comienza tu aventura*
+🎴 *Colección*
+.ctuperfil · Tu progreso
+.ctupersonajes · Elegir unidad
+.ctucatalogo · Ver personajes
+.ctuficha [ID o personaje] · Stats y precisión
+.ctuunidad ID · Propietario y procedencia
 
-.cturegistro Tu nombre
-Crear tu cuenta.
+🛡️ *Equipo*
+.ctuequipo · Ver equipo
+.ctuequipo usar ID · Seleccionar
+.ctuequipo limpiar · Vaciar
 
-.ctustarter
-Elegir tu primer personaje.
-
-------------------------
-
-🎴 *Tu colección*
-
-.ctuperfil
-Perfil y progreso.
-
-.ctupersonajes
-Ver tus unidades.
-
-.ctuunidad ID
-Ficha y propietario.
-
-.ctucatalogo
-Explorar personajes.
-
-------------------------
-
-🛡️ *Prepara tu equipo*
-
-.ctuequipo
-Consultar tu unidad activa.
-
-.ctuequipo usar ID
-Seleccionar una unidad propia.
-
-.ctuequipo limpiar
-Vaciar tu equipo.
-
-------------------------
-
-⚔️ *Combate en grupos*
-
-.ctupelea @jugador
-Desafiar a otro jugador.
-
-.ctuaceptar
-Aceptar el desafío.
-
-.cturechazar
-Rechazar el desafío recibido.
-
-.ctucancelar
-Retirar el desafío que enviaste.
-
-.ctuatacar 1 o .ctuatacar 2
-Atacar cuando sea tu turno.
-
-.ctucombate
-Ver estado y ataques disponibles.
-
-.ctuficha o .ctuficha ID
-Consultar precisión, potencia y estadísticas.
-
-.cturendirse
-Terminar el combate por rendición.
-
-------------------------
-
-💡 Cada unidad es única: conserva su ID, serial y procedencia.
-
-========================
+⚔️ *Combate en grupo*
+.ctupelea @jugador · Desafiar
+.ctuaceptar / .cturechazar · Responder
+.ctucancelar · Retirar desafío
+.ctuatacar 1 / .ctuatacar 2 · Atacar
+.ctucombate · Ver turno
+.cturendirse · Rendirse
 ```
 
 ## Equipo
 
 ```text
-========================
-🎴 *CHENGDÚ CARDS*
-🛡️ *Equipo de Miguel*
-========================
+🃏 *CHENGDÚ CARDS | EQUIPO*
+━━━━━━━━━━━━━━
+🛡️ *Miguel*
 
-🥇 *Unidad activa*
+🐼 *Panda Guerrero* · Nv. 1
+✅ Listo para combatir
 
-🐼 *Panda Guerrero #0001*
-
-🆔 PAND-000001
-
-❤️ Vida: 120
-⚔️ Ataque: 24
-🛡️ Defensa: 22
-💨 Velocidad: 8
-
-✅ Lista para combatir.
-
-------------------------
-
-⚔️ Desafiar en un grupo:
-.ctupelea @jugador
-
-Cambiar unidad:
-.ctuequipo usar ID
-
-========================
+👉 *.ctupelea @jugador*
+🔎 Stats y ataques: .ctuficha
 ```
 
 ## Ficha del equipo: precisión y estadísticas
 
 ```text
-========================
-🎴 *CHENGDÚ CARDS*
-🔎 *Ficha de combate*
-========================
-
+🃏 *CHENGDÚ CARDS | FICHA*
+━━━━━━━━━━━━━━
 🐼 *Panda Guerrero* · Miguel
-
 🆔 PAND-000001
-
 ❤️ Vida: 120/120 HP
-⚔️ Ataque: 24
-🛡️ Defensa: 22
-💨 Velocidad: 8
+⚔️ Ataque: 24 · 🛡️ Defensa: 22 · 💨 Velocidad: 8
 
-1️⃣ *Golpe de Bambú*
+1️⃣ *Golpe de Bambú* · Físico
 Potencia: 25 POT · Precisión: 100%
-Tipo: Físico
 
-2️⃣ *Impacto del Panda*
+2️⃣ *Impacto del Panda* · Físico
 Potencia: 40 POT · Precisión: 80%
-Tipo: Físico
 
-------------------------
-
-💡 Daño: potencia + ataque − defensa (mínimo 1).
-Un ataque fallido consume el turno.
-
-⚔️ Ver combate: .ctucombate
-
-========================
+💡 Daño: potencia + ataque − defensa (mín. 1).
+Fallar consume el turno.
 ```
 
 ## Desafío
@@ -596,77 +274,42 @@ Un ataque fallido consume el turno.
 ## Ficha detallada del combate
 
 ```text
-========================
-🎴 *CHENGDÚ CARDS*
-🔎 *Ficha de combate*
-========================
-
+🃏 *CHENGDÚ CARDS | FICHA*
+━━━━━━━━━━━━━━
 🐼 *Panda Guerrero* · Miguel
-
 🆔 PAND-000001
-
 ❤️ Vida: 120/120 HP
-⚔️ Ataque: 24
-🛡️ Defensa: 22
-💨 Velocidad: 8
+⚔️ Ataque: 24 · 🛡️ Defensa: 22 · 💨 Velocidad: 8
 
-1️⃣ *Golpe de Bambú*
+1️⃣ *Golpe de Bambú* · Físico
 Potencia: 25 POT · Precisión: 100%
-Tipo: Físico
 
-2️⃣ *Impacto del Panda*
+2️⃣ *Impacto del Panda* · Físico
 Potencia: 40 POT · Precisión: 80%
-Tipo: Físico
-
 📌 Datos del combate activo.
-
-------------------------
 
 🐺 *Lobo Sombrío* · Lukas
-
 🆔 LOBO-000001
-
 ❤️ Vida: 90/90 HP
-⚔️ Ataque: 27
-🛡️ Defensa: 16
-💨 Velocidad: 16
+⚔️ Ataque: 27 · 🛡️ Defensa: 16 · 💨 Velocidad: 16
 
-1️⃣ *Garra Sombría*
+1️⃣ *Garra Sombría* · Físico
 Potencia: 25 POT · Precisión: 100%
-Tipo: Físico
 
-2️⃣ *Colmillo Nocturno*
+2️⃣ *Colmillo Nocturno* · Físico
 Potencia: 40 POT · Precisión: 80%
-Tipo: Físico
-
 📌 Datos del combate activo.
 
-------------------------
-
-💡 Daño: potencia + ataque − defensa (mínimo 1).
-Un ataque fallido consume el turno.
-
-⚔️ Ver combate: .ctucombate
-
-========================
+💡 Daño: potencia + ataque − defensa (mín. 1).
+Fallar consume el turno.
 ```
 
 ## Error: todavía no es tu turno
 
 ```text
-========================
-🎴 *CHENGDÚ CARDS*
-⚠️ *Revisa tu comando*
-========================
-
+🃏 *CHENGDÚ CARDS | ERROR*
+━━━━━━━━━━━━━━
 ⏳ Aún no es tu turno. Consulta .ctucombate para ver quién debe atacar.
-
-------------------------
-
-📖 Consulta los comandos:
-.ctuayuda
-
-========================
 ```
 
 ## Ataque y siguiente turno

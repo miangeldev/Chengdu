@@ -29,12 +29,15 @@ try {
   await send(a, '.cturegistro Miguel', 'Registro');
   await send(b, '.cturegistro Lukas');
   await send(a, '.ctustarter', 'Elección de starter');
+  await send(a, '.ctuficha panda', 'Comparar un personaje antes de elegir');
   await send(a, '.ctustarter panda', 'Starter reclamado');
   await send(b, '.ctustarter lobo');
   await send(a, '.ctuperfil', 'Perfil');
   await send(a, '.ctupersonajes', 'Colección');
   await send(a, '.ctuunidad PAND-000001', 'Ficha de unidad');
   await send(a, '.ctucatalogo', 'Catálogo');
+  const catalogPage = await game.characters.listCharacters({ limit: 5 });
+  await send(a, `.ctucatalogo ${catalogPage.nextCursor}`, 'Catálogo: siguiente página');
   await send(a, '.ctuayuda', 'Guía de comandos');
   await send(a, '.ctuequipo usar PAND-000001', 'Equipo');
   await send(b, '.ctuequipo usar LOBO-000001');

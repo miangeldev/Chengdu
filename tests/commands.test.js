@@ -67,11 +67,43 @@ test('the WhatsApp commands complete the MVP flow with a simulated socket', asyn
   assert.match(replies[0].text, /Registro completado/);
   assert.match(replies[4].text, /PAND-000001/);
   assert.match(replies[6].text, /Propietario: Miguel/);
+  const catalogPage = await game.characters.listCharacters({ limit: 5 });
+  await route(sock, msg, `.ctucatalogo ${catalogPage.nextCursor}`);
+  const catalogText = replies[2].text + '\n' + replies.at(-1).text;
+  for (const character of (await game.characters.listCharacters()).items) {
+    assert.ok(catalogText.includes(character.name), character.name);
+  }
   await route(sock, msg, '.ctustarter lobo');
   assert.match(replies.at(-1).text, /Ya reclamaste/);
   assert.equal((await game.validateDatabase()).units, 1);
   assert.equal(await route(sock, msg, '.other'), false);
   assert.equal(await route(sock, msg, 'hello'), false);
+});
+
+test('players can compare catalog stats and live attack definitions before registration', async t => {
+  const { game, storage } = setup(t);
+  let reply;
+  const sock = { sendMessage: async (_, payload) => { reply = payload.text; } };
+  const msg = { key: { remoteJid: '521999999999@s.whatsapp.net' } };
+  const route = createCommandRouter({ game, debug: false });
+  await route(sock, msg, '.ctuficha panda');
+  assert.match(reply, /Panda Guerrero/);
+  assert.match(reply, /Vida: 120\/120 HP/);
+  assert.match(reply, /Potencia: 25 POT · Precisión: 100%/);
+  await storage.withTransaction(async repos => {
+    const character = await repos.characters.get('panda_guerrero');
+    await repos.characters.replace({ ...character, baseStats: { ...character.baseStats, hp: 130 }, revision: character.revision + 1 });
+    const attack = await repos.attacks.get(character.attackIds[0]);
+    await repos.attacks.replace({ ...attack, power: 45, accuracy: 73, revision: attack.revision + 1 });
+  });
+  await route(sock, msg, '.ctuficha panda_guerrero');
+  assert.match(reply, /Vida: 130\/130 HP/);
+  assert.match(reply, /Potencia: 45 POT · Precisión: 73%/);
+  await route(sock, msg, '.ctuficha desconocido_personaje');
+  assert.match(reply, /personaje no existe/);
+  assert.deepEqual(await game.validateDatabase(), {
+    valid: true, schemaVersion: 2, users: 0, characters: 8, units: 0, claims: 0
+  });
 });
 
 test('group metadata, device JIDs, self messages and invalid requests use the correct identity', async t => {

@@ -10,6 +10,13 @@ export function createCharacterService(storage) {
         return character;
       });
     },
+    async getCharacterDetails(characterId) {
+      return storage.withRead(async repos => {
+        const character = await repos.characters.get(characterId);
+        requireGame(character, 'CHARACTER_NOT_FOUND');
+        return { character, attacks: await Promise.all(character.attackIds.map(id => repos.attacks.get(id))) };
+      });
+    },
     async listCharacters(options = {}) {
       return storage.withRead(async repos => paginate(
         await repos.characters.all(), options, 'catalog', c => ['', c.id]

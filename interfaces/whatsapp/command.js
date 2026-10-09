@@ -10,14 +10,14 @@ const messages = {
   INVALID_NAME: '❌ Escribe un nombre de 1 a 40 caracteres, sin saltos de línea ni caracteres de control.\nEjemplo: .cturegistro Miguel',
   USER_NOT_FOUND: '❌ Primero regístrate con .cturegistro Tu nombre',
   INVALID_IDENTITY: '❌ No pude identificar al remitente. Usa el comando desde una conversación de WhatsApp válida.',
-  CHARACTER_NOT_FOUND: '❌ Ese personaje no existe.',
+  CHARACTER_NOT_FOUND: '❌ Ese personaje no existe.\n👉 Consulta .ctucatalogo',
   UNIT_NOT_FOUND: '❌ Esa unidad no existe. Ejemplo: .ctuunidad PAND-000001',
   INVALID_STARTER: '❌ Elige panda, mago o lobo (también 1, 2 o 3). Ejemplo: .ctustarter panda',
   CHARACTER_UNAVAILABLE: '❌ Ese personaje no está disponible para obtenerse.',
   SUPPLY_EXHAUSTED: '❌ Ya se emitieron todas las unidades disponibles de ese personaje.',
   INVALID_CURSOR: '❌ La página no es válida. Usa el comando sin argumentos para volver al inicio.',
   INVALID_PAGE_SIZE: '❌ El tamaño de página debe estar entre 1 y 25.',
-  INVALID_ARGUMENTS: '❌ Los argumentos no son válidos.',
+  INVALID_ARGUMENTS: '❌ Los argumentos no son válidos.\n👉 Consulta .ctuayuda',
   GROUP_ONLY: '⚔️ Los desafíos y combates se juegan en un grupo de WhatsApp. Usa el comando en el grupo donde está tu oponente.',
   INVALID_OPPONENT: '👤 Menciona a un solo jugador o usa su ID de jugador.\nEjemplo: .ctupelea @jugador',
   OPPONENT_NOT_REGISTERED: '👤 Tu oponente todavía no está registrado. Debe usar .cturegistro y elegir su starter primero.',
@@ -80,16 +80,16 @@ export function defineCommand(command, handler) {
         });
       } catch (error) {
         if (error instanceof GameError && error.code === 'USER_ALREADY_EXISTS') {
-          text = card('👤 *Registro existente*', [`Ya estás registrado como ${displayName(error.details.name)}.`, `📌 Consulta tu perfil:\n${commandText(prefix, 'ctuperfil')}`]);
+          text = card('REGISTRO', [`👤 Ya estás registrado como ${displayName(error.details.name)}.`], `👉 *${commandText(prefix, 'ctuperfil')}*`);
         } else if (error instanceof GameError && messages[error.code]) {
-          text = card('⚠️ *Revisa tu comando*', [messages[error.code].replace(/\.ctu/g, () => `${prefix}ctu`)], `📖 Consulta los comandos:\n${commandText(prefix, 'ctuayuda')}`);
+          text = card('ERROR', [messages[error.code].replace(/\.ctu/g, () => `${prefix}ctu`)]);
         } else {
           const code = typeof error?.code === 'string' ? error.code : 'UNEXPECTED_ERROR';
           const commandName = commandText(prefix, command);
           const diagnostic = `${code} | comando=${commandName} | Node=${process.version}\n${describeError(error)}`;
           logger(diagnostic, { code, command: commandName, runtime: process.version, error });
-          text = card('🛠️ *No pude confirmar la operación*', [
-            'Pide al administrador que revise el bot y vuelve a intentarlo.',
+          text = card('ERROR', [
+            '🛠️ No pude confirmar la operación.\nPide al administrador que revise el bot y vuelve a intentarlo.',
             debugEnabled(debug) ? debugSection(diagnostic) : null
           ]);
         }
@@ -103,9 +103,9 @@ export function defineCommand(command, handler) {
 
 export function pageArguments(args) {
   requireGame(args.length <= 1, 'INVALID_CURSOR');
-  return { cursor: args[0] ?? null };
+  return { cursor: args[0] ?? null, limit: 5 };
 }
 
 export function nextPage(page, command, prefix = '.') {
-  return page.nextCursor ? `📄 *Siguiente página*\n\n${commandText(prefix, command, page.nextCursor)}` : '';
+  return page.nextCursor ? `📄 Siguiente: ${commandText(prefix, command, page.nextCursor)}` : '';
 }

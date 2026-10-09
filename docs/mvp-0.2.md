@@ -32,6 +32,15 @@ unidad concreta. Las unidades ocupadas muestran sus stats y ataques fijados en
 el combate, aunque el catálogo se haya actualizado. La ficha es una consulta;
 no consume el turno. Inicio, victoria, empate y cierre tienen mensajes propios.
 
+El mismo formato compacto se aplica al resto de la interfaz: un encabezado y
+separador, resúmenes breves y una acción principal. Catálogo y colección muestran
+cinco entradas por página. Los IDs se reservan para acciones que deben identificar
+una unidad concreta o para inspección; el perfil muestra progreso y estadísticas.
+`.ctuficha panda`, `mago`, `lobo` o un ID de personaje del catálogo permite consultar
+stats base y ataques antes de elegir starter, incluso sin haberse registrado.
+`.ctuunidad ID` reúne serial, propietario, progreso y procedencia; su enlace de
+ficha permite consultar las estadísticas y precisión. La ayuda agrupa usos breves.
+
 ## Reglas de esta versión
 
 | Regla | Decisión |
@@ -60,6 +69,7 @@ Los nombres de ataque son datos del catálogo y no condiciones del motor.
 - `game/battle/battleService.js`: desafío, aceptación, acciones y consultas.
 - `game/battle/lifecycle.js`: cierre, expiración, estadísticas y liberación de locks.
 - `game/units/unitService.js`: ficha de estadísticas y ataques actuales o fijados en combate.
+- `game/characters/characterService.js`: fichas de plantilla y ataques del catálogo actual.
 - `interfaces/whatsapp/format.js`: formato común de tarjetas, secciones y barras de texto.
 - `interfaces/whatsapp/battleFormat.js`: presentación del estado y resultado.
 - `plugins/CTU-*.js`: comandos compatibles con `command` y `run(sock, msg, args)`.
@@ -111,7 +121,7 @@ metadatos autenticados y vincular aliases de identidad sólo después de verific
 
 ## Verificación
 
-77 pruebas ejecutadas con `node --test --test-isolation=none`: registro/starter,
+78 pruebas ejecutadas con `node --test --test-isolation=none`: registro/starter,
 colecciones, propiedad, migraciones, journals antiguos, ataques, turnos, fallos
 de precisión, snapshots, duplicados, rendición, expiración, límites, estadísticas
 y recuperación de escrituras interrumpidas. Se incluye el flujo completo con un

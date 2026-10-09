@@ -1,9 +1,9 @@
-import { characterIcon, displayName, healthBar } from './format.js';
+import { card, characterIcon, displayName, healthBar } from './format.js';
 
 const timeText = date => new Date(date).toLocaleTimeString('es-MX', { timeZone: 'America/Mexico_City', hour: '2-digit', minute: '2-digit', hour12: false });
 
 function message(label, sections) {
-  return [`🃏 *CHENGDÚ CARDS | ${label}*`, '━━━━━━━━━━━━━━', sections.filter(Boolean).join('\n\n')].join('\n');
+  return card(label, sections);
 }
 
 function actionText(battle, action) {

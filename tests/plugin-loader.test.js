@@ -30,6 +30,7 @@ test('direct plugin run exports share one database and complete the game flow', 
     assert.doesNotMatch(replies.at(-1), /No pude confirmar|Revisa tu comando/);
   }
   try {
+    await run('ctuficha', alice, ['panda']);
     await run('cturegistro', alice, ['Alice']);
     await run('cturegistro', bob, ['Bob']);
     await run('ctuperfil');
@@ -55,7 +56,7 @@ test('direct plugin run exports share one database and complete the game flow', 
     assert.deepEqual(await game.validateDatabase(), {
       valid: true, schemaVersion: 2, users: 2, characters: 8, units: 2, claims: 2
     });
-    assert.equal(replies.length, 22);
+    assert.equal(replies.length, 23);
     assert.equal(commands.length, 16);
   } finally {
     await game.close();

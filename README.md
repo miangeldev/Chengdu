@@ -2,8 +2,8 @@
 
 Módulo de juego para un bot de WhatsApp: registro, perfil, catálogo de ocho
 personajes, starter único, colección, equipos y combate 1 contra 1 por turnos.
-La interfaz usa secciones, emojis, negritas y saltos de línea. Los combates tienen
-un formato compacto, con barras de vida de texto y dos ataques por turno.
+Toda la interfaz usa mensajes compactos, emojis, negritas y un siguiente paso
+claro. Los combates muestran barras de vida de texto y dos ataques por turno.
 Los datos persisten en varios JSON, con repositorios, servicios y commits recuperables.
 
 Requiere Node.js 22 o superior en Linux; verificado con Node.js 26.8.2. No tiene dependencias
@@ -52,9 +52,12 @@ no se conectan a WhatsApp ni escriben jugadores de prueba en la base del juego.
 | `.ctuatacar 1` / `.ctuatacar 2` | Usar un ataque durante tu turno. |
 | `.ctucombate` | Ver el estado o resultado reciente en ese grupo. |
 | `.ctuficha` / `.ctuficha PAND-000001` | Consultar estadísticas, potencia y precisión del combate, equipo o unidad indicada. |
+| `.ctuficha panda` | Comparar la plantilla de un personaje antes de elegir; también `mago`, `lobo` o el ID del catálogo. |
 | `.cturendirse` | Rendirse y terminar el combate. |
 
-Catálogo y colección muestran el comando de la siguiente página cuando existe.
+Catálogo y colección muestran cinco entradas por página, con el comando de la
+siguiente página cuando existe. Los IDs aparecen al copiar una acción o consultar
+una ficha. Registro, perfil y equipo priorizan el resumen y el próximo paso.
 Un starter repetido devuelve la unidad original; cambiar la opción no crea otra.
 El detalle público muestra el ID interno y nombre del propietario, sin su JID.
 
@@ -83,10 +86,15 @@ anfitrión también puede llamar a `game.battle.sweepExpired()` periódicamente.
 npm run preview:whatsapp
 ```
 
-Genera [18 ejemplos de los mensajes](docs/whatsapp-preview.md) usando una base
+Genera [20 ejemplos de los mensajes](docs/whatsapp-preview.md) usando una base
 temporal y jugadores ficticios: registro, perfil, colección, starter, equipo,
 desafío, turnos, fichas detalladas, fallo de ataque, errores y resultado.
 No envía mensajes a WhatsApp real.
+
+Todas las pantallas usan el encabezado `🃏 CHENGDÚ CARDS | SECCIÓN` y un separador
+`━━━━━━━━━━━━━━`. Perfil y listas muestran lo necesario para continuar;
+`.ctuficha` reúne atributos y precisión, y `.ctuunidad ID` muestra identidad,
+propietario, progreso y procedencia. La ayuda agrupa comandos en una línea por uso.
 
 El turno envía un solo mensaje de texto, sin IDs, seriales ni atributos extra.
 Inicio y final usan sus propios encabezados. Las barras tienen diez caracteres:
@@ -242,7 +250,7 @@ activos, revisar la migración a SQLite prevista en el diseño.
 
 ## Alcance validado
 
-77 pruebas verificadas con `node --test --test-isolation=none`: persistencia al
+78 pruebas verificadas con `node --test --test-isolation=none`: persistencia al
 reabrir, registro/starter concurrentes, supply, identidades, cursores, migraciones
 desde esquema 1, journals antiguos, integridad y recuperación de commits. También
 cubren equipos, snapshots, turnos, precisión, duplicados, victoria, rendición,
@@ -253,6 +261,8 @@ El debug se verifica activado y desactivado, con causas anidadas, loggers que
 sólo aceptan un argumento y límites de longitud del mensaje de WhatsApp.
 La interfaz de combate verifica una respuesta por turno, ausencia de IDs y
 precisión en el mensaje normal, barras opcionales y fichas con ataques fijados.
+También se verifican la navegación del catálogo y las fichas de plantilla antes
+del registro, leyendo estadísticas y ataques actualizados sin emitir unidades.
 La validación con una sesión real de WhatsApp queda pendiente del bot anfitrión.
 
 XP ganado, sobres, transferencias, mercado y combate avanzado pertenecen

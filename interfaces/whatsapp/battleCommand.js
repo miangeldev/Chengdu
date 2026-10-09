@@ -37,7 +37,7 @@ export function defineBattleCommand(command, kind) {
       if (kind === 'reject' || kind === 'cancel') result = await game.battle.closeChallenge({ ...request, reject: kind === 'reject' });
       if (kind === 'status') {
         const battle = await game.battle.getMyBattle(request);
-        if (!battle) return card('⚔️ *Tu arena está libre*', ['Todavía no hay combates tuyos en este grupo.'], `👉 Desafiar a otro jugador:\n${cmd('ctupelea', '@jugador')}`);
+        if (!battle) return card('COMBATE', ['⚔️ Tu arena está libre.'], `👉 *${cmd('ctupelea', '@jugador')}*`);
         result = { battle };
       }
     }
