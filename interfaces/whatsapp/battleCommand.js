@@ -10,7 +10,7 @@ function operationKey(kind, context, userId) {
 }
 
 export function defineBattleCommand(command, kind) {
-  return defineCommand(command, async ({ game, identity, args, context, cmd }) => {
+  return defineCommand(command, async ({ game, identity, args, context, cmd, battleOptions }) => {
     requireGame(context.chatId.endsWith('@g.us'), 'GROUP_ONLY');
     const user = await game.users.getUserByIdentity(identity());
     const request = { userId: user.id, chatId: context.chatId, operationKey: operationKey(kind, context, user.id) };
@@ -41,6 +41,6 @@ export function defineBattleCommand(command, kind) {
         result = { battle };
       }
     }
-    return renderBattle(result, cmd);
+    return renderBattle(result, cmd, battleOptions);
   });
 }

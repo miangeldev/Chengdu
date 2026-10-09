@@ -18,6 +18,6 @@ export const dateText = date => date ? new Date(date).toLocaleDateString('es-MX'
 export const unitTitle = unit => `${characterIcon(unit.characterId)} *${displayName(unit.character.name)} #${serialText(unit.serial)}*`;
 
 export function healthBar(hp, maxHp) {
-  const filled = Math.ceil(Math.max(0, Math.min(1, hp / maxHp)) * 12);
-  return `[${'#'.repeat(filled)}${'-'.repeat(12 - filled)}]`;
+  const filled = Math.ceil(Math.max(0, Math.min(1, hp / maxHp)) * 10);
+  return `${'▓'.repeat(filled)}${'▒'.repeat(10 - filled)}`;
 }

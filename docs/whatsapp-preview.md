@@ -20,7 +20,7 @@ Tu aventura en Chengdú comienza aquí.
 
 Nombre: Miguel
 🆔 ID de jugador:
-USR-9ae9394e-922f-4f4d-aa8a-90c3fb1edbcd
+USR-649fb7fc-d364-4b26-9bbb-97761212e172
 
 🌱 Nivel inicial: 1
 💰 ChengCoins: 0
@@ -153,7 +153,7 @@ Su ID y serial se conservan durante toda su historia.
 
 🪪 *Identidad*
 
-🆔 USR-9ae9394e-922f-4f4d-aa8a-90c3fb1edbcd
+🆔 USR-649fb7fc-d364-4b26-9bbb-97761212e172
 📅 Registro: 8 de octubre de 2026
 
 ------------------------
@@ -240,7 +240,7 @@ PAND-000001
 
 Propietario: Miguel
 🪪 ID de jugador:
-USR-9ae9394e-922f-4f4d-aa8a-90c3fb1edbcd
+USR-649fb7fc-d364-4b26-9bbb-97761212e172
 
 ✅ Estado: Disponible
 
@@ -477,6 +477,9 @@ Atacar cuando sea tu turno.
 .ctucombate
 Ver estado y ataques disponibles.
 
+.ctuficha o .ctuficha ID
+Consultar precisión, potencia y estadísticas.
+
 .cturendirse
 Terminar el combate por rendición.
 
@@ -519,92 +522,131 @@ Cambiar unidad:
 ========================
 ```
 
-## Desafío
+## Ficha del equipo: precisión y estadísticas
 
 ```text
 ========================
 🎴 *CHENGDÚ CARDS*
-⚔️ *Desafío 1 contra 1*
+🔎 *Ficha de combate*
 ========================
 
-Miguel ha desafiado a Juan.
+🐼 *Panda Guerrero* · Miguel
 
-        VS
+🆔 PAND-000001
 
-Miguel ⚔️ Juan
+❤️ Vida: 120/120 HP
+⚔️ Ataque: 24
+🛡️ Defensa: 22
+💨 Velocidad: 8
 
-------------------------
+1️⃣ *Golpe de Bambú*
+Potencia: 25 POT · Precisión: 100%
+Tipo: Físico
 
-📣 *Juan, tú decides*
-
-✅ Aceptar:
-.ctuaceptar
-
-❌ Rechazar:
-.cturechazar
-
-------------------------
-
-⏳ Vence a las 14:05 (hora de Ciudad de México).
-Los personajes se fijan al aceptar el desafío.
+2️⃣ *Impacto del Panda*
+Potencia: 40 POT · Precisión: 80%
+Tipo: Físico
 
 ------------------------
 
-🆔 BTL-30096f9d-3dd3-4d08-a283-12125cd7a3e9
+💡 Daño: potencia + ataque − defensa (mínimo 1).
+Un ataque fallido consume el turno.
 
-Retirar el desafío:
-.ctucancelar
+⚔️ Ver combate: .ctucombate
 
 ========================
+```
+
+## Desafío
+
+```text
+🃏 *CHENGDÚ CARDS | DESAFÍO*
+━━━━━━━━━━━━━━
+⚔️ *Miguel* desafió a *Lukas*
+
+📣 *Lukas, ¿aceptas?*
+👉 *.ctuaceptar* o *.cturechazar*
+
+⏳ Vence a las 14:05 (CDMX).
+↩️ Retirar: .ctucancelar
 ```
 
 ## Comienzo del combate
 
 ```text
+🃏 *CHENGDÚ CARDS | INICIO | T1*
+━━━━━━━━━━━━━━
+⚔️ *Miguel* vs *Lukas*
+🐺 *Lobo Sombrío* toma la iniciativa.
+
+❤️ *ESTADO*
+🐼 Miguel
+▓▓▓▓▓▓▓▓▓▓ 120/120 HP
+🐺 Lukas
+▓▓▓▓▓▓▓▓▓▓ 90/90 HP
+
+🎯 *Turno de Lukas*
+1️⃣ Garra Sombría · 25 POT
+2️⃣ Colmillo Nocturno · 40 POT
+
+👉 *.ctuatacar 1* o *.ctuatacar 2*
+🔎 Detalles: .ctuficha
+```
+
+## Ficha detallada del combate
+
+```text
 ========================
 🎴 *CHENGDÚ CARDS*
-⚔️ *Combate en curso*
+🔎 *Ficha de combate*
 ========================
 
-👤 *Miguel*
+🐼 *Panda Guerrero* · Miguel
 
-🐼 Panda Guerrero #0001
 🆔 PAND-000001
 
-❤️ 120 / 120
-[############]
+❤️ Vida: 120/120 HP
+⚔️ Ataque: 24
+🛡️ Defensa: 22
+💨 Velocidad: 8
+
+1️⃣ *Golpe de Bambú*
+Potencia: 25 POT · Precisión: 100%
+Tipo: Físico
+
+2️⃣ *Impacto del Panda*
+Potencia: 40 POT · Precisión: 80%
+Tipo: Físico
+
+📌 Datos del combate activo.
 
 ------------------------
 
-👤 *Juan*
+🐺 *Lobo Sombrío* · Lukas
 
-🐺 Lobo Sombrío #0001
 🆔 LOBO-000001
 
-❤️ 90 / 90
-[############]
+❤️ Vida: 90/90 HP
+⚔️ Ataque: 27
+🛡️ Defensa: 16
+💨 Velocidad: 16
+
+1️⃣ *Garra Sombría*
+Potencia: 25 POT · Precisión: 100%
+Tipo: Físico
+
+2️⃣ *Colmillo Nocturno*
+Potencia: 40 POT · Precisión: 80%
+Tipo: Físico
+
+📌 Datos del combate activo.
 
 ------------------------
 
-🎯 *Turno 1: Juan*
+💡 Daño: potencia + ataque − defensa (mínimo 1).
+Un ataque fallido consume el turno.
 
-1. Garra Sombría
-⚔️ Potencia: 25 | 🎯 Precisión: 100%
-👉 .ctuatacar 1
-
-2. Colmillo Nocturno
-⚔️ Potencia: 40 | 🎯 Precisión: 80%
-👉 .ctuatacar 2
-
-------------------------
-
-🆔 BTL-30096f9d-3dd3-4d08-a283-12125cd7a3e9
-
-Consultar estado:
-.ctucombate
-
-Rendirse:
-.cturendirse
+⚔️ Ver combate: .ctucombate
 
 ========================
 ```
@@ -630,105 +672,80 @@ Rendirse:
 ## Ataque y siguiente turno
 
 ```text
-========================
-🎴 *CHENGDÚ CARDS*
-⚔️ *Combate en curso*
-========================
+🃏 *CHENGDÚ CARDS | T2*
+━━━━━━━━━━━━━━
+🐺 *Lobo Sombrío* usó _Colmillo Nocturno_
+💥 *45 de daño* a Panda Guerrero
 
-⚔️ Lobo Sombrío usó *Colmillo Nocturno*.
+❤️ *ESTADO*
+🐼 Miguel
+▓▓▓▓▓▓▓▒▒▒ 75/120 HP
+🐺 Lukas
+▓▓▓▓▓▓▓▓▓▓ 90/90 HP
 
-💥 Daño causado: 45
+🎯 *Turno de Miguel*
+1️⃣ Golpe de Bambú · 25 POT
+2️⃣ Impacto del Panda · 40 POT
 
-------------------------
+👉 *.ctuatacar 1* o *.ctuatacar 2*
+🔎 Detalles: .ctuficha
+```
 
-👤 *Miguel*
+## Turno compacto: Panda responde
 
-🐼 Panda Guerrero #0001
-🆔 PAND-000001
+```text
+🃏 *CHENGDÚ CARDS | T3*
+━━━━━━━━━━━━━━
+🐼 *Panda Guerrero* usó _Impacto del Panda_
+💥 *48 de daño* a Lobo Sombrío
 
-❤️ 75 / 120
-[########----]
+❤️ *ESTADO*
+🐼 Miguel
+▓▓▓▓▓▓▓▒▒▒ 75/120 HP
+🐺 Lukas
+▓▓▓▓▓▒▒▒▒▒ 42/90 HP
 
-------------------------
+🎯 *Turno de Lukas*
+1️⃣ Garra Sombría · 25 POT
+2️⃣ Colmillo Nocturno · 40 POT
 
-👤 *Juan*
+👉 *.ctuatacar 1* o *.ctuatacar 2*
+🔎 Detalles: .ctuficha
+```
 
-🐺 Lobo Sombrío #0001
-🆔 LOBO-000001
+## Ataque fallido dentro del turno
 
-❤️ 90 / 90
-[############]
+```text
+🃏 *CHENGDÚ CARDS | T4*
+━━━━━━━━━━━━━━
+🐺 *Lobo Sombrío* usó _Colmillo Nocturno_
+💨 ¡El ataque falló!
 
-------------------------
+❤️ *ESTADO*
+🐼 Miguel
+▓▓▓▓▓▓▓▒▒▒ 75/120 HP
+🐺 Lukas
+▓▓▓▓▓▒▒▒▒▒ 42/90 HP
 
-🎯 *Turno 2: Miguel*
+🎯 *Turno de Miguel*
+1️⃣ Golpe de Bambú · 25 POT
+2️⃣ Impacto del Panda · 40 POT
 
-1. Golpe de Bambú
-⚔️ Potencia: 25 | 🎯 Precisión: 100%
-👉 .ctuatacar 1
-
-2. Impacto del Panda
-⚔️ Potencia: 40 | 🎯 Precisión: 80%
-👉 .ctuatacar 2
-
-------------------------
-
-🆔 BTL-30096f9d-3dd3-4d08-a283-12125cd7a3e9
-
-Consultar estado:
-.ctucombate
-
-Rendirse:
-.cturendirse
-
-========================
+👉 *.ctuatacar 1* o *.ctuatacar 2*
+🔎 Detalles: .ctuficha
 ```
 
 ## Resultado del combate
 
 ```text
-========================
-🎴 *CHENGDÚ CARDS*
-🏆 *Miguel gana*
-========================
+🃏 *CHENGDÚ CARDS | VICTORIA*
+━━━━━━━━━━━━━━
+🐼 *Panda Guerrero* usó _Impacto del Panda_
+💥 *42 de daño* a Lobo Sombrío
 
-⚔️ Panda Guerrero usó *Impacto del Panda*.
+🐼 *¡Miguel derrotó a Lukas!*
 
-💥 Daño causado: 42
+⚔️ 4 turnos · ❤️ 75 HP restantes
 
-------------------------
-
-👤 *Miguel*
-
-🐼 Panda Guerrero #0001
-🆔 PAND-000001
-
-❤️ 30 / 120
-[###---------]
-
-------------------------
-
-👤 *Juan*
-
-🐺 Lobo Sombrío #0001
-🆔 LOBO-000001
-
-❤️ 0 / 90
-[------------]
-
-------------------------
-
-📊 Las estadísticas de jugadores y unidades ya se actualizaron.
-
-------------------------
-
-🆔 BTL-30096f9d-3dd3-4d08-a283-12125cd7a3e9
-
-⚔️ Iniciar otro desafío:
-.ctupelea @jugador
-
-👤 Ver perfil:
-.ctuperfil
-
-========================
+⚔️ Otra partida: .ctupelea @jugador
 ```

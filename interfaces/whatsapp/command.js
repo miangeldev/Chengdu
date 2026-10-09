@@ -65,7 +65,7 @@ function debugSection(diagnostic) {
 }
 
 export function defineCommand(command, handler) {
-  function createRun(game, { logger = defaultLogger, prefix = '.', debug } = {}) {
+  function createRun(game, { logger = defaultLogger, prefix = '.', debug, battleHealthBars } = {}) {
     return async function run(sock, msg, args = []) {
       const from = msg?.key?.remoteJid;
       requireGame(typeof from === 'string' && typeof sock?.sendMessage === 'function', 'INVALID_CONTEXT');
@@ -75,6 +75,7 @@ export function defineCommand(command, handler) {
         const contextInfo = msg.message?.extendedTextMessage?.contextInfo ?? msg.message?.imageMessage?.contextInfo ?? msg.message?.videoMessage?.contextInfo;
         text = await handler({ game, args, identity: () => identityFor(sock, msg), prefix,
           cmd: (name, value) => commandText(prefix, name, value),
+          battleOptions: { healthBars: typeof battleHealthBars === 'boolean' ? battleHealthBars : whatsappConfig.battleHealthBars },
           context: { chatId: from, messageId: msg.key.id ?? null, mentions: contextInfo?.mentionedJid ?? [] }
         });
       } catch (error) {

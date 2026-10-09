@@ -6,7 +6,8 @@ import { createGame } from '../game/createGame.js';
 import { createCommandRouter } from '../interfaces/whatsapp/index.js';
 
 const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'chengdu-preview-'));
-const game = createGame({ directory, clock: () => '2026-10-08T20:00:00Z', randomRoll: () => 0 });
+let roll = 0;
+const game = createGame({ directory, clock: () => '2026-10-08T20:00:00Z', randomRoll: () => roll });
 const route = createCommandRouter({ game });
 const samples = [];
 let latest;
@@ -26,7 +27,7 @@ async function send(actor, body, title = null, mentions = []) {
 
 try {
   await send(a, '.cturegistro Miguel', 'Registro');
-  await send(b, '.cturegistro Juan');
+  await send(b, '.cturegistro Lukas');
   await send(a, '.ctustarter', 'Elección de starter');
   await send(a, '.ctustarter panda', 'Starter reclamado');
   await send(b, '.ctustarter lobo');
@@ -37,10 +38,16 @@ try {
   await send(a, '.ctuayuda', 'Guía de comandos');
   await send(a, '.ctuequipo usar PAND-000001', 'Equipo');
   await send(b, '.ctuequipo usar LOBO-000001');
-  await send(a, '.ctupelea @Juan', 'Desafío', [b]);
+  await send(a, '.ctuficha', 'Ficha del equipo: precisión y estadísticas');
+  await send(a, '.ctupelea @Lukas', 'Desafío', [b]);
   await send(b, '.ctuaceptar', 'Comienzo del combate');
+  await send(a, '.ctuficha', 'Ficha detallada del combate');
   await send(a, '.ctuatacar 1', 'Error: todavía no es tu turno');
   await send(b, '.ctuatacar 2', 'Ataque y siguiente turno');
+  await send(a, '.ctuatacar 2', 'Turno compacto: Panda responde');
+  roll = 99;
+  await send(b, '.ctuatacar 2', 'Ataque fallido dentro del turno');
+  roll = 0;
   const user = await game.users.getUserByIdentity({ provider: 'whatsapp', subject: a });
   let battle = await game.battle.getMyBattle({ userId: user.id, chatId });
   while (battle.status === 'active') {

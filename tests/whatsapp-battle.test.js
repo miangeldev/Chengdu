@@ -24,20 +24,109 @@ test('WhatsApp team → mentioned challenge → accept → fight completes with 
   await send(b, '.ctustarter lobo');
   await send(a, '.ctuequipo usar PAND-000001');
   await send(b, '.ctuequipo usar LOBO-000001');
+  const battleStart = replies.length;
   await send(a, '.ctupelea @Juan', [b]);
-  assert.match(replies.at(-1).text, /Desafío 1 contra 1/);
+  assert.match(replies.at(-1).text, /CHENGDÚ CARDS \| DESAFÍO/);
   await send(b, '.ctuaceptar');
-  assert.match(replies.at(-1).text, /Turno 1: Juan/);
+  assert.match(replies.at(-1).text, /INICIO \| T1/);
+  assert.match(replies.at(-1).text, /Turno de Juan/);
+  assert.match(replies.at(-1).text, /1️⃣ Garra Sombría · 25 POT\n2️⃣ Colmillo Nocturno · 40 POT/);
   const userA = await game.users.getUserByIdentity({ provider: 'whatsapp', subject: a });
   let battle = await game.battle.getMyBattle({ userId: userA.id, chatId: group });
   while (battle.status === 'active') {
     const actor = battle.turnUserId === userA.id ? a : b;
+    const count = replies.length;
     await send(actor, '.ctuatacar 2');
+    assert.equal(replies.length, count + 1);
     battle = await game.battle.getMyBattle({ userId: userA.id, chatId: group });
   }
-  assert.match(replies.at(-1).text, /gana/);
-  assert.ok(replies.every(r => r.chatId === group && r.text.includes('========================') && r.text.includes('\n\n') && !r.text.includes('@s.whatsapp.net')));
+  const final = replies.at(-1).text;
+  assert.match(final, /CHENGDÚ CARDS \| VICTORIA/);
+  assert.match(final, /derrotó a/);
+  assert.match(final, /turnos · ❤️ \d+ HP restantes/);
+  assert.doesNotMatch(final, /monedas|XP|🎁/);
+  assert.ok(replies.every(r => r.chatId === group && r.text.includes('\n\n') && !r.text.includes('@s.whatsapp.net')));
+  for (const { text } of replies.slice(battleStart)) {
+    assert.match(text, /━━━━━━━━━━━━━━/);
+    assert.doesNotMatch(text, /BTL-|USR-|PAND-|LOBO-|Precisión:|Defensa:|Velocidad:|🆔/);
+    assert.ok(text.length < 900);
+  }
   assert.equal((await game.users.getUser(userA.id)).battleStats.matches, 1);
+});
+
+test('combat ficha shows precision before choosing and preserves frozen attacks during combat', async t => {
+  const { game, storage } = setup(t, { randomRoll: () => 0 });
+  const a = await register(game);
+  const b = await register(game, 'Lukas', '521111111111');
+  const ua = (await game.starter.claimStarter({ userId: a.id, choice: 'panda' })).unit;
+  const ub = (await game.starter.claimStarter({ userId: b.id, choice: 'lobo' })).unit;
+  const group = '120363111@g.us';
+  const route = createCommandRouter({ game, debug: false });
+  let reply;
+  const sock = { sendMessage: async (_, payload) => { reply = payload.text; } };
+  const msg = { key: { remoteJid: group, participant: '521999999999@s.whatsapp.net' } };
+  await route(sock, msg, '.ctuficha');
+  assert.match(reply, /Selecciona una unidad/);
+  await game.teams.setTeam({ userId: a.id, unitIds: [ua.id] });
+  await game.teams.setTeam({ userId: b.id, unitIds: [ub.id] });
+  await route(sock, msg, '.ctuficha');
+  assert.match(reply, /Panda Guerrero/);
+  assert.match(reply, /Defensa: 22/);
+  assert.match(reply, /Precisión: 100%/);
+  assert.match(reply, /Precisión: 80%/);
+  assert.doesNotMatch(reply, /Lobo Sombrío/);
+  await game.battle.challenge({ userId: a.id, opponentId: b.id, chatId: group });
+  const { battle } = await game.battle.accept({ userId: b.id, chatId: group });
+  const attackId = battle.players[0].unit.attacks[1].id;
+  await storage.withTransaction(async repos => {
+    const attack = await repos.attacks.get(attackId);
+    await repos.attacks.replace({ ...attack, power: 250, accuracy: 17, revision: attack.revision + 1 });
+  });
+  await route(sock, msg, '.ctuficha');
+  assert.match(reply, /Lobo Sombrío/);
+  assert.match(reply, /Datos del combate activo/);
+  assert.match(reply, /Potencia: 40 POT · Precisión: 80%/);
+  assert.doesNotMatch(reply, /250 POT|17%/);
+  await route(sock, { key: { remoteJid: '521999999999@s.whatsapp.net' } }, '.ctuficha');
+  assert.match(reply, /Lobo Sombrío/);
+  assert.match(reply, /Potencia: 40 POT · Precisión: 80%/);
+  await route(sock, msg, `.ctuficha ${ua.id}`);
+  assert.match(reply, /Potencia: 40 POT · Precisión: 80%/);
+  assert.doesNotMatch(reply, /Lobo Sombrío/);
+  await game.battle.surrender({ userId: a.id, chatId: group });
+  await route(sock, msg, `.ctuficha ${ua.id}`);
+  assert.match(reply, /Potencia: 250 POT · Precisión: 17%/);
+  await route(sock, msg, '.ctuficha NO-EXISTE');
+  assert.match(reply, /unidad no existe/);
+});
+
+test('misses stay inside one turn message and health bars can be disabled without hiding HP', async t => {
+  const { game } = setup(t, { randomRoll: () => 99 });
+  const a = await register(game);
+  const b = await register(game, 'Lukas', '521111111111');
+  const ua = (await game.starter.claimStarter({ userId: a.id, choice: 'panda' })).unit;
+  const ub = (await game.starter.claimStarter({ userId: b.id, choice: 'lobo' })).unit;
+  await game.teams.setTeam({ userId: a.id, unitIds: [ua.id] });
+  await game.teams.setTeam({ userId: b.id, unitIds: [ub.id] });
+  const group = '120363111@g.us';
+  await game.battle.challenge({ userId: a.id, opponentId: b.id, chatId: group });
+  await game.battle.accept({ userId: b.id, chatId: group });
+  const route = createCommandRouter({ game, prefix: '!', battleHealthBars: false });
+  const replies = [];
+  const sock = { sendMessage: async (_, payload) => replies.push(payload) };
+  await route(sock, { key: { remoteJid: group, participant: '521111111111@s.whatsapp.net', id: 'miss-1' } }, '!ctuatacar 2');
+  assert.equal(replies.length, 1);
+  const text = replies[0].text;
+  assert.match(text, /CHENGDÚ CARDS \| T2/);
+  assert.match(text, /Lobo Sombrío\* usó _Colmillo Nocturno_/);
+  assert.match(text, /¡El ataque falló!/);
+  assert.match(text, /Miguel: 120\/120 HP/);
+  assert.match(text, /Lukas: 90\/90 HP/);
+  assert.match(text, /Turno de Miguel/);
+  assert.match(text, /!ctuatacar 1/);
+  assert.match(text, /!ctuficha/);
+  assert.doesNotMatch(text, /▓|▒|Precisión:|\.ctu/);
+  assert.deepEqual(Object.keys(replies[0]), ['text']);
 });
 
 test('private fights and unverified text targets are refused; repeated transport IDs cannot deal double damage', async t => {

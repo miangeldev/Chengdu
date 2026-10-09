@@ -19,6 +19,19 @@ El creador puede retirar un desafío pendiente con `.ctucancelar`.
 grupo. Los comandos de batalla admiten grupos; equipos y colección también se
 consultan en conversaciones privadas.
 
+Cada turno se presenta en un único mensaje compacto: resultado del ataque
+anterior, daño o fallo, HP de ambos jugadores y dos ataques con su potencia.
+Las barras de vida usan diez caracteres `▓` y `▒`; se pueden ocultar con
+`battleHealthBars: false` en `CTU-config.js` o en las opciones del router.
+Los IDs, seriales, precisión y atributos no aparecen en el mensaje normal.
+
+`.ctuficha` muestra estadísticas y precisión de ambas unidades durante una
+batalla; antes de ella muestra el equipo seleccionado. En privado también puede
+consultarse el combate activo propio. `.ctuficha ID` permite inspeccionar una
+unidad concreta. Las unidades ocupadas muestran sus stats y ataques fijados en
+el combate, aunque el catálogo se haya actualizado. La ficha es una consulta;
+no consume el turno. Inicio, victoria, empate y cierre tienen mensajes propios.
+
 ## Reglas de esta versión
 
 | Regla | Decisión |
@@ -46,7 +59,8 @@ Los nombres de ataque son datos del catálogo y no condiciones del motor.
 - `game/battle/engine.js`: resolución pura de ataque y daño.
 - `game/battle/battleService.js`: desafío, aceptación, acciones y consultas.
 - `game/battle/lifecycle.js`: cierre, expiración, estadísticas y liberación de locks.
-- `interfaces/whatsapp/format.js`: formato común de tarjetas, secciones y barras ASCII.
+- `game/units/unitService.js`: ficha de estadísticas y ataques actuales o fijados en combate.
+- `interfaces/whatsapp/format.js`: formato común de tarjetas, secciones y barras de texto.
 - `interfaces/whatsapp/battleFormat.js`: presentación del estado y resultado.
 - `plugins/CTU-*.js`: comandos compatibles con `command` y `run(sock, msg, args)`.
 
@@ -97,12 +111,12 @@ metadatos autenticados y vincular aliases de identidad sólo después de verific
 
 ## Verificación
 
-75 pruebas ejecutadas con `node --test --test-isolation=none`: registro/starter,
+77 pruebas ejecutadas con `node --test --test-isolation=none`: registro/starter,
 colecciones, propiedad, migraciones, journals antiguos, ataques, turnos, fallos
 de precisión, snapshots, duplicados, rendición, expiración, límites, estadísticas
 y recuperación de escrituras interrumpidas. Se incluye el flujo completo con un
 socket de WhatsApp simulado y la terminación real de un proceso hijo.
-También se prueban los 15 plugins con su exportación directa `run` y el registro
+También se prueban los 16 plugins con su exportación directa `run` y el registro
 del error original en el servidor. La traza en WhatsApp se muestra sólo con debug
 activado en `CTU-config.js`, el entorno `CTU_DEBUG` o la opción `debug` del router.
 En esta etapa de desarrollo, el archivo de configuración lo habilita por defecto.

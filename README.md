@@ -2,7 +2,8 @@
 
 Módulo de juego para un bot de WhatsApp: registro, perfil, catálogo de ocho
 personajes, starter único, colección, equipos y combate 1 contra 1 por turnos.
-La interfaz usa secciones, emojis, negritas, saltos de línea y separadores ASCII.
+La interfaz usa secciones, emojis, negritas y saltos de línea. Los combates tienen
+un formato compacto, con barras de vida de texto y dos ataques por turno.
 Los datos persisten en varios JSON, con repositorios, servicios y commits recuperables.
 
 Requiere Node.js 22 o superior en Linux; verificado con Node.js 26.8.2. No tiene dependencias
@@ -50,6 +51,7 @@ no se conectan a WhatsApp ni escriben jugadores de prueba en la base del juego.
 | `.ctucancelar` | Retirar el desafío enviado. |
 | `.ctuatacar 1` / `.ctuatacar 2` | Usar un ataque durante tu turno. |
 | `.ctucombate` | Ver el estado o resultado reciente en ese grupo. |
+| `.ctuficha` / `.ctuficha PAND-000001` | Consultar estadísticas, potencia y precisión del combate, equipo o unidad indicada. |
 | `.cturendirse` | Rendirse y terminar el combate. |
 
 Catálogo y colección muestran el comando de la siguiente página cuando existe.
@@ -63,7 +65,11 @@ En un grupo, uno menciona al otro con `.ctupelea @jugador`; el destinatario usa
 `.ctuaceptar`. El más rápido empieza y el bot muestra los ataques disponibles.
 
 El ataque 1 tiene potencia 25 y precisión 100%; el ataque 2 tiene potencia 40 y
-precisión 80%. Cada turno muestra daño, HP y quién debe actuar. Al ganar o rendirse,
+precisión 80%. Cada turno muestra el resultado anterior, HP y quién debe actuar,
+con dos habilidades y su potencia. La precisión y los demás atributos se consultan
+en `.ctuficha`; se mantienen en el motor. Durante una batalla, la ficha muestra
+los valores fijados al aceptarla, incluidos los de ambas unidades.
+Al ganar o rendirse,
 se actualizan estadísticas y se liberan ambas unidades. XP, monedas ganadas y
 recompensas corresponden al siguiente milestone.
 
@@ -77,9 +83,16 @@ anfitrión también puede llamar a `game.battle.sweepExpired()` periódicamente.
 npm run preview:whatsapp
 ```
 
-Genera [14 ejemplos de los mensajes](docs/whatsapp-preview.md) usando una base
+Genera [18 ejemplos de los mensajes](docs/whatsapp-preview.md) usando una base
 temporal y jugadores ficticios: registro, perfil, colección, starter, equipo,
-desafío, turnos, errores y resultado. No envía mensajes a WhatsApp real.
+desafío, turnos, fichas detalladas, fallo de ataque, errores y resultado.
+No envía mensajes a WhatsApp real.
+
+El turno envía un solo mensaje de texto, sin IDs, seriales ni atributos extra.
+Inicio y final usan sus propios encabezados. Las barras tienen diez caracteres:
+`▓▒▒▒▒▒▒▒▒▒ 10/100 HP`. Para ocultarlas, cambia `battleHealthBars: true` a `false`
+en `CTU-config.js` o usa `createCommandRouter({ game, battleHealthBars: false })`;
+el HP numérico se sigue mostrando.
 
 ## Integración con el bot
 
@@ -229,15 +242,17 @@ activos, revisar la migración a SQLite prevista en el diseño.
 
 ## Alcance validado
 
-75 pruebas verificadas con `node --test --test-isolation=none`: persistencia al
+77 pruebas verificadas con `node --test --test-isolation=none`: persistencia al
 reabrir, registro/starter concurrentes, supply, identidades, cursores, migraciones
 desde esquema 1, journals antiguos, integridad y recuperación de commits. También
 cubren equipos, snapshots, turnos, precisión, duplicados, victoria, rendición,
 expiración y estadísticas. Se interrumpe realmente un proceso con `SIGKILL`.
-También se comprueban las trazas de error y los 15 plugins mediante sus
+También se comprueban las trazas de error y los 16 plugins mediante sus
 exportaciones `run`, con una base compartida y sin inyectar el juego del router.
 El debug se verifica activado y desactivado, con causas anidadas, loggers que
 sólo aceptan un argumento y límites de longitud del mensaje de WhatsApp.
+La interfaz de combate verifica una respuesta por turno, ausencia de IDs y
+precisión en el mensaje normal, barras opcionales y fichas con ataques fijados.
 La validación con una sesión real de WhatsApp queda pendiente del bot anfitrión.
 
 XP ganado, sobres, transferencias, mercado y combate avanzado pertenecen

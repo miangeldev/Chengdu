@@ -57,7 +57,7 @@ test('the WhatsApp commands complete the MVP flow with a simulated socket', asyn
   const sock = { sendMessage: async (from, payload) => { replies.push({ from, ...payload }); } };
   const msg = { key: { remoteJid: '120363111@g.us', participant: '521999999999@s.whatsapp.net' } };
   const route = createCommandRouter({ game });
-  assert.equal(commands.length, 15);
+  assert.equal(commands.length, 16);
   for (const body of ['.cturegistro Miguel', '.ctuperfil', '.ctucatalogo', '.ctustarter', '.ctustarter 1', '.ctupersonajes', '.ctuunidad PAND-000001']) {
     assert.equal(await route(sock, msg, body), true);
   }
