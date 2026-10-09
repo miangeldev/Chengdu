@@ -11,7 +11,7 @@ export function crearDatabase(nombre, valorInicial = {}, { directory = DATA_DIR,
   requireGame(typeof nombre === 'string' && /^[A-Za-z0-9_-]+(?:\.json)?$/.test(nombre), 'INVALID_DATABASE_NAME');
   const ruta = path.join(path.resolve(directory), nombre.endsWith('.json') ? nombre : `${nombre}.json`);
   function assertStandalone() {
-    const managed = ['usuarios.json', 'personajes.json', 'unidades.json', 'estado.json', 'eventos.json', 'ataques.json', 'combates.json', '_database.json', '_journal.json'];
+    const managed = ['usuarios.json', 'personajes.json', 'unidades.json', 'estado.json', 'eventos.json', 'ataques.json', 'combates.json', 'recompensas.json', '_database.json', '_journal.json'];
     requireGame(!managed.includes(path.basename(ruta)) ||
       (!fs.existsSync(path.join(path.dirname(ruta), '_database.json')) && !fs.existsSync(path.join(path.dirname(ruta), '.writer.lock'))), 'MANAGED_DATABASE_FILE');
   }

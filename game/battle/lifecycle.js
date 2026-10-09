@@ -1,4 +1,5 @@
 import { requireGame } from '../../utils/GameError.js';
+import { rewardBattle } from '../rewards/battleRewards.js';
 
 export const isOpenBattle = battle => ['pending', 'active'].includes(battle.status);
 
@@ -24,6 +25,7 @@ export async function settleBattle(repos, battle, now) {
       await repos.users.replace({ ...user, battleStats: userStats, updatedAt: now });
       await repos.units.replace({ ...unit, lock: null, battleStats: unitStats, updatedAt: now });
     }
+    await rewardBattle(repos, battle, now);
   }
   await repos.battles.replace(battle);
   return battle;

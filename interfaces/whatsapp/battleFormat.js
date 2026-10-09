@@ -25,6 +25,21 @@ function statusText(battle, bars) {
   return rows.length ? `❤️ *ESTADO*\n${rows.join('\n')}` : null;
 }
 
+export function rewardText(battle) {
+  if (!battle.settlement) return battle.rewardVersion === 0 && battle.acceptedAt ? '📜 Combate anterior a las recompensas del MVP 0.3.' : null;
+  const reason = battle.settlement.reason;
+  if (reason !== 'rewarded') return `🎁 Sin recompensa: ${
+    { early_surrender: 'rendición antes de 4 ataques entre ambos jugadores.', pair_limit: 'ya alcanzaron 3 combates con recompensa entre ustedes en 24 h.', inactivity: 'el combate terminó por inactividad.' }[reason]
+  }`;
+  return '🎁 *RECOMPENSAS*\n' + battle.settlement.rewards.map(reward => {
+    const player = battle.players.find(p => p.userId === reward.userId);
+    const levels = [];
+    if (reward.userLevelAfter > reward.userLevelBefore) levels.push(`👤 ${displayName(player.name)} subió al nivel ${reward.userLevelAfter}`);
+    if (reward.unitLevelAfter > reward.unitLevelBefore) levels.push(`${characterIcon(player.unit.characterId)} ${displayName(player.unit.characterName)} subió al nivel ${reward.unitLevelAfter}`);
+    return `${displayName(player.name)}: ${reward.coins ? `+${reward.coins} ChengCoins · ` : ''}+${reward.userXp} XP\n${characterIcon(player.unit.characterId)} Unidad: +${reward.unitXp} XP` + (levels.length ? `\n🌱 ${levels.join('\n🌱 ')}` : '');
+  }).join('\n');
+}
+
 export function renderBattle(result, cmd, { healthBars = true } = {}) {
   const battle = result.battle ?? result;
   const names = battle.players.map(p => displayName(p.name));
@@ -72,6 +87,7 @@ export function renderBattle(result, cmd, { healthBars = true } = {}) {
     }[battle.finishReason]);
     body.push(statusText(battle, healthBars));
   }
+  body.push(rewardText(battle));
   body.push(`⚔️ Otra partida: ${cmd('ctupelea', '@jugador')}`);
   return message(label, body);
 }

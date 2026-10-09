@@ -1,5 +1,6 @@
 import { randomInt, randomUUID } from 'node:crypto';
 import { requireGame } from '../../utils/GameError.js';
+import { progressionBaseline, PROGRESSION_VERSION } from '../progression/rules.js';
 
 export async function createUnitInTransaction(repos, { characterId, ownerId, origin, operationKey }, clock) {
   requireGame(typeof operationKey === 'string' && operationKey.trim().length > 0 && operationKey.length <= 200, 'INVALID_OPERATION_KEY');
@@ -32,10 +33,11 @@ export async function createUnitInTransaction(repos, { characterId, ownerId, ori
     id: `${character.unitPrefix}-${String(serial).padStart(6, '0')}`,
     characterId, characterRevision: character.revision, serial, ownerId,
     createdAt: now, updatedAt: now, origin: { type: origin.type, sourceId: origin.sourceId }, initialStats,
-    progress: { level: 1, xp: 0 }, traits: [], variant: 'normal',
+    progress: { level: 1, xp: 0 }, statGrowthVersion: PROGRESSION_VERSION, traits: [], variant: 'normal',
     battleStats: { wins: 0, losses: 0 }, lock: null
   };
   await repos.units.insert(unit);
+  await repos.state.insert(progressionBaseline('unit', unit));
   await repos.state.replace({ ...counter, lastSerial: serial, issuedCount });
   await repos.events.insert({
     id: `EVT-${randomUUID()}`, type: 'unit_created', unitId: unit.id,

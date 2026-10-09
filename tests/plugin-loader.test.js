@@ -53,11 +53,13 @@ test('direct plugin run exports share one database and complete the game flow', 
     await run('cturechazar', bob);
     await run('ctupelea', alice, ['@Bob'], [bob]);
     await run('ctucancelar');
+    await run('ctubalance');
+    await run('ctuhistorial');
     assert.deepEqual(await game.validateDatabase(), {
-      valid: true, schemaVersion: 2, users: 2, characters: 8, units: 2, claims: 2
+      valid: true, schemaVersion: 3, users: 2, characters: 8, units: 2, claims: 2
     });
-    assert.equal(replies.length, 23);
-    assert.equal(commands.length, 16);
+    assert.equal(replies.length, 25);
+    assert.equal(commands.length, 18);
   } finally {
     await game.close();
   }

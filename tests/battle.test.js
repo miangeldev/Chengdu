@@ -117,8 +117,9 @@ test('a complete knockout settles player/unit statistics once and releases both 
     assert.equal(unit.battleStats.losses, user.battleStats.losses);
     assert.equal(unit.lock, null);
     assert.equal(unit.initialStats.hp, player.unit.stats.hp);
-    assert.equal(user.economy.coins, 0);
-    assert.equal(user.progress.xp, 0);
+    assert.equal(user.economy.coins, player.userId === winner ? 120 : 0);
+    assert.equal(user.progress.xp, player.userId === winner ? 35 : 15);
+    assert.equal(unit.progress.xp, user.progress.xp);
   }
   await assert.rejects(c.game.battle.attack({ ...lastRequest, operationKey: 'after-finish' }), { code: 'BATTLE_NOT_FOUND' });
   await c.game.battle.challenge({ userId: c.a.id, opponentId: c.b.id, chatId: c.chatId });

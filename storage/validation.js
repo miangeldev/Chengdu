@@ -1,10 +1,12 @@
 import { GameError, requireGame } from '../utils/GameError.js';
 import { normalizeIdentity, validName } from '../utils/identity.js';
 import { validateBattleData, validateBattleTransition } from './battleValidation.js';
+import { validateProgressionData, validateProgressionTransition } from './progressionValidation.js';
 
 export const V1_COLLECTIONS = Object.freeze(['usuarios', 'personajes', 'unidades', 'estado', 'eventos']);
-export const COLLECTIONS = Object.freeze([...V1_COLLECTIONS, 'ataques', 'combates']);
-export const SCHEMA_VERSION = 2;
+export const V2_COLLECTIONS = Object.freeze([...V1_COLLECTIONS, 'ataques', 'combates']);
+export const COLLECTIONS = Object.freeze([...V2_COLLECTIONS, 'recompensas']);
+export const SCHEMA_VERSION = 3;
 const integer = (v, minimum = 0) => Number.isSafeInteger(v) && v >= minimum;
 const text = v => typeof v === 'string' && v.length > 0 && v.length <= 200;
 const date = v => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(v) && Number.isFinite(Date.parse(v));
@@ -33,8 +35,8 @@ function progress(value) {
 
 export function validateDatabase(state, schemaVersion = SCHEMA_VERSION) {
   try {
-    requireGame([1, 2].includes(schemaVersion), 'UNSUPPORTED_SCHEMA_VERSION');
-    for (const name of schemaVersion === 1 ? V1_COLLECTIONS : COLLECTIONS) {
+    requireGame([1, 2, 3].includes(schemaVersion), 'UNSUPPORTED_SCHEMA_VERSION');
+    for (const name of schemaVersion === 1 ? V1_COLLECTIONS : schemaVersion === 2 ? V2_COLLECTIONS : COLLECTIONS) {
       const collection = state[name];
       check(collection && typeof collection._meta === 'object', name);
       requireGame(collection._meta.schemaVersion === schemaVersion, 'UNSUPPORTED_SCHEMA_VERSION', { collection: name });
@@ -97,12 +99,12 @@ export function validateDatabase(state, schemaVersion = SCHEMA_VERSION) {
       stats(u.initialStats);
       progress(u.progress);
       check(Array.isArray(u.traits) && u.traits.every(text) && text(u.variant), 'unit.traits');
-      check(integer(u.battleStats?.wins) && integer(u.battleStats?.losses) && (schemaVersion === 2 || u.lock === null), 'unit.state');
+      check(integer(u.battleStats?.wins) && integer(u.battleStats?.losses) && (schemaVersion >= 2 || u.lock === null), 'unit.state');
     }
 
     const counters = entries.filter(r => r.kind === 'mintCounter');
     const claims = entries.filter(r => r.kind === 'claim');
-    check(entries.every(r => ['mintCounter', 'claim', 'migrationMap'].includes(r.kind)), 'state.kind');
+    check(entries.every(r => ['mintCounter', 'claim', 'migrationMap', ...(schemaVersion >= 3 ? ['progressionBaseline'] : [])].includes(r.kind)), 'state.kind');
     unique(counters, r => r.characterId, 'counter.character');
     for (const character of characters) {
       const counter = counters.find(r => r.characterId === character.id);
@@ -140,7 +142,8 @@ export function validateDatabase(state, schemaVersion = SCHEMA_VERSION) {
         check(userById.get(item.userId)?.identities.some(r => r.subject === item.subject), 'migration.references');
       }
     }
-    if (schemaVersion === 2) validateBattleData(state);
+    if (schemaVersion >= 2) validateBattleData(state, schemaVersion);
+    if (schemaVersion >= 3) validateProgressionData(state);
     return { valid: true, schemaVersion, users: users.length, characters: characters.length, units: units.length, claims: claims.length };
   } catch (error) {
     if (error instanceof GameError && ['DATABASE_CORRUPT', 'UNSUPPORTED_SCHEMA_VERSION'].includes(error.code)) throw error;
@@ -154,11 +157,11 @@ export function validateTransition(before, after) {
     for (const previous of before[name].records) {
       const next = nextById.get(previous.id);
       check(next, `${name}.deletion`);
-      if (name === 'eventos' || (name === 'estado' && previous.kind !== 'mintCounter')) {
+      if (name === 'eventos' || name === 'recompensas' || (name === 'estado' && previous.kind !== 'mintCounter')) {
         check(equal(previous, next), `${name}.immutable`);
       }
       if (name === 'unidades') {
-        for (const key of ['characterId', 'characterRevision', 'serial', 'ownerId', 'origin', 'initialStats', 'createdAt']) {
+        for (const key of ['characterId', 'characterRevision', 'serial', 'ownerId', 'origin', 'initialStats', 'createdAt', 'statGrowthVersion']) {
           check(equal(previous[key], next[key]), `unit.immutable.${key}`);
         }
       }
@@ -175,4 +178,5 @@ export function validateTransition(before, after) {
     }
   }
   validateBattleTransition(before, after);
+  validateProgressionTransition(before, after);
 }

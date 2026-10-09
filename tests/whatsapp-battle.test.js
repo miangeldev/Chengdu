@@ -44,7 +44,9 @@ test('WhatsApp team → mentioned challenge → accept → fight completes with 
   assert.match(final, /CHENGDÚ CARDS \| VICTORIA/);
   assert.match(final, /derrotó a/);
   assert.match(final, /turnos · ❤️ \d+ HP restantes/);
-  assert.doesNotMatch(final, /monedas|XP|🎁/);
+  assert.match(final, /🎁 \*RECOMPENSAS\*/);
+  assert.match(final, /Miguel: \+120 ChengCoins · \+35 XP/);
+  assert.match(final, /Juan: \+15 XP/);
   assert.ok(replies.every(r => r.chatId === group && r.text.includes('\n\n') && !r.text.includes('@s.whatsapp.net')));
   for (const { text } of replies.slice(battleStart)) {
     assert.match(text, /━━━━━━━━━━━━━━/);

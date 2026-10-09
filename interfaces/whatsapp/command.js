@@ -7,6 +7,7 @@ import { card, commandText, displayName, section } from './format.js';
 export { displayName, rarityName } from './format.js';
 
 const messages = {
+  HISTORY_NOT_FOUND: '📜 Esa partida no está en el historial. Consulta .ctuhistorial',
   INVALID_NAME: '❌ Escribe un nombre de 1 a 40 caracteres, sin saltos de línea ni caracteres de control.\nEjemplo: .cturegistro Miguel',
   USER_NOT_FOUND: '❌ Primero regístrate con .cturegistro Tu nombre',
   INVALID_IDENTITY: '❌ No pude identificar al remitente. Usa el comando desde una conversación de WhatsApp válida.',

@@ -7,8 +7,10 @@ import { seedCharacters } from '../game/characters/catalog.js';
 import { createRepositories } from '../repositories/index.js';
 import { migrateLegacyUsers } from './migrations/001-users.js';
 import { migrateBattlesV2 } from './migrations/002-battles.js';
+import { migrateProgressionV3 } from './migrations/003-progression.js';
+import { progressionBaseline } from '../game/progression/rules.js';
 import { seedAttacks } from '../game/battle/attacks.js';
-import { COLLECTIONS, V1_COLLECTIONS, SCHEMA_VERSION, validateDatabase, validateTransition } from './validation.js';
+import { COLLECTIONS, V1_COLLECTIONS, V2_COLLECTIONS, SCHEMA_VERSION, validateDatabase, validateTransition } from './validation.js';
 import { acquireWriterLock } from './writerLock.js';
 import { atomicWrite, parseJSON, readText, syncDirectory } from './files.js';
 
@@ -16,6 +18,7 @@ const MANIFEST = '_database.json';
 const JOURNAL = '_journal.json';
 const FILES = [...COLLECTIONS.map(name => `${name}.json`), MANIFEST];
 const V1_FILES = [...V1_COLLECTIONS.map(name => `${name}.json`), MANIFEST];
+const V2_FILES = [...V2_COLLECTIONS.map(name => `${name}.json`), MANIFEST];
 const serialize = value => JSON.stringify(value, null, 2) + '\n';
 const digest = body => createHash('sha256').update(JSON.stringify(body)).digest('hex');
 
@@ -33,9 +36,9 @@ function initialState() {
 
 function decode(raw, expectedVersion = null) {
   const manifest = parseJSON(raw[MANIFEST], MANIFEST);
-  requireGame([1, 2].includes(manifest?.schemaVersion) && (expectedVersion === null || manifest.schemaVersion === expectedVersion), 'UNSUPPORTED_SCHEMA_VERSION', { file: MANIFEST });
+  requireGame([1, 2, 3].includes(manifest?.schemaVersion) && (expectedVersion === null || manifest.schemaVersion === expectedVersion), 'UNSUPPORTED_SCHEMA_VERSION', { file: MANIFEST });
   requireGame(manifest.database === 'chengdu-cards', 'DATABASE_CORRUPT');
-  const names = manifest.schemaVersion === 1 ? V1_COLLECTIONS : COLLECTIONS;
+  const names = manifest.schemaVersion === 1 ? V1_COLLECTIONS : manifest.schemaVersion === 2 ? V2_COLLECTIONS : COLLECTIONS;
   requireGame(names.every(name => typeof raw[`${name}.json`] === 'string'), 'DATABASE_INCOMPLETE');
   const state = Object.fromEntries(names.map(name => [name, parseJSON(raw[`${name}.json`], `${name}.json`)]));
   validateDatabase(state, manifest.schemaVersion);
@@ -86,8 +89,8 @@ export class JsonUnitOfWork {
       typeof body.id === 'string' && journal.checksum === digest(body), 'DATABASE_CORRUPT', { file: JOURNAL });
     requireGame(body.after && typeof body.after[MANIFEST] === 'string', 'DATABASE_CORRUPT');
     const version = parseJSON(body.after[MANIFEST], MANIFEST).schemaVersion;
-    requireGame([1, 2].includes(version), 'UNSUPPORTED_SCHEMA_VERSION');
-    const files = version === 1 ? V1_FILES : FILES;
+    requireGame([1, 2, 3].includes(version), 'UNSUPPORTED_SCHEMA_VERSION');
+    const files = version === 1 ? V1_FILES : version === 2 ? V2_FILES : FILES;
     for (const state of [body.before, body.after]) {
       requireGame(state && Object.keys(state).length === files.length && files.every(file => Object.hasOwn(state, file)), 'DATABASE_CORRUPT', { file: JOURNAL });
     }
@@ -166,10 +169,14 @@ export class JsonUnitOfWork {
         const state = initialState();
         state.usuarios.records = migrated.users;
         state.estado.records.push(migrated.mapping);
+        state.estado.records.push(...migrated.users.map(user => progressionBaseline('user', user)));
         this.#commit(raw, state);
       } else if (parseJSON(raw[MANIFEST], MANIFEST).schemaVersion === 1) {
         requireGame(FILES.filter(file => !V1_FILES.includes(file)).every(file => raw[file] === null), 'DATABASE_INCOMPLETE');
-        this.#commit(raw, migrateBattlesV2(decode(raw, 1), this.clock()));
+        this.#commit(raw, migrateProgressionV3(migrateBattlesV2(decode(raw, 1), this.clock()), this.clock()));
+      } else if (parseJSON(raw[MANIFEST], MANIFEST).schemaVersion === 2) {
+        requireGame(raw['recompensas.json'] === null, 'DATABASE_INCOMPLETE');
+        this.#commit(raw, migrateProgressionV3(decode(raw, 2), this.clock()));
       }
       this.#load();
       this.#opened = true;

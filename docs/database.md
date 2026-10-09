@@ -1,8 +1,9 @@
-# Modelo de datos para el MVP 0.1 y su evolución
+# Modelo de datos — MVP 0.3 y su evolución
 
-Estado: contrato implementado hasta 0.2 (esquema 2), basado en `../project.md`.
+Estado: contrato implementado hasta 0.3 (esquema 3), basado en `../project.md`.
 Los mecanismos descritos como futuros aún requieren servicios y migraciones.
-El alcance se divide en [fundación 0.1](mvp-0.1.md) y [combate 0.2](mvp-0.2.md).
+El alcance se divide en [fundación 0.1](mvp-0.1.md), [combate 0.2](mvp-0.2.md)
+y [progresión 0.3](mvp-0.3.md).
 
 ## Convenciones y fuentes de verdad
 
@@ -26,10 +27,11 @@ El alcance se divide en [fundación 0.1](mvp-0.1.md) y [combate 0.2](mvp-0.2.md)
 | `usuarios.json` | Jugadores e identidades vinculadas. |
 | `personajes.json` | Plantillas de contenido versionadas. |
 | `unidades.json` | Unidades, propietario y progreso individual. |
-| `estado.json` | Contadores de emisión y reclamos idempotentes. |
+| `estado.json` | Contadores, reclamos y saldos/progresos iniciales auditados. |
 | `eventos.json` | Creaciones auditables; después, cambios de propiedad. |
 | `ataques.json` | Definiciones de ataques versionadas, potencia y precisión. |
 | `combates.json` | Desafíos, snapshots, acciones, turnos y resultados. |
+| `recompensas.json` | Premios por jugador/batalla, motivo, cantidades y valores antes/después. |
 
 Además, `_database.json` marca la instalación, `_journal.json` coordina un commit
 pendiente y `backups/` conserva snapshots coherentes del estado anterior.
@@ -39,7 +41,7 @@ Cada colección emplea esta envoltura; el adaptador oculta la envoltura a servic
 ```json
 {
   "_meta": {
-    "schemaVersion": 2,
+    "schemaVersion": 3,
     "revision": 0,
     "updatedAt": null
   },
@@ -130,6 +132,7 @@ silenciosamente unidades existentes.
   "initialStats": { "hp": 120, "attack": 24, "defense": 22, "speed": 8 },
   "progress": { "level": 1, "xp": 0 },
   "traits": [],
+  "statGrowthVersion": 1,
   "variant": "normal",
   "battleStats": { "wins": 0, "losses": 0 },
   "lock": null
@@ -137,8 +140,9 @@ silenciosamente unidades existentes.
 ```
 
 `initialStats` conserva los valores generados al emitir, con variación aplicada
-una sola vez. Los stats efectivos futuros se calcularán con una regla de progresión
-versionada y se copiarán al snapshot de combate. El balance de unidades existentes
+una sola vez. Los stats efectivos se calculan con `statGrowthVersion: 1` y el nivel:
+`+2 HP` por nivel ganado, `+1 ataque/defensa` por cada cinco, hasta nivel 20; la
+velocidad no cambia. Se copian al snapshot junto con `statsVersion: 1`. El balance de unidades existentes
 se hará mediante una operación explícita, no recargando el catálogo en cada turno.
 
 ID, `characterId`, `serial`, origen y fecha de creación son identidad de emisión
@@ -250,6 +254,10 @@ compatibles con emisiones y supply; reclamos y eventos apuntando a unidades
 existentes; equipos sin duplicados ni unidades ajenas; valores numéricos válidos.
 En 0.2 se validan ataques, snapshots, secuencia de acciones, HP derivado del
 historial, turnos, participantes, ganador, locks y estadísticas de cierre.
+En 0.3 se reconstruyen saldo y progreso desde el punto inicial y los premios;
+se verifican elegibilidad, cantidades, destinatarios, valores antes/después,
+umbral de nivel, crecimiento de stats y recibo exacto del cierre. Las transiciones
+exigen registros de recompensa append-only y estados finales inmutables.
 Las relaciones de mercado se añadirán cuando exista esa funcionalidad.
 
 ## Crecimiento y cambio de almacenamiento
@@ -284,3 +292,66 @@ ataques copiados en `combates.json`. Una batalla aceptada conserva `rulesVersion
 snapshots de ambas unidades y un máximo de 50 acciones. No se altera un combate
 cerrado ni sus estadísticas por repetir una clave de operación. Los contadores
 de combate se actualizan sólo en el cierre transaccional.
+
+## Migración del esquema 2 al 3
+
+Se añade `recompensas.json`, `unit.statGrowthVersion: 1` y un registro
+`progressionBaseline` por usuario y unidad en `estado.json`. Su ID es
+`progression:<entityId>` y contiene `entityType`, `entityId` y `progress`; el de
+usuario también contiene `coins`. Ese registro inmutable captura los valores
+existentes, incluidos saldos o niveles no nulos, sin corregirlos ni inventar
+operaciones anteriores. Un nuevo usuario/unidad comienza con nivel 1, XP 0 y
+monedas 0 y recibe su baseline en el mismo commit de creación.
+
+Los combates cerrados existentes reciben `rewardVersion: 0`, `settlement: null` y
+no generan recompensas retroactivas. Los pendientes/activos reciben
+`rewardVersion: 1`; se liquidan con las reglas 0.3 al terminar. Los snapshots
+activos anteriores permanecen intactos: la ausencia histórica de `statsVersion`
+representa versión 0 (stats de nacimiento). Las nuevas aceptaciones fijan nivel,
+stats efectivos y versión de crecimiento. XP y niveles actuales no reescriben
+snapshots antiguos.
+
+La recuperación reconoce journals de esquema 1 (seis archivos), 2 (ocho) y
+3 (nueve), incluido el manifest. Una instalación en esquema 1 aplica ambas
+migraciones en un único commit con su snapshot previo completo. Una migración
+interrumpida se revierte si sólo estaba preparada y se completa si ya estaba
+comprometida. La base se valida antes y después de migrar.
+
+## Recompensas y economía 0.3
+
+Cada cierre aceptado en `rewardVersion: 1` agrega dos registros inmutables:
+
+```text
+id: reward:<battleId>:<userId>
+battleId, userId, unitId, version: 1, reason, createdAt
+coins, userXp, unitXp
+balanceBefore, balanceAfter
+userProgressBefore, userProgressAfter
+unitProgressBefore, unitProgressAfter
+```
+
+Se conservan incluso con importes cero para explicar rendición temprana,
+inactividad o límite por pareja. El recibo `battle.settlement` contiene versión,
+motivo, fecha y resúmenes para ambos participantes, con XP/monedas y niveles
+anteriores/finales. Las claves por batalla/jugador evitan duplicar premios;
+el historial muestra el recibo original, sin recalcularlo con el progreso actual.
+
+Los cambios de monedas pasan por `game/economy/coinOperations.js`, dentro de la
+misma transacción que escribe recompensas, XP, resultado, estadísticas y locks.
+`game.economy.getBalance()` sólo consulta. No hay compras, retiros, transferencias
+ni crédito administrativo en 0.3. El ledger general futuro deberá ampliar esta
+validación mediante una migración para aceptar nuevas fuentes y gastos, sin
+eliminar los registros de premio ni perder sus claves únicas.
+
+`progress.xp` es XP restante para el siguiente nivel, cuyo coste es `100 × nivel`.
+Al alcanzarlo se descuenta ese coste; el excedente se conserva. Los límites son
+50 para usuario y 20 para unidad; en el límite se sigue acumulando XP sin aumentar
+el nivel. Progresos históricos mayores se preservan al migrar; la siguiente
+recompensa positiva aplica los umbrales hasta el límite. Una recompensa cero no
+cambia un progreso histórico.
+
+El historial se consulta por participante, ordenado por fecha de cierre
+descendente con ID de desempate. Los cursores están ligados a cada usuario.
+La consulta detallada exige ser participante, incluso al consultarla en privado
+o desde otro grupo. Para SQLite, mantener índices por `(userId, finishedAt, id)`
+y restricciones únicas por `(battleId, userId)`, además de todas las referencias.

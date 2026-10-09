@@ -1,5 +1,6 @@
 import { requireGame } from '../utils/GameError.js';
 import { calculateDamage, firstPlayer, MAX_TURNS } from '../game/battle/engine.js';
+import { effectiveStats } from '../game/progression/rules.js';
 
 const check = (value, field) => requireGame(value, 'DATABASE_CORRUPT', { field });
 const equal = (a, b) => JSON.stringify(a) === JSON.stringify(b);
@@ -8,7 +9,7 @@ const text = value => typeof value === 'string' && value.length > 0 && value.len
 const date = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(value) && Number.isFinite(Date.parse(value));
 export const openBattle = battle => ['pending', 'active'].includes(battle.status);
 
-export function validateBattleData(state) {
+export function validateBattleData(state, schemaVersion = 3) {
   const users = new Map(state.usuarios.records.map(u => [u.id, u]));
   const units = new Map(state.unidades.records.map(u => [u.id, u]));
   const characters = new Map(state.personajes.records.map(c => [c.id, c]));
@@ -48,7 +49,9 @@ export function validateBattleData(state) {
       const u = p.unit;
       check(u && units.get(u.id)?.ownerId === p.userId && units.get(u.id).characterId === u.characterId, 'battle.snapshotReferences');
       check(text(u.characterName) && integer(u.serial, 1) && integer(u.characterRevision, 1) && integer(u.level, 1), 'battle.snapshot');
-      check(u.serial === units.get(u.id).serial && u.characterRevision <= characters.get(u.characterId).revision && equal(u.stats, units.get(u.id).initialStats), 'battle.snapshotOrigin');
+      const initialStats = units.get(u.id).initialStats;
+      check(u.serial === units.get(u.id).serial && u.characterRevision <= characters.get(u.characterId).revision &&
+        equal(u.stats, schemaVersion < 3 ? initialStats : effectiveStats(initialStats, u.level, u.statsVersion ?? 0)), 'battle.snapshotOrigin');
       for (const key of ['hp', 'attack', 'defense', 'speed']) check(integer(u.stats?.[key], key === 'defense' ? 0 : 1), 'battle.snapshotStats');
       check(integer(u.hp) && u.hp <= u.stats.hp && Array.isArray(u.attacks) && u.attacks.length === 2 && u.attacks[0].id !== u.attacks[1].id, 'battle.snapshotHp');
       for (const attack of u.attacks) {
@@ -122,8 +125,16 @@ export function validateBattleTransition(before, after) {
   for (const battle of before.combates.records) {
     const updated = next.get(battle.id);
     check(updated && updated.chatId === battle.chatId && updated.createdAt === battle.createdAt && updated.challengeKey === battle.challengeKey && updated.rulesVersion === battle.rulesVersion && equal(updated.players.map(p => [p.userId, p.name]), battle.players.map(p => [p.userId, p.name])), 'battle.immutable');
+    check(updated.rewardVersion === battle.rewardVersion, 'battle.rewardVersionImmutable');
     if (!openBattle(battle)) { check(equal(battle, updated), 'battle.closedImmutable'); continue; }
     check(equal(battle.actions, updated.actions.slice(0, battle.actions.length)) && updated.actions.length <= battle.actions.length + 1, 'battle.appendActions');
+    if (battle.status === 'pending' && updated.status === 'active') {
+      for (const player of updated.players) {
+        const unit = before.unidades.records.find(u => u.id === player.unit.id);
+        check(unit && unit.ownerId === player.userId && player.unit.level === unit.progress.level && player.unit.statsVersion === unit.statGrowthVersion, 'battle.snapshotLevel');
+        check(before.usuarios.records.find(u => u.id === player.userId).team[0] === unit.id, 'battle.snapshotTeam');
+      }
+    }
     if (battle.status === 'active') {
       check(updated.status !== 'pending' && updated.acceptedAt === battle.acceptedAt && updated.acceptKey === battle.acceptKey, 'battle.activeTransition');
       for (let i = 0; i < 2; i++) {

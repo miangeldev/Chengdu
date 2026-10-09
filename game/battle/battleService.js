@@ -2,6 +2,9 @@ import { randomInt, randomUUID } from 'node:crypto';
 import { requireGame } from '../../utils/GameError.js';
 import { BATTLE_IDLE_MS, CHALLENGE_TTL_MS, deadline, firstPlayer, resolveAttack, selectedAttack } from './engine.js';
 import { expireBattles, isOpenBattle, settleBattle } from './lifecycle.js';
+import { effectiveStats } from '../progression/rules.js';
+import { REWARD_VERSION } from '../rewards/battlePolicy.js';
+import { paginate } from '../../utils/pagination.js';
 
 function checkKey(key) {
   requireGame(key === null || (typeof key === 'string' && key.length > 0 && key.length <= 200), 'INVALID_OPERATION_KEY');
@@ -68,7 +71,7 @@ export function createBattleService(storage, clock, randomRoll = () => randomInt
           turnUserId: null, turnNumber: 0, actions: [],
           createdAt: now, updatedAt: now, expiresAt: deadline(now, CHALLENGE_TTL_MS),
           acceptedAt: null, finishedAt: null, winnerId: null, finishReason: null,
-          challengeKey: operationKey, acceptKey: null
+          challengeKey: operationKey, acceptKey: null, rewardVersion: REWARD_VERSION, settlement: null
         };
         await repos.battles.insert(battle);
         return { battle, duplicate: false };
@@ -96,10 +99,11 @@ export function createBattleService(storage, clock, randomRoll = () => randomInt
           const character = await repos.characters.get(unit.characterId);
           const attacks = await Promise.all(character.attackIds.map(id => repos.attacks.get(id)));
           requireGame(attacks.length === 2 && attacks.every(Boolean), 'DATABASE_CORRUPT');
+          const stats = effectiveStats(unit.initialStats, unit.progress.level, unit.statGrowthVersion);
           p.unit = {
             id: unit.id, characterId: unit.characterId, characterRevision: character.revision,
             characterName: character.name, serial: unit.serial, level: unit.progress.level,
-            stats: structuredClone(unit.initialStats), hp: unit.initialStats.hp, attacks
+            statsVersion: unit.statGrowthVersion, stats, hp: stats.hp, attacks
           };
           await repos.units.replace({ ...unit, lock: { type: 'battle', referenceId: battle.id }, updatedAt: now });
         }
@@ -180,6 +184,24 @@ export function createBattleService(storage, clock, randomRoll = () => randomInt
         if (battleId) return findBattle(repos, { userId, chatId, battleId }, ['pending', 'active', 'finished', 'expired', 'rejected', 'cancelled']);
         const rows = await repos.battles.filter(b => b.chatId === chatId && b.players.some(p => p.userId === userId));
         return rows.reverse().sort((a, b) => Number(isOpenBattle(b)) - Number(isOpenBattle(a)) || b.updatedAt.localeCompare(a.updatedAt))[0] ?? null;
+      });
+    },
+    async getHistory({ userId, ...options }) {
+      return storage.withTransaction(async repos => {
+        await expireBattles(repos, clock());
+        await participant(repos, userId);
+        const rows = await repos.battles.filter(b => b.acceptedAt !== null && !isOpenBattle(b) && b.players.some(p => p.userId === userId));
+        return paginate(rows, options, `battleHistory:${userId}`, b => [String(8_640_000_000_000_000 - Date.parse(b.finishedAt)).padStart(17, '0'), b.id]);
+      });
+    },
+    async getHistoryBattle({ userId, battleId }) {
+      return storage.withTransaction(async repos => {
+        await expireBattles(repos, clock());
+        await participant(repos, userId);
+        const battle = await repos.battles.get(battleId);
+        requireGame(battle && battle.acceptedAt !== null && !isOpenBattle(battle), 'HISTORY_NOT_FOUND');
+        requireGame(battle.players.some(p => p.userId === userId), 'BATTLE_NOT_PARTICIPANT');
+        return battle;
       });
     },
     async sweepExpired() {

@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { normalizeIdentity, validName } from '../../utils/identity.js';
 import { requireGame } from '../../utils/GameError.js';
 import { expireBattles } from '../battle/lifecycle.js';
+import { progressionBaseline } from '../progression/rules.js';
 
 export function createUserService(storage, clock) {
   return {
@@ -12,12 +13,14 @@ export function createUserService(storage, clock) {
         const existing = await repos.users.getByIdentity(canonical);
         requireGame(!existing, 'USER_ALREADY_EXISTS', { name: existing?.name });
         const now = clock();
-        return repos.users.insert({
+        const user = await repos.users.insert({
           id: `USR-${randomUUID()}`, identities: [canonical], name: cleanName,
           createdAt: now, updatedAt: now,
           economy: { coins: 0 }, progress: { level: 1, xp: 0 },
           battleStats: { wins: 0, losses: 0, matches: 0 }, team: [], settings: { notifications: true }
         });
+        await repos.state.insert(progressionBaseline('user', user));
+        return user;
       });
     },
     async getUser(userId) {

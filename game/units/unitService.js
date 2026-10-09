@@ -2,10 +2,11 @@ import { createUnitInTransaction } from './unitGenerator.js';
 import { requireGame } from '../../utils/GameError.js';
 import { paginate } from '../../utils/pagination.js';
 import { expireBattles } from '../battle/lifecycle.js';
+import { effectiveStats } from '../progression/rules.js';
 
 async function detail(repos, unit) {
   const owner = await repos.users.get(unit.ownerId);
-  return { ...unit, character: await repos.characters.get(unit.characterId), owner: { id: owner.id, name: owner.name } };
+  return { ...unit, currentStats: effectiveStats(unit.initialStats, unit.progress.level, unit.statGrowthVersion), character: await repos.characters.get(unit.characterId), owner: { id: owner.id, name: owner.name } };
 }
 
 function snapshotDetail(player) {
@@ -21,9 +22,10 @@ async function combatDetail(repos, unitId) {
   }
   const character = await repos.characters.get(unit.characterId);
   const owner = await repos.users.get(unit.ownerId);
+  const stats = effectiveStats(unit.initialStats, unit.progress.level, unit.statGrowthVersion);
   return {
     id: unit.id, characterId: unit.characterId, characterName: character.name,
-    stats: unit.initialStats, hp: unit.initialStats.hp,
+    level: unit.progress.level, stats, hp: stats.hp,
     attacks: await Promise.all(character.attackIds.map(id => repos.attacks.get(id))),
     owner: { id: owner.id, name: owner.name }, inBattle: false
   };

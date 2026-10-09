@@ -78,9 +78,9 @@ Fallar consume el turno.
 ```text
 🃏 *CHENGDÚ CARDS | PERFIL*
 ━━━━━━━━━━━━━━
-👤 *Miguel* · Nivel 1
-✨ 0 XP · 💰 0 ChengCoins
-🎴 1 unidad
+👤 *Miguel*
+🌱 Nivel 1 · ✨ 0/100 XP
+💰 0 ChengCoins · 🎴 1 unidad
 
 ⚔️ 0 combates
 🏆 0 victorias · 💔 0 derrotas · ⚖️ 0 sin ganador
@@ -112,10 +112,10 @@ Fallar consume el turno.
 ⚪ Común · Tanque · Normal
 
 👤 Propietario: Miguel
-🪪 USR-3d4cd2c7-3938-4196-9630-87a6a8a1b0bb
+🪪 USR-f48cb8a2-604c-46bd-96e0-7bcbb95e79d4
 ✅ Disponible
 
-🌱 Nivel 1 · ✨ 0 XP
+🌱 Nivel 1 · ✨ 0/100 XP
 🏆 0 victorias · 💔 0 derrotas
 
 📜 Personaje inicial · 8 de octubre de 2026
@@ -192,6 +192,11 @@ Fallar consume el turno.
 .ctuequipo usar ID · Seleccionar
 .ctuequipo limpiar · Vaciar
 
+✨ *Progreso*
+.ctubalance · Saldo y recompensas
+.ctuhistorial · Tus partidas
+.ctuhistorial ID · Turnos y recompensa
+
 ⚔️ *Combate en grupo*
 .ctupelea @jugador · Desafiar
 .ctuaceptar / .cturechazar · Responder
@@ -222,6 +227,7 @@ Fallar consume el turno.
 ━━━━━━━━━━━━━━
 🐼 *Panda Guerrero* · Miguel
 🆔 PAND-000001
+🌱 Nivel 1
 ❤️ Vida: 120/120 HP
 ⚔️ Ataque: 24 · 🛡️ Defensa: 22 · 💨 Velocidad: 8
 
@@ -278,6 +284,7 @@ Fallar consume el turno.
 ━━━━━━━━━━━━━━
 🐼 *Panda Guerrero* · Miguel
 🆔 PAND-000001
+🌱 Nivel 1
 ❤️ Vida: 120/120 HP
 ⚔️ Ataque: 24 · 🛡️ Defensa: 22 · 💨 Velocidad: 8
 
@@ -290,6 +297,7 @@ Potencia: 40 POT · Precisión: 80%
 
 🐺 *Lobo Sombrío* · Lukas
 🆔 LOBO-000001
+🌱 Nivel 1
 ❤️ Vida: 90/90 HP
 ⚔️ Ataque: 27 · 🛡️ Defensa: 16 · 💨 Velocidad: 16
 
@@ -389,6 +397,162 @@ Fallar consume el turno.
 🐼 *¡Miguel derrotó a Lukas!*
 
 ⚔️ 4 turnos · ❤️ 75 HP restantes
+
+🎁 *RECOMPENSAS*
+Miguel: +120 ChengCoins · +35 XP
+🐼 Unidad: +35 XP
+Lukas: +15 XP
+🐺 Unidad: +15 XP
+
+⚔️ Otra partida: .ctupelea @jugador
+```
+
+## Victoria con subida de nivel de jugador y unidad
+
+```text
+🃏 *CHENGDÚ CARDS | VICTORIA*
+━━━━━━━━━━━━━━
+🐼 *Panda Guerrero* usó _Impacto del Panda_
+💥 *42 de daño* a Lobo Sombrío
+
+🐼 *¡Miguel derrotó a Lukas!*
+
+⚔️ 4 turnos · ❤️ 30 HP restantes
+
+🎁 *RECOMPENSAS*
+Miguel: +120 ChengCoins · +35 XP
+🐼 Unidad: +35 XP
+🌱 👤 Miguel subió al nivel 2
+🌱 🐼 Panda Guerrero subió al nivel 2
+Lukas: +15 XP
+🐺 Unidad: +15 XP
+
+⚔️ Otra partida: .ctupelea @jugador
+```
+
+## Perfil con progreso ganado
+
+```text
+🃏 *CHENGDÚ CARDS | PERFIL*
+━━━━━━━━━━━━━━
+👤 *Miguel*
+🌱 Nivel 2 · ✨ 5/200 XP
+💰 360 ChengCoins · 🎴 1 unidad
+
+⚔️ 3 combates
+🏆 3 victorias · 💔 0 derrotas · ⚖️ 0 sin ganador
+
+👉 Tu colección: *.ctupersonajes*
+```
+
+## Saldo y reglas de recompensa
+
+```text
+🃏 *CHENGDÚ CARDS | BALANCE*
+━━━━━━━━━━━━━━
+💰 *360 ChengCoins*
+
+🏆 Victoria: +120 ChengCoins y +35 XP
+💔 Derrota: +15 XP · ⚖️ Empate: +20 XP
+✨ La unidad participante también recibe esa XP.
+
+⏳ Hasta 3 combates con recompensa contra el mismo rival en 24 h.
+🏳️ Rendirse requiere 4 ataques y que ambos hayan atacado.
+⌛ La inactividad no otorga recompensas.
+
+👉 Tus partidas: *.ctuhistorial*
+```
+
+## Historial compacto de partidas
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIAL*
+━━━━━━━━━━━━━━
+🏆 Victoria vs *Lukas*
+📅 8 de octubre de 2026 · 4 turnos
+🎁 +120 ChengCoins · +35 XP
+🔎 .ctuhistorial BTL-01e101d4-bcce-4871-9552-fec32abc25c2
+
+🏆 Victoria vs *Lukas*
+📅 8 de octubre de 2026 · 4 turnos
+🎁 +120 ChengCoins · +35 XP
+🔎 .ctuhistorial BTL-669031e2-6254-4546-94e5-b604cd523985
+
+🏆 Victoria vs *Lukas*
+📅 8 de octubre de 2026 · 4 turnos
+🎁 +120 ChengCoins · +35 XP
+🔎 .ctuhistorial BTL-f22070f5-4551-43aa-bd5a-2dfde1116deb
+
+👉 Tu saldo: *.ctubalance*
+```
+
+## Detalle del historial: turnos y recompensa original
+
+```text
+🃏 *CHENGDÚ CARDS | PARTIDA*
+━━━━━━━━━━━━━━
+🏆 Victoria · 8 de octubre de 2026
+Miguel · Panda Guerrero · Niv. 1
+Lukas · Lobo Sombrío · Niv. 1
+
+⚔️ *TURNOS*
+T1 · Lukas: Colmillo Nocturno
+💥 45 de daño · Rival: 75 HP
+
+T2 · Miguel: Impacto del Panda
+💥 48 de daño · Rival: 42 HP
+
+T3 · Lukas: Colmillo Nocturno
+💥 45 de daño · Rival: 30 HP
+
+T4 · Miguel: Impacto del Panda
+💥 42 de daño · Rival: 0 HP
+
+🎁 *RECOMPENSAS*
+Miguel: +120 ChengCoins · +35 XP
+🐼 Unidad: +35 XP
+🌱 👤 Miguel subió al nivel 2
+🌱 🐼 Panda Guerrero subió al nivel 2
+Lukas: +15 XP
+🐺 Unidad: +15 XP
+
+👉 *.ctuhistorial*
+```
+
+## Ficha de unidad de nivel 2: HP aumentado
+
+```text
+🃏 *CHENGDÚ CARDS | FICHA*
+━━━━━━━━━━━━━━
+🐼 *Panda Guerrero* · Miguel
+🆔 PAND-000001
+🌱 Nivel 2
+❤️ Vida: 122/122 HP
+⚔️ Ataque: 24 · 🛡️ Defensa: 22 · 💨 Velocidad: 8
+
+1️⃣ *Golpe de Bambú* · Físico
+Potencia: 25 POT · Precisión: 100%
+
+2️⃣ *Impacto del Panda* · Físico
+Potencia: 40 POT · Precisión: 80%
+
+💡 Daño: potencia + ataque − defensa (mín. 1).
+Fallar consume el turno.
+```
+
+## Victoria después de alcanzar el límite de recompensas por rival
+
+```text
+🃏 *CHENGDÚ CARDS | VICTORIA*
+━━━━━━━━━━━━━━
+🐼 *Panda Guerrero* usó _Impacto del Panda_
+💥 *42 de daño* a Lobo Sombrío
+
+🐼 *¡Miguel derrotó a Lukas!*
+
+⚔️ 4 turnos · ❤️ 32 HP restantes
+
+🎁 Sin recompensa: ya alcanzaron 3 combates con recompensa entre ustedes en 24 h.
 
 ⚔️ Otra partida: .ctupelea @jugador
 ```

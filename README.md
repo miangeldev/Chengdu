@@ -1,7 +1,8 @@
-# Chengdú Cards — MVP 0.2
+# Chengdú Cards — MVP 0.3
 
 Módulo de juego para un bot de WhatsApp: registro, perfil, catálogo de ocho
-personajes, starter único, colección, equipos y combate 1 contra 1 por turnos.
+personajes, starter único, colección, equipos y combate 1 contra 1 por turnos,
+con XP, niveles independientes de jugador/unidad, ChengCoins e historial.
 Toda la interfaz usa mensajes compactos, emojis, negritas y un siguiente paso
 claro. Los combates muestran barras de vida de texto y dos ataques por turno.
 Los datos persisten en varios JSON, con repositorios, servicios y commits recuperables.
@@ -19,8 +20,8 @@ npm run db:validate
 
 El segundo comando inicializa la base vacía y el catálogo si se trata de una
 instalación nueva; en instalaciones existentes valida o migra el formato original
-de usuarios. Desde el esquema 1, añade ataques y combates con una migración
-recuperable, conservando unidades e identidades. La ruta por defecto es `ChengdúData/` junto al módulo, independiente
+de usuarios. Desde los esquemas 1 y 2, migra al esquema 3 con backup y recuperación,
+conservando unidades, identidades, saldos, XP y combates anteriores. La ruta por defecto es `ChengdúData/` junto al módulo, independiente
 del directorio desde el que se ejecute el bot.
 
 Para una ruta distinta:
@@ -37,7 +38,10 @@ no se conectan a WhatsApp ni escriben jugadores de prueba en la base del juego.
 | Comando | Uso |
 | --- | --- |
 | `.cturegistro Miguel` | Crear jugador; nombre de 1–40 caracteres. |
-| `.ctuperfil` | Ver perfil propio, monedas iniciales y estado del starter. |
+| `.ctuperfil` | Ver nivel, XP hacia el siguiente nivel, monedas y estadísticas. |
+| `.ctubalance` | Ver ChengCoins y reglas de recompensa. |
+| `.ctuhistorial` | Ver tus partidas terminadas, cinco por página y desde cualquier chat. |
+| `.ctuhistorial BTL-…` | Consultar turnos, resultado y recompensa original de una partida propia. |
 | `.ctucatalogo` | Ver las plantillas del catálogo. |
 | `.ctustarter` | Ver las tres opciones iniciales. |
 | `.ctustarter panda` | Elegir Panda Guerrero; también `mago`, `lobo`, `1`, `2` o `3`. |
@@ -72,12 +76,31 @@ precisión 80%. Cada turno muestra el resultado anterior, HP y quién debe actua
 con dos habilidades y su potencia. La precisión y los demás atributos se consultan
 en `.ctuficha`; se mantienen en el motor. Durante una batalla, la ficha muestra
 los valores fijados al aceptarla, incluidos los de ambas unidades.
-Al ganar o rendirse,
-se actualizan estadísticas y se liberan ambas unidades. XP, monedas ganadas y
-recompensas corresponden al siguiente milestone.
+Al terminar, se actualizan estadísticas, se liberan ambas unidades y se acredita
+la recompensa en el mismo commit. El mensaje final incluye lo ganado por cada
+jugador y unidad y las subidas de nivel, sin enviar avisos adicionales.
+
+| Resultado elegible | ChengCoins | XP jugador | XP unidad participante |
+| --- | ---: | ---: | ---: |
+| Victoria | 120 | 35 | 35 |
+| Derrota | 0 | 15 | 15 |
+| Empate | 0 | 20 | 20 |
+
+Hasta tres partidas con recompensa por pareja de jugadores en una ventana móvil
+de 24 horas, compartida entre grupos y unidades. Una rendición requiere cuatro
+ataques y participación de ambos para otorgar premios. La inactividad y los
+desafíos sin aceptar no generan XP ni monedas. Estas reglas no impiden jugar
+partidas adicionales: sus resultados y estadísticas se conservan.
+
+Subir de nivel cuesta `100 × nivel actual` XP; el excedente se conserva. Jugador
+y unidad avanzan por separado, con límites de nivel 50 y 20 respectivamente.
+La unidad gana 2 HP por nivel y 1 ataque/defensa cada cinco niveles ganados;
+su velocidad y estadísticas de nacimiento permanecen intactas. Los combates
+anteriores conservan sus snapshots, y la nueva fuerza se aplica al aceptar la
+siguiente partida. Las reglas completas están en [MVP 0.3](docs/mvp-0.3.md).
 
 Los desafíos vencen en 5 minutos y los combates tras 30 minutos sin una acción.
-La expiración se procesa al consultar perfil, unidades, equipos o batallas; el
+La expiración se procesa al consultar perfil, unidades, equipos, saldo o batallas; el
 anfitrión también puede llamar a `game.battle.sweepExpired()` periódicamente.
 
 ## Revisar la interfaz
@@ -86,9 +109,10 @@ anfitrión también puede llamar a `game.battle.sweepExpired()` periódicamente.
 npm run preview:whatsapp
 ```
 
-Genera [20 ejemplos de los mensajes](docs/whatsapp-preview.md) usando una base
+Genera [27 ejemplos de los mensajes](docs/whatsapp-preview.md) usando una base
 temporal y jugadores ficticios: registro, perfil, colección, starter, equipo,
-desafío, turnos, fichas detalladas, fallo de ataque, errores y resultado.
+desafío, turnos, fichas detalladas, fallo de ataque, errores, recompensas,
+subidas de nivel, saldo e historial.
 No envía mensajes a WhatsApp real.
 
 Todas las pantallas usan el encabezado `🃏 CHENGDÚ CARDS | SECCIÓN` y un separador
@@ -211,8 +235,8 @@ independientes; rechaza modificaciones directas de colecciones administradas.
 ## Persistencia y recuperación
 
 `usuarios.json`, `personajes.json`, `unidades.json`, `estado.json`, `eventos.json`,
-`ataques.json` y `combates.json`
-incluyen versión de esquema 2 y revisión. `_database.json` identifica la instalación.
+`ataques.json`, `combates.json` y `recompensas.json`
+incluyen versión de esquema 3 y revisión. `_database.json` identifica la instalación.
 `_journal.json` existe mientras hay un commit pendiente. Cada operación que cambia
 datos guarda previamente una copia coherente en `backups/<id-operación>/`.
 
@@ -221,7 +245,11 @@ por carpeta. Las publicaciones de archivos usan temporales, sincronización y
 renombrado; el journal decide si se descarta una operación preparada o se completa
 una ya comprometida. La creación de unidad, contador, reclamo y evento de auditoría
 ocurre en el mismo commit. Las acciones de combate, estadísticas y locks también
-se coordinan mediante el mismo mecanismo. La recuperación se ejecuta antes de atender consultas.
+se coordinan mediante el mismo mecanismo, incluyendo saldos, XP y registros de
+recompensa. La recuperación se ejecuta antes de atender consultas. Las recompensas
+se registran una vez por jugador y batalla; repetir el mensaje final reutiliza
+el recibo sin volver a acreditarlo. Los saldos/progresos se validan contra su
+valor inicial registrado y el historial de recompensas.
 
 Después de una terminación abrupta que deje el lock, detener las instancias del
 bot y ejecutar una sola vez:
@@ -250,12 +278,12 @@ activos, revisar la migración a SQLite prevista en el diseño.
 
 ## Alcance validado
 
-78 pruebas verificadas con `node --test --test-isolation=none`: persistencia al
+107 pruebas verificadas con `node --test --test-isolation=none`: persistencia al
 reabrir, registro/starter concurrentes, supply, identidades, cursores, migraciones
-desde esquema 1, journals antiguos, integridad y recuperación de commits. También
+desde esquemas 1 y 2, journals antiguos, integridad y recuperación de commits. También
 cubren equipos, snapshots, turnos, precisión, duplicados, victoria, rendición,
 expiración y estadísticas. Se interrumpe realmente un proceso con `SIGKILL`.
-También se comprueban las trazas de error y los 16 plugins mediante sus
+También se comprueban las trazas de error y los 18 plugins mediante sus
 exportaciones `run`, con una base compartida y sin inyectar el juego del router.
 El debug se verifica activado y desactivado, con causas anidadas, loggers que
 sólo aceptan un argumento y límites de longitud del mensaje de WhatsApp.
@@ -264,11 +292,17 @@ precisión en el mensaje normal, barras opcionales y fichas con ataques fijados.
 También se verifican la navegación del catálogo y las fichas de plantilla antes
 del registro, leyendo estadísticas y ataques actualizados sin emitir unidades.
 La validación con una sesión real de WhatsApp queda pendiente del bot anfitrión.
+Se verifican umbrales y excedentes de XP, límites de nivel, crecimiento acotado,
+recompensas únicas incluso con mensajes simultáneos o interrupciones, límites por
+pareja, historial paginado y acceso restringido a los participantes. La migración
+preserva saldos/progresos anteriores y snapshots de combates activos, sin premios
+retroactivos. El saldo, la XP y los recibos rechazan modificaciones sin su operación.
 
-XP ganado, sobres, transferencias, mercado y combate avanzado pertenecen
+Sobres, gasto de monedas, transferencias, mercado y combate avanzado pertenecen
 a las siguientes versiones. El modelo ya conserva progreso, procedencia,
 revisiones de contenido, seriales, stats individuales, traits y variante.
 
 Diseño: [fundación 0.1](docs/mvp-0.1.md), [combate 0.2](docs/mvp-0.2.md),
+[progresión 0.3](docs/mvp-0.3.md),
 [modelo de datos](docs/database.md) y
 [visión completa](project.md).

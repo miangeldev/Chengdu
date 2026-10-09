@@ -1,3 +1,5 @@
+import { xpToNextLevel } from '../../game/progression/rules.js';
+
 export function card(title, sections = [], footer = null) {
   const label = String(title).replace(/\*/g, '');
   return [`🃏 *CHENGDÚ CARDS | ${label}*`, '━━━━━━━━━━━━━━', [...sections, footer].filter(Boolean).join('\n\n')].join('\n');
@@ -14,6 +16,10 @@ export const statsText = stats => `❤️ Vida: ${stats.hp}\n⚔️ Ataque: ${st
 export const serialText = serial => String(serial).padStart(4, '0');
 export const dateText = date => date ? new Date(date).toLocaleDateString('es-MX', { timeZone: 'America/Mexico_City', day: 'numeric', month: 'long', year: 'numeric' }) : 'Fecha no registrada';
 export const unitTitle = unit => `${characterIcon(unit.characterId)} *${displayName(unit.character.name)}*`;
+export function progressText(progress, kind) {
+  const next = xpToNextLevel(progress, kind);
+  return `Nivel ${progress.level} · ✨ ${next === null ? `${progress.xp} XP acumulada · Nivel máximo` : `${progress.xp}/${next} XP`}`;
+}
 
 export function healthBar(hp, maxHp) {
   const filled = Math.ceil(Math.max(0, Math.min(1, hp / maxHp)) * 10);

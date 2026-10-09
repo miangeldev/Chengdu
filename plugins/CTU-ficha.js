@@ -29,7 +29,7 @@ export const { command, run, createRun } = defineCommand('ctuficha', async ({ ga
 
   return card('FICHA', result.units.map(unit => section(
     `${characterIcon(unit.characterId)} *${displayName(unit.characterName)}*${unit.owner ? ` · ${displayName(unit.owner.name)}` : ''}`,
-    `🆔 ${unit.id}\n` +
+    `🆔 ${unit.id}\n${unit.level ? `🌱 Nivel ${unit.level}\n` : ''}` +
     (unit.template ? `${rarityIcon(unit.template.rarity)} ${rarityName(unit.template.rarity)} · ${roleName(unit.template.role)}\n📦 Emisión: ${unit.template.supply.type === 'limited' ? `${unit.template.supply.max} unidades como máximo` : 'Ilimitada'}${!unit.template.obtainable ? '\n🔒 Emisión cerrada' : ''}\n📚 Estadísticas base\n` : '') +
     `❤️ Vida: ${unit.hp}/${unit.stats.hp} HP\n⚔️ Ataque: ${unit.stats.attack} · 🛡️ Defensa: ${unit.stats.defense} · 💨 Velocidad: ${unit.stats.speed}\n\n` +
     unit.attacks.map((attack, i) => `${i === 0 ? '1️⃣' : '2️⃣'} *${displayName(attack.name)}* · ${attack.type === 'physical' ? 'Físico' : displayName(attack.type)}\nPotencia: ${attack.power} POT · Precisión: ${attack.accuracy}%`).join('\n\n') +

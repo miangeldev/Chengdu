@@ -26,7 +26,7 @@ test('register → starter → collection and ownership survive reopening', asyn
   assert.equal((await game.users.getUserByIdentity(identity())).id, miguel.id);
   assert.equal((await game.users.getProfile(miguel.id)).starterClaim.unitId, panda.unit.id);
   assert.deepEqual((await game.units.getUserUnits(juan.id)).items.map(u => u.id), [lobo.unit.id]);
-  assert.deepEqual(await game.validateDatabase(), { valid: true, schemaVersion: 2, users: 2, characters: 8, units: 2, claims: 2 });
+  assert.deepEqual(await game.validateDatabase(), { valid: true, schemaVersion: 3, users: 2, characters: 8, units: 2, claims: 2 });
 });
 
 test('simultaneous registrations and normalized device JIDs cannot duplicate a player', async t => {

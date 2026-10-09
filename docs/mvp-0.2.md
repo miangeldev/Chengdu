@@ -3,6 +3,9 @@
 Fecha: 2026-10-08. Estado: implementación local validada. Continúa el milestone de
 batalla de `../project.md`; la sesión real de WhatsApp la proporciona el bot anfitrión.
 
+Este documento describe el milestone 0.2. La versión actual incorpora
+[progresión 0.3](mvp-0.3.md) y migra al esquema 3.
+
 ## Flujo jugable
 
 1. Cada jugador se registra y reclama su starter.

@@ -58,6 +58,30 @@ try {
     battle = await game.battle.getMyBattle({ userId: user.id, chatId });
   }
   samples.push({ title: 'Resultado del combate', text: latest });
+  // Earn two more real victories in the temporary database to preview a level-up.
+  for (let i = 0; i < 2; i++) {
+    await send(a, '.ctupelea @Lukas', null, [b]);
+    await send(b, '.ctuaceptar');
+    battle = await game.battle.getMyBattle({ userId: user.id, chatId });
+    while (battle.status === 'active') {
+      await send(battle.turnUserId === user.id ? a : b, '.ctuatacar 2');
+      battle = await game.battle.getMyBattle({ userId: user.id, chatId });
+    }
+  }
+  samples.push({ title: 'Victoria con subida de nivel de jugador y unidad', text: latest });
+  await send(a, '.ctuperfil', 'Perfil con progreso ganado');
+  await send(a, '.ctubalance', 'Saldo y reglas de recompensa');
+  await send(a, '.ctuhistorial', 'Historial compacto de partidas');
+  await send(a, `.ctuhistorial ${battle.id}`, 'Detalle del historial: turnos y recompensa original');
+  await send(a, '.ctuficha PAND-000001', 'Ficha de unidad de nivel 2: HP aumentado');
+  await send(a, '.ctupelea @Lukas', null, [b]);
+  await send(b, '.ctuaceptar');
+  battle = await game.battle.getMyBattle({ userId: user.id, chatId });
+  while (battle.status === 'active') {
+    await send(battle.turnUserId === user.id ? a : b, '.ctuatacar 2');
+    battle = await game.battle.getMyBattle({ userId: user.id, chatId });
+  }
+  samples.push({ title: 'Victoria después de alcanzar el límite de recompensas por rival', text: latest });
   const output = fileURLToPath(new URL('../docs/whatsapp-preview.md', import.meta.url));
   fs.writeFileSync(output, '# Vista previa de los mensajes de WhatsApp\n\n' +
     'Generada con `npm run preview:whatsapp`, usando jugadores ficticios y una base temporal.\n' +
