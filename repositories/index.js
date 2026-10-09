@@ -12,6 +12,9 @@ export function createRepositories(state, writable = false) {
     events: collectionRepository(state.eventos.records, writable),
     attacks: collectionRepository(state.ataques.records, writable),
     battles: collectionRepository(state.combates.records, writable),
-    rewards: collectionRepository(state.recompensas.records, writable)
+    rewards: collectionRepository(state.recompensas.records, writable),
+    packs: collectionRepository(state.sobres.records, writable),
+    openings: collectionRepository(state.aperturas.records, writable),
+    economy: collectionRepository(state.economia.records, writable)
   };
 }

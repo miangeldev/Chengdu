@@ -16,9 +16,11 @@ import * as cancelar from '../../plugins/CTU-cancelar.js';
 import * as ficha from '../../plugins/CTU-ficha.js';
 import * as balance from '../../plugins/CTU-balance.js';
 import * as historial from '../../plugins/CTU-historial.js';
+import * as sobres from '../../plugins/CTU-sobres.js';
+import * as abrir from '../../plugins/CTU-abrir.js';
 import { game as defaultGame } from '../../game/index.js';
 
-export const commands = Object.freeze([registro, perfil, catalogo, starter, personajes, unidad, ayuda, equipo, pelea, aceptar, atacar, rendirse, combate, rechazar, cancelar, ficha, balance, historial]);
+export const commands = Object.freeze([registro, perfil, catalogo, starter, personajes, unidad, ayuda, equipo, pelea, aceptar, atacar, rendirse, combate, rechazar, cancelar, ficha, balance, historial, sobres, abrir]);
 
 // Host supplies authenticated msg metadata and the text extracted from the message.
 export function createCommandRouter({ game = defaultGame, prefix = '.', logger, debug, battleHealthBars } = {}) {

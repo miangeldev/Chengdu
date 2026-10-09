@@ -1,8 +1,9 @@
 import { randomInt, randomUUID } from 'node:crypto';
 import { requireGame } from '../../utils/GameError.js';
 import { progressionBaseline, PROGRESSION_VERSION } from '../progression/rules.js';
+import { applyTraits, TRAIT_VERSION, VARIANTS } from './collectibles.js';
 
-export async function createUnitInTransaction(repos, { characterId, ownerId, origin, operationKey }, clock) {
+export async function createUnitInTransaction(repos, { characterId, ownerId, origin, operationKey, collectibles = { traits: [], variant: 'normal', traitVersion: TRAIT_VERSION } }, clock) {
   requireGame(typeof operationKey === 'string' && operationKey.trim().length > 0 && operationKey.length <= 200, 'INVALID_OPERATION_KEY');
   requireGame(origin && typeof origin.type === 'string' && typeof origin.sourceId === 'string' &&
     origin.type.length > 0 && origin.type.length <= 200 && origin.sourceId.length > 0 && origin.sourceId.length <= 200, 'INVALID_ORIGIN');
@@ -19,7 +20,8 @@ export async function createUnitInTransaction(repos, { characterId, ownerId, ori
   requireGame(character.obtainable, 'CHARACTER_UNAVAILABLE');
   const counter = await repos.state.get(`mint:${character.id}`);
   requireGame(counter, 'DATABASE_CORRUPT');
-  requireGame(character.supply.type !== 'limited' || counter.issuedCount < character.supply.max, 'SUPPLY_EXHAUSTED');
+  requireGame(character.supply.grandfatheredIssued === undefined &&
+    (character.supply.type !== 'limited' || counter.issuedCount < character.supply.max), 'SUPPLY_EXHAUSTED');
   const serial = counter.lastSerial + 1;
   const issuedCount = counter.issuedCount + 1;
   requireGame(Number.isSafeInteger(serial) && Number.isSafeInteger(issuedCount), 'NUMERIC_OVERFLOW');
@@ -29,11 +31,14 @@ export async function createUnitInTransaction(repos, { characterId, ownerId, ori
     initialStats[key] = character.baseStats[key] + (variation ? randomInt(-variation, variation + 1) : 0);
   }
   const now = clock();
+  requireGame(collectibles.traitVersion === TRAIT_VERSION && VARIANTS.some(v => v.id === collectibles.variant), 'INVALID_COLLECTIBLE');
+  applyTraits(initialStats, collectibles.traits, collectibles.traitVersion);
   const unit = {
     id: `${character.unitPrefix}-${String(serial).padStart(6, '0')}`,
     characterId, characterRevision: character.revision, serial, ownerId,
-    createdAt: now, updatedAt: now, origin: { type: origin.type, sourceId: origin.sourceId }, initialStats,
-    progress: { level: 1, xp: 0 }, statGrowthVersion: PROGRESSION_VERSION, traits: [], variant: 'normal',
+    createdAt: now, updatedAt: now, origin: { type: origin.type, sourceId: origin.sourceId }, initialStats, combatBaseStats: { ...initialStats },
+    progress: { level: 1, xp: 0 }, statGrowthVersion: PROGRESSION_VERSION,
+    traits: [...collectibles.traits], variant: collectibles.variant, traitVersion: collectibles.traitVersion,
     battleStats: { wins: 0, losses: 0 }, lock: null
   };
   await repos.units.insert(unit);

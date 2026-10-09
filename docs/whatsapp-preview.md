@@ -44,10 +44,10 @@ Los asteriscos muestran el formato de negrita que aplica WhatsApp.
 🐼 *Panda Guerrero*
 🆔 panda_guerrero
 ⚪ Común · Tanque
-📦 Emisión: Ilimitada
+📦 Emisión: 50 unidades como máximo
 📚 Estadísticas base
 ❤️ Vida: 120/120 HP
-⚔️ Ataque: 24 · 🛡️ Defensa: 22 · 💨 Velocidad: 8
+⚔️ Ataque: 25 · 🛡️ Defensa: 23 · 💨 Velocidad: 8
 
 1️⃣ *Golpe de Bambú* · Físico
 Potencia: 25 POT · Precisión: 100%
@@ -112,13 +112,15 @@ Fallar consume el turno.
 ⚪ Común · Tanque · Normal
 
 👤 Propietario: Miguel
-🪪 USR-f48cb8a2-604c-46bd-96e0-7bcbb95e79d4
+🪪 USR-f521cd40-c9dc-4c89-8d74-4537a42aa3ba
 ✅ Disponible
 
 🌱 Nivel 1 · ✨ 0/100 XP
 🏆 0 victorias · 💔 0 derrotas
 
-📜 Personaje inicial · 8 de octubre de 2026
+🧬 Sin rasgos
+
+📜 Personaje inicial · 9 de octubre de 2026
 
 🔎 Stats y ataques: *.ctuficha PAND-000001*
 ```
@@ -187,6 +189,10 @@ Fallar consume el turno.
 .ctuficha [ID o personaje] · Stats y precisión
 .ctuunidad ID · Propietario y procedencia
 
+🎁 *Sobres*
+.ctusobres · Precios y probabilidades
+.ctuabrir basico · Obtener un personaje
+
 🛡️ *Equipo*
 .ctuequipo · Ver equipo
 .ctuequipo usar ID · Seleccionar
@@ -229,7 +235,7 @@ Fallar consume el turno.
 🆔 PAND-000001
 🌱 Nivel 1
 ❤️ Vida: 120/120 HP
-⚔️ Ataque: 24 · 🛡️ Defensa: 22 · 💨 Velocidad: 8
+⚔️ Ataque: 25 · 🛡️ Defensa: 23 · 💨 Velocidad: 8
 
 1️⃣ *Golpe de Bambú* · Físico
 Potencia: 25 POT · Precisión: 100%
@@ -267,7 +273,7 @@ Fallar consume el turno.
 🐼 Miguel
 ▓▓▓▓▓▓▓▓▓▓ 120/120 HP
 🐺 Lukas
-▓▓▓▓▓▓▓▓▓▓ 90/90 HP
+▓▓▓▓▓▓▓▓▓▓ 95/95 HP
 
 🎯 *Turno de Lukas*
 1️⃣ Garra Sombría · 25 POT
@@ -286,7 +292,7 @@ Fallar consume el turno.
 🆔 PAND-000001
 🌱 Nivel 1
 ❤️ Vida: 120/120 HP
-⚔️ Ataque: 24 · 🛡️ Defensa: 22 · 💨 Velocidad: 8
+⚔️ Ataque: 25 · 🛡️ Defensa: 23 · 💨 Velocidad: 8
 
 1️⃣ *Golpe de Bambú* · Físico
 Potencia: 25 POT · Precisión: 100%
@@ -298,8 +304,8 @@ Potencia: 40 POT · Precisión: 80%
 🐺 *Lobo Sombrío* · Lukas
 🆔 LOBO-000001
 🌱 Nivel 1
-❤️ Vida: 90/90 HP
-⚔️ Ataque: 27 · 🛡️ Defensa: 16 · 💨 Velocidad: 16
+❤️ Vida: 95/95 HP
+⚔️ Ataque: 27 · 🛡️ Defensa: 17 · 💨 Velocidad: 16
 
 1️⃣ *Garra Sombría* · Físico
 Potencia: 25 POT · Precisión: 100%
@@ -326,13 +332,13 @@ Fallar consume el turno.
 🃏 *CHENGDÚ CARDS | T2*
 ━━━━━━━━━━━━━━
 🐺 *Lobo Sombrío* usó _Colmillo Nocturno_
-💥 *45 de daño* a Panda Guerrero
+💥 *44 de daño* a Panda Guerrero
 
 ❤️ *ESTADO*
 🐼 Miguel
-▓▓▓▓▓▓▓▒▒▒ 75/120 HP
+▓▓▓▓▓▓▓▒▒▒ 76/120 HP
 🐺 Lukas
-▓▓▓▓▓▓▓▓▓▓ 90/90 HP
+▓▓▓▓▓▓▓▓▓▓ 95/95 HP
 
 🎯 *Turno de Miguel*
 1️⃣ Golpe de Bambú · 25 POT
@@ -352,9 +358,9 @@ Fallar consume el turno.
 
 ❤️ *ESTADO*
 🐼 Miguel
-▓▓▓▓▓▓▓▒▒▒ 75/120 HP
+▓▓▓▓▓▓▓▒▒▒ 76/120 HP
 🐺 Lukas
-▓▓▓▓▓▒▒▒▒▒ 42/90 HP
+▓▓▓▓▓▒▒▒▒▒ 47/95 HP
 
 🎯 *Turno de Lukas*
 1️⃣ Garra Sombría · 25 POT
@@ -374,9 +380,9 @@ Fallar consume el turno.
 
 ❤️ *ESTADO*
 🐼 Miguel
-▓▓▓▓▓▓▓▒▒▒ 75/120 HP
+▓▓▓▓▓▓▓▒▒▒ 76/120 HP
 🐺 Lukas
-▓▓▓▓▓▒▒▒▒▒ 42/90 HP
+▓▓▓▓▓▒▒▒▒▒ 47/95 HP
 
 🎯 *Turno de Miguel*
 1️⃣ Golpe de Bambú · 25 POT
@@ -392,11 +398,11 @@ Fallar consume el turno.
 🃏 *CHENGDÚ CARDS | VICTORIA*
 ━━━━━━━━━━━━━━
 🐼 *Panda Guerrero* usó _Impacto del Panda_
-💥 *42 de daño* a Lobo Sombrío
+💥 *47 de daño* a Lobo Sombrío
 
 🐼 *¡Miguel derrotó a Lukas!*
 
-⚔️ 4 turnos · ❤️ 75 HP restantes
+⚔️ 4 turnos · ❤️ 76 HP restantes
 
 🎁 *RECOMPENSAS*
 Miguel: +120 ChengCoins · +35 XP
@@ -413,11 +419,11 @@ Lukas: +15 XP
 🃏 *CHENGDÚ CARDS | VICTORIA*
 ━━━━━━━━━━━━━━
 🐼 *Panda Guerrero* usó _Impacto del Panda_
-💥 *42 de daño* a Lobo Sombrío
+💥 *47 de daño* a Lobo Sombrío
 
 🐼 *¡Miguel derrotó a Lukas!*
 
-⚔️ 4 turnos · ❤️ 30 HP restantes
+⚔️ 4 turnos · ❤️ 32 HP restantes
 
 🎁 *RECOMPENSAS*
 Miguel: +120 ChengCoins · +35 XP
@@ -460,7 +466,7 @@ Lukas: +15 XP
 🏳️ Rendirse requiere 4 ataques y que ambos hayan atacado.
 ⌛ La inactividad no otorga recompensas.
 
-👉 Tus partidas: *.ctuhistorial*
+👉 Conseguir personajes: *.ctusobres*
 ```
 
 ## Historial compacto de partidas
@@ -469,19 +475,19 @@ Lukas: +15 XP
 🃏 *CHENGDÚ CARDS | HISTORIAL*
 ━━━━━━━━━━━━━━
 🏆 Victoria vs *Lukas*
-📅 8 de octubre de 2026 · 4 turnos
+📅 9 de octubre de 2026 · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-01e101d4-bcce-4871-9552-fec32abc25c2
+🔎 .ctuhistorial BTL-454dbc48-0a70-4fdd-9f7d-08e564d8d549
 
 🏆 Victoria vs *Lukas*
-📅 8 de octubre de 2026 · 4 turnos
+📅 9 de octubre de 2026 · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-669031e2-6254-4546-94e5-b604cd523985
+🔎 .ctuhistorial BTL-abfc0c72-a290-41b6-9569-bc13e59889f8
 
 🏆 Victoria vs *Lukas*
-📅 8 de octubre de 2026 · 4 turnos
+📅 9 de octubre de 2026 · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-f22070f5-4551-43aa-bd5a-2dfde1116deb
+🔎 .ctuhistorial BTL-e5148b4c-83b9-4438-aa69-79c2e48f899f
 
 👉 Tu saldo: *.ctubalance*
 ```
@@ -491,22 +497,22 @@ Lukas: +15 XP
 ```text
 🃏 *CHENGDÚ CARDS | PARTIDA*
 ━━━━━━━━━━━━━━
-🏆 Victoria · 8 de octubre de 2026
+🏆 Victoria · 9 de octubre de 2026
 Miguel · Panda Guerrero · Niv. 1
 Lukas · Lobo Sombrío · Niv. 1
 
 ⚔️ *TURNOS*
 T1 · Lukas: Colmillo Nocturno
-💥 45 de daño · Rival: 75 HP
+💥 44 de daño · Rival: 76 HP
 
 T2 · Miguel: Impacto del Panda
-💥 48 de daño · Rival: 42 HP
+💥 48 de daño · Rival: 47 HP
 
 T3 · Lukas: Colmillo Nocturno
-💥 45 de daño · Rival: 30 HP
+💥 44 de daño · Rival: 32 HP
 
 T4 · Miguel: Impacto del Panda
-💥 42 de daño · Rival: 0 HP
+💥 47 de daño · Rival: 0 HP
 
 🎁 *RECOMPENSAS*
 Miguel: +120 ChengCoins · +35 XP
@@ -528,7 +534,7 @@ Lukas: +15 XP
 🆔 PAND-000001
 🌱 Nivel 2
 ❤️ Vida: 122/122 HP
-⚔️ Ataque: 24 · 🛡️ Defensa: 22 · 💨 Velocidad: 8
+⚔️ Ataque: 25 · 🛡️ Defensa: 23 · 💨 Velocidad: 8
 
 1️⃣ *Golpe de Bambú* · Físico
 Potencia: 25 POT · Precisión: 100%
@@ -546,13 +552,161 @@ Fallar consume el turno.
 🃏 *CHENGDÚ CARDS | VICTORIA*
 ━━━━━━━━━━━━━━
 🐼 *Panda Guerrero* usó _Impacto del Panda_
-💥 *42 de daño* a Lobo Sombrío
+💥 *47 de daño* a Lobo Sombrío
 
 🐼 *¡Miguel derrotó a Lukas!*
 
-⚔️ 4 turnos · ❤️ 32 HP restantes
+⚔️ 4 turnos · ❤️ 34 HP restantes
 
 🎁 Sin recompensa: ya alcanzaron 3 combates con recompensa entre ustedes en 24 h.
 
 ⚔️ Otra partida: .ctupelea @jugador
+```
+
+## Sobres: precio y probabilidades actuales
+
+```text
+🃏 *CHENGDÚ CARDS | SOBRES*
+━━━━━━━━━━━━━━
+🎁 *Sobre Básico* · 500 ChengCoins
+⚪ Común: 70% · 🔵 Raro: 22% · 🟣 Épico: 7% · 🟡 Legendario: 1%
+✨ Variante: 94% Normal · 5% Shiny · 1% Dorada
+🧬 Rasgos: 80% sin rasgos · 19% uno · 1% dos
+👉 *.ctuabrir basico*
+
+🎲 Un personaje por sobre. Las probabilidades de rareza se ajustan si una categoría se agota.
+Las variantes son cosméticas; los rasgos mejoran stats.
+
+🔎 Consulta el resultado con .ctuficha ID.
+
+💰 Consultar saldo: *.ctubalance*
+```
+
+## Apertura: personaje, variante y rasgos
+
+```text
+🃏 *CHENGDÚ CARDS | SOBRE ABIERTO*
+━━━━━━━━━━━━━━
+🎁 *Sobre Básico*
+
+🐉 *Dragón Carmesí*
+🟡 Legendario · Dorada
+
+🧬 Firme · Agresivo
+
+💰 500 ChengCoins gastados
+Saldo restante: *100 ChengCoins*
+
+👉 Stats y ataques: *.ctuficha DRGC-000001*
+🛡️ Seleccionar: .ctuequipo usar DRGC-000001
+```
+
+## Colección: variantes y rasgos a simple vista
+
+```text
+🃏 *CHENGDÚ CARDS | COLECCIÓN*
+━━━━━━━━━━━━━━
+🎴 *Miguel*
+
+🐼 *Panda Guerrero* · Nv. 2
+⚪ Común · ✅ Disponible
+↳ .ctuequipo usar PAND-000001
+
+🐉 *Dragón Carmesí* · ✨ Dorada · Nv. 1
+🟡 Legendario · 🧬 2 rasgos · ✅ Disponible
+↳ .ctuequipo usar DRGC-000001
+
+🔎 Detalles: .ctuficha ID
+```
+
+## Unidad obtenida: propietario y procedencia del sobre
+
+```text
+🃏 *CHENGDÚ CARDS | UNIDAD*
+━━━━━━━━━━━━━━
+🐉 *Dragón Carmesí #0001*
+🆔 DRGC-000001
+🟡 Legendario · Atacante · Dorada
+
+👤 Propietario: Miguel
+🪪 USR-f521cd40-c9dc-4c89-8d74-4537a42aa3ba
+✅ Disponible
+
+🌱 Nivel 1 · ✨ 0/100 XP
+🏆 0 victorias · 💔 0 derrotas
+
+🧬 Firme · Agresivo
+
+📜 Sobre: Sobre Básico · 11 de octubre de 2026
+
+🔎 Stats y ataques: *.ctuficha DRGC-000001*
+```
+
+## Ficha: efectos de los rasgos y estadísticas efectivas
+
+```text
+🃏 *CHENGDÚ CARDS | FICHA*
+━━━━━━━━━━━━━━
+🐉 *Dragón Carmesí* · Miguel
+🆔 DRGC-000001
+🌱 Nivel 1
+✨ Dorada
+🧬 Firme (+1 defensa) · Agresivo (+1 ataque)
+❤️ Vida: 124/124 HP
+⚔️ Ataque: 36 · 🛡️ Defensa: 23 · 💨 Velocidad: 12
+
+1️⃣ *Garra del Dragón* · Físico
+Potencia: 25 POT · Precisión: 100%
+
+2️⃣ *Aliento Carmesí* · Físico
+Potencia: 40 POT · Precisión: 80%
+
+💡 Daño: potencia + ataque − defensa (mín. 1).
+Fallar consume el turno.
+```
+
+## Repetir el mismo mensaje: recibo original, sin otro cobro
+
+```text
+🃏 *CHENGDÚ CARDS | SOBRE ABIERTO*
+━━━━━━━━━━━━━━
+↩️ Este mensaje ya abrió un sobre. Aquí está su resultado original.
+
+🐉 *Dragón Carmesí*
+🟡 Legendario · Dorada
+
+🧬 Firme · Agresivo
+
+💰 500 ChengCoins pagados en la apertura original
+Saldo tras esa apertura: *100 ChengCoins*
+
+👉 Stats y ataques: *.ctuficha DRGC-000001*
+🛡️ Seleccionar: .ctuequipo usar DRGC-000001
+```
+
+## Saldo después de abrir un sobre
+
+```text
+🃏 *CHENGDÚ CARDS | BALANCE*
+━━━━━━━━━━━━━━
+💰 *100 ChengCoins*
+
+🏆 Victoria: +120 ChengCoins y +35 XP
+💔 Derrota: +15 XP · ⚖️ Empate: +20 XP
+✨ La unidad participante también recibe esa XP.
+
+⏳ Hasta 3 combates con recompensa contra el mismo rival en 24 h.
+🏳️ Rendirse requiere 4 ataques y que ambos hayan atacado.
+⌛ La inactividad no otorga recompensas.
+
+👉 Conseguir personajes: *.ctusobres*
+```
+
+## Error: saldo insuficiente para otro sobre
+
+```text
+🃏 *CHENGDÚ CARDS | ERROR*
+━━━━━━━━━━━━━━
+💰 No tienes suficientes ChengCoins para abrir ese sobre.
+👉 Consulta .ctubalance
 ```

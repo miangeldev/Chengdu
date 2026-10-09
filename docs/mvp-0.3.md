@@ -4,6 +4,9 @@ Fecha: 2026-10-08. Alcance de `project.md`: XP, niveles, recompensas, monedas e
 historial de combate. Implementación local; la sesión real de WhatsApp sigue
 siendo responsabilidad del bot anfitrión.
 
+Este documento describe el milestone 0.3. La versión actual incorpora
+[colección 0.4](alpha-0.4.md), compras de sobres y el esquema 4.
+
 ## Flujo y mensajes
 
 Combatir ahora produce progreso. Una partida elegible paga 120 ChengCoins y

@@ -70,7 +70,7 @@ test('three victories level player and unit independently and new fights freeze 
   const next = await start(c);
   assert.equal(next.players[0].unit.stats.hp, 122);
   assert.equal(next.players[0].unit.level, 2);
-  assert.equal(next.players[0].unit.statsVersion, 1);
+  assert.equal(next.players[0].unit.statsVersion, 2);
   assert.deepEqual(await c.game.battle.getHistoryBattle({ userId: c.a.id, battleId: fights[0].id }), fights[0]);
   assert.equal((await c.game.units.getCombatDetails({ unitId: c.ua.id })).units[0].stats.hp, 122);
 });

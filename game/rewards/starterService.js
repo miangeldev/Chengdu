@@ -8,7 +8,9 @@ export function createStarterService(storage, clock) {
       return storage.withRead(async repos => Promise.all(STARTERS.map(async option => {
         const character = await repos.characters.get(option.characterId);
         const counter = character ? await repos.state.get(`mint:${character.id}`) : null;
-        return { ...option, character, available: Boolean(character?.obtainable && character?.starterEligible && (character.supply.type === 'unlimited' || counter?.issuedCount < character.supply.max)) };
+        return { ...option, character, available: Boolean(character?.obtainable && character?.starterEligible &&
+          character.supply.grandfatheredIssued === undefined &&
+          (character.supply.type === 'unlimited' || counter?.issuedCount < character.supply.max)) };
       })));
     },
     async claimStarter({ userId, choice }) {

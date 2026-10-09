@@ -73,7 +73,7 @@ test('combat ficha shows precision before choosing and preserves frozen attacks 
   await game.teams.setTeam({ userId: b.id, unitIds: [ub.id] });
   await route(sock, msg, '.ctuficha');
   assert.match(reply, /Panda Guerrero/);
-  assert.match(reply, /Defensa: 22/);
+  assert.match(reply, /Defensa: 23/);
   assert.match(reply, /Precisión: 100%/);
   assert.match(reply, /Precisión: 80%/);
   assert.doesNotMatch(reply, /Lobo Sombrío/);
@@ -123,7 +123,7 @@ test('misses stay inside one turn message and health bars can be disabled withou
   assert.match(text, /Lobo Sombrío\* usó _Colmillo Nocturno_/);
   assert.match(text, /¡El ataque falló!/);
   assert.match(text, /Miguel: 120\/120 HP/);
-  assert.match(text, /Lukas: 90\/90 HP/);
+  assert.match(text, /Lukas: 95\/95 HP/);
   assert.match(text, /Turno de Miguel/);
   assert.match(text, /!ctuatacar 1/);
   assert.match(text, /!ctuficha/);

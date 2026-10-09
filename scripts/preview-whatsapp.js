@@ -7,7 +7,8 @@ import { createCommandRouter } from '../interfaces/whatsapp/index.js';
 
 const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'chengdu-preview-'));
 let roll = 0;
-const game = createGame({ directory, clock: () => '2026-10-08T20:00:00Z', randomRoll: () => roll });
+let currentTime = '2026-10-09T20:00:00Z';
+const game = createGame({ directory, clock: () => currentTime, randomRoll: () => roll, randomDropInt: upper => upper - 1 });
 const route = createCommandRouter({ game });
 const samples = [];
 let latest;
@@ -17,9 +18,9 @@ const a = '521999999999@s.whatsapp.net';
 const b = '521111111111@s.whatsapp.net';
 const chatId = '120363111@g.us';
 
-async function send(actor, body, title = null, mentions = []) {
+async function send(actor, body, title = null, mentions = [], replayId = null) {
   await route(sock, {
-    key: { remoteJid: chatId, participant: actor, id: `preview-${++messageId}` },
+    key: { remoteJid: chatId, participant: actor, id: replayId ?? `preview-${++messageId}` },
     message: { extendedTextMessage: { contextInfo: { mentionedJid: mentions } } }
   }, body);
   if (title) samples.push({ title, text: latest });
@@ -82,6 +83,29 @@ try {
     battle = await game.battle.getMyBattle({ userId: user.id, chatId });
   }
   samples.push({ title: 'Victoria después de alcanzar el límite de recompensas por rival', text: latest });
+  // Continue real play after the reward window expires, without touching account balances.
+  currentTime = '2026-10-11T20:00:00Z';
+  for (let i = 0; i < 2; i++) {
+    await send(a, '.ctupelea @Lukas', null, [b]);
+    await send(b, '.ctuaceptar');
+    battle = await game.battle.getMyBattle({ userId: user.id, chatId });
+    while (battle.status === 'active') {
+      await send(battle.turnUserId === user.id ? a : b, '.ctuatacar 2');
+      battle = await game.battle.getMyBattle({ userId: user.id, chatId });
+    }
+  }
+  await send(a, '.ctusobres', 'Sobres: precio y probabilidades actuales');
+  const openingMessageId = 'preview-pack-purchase';
+  await send(a, '.ctuabrir basico', 'Apertura: personaje, variante y rasgos', [], openingMessageId);
+  const collection = await game.units.getUserUnits(user.id);
+  const obtained = collection.items.find(unit => unit.origin.type === 'pack');
+  if (!obtained) throw new Error('La vista previa no obtuvo una unidad del sobre.');
+  await send(a, '.ctupersonajes', 'Colección: variantes y rasgos a simple vista');
+  await send(a, `.ctuunidad ${obtained.id}`, 'Unidad obtenida: propietario y procedencia del sobre');
+  await send(a, `.ctuficha ${obtained.id}`, 'Ficha: efectos de los rasgos y estadísticas efectivas');
+  await send(a, '.ctuabrir basico', 'Repetir el mismo mensaje: recibo original, sin otro cobro', [], openingMessageId);
+  await send(a, '.ctubalance', 'Saldo después de abrir un sobre');
+  await send(a, '.ctuabrir basico', 'Error: saldo insuficiente para otro sobre');
   const output = fileURLToPath(new URL('../docs/whatsapp-preview.md', import.meta.url));
   fs.writeFileSync(output, '# Vista previa de los mensajes de WhatsApp\n\n' +
     'Generada con `npm run preview:whatsapp`, usando jugadores ficticios y una base temporal.\n' +

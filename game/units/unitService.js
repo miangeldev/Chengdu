@@ -6,7 +6,10 @@ import { effectiveStats } from '../progression/rules.js';
 
 async function detail(repos, unit) {
   const owner = await repos.users.get(unit.ownerId);
-  return { ...unit, currentStats: effectiveStats(unit.initialStats, unit.progress.level, unit.statGrowthVersion), character: await repos.characters.get(unit.characterId), owner: { id: owner.id, name: owner.name } };
+  const opening = unit.origin.type === 'pack' ? await repos.openings.get(unit.origin.sourceId) : null;
+  return { ...unit, currentStats: effectiveStats(unit.initialStats, unit.progress.level, unit.statGrowthVersion, unit.traits, unit.traitVersion, unit.combatBaseStats),
+    pack: opening ? { id: opening.packId, name: opening.packSnapshot.name, revision: opening.packRevision } : null,
+    character: await repos.characters.get(unit.characterId), owner: { id: owner.id, name: owner.name } };
 }
 
 function snapshotDetail(player) {
@@ -22,10 +25,10 @@ async function combatDetail(repos, unitId) {
   }
   const character = await repos.characters.get(unit.characterId);
   const owner = await repos.users.get(unit.ownerId);
-  const stats = effectiveStats(unit.initialStats, unit.progress.level, unit.statGrowthVersion);
+  const stats = effectiveStats(unit.initialStats, unit.progress.level, unit.statGrowthVersion, unit.traits, unit.traitVersion, unit.combatBaseStats);
   return {
     id: unit.id, characterId: unit.characterId, characterName: character.name,
-    level: unit.progress.level, stats, hp: stats.hp,
+    level: unit.progress.level, stats, hp: stats.hp, traits: unit.traits, variant: unit.variant, traitVersion: unit.traitVersion,
     attacks: await Promise.all(character.attackIds.map(id => repos.attacks.get(id))),
     owner: { id: owner.id, name: owner.name }, inBattle: false
   };
@@ -35,7 +38,7 @@ export function createUnitService(storage, clock) {
   return {
     async createUnit(options) {
       // Internal API. No player command accepts origin, owner or operationKey.
-      requireGame(options.origin?.type !== 'starter', 'INVALID_ORIGIN');
+      requireGame(!['starter', 'pack'].includes(options.origin?.type), 'INVALID_ORIGIN');
       return storage.withTransaction(repos => createUnitInTransaction(repos, options, clock));
     },
     async getUnit(unitId) {

@@ -13,7 +13,7 @@ export async function rewardBattle(repos, battle, now) {
     const user = await repos.users.get(player.userId);
     const unit = await repos.units.get(player.unit.id);
     const amounts = rewardAmounts(battle, user.id, reason);
-    const credited = await creditCoinsInTransaction(repos, user, amounts.coins, now);
+    const credited = await creditCoinsInTransaction(repos, user, amounts.coins, now, { type: 'battle_reward', id: `reward:${battle.id}:${user.id}` });
     const reward = {
       id: `reward:${battle.id}:${user.id}`, battleId: battle.id, userId: user.id, unitId: unit.id,
       version: REWARD_VERSION, reason, ...amounts, createdAt: now,

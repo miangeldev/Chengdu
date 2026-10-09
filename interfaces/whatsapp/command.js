@@ -7,6 +7,12 @@ import { card, commandText, displayName, section } from './format.js';
 export { displayName, rarityName } from './format.js';
 
 const messages = {
+  PACK_NOT_FOUND: '🎁 Ese sobre no existe.\n👉 Consulta .ctusobres',
+  PACK_UNAVAILABLE: '📦 Este sobre no tiene personajes disponibles por ahora.\n👉 Consulta .ctusobres',
+  INSUFFICIENT_COINS: '💰 No tienes suficientes ChengCoins para abrir ese sobre.\n👉 Consulta .ctubalance',
+  PACK_MESSAGE_ID_REQUIRED: '📨 No pude identificar este mensaje para confirmar la compra.\nEnvía de nuevo el comando en un mensaje nuevo.',
+  INVALID_OPERATION_KEY: '📨 No pude identificar esta operación. Envía el comando en un mensaje nuevo.',
+  OPERATION_CONFLICT: '📨 Este mensaje ya confirmó otra operación.\nEnvía tu nuevo comando en un mensaje nuevo.',
   HISTORY_NOT_FOUND: '📜 Esa partida no está en el historial. Consulta .ctuhistorial',
   INVALID_NAME: '❌ Escribe un nombre de 1 a 40 caracteres, sin saltos de línea ni caracteres de control.\nEjemplo: .cturegistro Miguel',
   USER_NOT_FOUND: '❌ Primero regístrate con .cturegistro Tu nombre',

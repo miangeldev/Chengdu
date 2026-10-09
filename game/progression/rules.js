@@ -1,6 +1,7 @@
 import { requireGame } from '../../utils/GameError.js';
+import { applyTraits } from '../units/collectibles.js';
 
-export const PROGRESSION_VERSION = 1;
+export const PROGRESSION_VERSION = 2;
 export const LEVEL_CAPS = Object.freeze({ user: 50, unit: 20 });
 
 export function safeAdd(value, amount) {
@@ -27,15 +28,16 @@ export function grantXp(progress, amount, kind) {
   return next;
 }
 
-export function effectiveStats(initialStats, level, version = PROGRESSION_VERSION) {
-  requireGame([0, 1].includes(version) && Number.isSafeInteger(level) && level >= 1, 'INVALID_PROGRESSION');
+export function effectiveStats(initialStats, level, version = PROGRESSION_VERSION, traits = [], traitVersion = 0, combatBaseStats = null) {
+  requireGame([0, 1, 2].includes(version) && Number.isSafeInteger(level) && level >= 1, 'INVALID_PROGRESSION');
+  const base = version === 2 ? combatBaseStats ?? initialStats : initialStats;
   const steps = version === 0 ? 0 : Math.min(level - 1, LEVEL_CAPS.unit - 1);
-  return {
-    hp: safeAdd(initialStats.hp, steps * 2),
-    attack: safeAdd(initialStats.attack, Math.floor(steps / 5)),
-    defense: safeAdd(initialStats.defense, Math.floor(steps / 5)),
-    speed: initialStats.speed
-  };
+  return applyTraits({
+    hp: safeAdd(base.hp, steps * 2),
+    attack: safeAdd(base.attack, Math.floor(steps / 5)),
+    defense: safeAdd(base.defense, Math.floor(steps / 5)),
+    speed: base.speed
+  }, traits, traitVersion);
 }
 
 export function progressionBaseline(type, entity) {

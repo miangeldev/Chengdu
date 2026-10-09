@@ -99,11 +99,13 @@ export function createBattleService(storage, clock, randomRoll = () => randomInt
           const character = await repos.characters.get(unit.characterId);
           const attacks = await Promise.all(character.attackIds.map(id => repos.attacks.get(id)));
           requireGame(attacks.length === 2 && attacks.every(Boolean), 'DATABASE_CORRUPT');
-          const stats = effectiveStats(unit.initialStats, unit.progress.level, unit.statGrowthVersion);
+          const stats = effectiveStats(unit.initialStats, unit.progress.level, unit.statGrowthVersion, unit.traits, unit.traitVersion, unit.combatBaseStats);
           p.unit = {
             id: unit.id, characterId: unit.characterId, characterRevision: character.revision,
             characterName: character.name, serial: unit.serial, level: unit.progress.level,
-            statsVersion: unit.statGrowthVersion, stats, hp: stats.hp, attacks
+            statsVersion: unit.statGrowthVersion, traitVersion: unit.traitVersion, traits: unit.traits, variant: unit.variant,
+            combatBaseStats: structuredClone(unit.combatBaseStats),
+            stats, hp: stats.hp, attacks
           };
           await repos.units.replace({ ...unit, lock: { type: 'battle', referenceId: battle.id }, updatedAt: now });
         }

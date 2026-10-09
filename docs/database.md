@@ -1,9 +1,10 @@
-# Modelo de datos — MVP 0.3 y su evolución
+# Modelo de datos — Alpha 0.4.1 y su evolución
 
-Estado: contrato implementado hasta 0.3 (esquema 3), basado en `../project.md`.
+Estado: contrato implementado hasta 0.4.1 (esquema 5), basado en `../project.md`.
 Los mecanismos descritos como futuros aún requieren servicios y migraciones.
 El alcance se divide en [fundación 0.1](mvp-0.1.md), [combate 0.2](mvp-0.2.md)
-y [progresión 0.3](mvp-0.3.md).
+[progresión 0.3](mvp-0.3.md), [colección 0.4](alpha-0.4.md)
+y [balance 0.4.1](balance-0.4.1.md).
 
 ## Convenciones y fuentes de verdad
 
@@ -32,16 +33,21 @@ y [progresión 0.3](mvp-0.3.md).
 | `ataques.json` | Definiciones de ataques versionadas, potencia y precisión. |
 | `combates.json` | Desafíos, snapshots, acciones, turnos y resultados. |
 | `recompensas.json` | Premios por jugador/batalla, motivo, cantidades y valores antes/después. |
+| `sobres.json` | Definiciones versionadas: precio, pool, pesos de rareza/rasgos/variante. |
+| `aperturas.json` | Compras únicas, snapshot del sobre, resultado y recibo originales. |
+| `economia.json` | Créditos/débitos inmutables, fuente y saldo antes/después. |
 
 Además, `_database.json` marca la instalación, `_journal.json` coordina un commit
 pendiente y `backups/` conserva snapshots coherentes del estado anterior.
+El esquema 5 conserva las once colecciones del esquema 4; con el manifest,
+cada snapshot del journal contiene doce archivos.
 
 Cada colección emplea esta envoltura; el adaptador oculta la envoltura a servicios:
 
 ```json
 {
   "_meta": {
-    "schemaVersion": 3,
+    "schemaVersion": 5,
     "revision": 0,
     "updatedAt": null
   },
@@ -88,34 +94,43 @@ la futura capacidad de tres unidades; en 0.2 el servicio permite seleccionar una
 ```json
 {
   "id": "panda_guerrero",
-  "revision": 1,
+  "revision": 2,
   "name": "Panda Guerrero",
   "unitPrefix": "PAND",
   "rarity": "common",
   "role": "tank",
-  "baseStats": { "hp": 120, "attack": 24, "defense": 22, "speed": 8 },
+  "baseStats": { "hp": 120, "attack": 25, "defense": 23, "speed": 8 },
   "statVariation": { "hp": 0, "attack": 0, "defense": 0, "speed": 0 },
   "attackIds": ["panda_guerrero_1", "panda_guerrero_2"],
-  "supply": { "type": "unlimited", "max": null },
+  "supply": { "type": "limited", "max": 50 },
   "obtainable": true,
   "starterEligible": true
 }
 ```
 
-Estos números ilustran la estructura; el balance requiere revisión de contenido.
+El ejemplo representa una plantilla migrada al balance 0.4.1. Una instalación
+nueva puede comenzar con revisión 1; la revisión describe cambios de esa
+plantilla, no la versión del esquema. Los valores finales están en
+[balance 0.4.1](balance-0.4.1.md).
 Rarezas iniciales: `common`, `rare`, `epic`, `legendary`, `mythic`.
 `role` es descriptivo; rareza no aplica automáticamente multiplicadores de fuerza.
 `attackIds` contiene dos referencias del catálogo de ataques; cada combate
 congela sus definiciones completas al ser aceptado.
 Una emisión limitada usa `supply.type = limited` y `max` entero positivo.
 La variación permitida está acotada a 1,000,000 por stat; en el catálogo inicial
-es cero. El primer catálogo establece supply 500 para Dragón Carmesí.
+es cero. Los máximos actuales por personaje son común 50, raro 35, épico 20,
+legendario 10 y mítico 5 para contenido futuro. La migración conserva un máximo
+previo si era menor. El antiguo máximo de 500 de Dragón Carmesí corresponde al
+contenido anterior al balance 0.4.1.
 
 `obtainable = false` cierra nuevas emisiones; las unidades existentes continúan
 siendo válidas. No borrar ni renombrar IDs o prefijos que ya emitieron unidades.
-No reducir `max` por debajo de lo emitido; los cambios de límites o rareza requieren
-decisión de contenido explícita. Cambiar stats incrementa `revision` y no reescribe
-silenciosamente unidades existentes.
+Los cambios de límites o rareza requieren una decisión de contenido y una
+migración. El esquema 5 admite un máximo menor que lo emitido sólo si conserva
+el total histórico mediante `supply.grandfatheredIssued`: las unidades anteriores
+siguen siendo válidas y no se permiten nuevas emisiones. Ese dato no concede
+cupos adicionales. Cambiar stats incrementa `revision`; el balance de unidades
+existentes necesita una base de combate versionada y una migración explícita.
 
 ## Unidad coleccionable
 
@@ -130,9 +145,11 @@ silenciosamente unidades existentes.
   "updatedAt": "2026-10-07T20:00:00Z",
   "origin": { "type": "starter", "sourceId": "starter_v1" },
   "initialStats": { "hp": 120, "attack": 24, "defense": 22, "speed": 8 },
+  "combatBaseStats": { "hp": 120, "attack": 25, "defense": 23, "speed": 8 },
   "progress": { "level": 1, "xp": 0 },
   "traits": [],
-  "statGrowthVersion": 1,
+  "statGrowthVersion": 2,
+  "traitVersion": 1,
   "variant": "normal",
   "battleStats": { "wins": 0, "losses": 0 },
   "lock": null
@@ -140,13 +157,21 @@ silenciosamente unidades existentes.
 ```
 
 `initialStats` conserva los valores generados al emitir, con variación aplicada
-una sola vez. Los stats efectivos se calculan con `statGrowthVersion: 1` y el nivel:
+una sola vez. El ejemplo muestra una unidad anterior migrada: conserva sus
+stats de nacimiento y añade `combatBaseStats` para el balance vigente.
+Las unidades nuevas comienzan con `combatBaseStats` igual a `initialStats`.
+Con `statGrowthVersion: 2`, los stats efectivos parten de esa base y del nivel:
 `+2 HP` por nivel ganado, `+1 ataque/defensa` por cada cinco, hasta nivel 20; la
-velocidad no cambia. Se copian al snapshot junto con `statsVersion: 1`. El balance de unidades existentes
-se hará mediante una operación explícita, no recargando el catálogo en cada turno.
+velocidad no cambia. Después se aplican los rasgos de su versión. Los snapshots
+nuevos copian `combatBaseStats` junto con `statsVersion: 2`; ambas bases y la
+versión permiten validar el resultado sin consultar el catálogo actual.
+Las versiones históricas 0 y 1 conservan sus reglas sobre los stats de nacimiento.
+No se recarga la plantilla para recalcular una unidad o un turno ya iniciado.
 
 ID, `characterId`, `serial`, origen y fecha de creación son identidad de emisión
-inmutable. `ownerId` cambia sólo mediante un servicio transaccional. Para evolución
+inmutable. `combatBaseStats` se fija al emitir o migrar y tampoco admite cambios
+ordinarios; un balance futuro requiere otra versión y migración. `ownerId` cambia
+sólo mediante un servicio transaccional. Para evolución
 futura, añadir una referencia de forma/evolución separada: no cambiar el personaje
 de emisión, porque alteraría el significado del serial y el supply original.
 En 0.2 también se valida que el propietario permanezca igual al de emisión;
@@ -187,6 +212,9 @@ Los registros de `estado.json` se distinguen por `kind`:
 Supply significa total histórico emitido, no unidades activas ni propietarios.
 `lastSerial` nunca baja; eliminar o retirar una unidad no devuelve cupos ni seriales.
 Futuras bajas deben conservar un registro o tombstone de emisión.
+Los cupos se comparten entre starters, sobres y otras fuentes, entre todos los
+jugadores. Una variante o rasgo no inicia otro contador. El máximo por personaje
+permanece independiente del número de propietarios.
 
 El reclamo es la fuente de verdad del starter; evitar duplicarlo en un booleano
 del usuario. Su clave es por usuario, independientemente de `starter_v1`: cambiar
@@ -197,8 +225,8 @@ Las claves de premios futuros incluirán el evento o recompensa específica.
 `eventos.json` guarda un registro por creación: `id`, `type = unit_created`,
 `unitId`, `fromOwnerId = null`, `toOwnerId`, `reason`, `operationKey`, `createdAt`.
 Se escribe en el mismo commit que la unidad. El ID y la clave de operación son
-únicos. El historial creciente vive fuera de la unidad; el ledger monetario futuro
-tendrá su propia colección y referencias a la operación que lo causó.
+únicos. El historial creciente vive fuera de la unidad; `economia.json` tiene
+referencias a las recompensas y aperturas que causaron cada crédito o débito.
 
 ## Persistencia consistente con varios JSON
 
@@ -339,7 +367,8 @@ el historial muestra el recibo original, sin recalcularlo con el progreso actual
 Los cambios de monedas pasan por `game/economy/coinOperations.js`, dentro de la
 misma transacción que escribe recompensas, XP, resultado, estadísticas y locks.
 `game.economy.getBalance()` sólo consulta. No hay compras, retiros, transferencias
-ni crédito administrativo en 0.3. El ledger general futuro deberá ampliar esta
+ni crédito administrativo en 0.3. En 0.4 se añade el ledger descrito más abajo y
+la compra de sobres. Las fuentes y gastos futuros deberán ampliar esta
 validación mediante una migración para aceptar nuevas fuentes y gastos, sin
 eliminar los registros de premio ni perder sus claves únicas.
 
@@ -355,3 +384,141 @@ descendente con ID de desempate. Los cursores están ligados a cada usuario.
 La consulta detallada exige ser participante, incluso al consultarla en privado
 o desde otro grupo. Para SQLite, mantener índices por `(userId, finishedAt, id)`
 y restricciones únicas por `(battleId, userId)`, además de todas las referencias.
+
+## Sobres, drops y coleccionables 0.4
+
+`sobres.json` contiene el Sobre Básico (`id: basico`, `revision: 1`, `price: 500`).
+Su `pool` define rarezas, pesos enteros y IDs de personaje; `traitWeights` define
+pesos por cantidad de rasgos y `variantWeights` pesos por variante. El catálogo
+se siembra sólo en instalaciones nuevas o durante la migración: no se reemplaza
+al arrancar. Un cambio de contenido debe incrementar la revisión del sobre.
+
+El motor comprueba catálogo actual, emisión abierta y contador global antes de
+sortear. Elimina candidatos agotados y rarezas sin candidatos; conserva los
+pesos relativos restantes. Selecciona uniforme dentro de cada rareza. El mismo
+contador asigna seriales para starter, sobre y emisiones administrativas; las
+variantes no tienen un supply independiente. Un sobre vacío falla antes del
+descuento. La aleatoriedad criptográfica admite pesos enteros con suma menor
+que `2^48`; la inyección de un RNG se limita al API interno para pruebas.
+
+Las unidades nuevas tienen `traitVersion: 1`, cero a dos rasgos distintos entre
+`robust`, `aggressive` y `resolute`, y una variante `normal`, `shiny` o `golden`.
+Se calculan los stats del nivel y después los bonos: Robusto agrega 3% HP
+redondeado hacia abajo; Agresivo +1 ataque; Firme +1 defensa. La variante no
+modifica stats. `initialStats`, rasgos, variante y versión de rasgos son identidad
+de nacimiento inmutable. Los snapshots nuevos copian rasgos, variante y
+`traitVersion` además de `statsVersion`; los anteriores siguen usando su regla
+histórica. Un futuro cambio de efectos debe añadir otra versión, conservando
+la anterior para validar resultados históricos.
+
+Cada apertura guarda un registro append-only en `aperturas.json`:
+
+```text
+id: OPEN-<uuid>, userId, packId, packRevision, operationKey, createdAt
+price, balanceBefore, balanceAfter, unitId
+packSnapshot: definición completa del sobre al comprar
+result: characterId, characterRevision, characterName, rarity, serial,
+        traits, variant, traitVersion
+```
+
+La unidad emitida tiene `origin: {type: "pack", sourceId: opening.id}`. Su evento
+usa `operationKey: "opening:" + opening.id`. La validación exige un vínculo
+exacto entre recibo, unidad, evento, revisión, rareza, precio y movimiento
+monetario. El snapshot de compra puede tener una revisión anterior a la vigente;
+una revisión futura se rechaza. No se admite falsificar origen de sobre mediante
+el servicio general de emisión.
+
+La clave de apertura es globalmente única. WhatsApp la deriva de identidad,
+conversación e ID autenticado del mensaje; sin ese ID se rechaza la compra.
+Un replay devuelve la compra persistida antes de comprobar saldo o tirar dados.
+El recibo mantiene sus cantidades originales; una consulta pública de unidad
+sólo expone nombre/revisión del sobre, sin saldos ni datos privados de compra.
+
+## Movimientos de monedas 0.4
+
+`economia.json` registra créditos de batalla y débitos de sobres, incluso los
+créditos cero, para mantener la secuencia exacta de cada saldo:
+
+```text
+id: coin:<sourceId>, userId, type: credit|debit
+sourceType: battle_reward|pack_opening, sourceId
+amount, balanceBefore, balanceAfter, createdAt
+```
+
+Cada recompensa y apertura tiene exactamente un movimiento con la misma
+identidad, importe, fecha y saldo antes/después. El ledger es append-only;
+la validación recorre sus registros desde los baselines existentes y compara
+el total con `user.economy.coins`. Una compra puede aparecer entre dos premios
+sin romper la reconstrucción. La XP sigue recorriendo sólo recompensas de
+batalla. Crédito, débito, recibo y demás cambios se publican en la misma
+transacción; no existe una API de jugador para dar o retirar monedas libremente.
+
+El ledger actual cubre esas dos fuentes. Añadir daily, transferencias, otras
+monedas o gastos en Alpha 0.5 y posteriores exige extender y versionar las
+fuentes y validadores. Conservar IDs, baselines, orden, claves de operación y
+referencias al migrar a SQLite; no recomputar compras con precios actuales.
+
+## Migración del esquema 3 al 4
+
+Se añaden `sobres.json`, `aperturas.json` y `economia.json`; los sobres se siembran,
+las aperturas empiezan vacías y cada recompensa histórica produce un crédito
+determinista `coin:<reward.id>` con sus importes originales. No se acredita
+dinero nuevo: el backfill reconstruye movimientos ya incluidos en los saldos.
+
+Cada unidad preexistente recibe `traitVersion: 0`. Se conservan sus strings de
+rasgos y variante, sin adquirir nuevos bonos. IDs, seriales, unidades, propietarios,
+saldos, XP, estadísticas, orígenes y snapshots activos/cerrados permanecen intactos.
+La migración valida el esquema 3 antes de cambiarlo y el 4 antes de publicarlo.
+
+El journal admite esquema 4 con doce archivos, incluido `_database.json`, además
+de los journals anteriores de seis, ocho y nueve archivos. Desde esquemas 1 o
+2 se aplica toda la cadena en un único commit con backup de los originales.
+Las fases preparadas se revierten; las comprometidas se completan. La presencia
+inesperada de archivos nuevos junto a un esquema antiguo bloquea la migración
+para conservar evidencia, en vez de sobrescribirlos.
+
+## Migración del esquema 4 al 5
+
+El balance 0.4.1 conserva las once colecciones y actualiza sus envolturas al
+esquema 5 en un mismo commit con backup. Las plantillas aumentan su revisión,
+reciben los stats del balance versionado y pasan a emisión limitada según su
+rareza. Si ya tenían un máximo menor, se conserva ese máximo.
+
+Para cada unidad anterior se calcula:
+
+```text
+combatBaseStats = initialStats + (stats del balance 0.4.1 − stats canónicos anteriores)
+statGrowthVersion = 2
+```
+
+El ajuste se aplica por stat y preserva la variación individual de nacimiento.
+Un personaje ajeno al catálogo de balance conserva su base anterior. Una unidad
+nueva guarda directamente su base de emisión en `combatBaseStats`.
+`initialStats`, serial, revisión de emisión, origen, dueño, progreso, rasgos y
+variante permanecen intactos. Las recompensas, movimientos de monedas, recibos,
+estadísticas y snapshots de combates anteriores tampoco se reescriben.
+
+Si un contador ya supera el nuevo máximo, la plantilla conserva ese total en
+`supply.grandfatheredIssued`. Por ejemplo, con 54 unidades comunes ya emitidas:
+
+```json
+{ "type": "limited", "max": 50, "grandfatheredIssued": 54 }
+```
+
+Se validan las 54 unidades existentes y se bloquea cualquier nueva emisión del
+personaje. No se borran unidades ni se reducen contadores para ajustar el máximo.
+Cuando existe `grandfatheredIssued`, el cupo disponible es cero y el contador
+debe permanecer igual al total heredado. El marcador mantiene la emisión
+cerrada incluso si después aumenta el máximo o cambia la rareza.
+
+Una partida aceptada antes de migrar conserva su snapshot de versión 0 o 1 y
+se termina con esos valores. Una aceptación posterior fija `statsVersion: 2`
+y copia la base de combate en el snapshot; a partir de ella se validan crecimiento
+y rasgos sin depender del catálogo vigente. Los resultados ya cerrados siguen
+siendo inmutables.
+
+La recuperación admite journals de esquema 5 con doce archivos, además de
+todos los anteriores. Desde esquemas previos, el arranque aplica la cadena
+completa con validación y un backup coherente. Un cambio posterior de balance
+debe añadir otra versión y su migración; modificar una constante histórica o
+sobrescribir catálogos al arrancar impediría validar partidas anteriores.

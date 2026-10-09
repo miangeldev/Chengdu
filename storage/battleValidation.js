@@ -51,7 +51,11 @@ export function validateBattleData(state, schemaVersion = 3) {
       check(text(u.characterName) && integer(u.serial, 1) && integer(u.characterRevision, 1) && integer(u.level, 1), 'battle.snapshot');
       const initialStats = units.get(u.id).initialStats;
       check(u.serial === units.get(u.id).serial && u.characterRevision <= characters.get(u.characterId).revision &&
-        equal(u.stats, schemaVersion < 3 ? initialStats : effectiveStats(initialStats, u.level, u.statsVersion ?? 0)), 'battle.snapshotOrigin');
+        equal(u.stats, schemaVersion < 3 ? initialStats : effectiveStats(initialStats, u.level, u.statsVersion ?? 0, u.traits ?? [], u.traitVersion ?? 0, u.combatBaseStats)), 'battle.snapshotOrigin');
+      if (u.statsVersion === 2) check(schemaVersion >= 5 && equal(u.combatBaseStats, units.get(u.id).combatBaseStats), 'battle.snapshotBalance');
+      if (u.traitVersion !== undefined) {
+        check(u.traitVersion === units.get(u.id).traitVersion && equal(u.traits, units.get(u.id).traits) && u.variant === units.get(u.id).variant, 'battle.snapshotTraits');
+      }
       for (const key of ['hp', 'attack', 'defense', 'speed']) check(integer(u.stats?.[key], key === 'defense' ? 0 : 1), 'battle.snapshotStats');
       check(integer(u.hp) && u.hp <= u.stats.hp && Array.isArray(u.attacks) && u.attacks.length === 2 && u.attacks[0].id !== u.attacks[1].id, 'battle.snapshotHp');
       for (const attack of u.attacks) {
@@ -131,7 +135,8 @@ export function validateBattleTransition(before, after) {
     if (battle.status === 'pending' && updated.status === 'active') {
       for (const player of updated.players) {
         const unit = before.unidades.records.find(u => u.id === player.unit.id);
-        check(unit && unit.ownerId === player.userId && player.unit.level === unit.progress.level && player.unit.statsVersion === unit.statGrowthVersion, 'battle.snapshotLevel');
+        check(unit && unit.ownerId === player.userId && player.unit.level === unit.progress.level && player.unit.statsVersion === unit.statGrowthVersion && equal(player.unit.combatBaseStats, unit.combatBaseStats) &&
+          player.unit.traitVersion === unit.traitVersion && equal(player.unit.traits, unit.traits) && player.unit.variant === unit.variant, 'battle.snapshotLevel');
         check(before.usuarios.records.find(u => u.id === player.userId).team[0] === unit.id, 'battle.snapshotTeam');
       }
     }

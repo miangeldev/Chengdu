@@ -6,10 +6,12 @@ const check = (value, field) => requireGame(value, 'DATABASE_CORRUPT', { field }
 const equal = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const integer = value => Number.isSafeInteger(value) && value >= 0;
 
-export function validateProgressionData(state) {
+export function validateProgressionData(state, schemaVersion = 5) {
   const users = new Map(state.usuarios.records.map(u => [u.id, u]));
   const units = new Map(state.unidades.records.map(u => [u.id, u]));
   const battles = new Map(state.combates.records.map(b => [b.id, b]));
+  const coinMovements = schemaVersion >= 4 ? new Map(state.economia.records
+    .filter(m => m.sourceType === 'battle_reward').map(m => [m.sourceId, m])) : null;
   const balances = new Map();
   const userProgress = new Map();
   const unitProgress = new Map();
@@ -27,8 +29,8 @@ export function validateProgressionData(state) {
   }
   check(userProgress.size === users.size && unitProgress.size === units.size, 'progression.baselineComplete');
   for (const unit of units.values()) {
-    check(unit.statGrowthVersion === 1, 'progression.statVersion');
-    effectiveStats(unit.initialStats, unit.progress.level, unit.statGrowthVersion);
+    check(unit.statGrowthVersion === (schemaVersion >= 5 ? 2 : 1), 'progression.statVersion');
+    effectiveStats(unit.initialStats, unit.progress.level, unit.statGrowthVersion, unit.traits, unit.traitVersion ?? 0, unit.combatBaseStats ?? null);
   }
 
   const byBattle = new Map();
@@ -48,7 +50,14 @@ export function validateProgressionData(state) {
     check(!entries.some(r => r.userId === reward.userId) && reward.reason === (entries[0]?.reason ?? reward.reason), 'reward.uniquePlayer');
     const amounts = rewardAmounts(battle, reward.userId, reward.reason);
     check(['coins', 'userXp', 'unitXp'].every(key => reward[key] === amounts[key]), 'reward.amounts');
-    check(reward.balanceBefore === balances.get(reward.userId) && reward.balanceAfter === safeAdd(reward.balanceBefore, reward.coins), 'reward.balance');
+    check(integer(reward.balanceBefore) && reward.balanceAfter === safeAdd(reward.balanceBefore, reward.coins) &&
+      (schemaVersion >= 4 || reward.balanceBefore === balances.get(reward.userId)), 'reward.balance');
+    if (schemaVersion >= 4) {
+      const movement = coinMovements.get(reward.id);
+      check(movement && movement.userId === reward.userId && movement.amount === reward.coins &&
+        movement.balanceBefore === reward.balanceBefore && movement.balanceAfter === reward.balanceAfter &&
+        movement.createdAt === reward.createdAt, 'reward.coinMovement');
+    }
     check(equal(reward.userProgressBefore, userProgress.get(reward.userId)) &&
       equal(reward.userProgressAfter, grantXp(reward.userProgressBefore, reward.userXp, 'user')), 'reward.userProgress');
     check(equal(reward.unitProgressBefore, unitProgress.get(reward.unitId)) &&
@@ -69,7 +78,7 @@ export function validateProgressionData(state) {
       rewards: battle.players.map(p => rewardSummary(entries.find(r => r.userId === p.userId)))
     }), 'reward.settlement');
   }
-  for (const user of users.values()) check(user.economy.coins === balances.get(user.id) && equal(user.progress, userProgress.get(user.id)), 'reward.userTotals');
+  for (const user of users.values()) check((schemaVersion >= 4 || user.economy.coins === balances.get(user.id)) && equal(user.progress, userProgress.get(user.id)), 'reward.userTotals');
   for (const unit of units.values()) check(equal(unit.progress, unitProgress.get(unit.id)), 'reward.unitTotals');
 }
 

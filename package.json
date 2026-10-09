@@ -1,12 +1,13 @@
 {
   "name": "chengdu-cards",
-  "version": "0.3.0",
+  "version": "0.4.1",
   "private": true,
   "type": "module",
   "engines": { "node": ">=22" },
   "scripts": {
     "test": "node --test",
     "preview:whatsapp": "node scripts/preview-whatsapp.js",
+    "balance:simulate": "node scripts/simulate-balance.js",
     "db:validate": "node scripts/database.js validate",
     "db:unlock": "node scripts/database.js unlock"
   }

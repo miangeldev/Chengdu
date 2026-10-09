@@ -8,9 +8,12 @@ import { createRepositories } from '../repositories/index.js';
 import { migrateLegacyUsers } from './migrations/001-users.js';
 import { migrateBattlesV2 } from './migrations/002-battles.js';
 import { migrateProgressionV3 } from './migrations/003-progression.js';
+import { migrateCollectionV4 } from './migrations/004-collection.js';
+import { migrateBalanceV5 } from './migrations/005-balance.js';
 import { progressionBaseline } from '../game/progression/rules.js';
 import { seedAttacks } from '../game/battle/attacks.js';
-import { COLLECTIONS, V1_COLLECTIONS, V2_COLLECTIONS, SCHEMA_VERSION, validateDatabase, validateTransition } from './validation.js';
+import { seedPacks } from '../game/packs/catalog.js';
+import { COLLECTIONS, V1_COLLECTIONS, V2_COLLECTIONS, V3_COLLECTIONS, SCHEMA_VERSION, validateDatabase, validateTransition } from './validation.js';
 import { acquireWriterLock } from './writerLock.js';
 import { atomicWrite, parseJSON, readText, syncDirectory } from './files.js';
 
@@ -19,6 +22,7 @@ const JOURNAL = '_journal.json';
 const FILES = [...COLLECTIONS.map(name => `${name}.json`), MANIFEST];
 const V1_FILES = [...V1_COLLECTIONS.map(name => `${name}.json`), MANIFEST];
 const V2_FILES = [...V2_COLLECTIONS.map(name => `${name}.json`), MANIFEST];
+const V3_FILES = [...V3_COLLECTIONS.map(name => `${name}.json`), MANIFEST];
 const serialize = value => JSON.stringify(value, null, 2) + '\n';
 const digest = body => createHash('sha256').update(JSON.stringify(body)).digest('hex');
 
@@ -30,15 +34,16 @@ function initialState() {
   const state = Object.fromEntries(COLLECTIONS.map(name => [name, envelope()]));
   state.personajes.records = seedCharacters();
   state.ataques.records = seedAttacks();
+  state.sobres.records = seedPacks();
   state.estado.records = state.personajes.records.map(c => ({ id: `mint:${c.id}`, kind: 'mintCounter', characterId: c.id, lastSerial: 0, issuedCount: 0 }));
   return state;
 }
 
 function decode(raw, expectedVersion = null) {
   const manifest = parseJSON(raw[MANIFEST], MANIFEST);
-  requireGame([1, 2, 3].includes(manifest?.schemaVersion) && (expectedVersion === null || manifest.schemaVersion === expectedVersion), 'UNSUPPORTED_SCHEMA_VERSION', { file: MANIFEST });
+  requireGame([1, 2, 3, 4, 5].includes(manifest?.schemaVersion) && (expectedVersion === null || manifest.schemaVersion === expectedVersion), 'UNSUPPORTED_SCHEMA_VERSION', { file: MANIFEST });
   requireGame(manifest.database === 'chengdu-cards', 'DATABASE_CORRUPT');
-  const names = manifest.schemaVersion === 1 ? V1_COLLECTIONS : manifest.schemaVersion === 2 ? V2_COLLECTIONS : COLLECTIONS;
+  const names = manifest.schemaVersion === 1 ? V1_COLLECTIONS : manifest.schemaVersion === 2 ? V2_COLLECTIONS : manifest.schemaVersion === 3 ? V3_COLLECTIONS : COLLECTIONS;
   requireGame(names.every(name => typeof raw[`${name}.json`] === 'string'), 'DATABASE_INCOMPLETE');
   const state = Object.fromEntries(names.map(name => [name, parseJSON(raw[`${name}.json`], `${name}.json`)]));
   validateDatabase(state, manifest.schemaVersion);
@@ -89,8 +94,8 @@ export class JsonUnitOfWork {
       typeof body.id === 'string' && journal.checksum === digest(body), 'DATABASE_CORRUPT', { file: JOURNAL });
     requireGame(body.after && typeof body.after[MANIFEST] === 'string', 'DATABASE_CORRUPT');
     const version = parseJSON(body.after[MANIFEST], MANIFEST).schemaVersion;
-    requireGame([1, 2, 3].includes(version), 'UNSUPPORTED_SCHEMA_VERSION');
-    const files = version === 1 ? V1_FILES : version === 2 ? V2_FILES : FILES;
+    requireGame([1, 2, 3, 4, 5].includes(version), 'UNSUPPORTED_SCHEMA_VERSION');
+    const files = version === 1 ? V1_FILES : version === 2 ? V2_FILES : version === 3 ? V3_FILES : FILES;
     for (const state of [body.before, body.after]) {
       requireGame(state && Object.keys(state).length === files.length && files.every(file => Object.hasOwn(state, file)), 'DATABASE_CORRUPT', { file: JOURNAL });
     }
@@ -173,10 +178,15 @@ export class JsonUnitOfWork {
         this.#commit(raw, state);
       } else if (parseJSON(raw[MANIFEST], MANIFEST).schemaVersion === 1) {
         requireGame(FILES.filter(file => !V1_FILES.includes(file)).every(file => raw[file] === null), 'DATABASE_INCOMPLETE');
-        this.#commit(raw, migrateProgressionV3(migrateBattlesV2(decode(raw, 1), this.clock()), this.clock()));
+        this.#commit(raw, migrateBalanceV5(migrateCollectionV4(migrateProgressionV3(migrateBattlesV2(decode(raw, 1), this.clock()), this.clock()), this.clock()), this.clock()));
       } else if (parseJSON(raw[MANIFEST], MANIFEST).schemaVersion === 2) {
-        requireGame(raw['recompensas.json'] === null, 'DATABASE_INCOMPLETE');
-        this.#commit(raw, migrateProgressionV3(decode(raw, 2), this.clock()));
+        requireGame(FILES.filter(file => !V2_FILES.includes(file)).every(file => raw[file] === null), 'DATABASE_INCOMPLETE');
+        this.#commit(raw, migrateBalanceV5(migrateCollectionV4(migrateProgressionV3(decode(raw, 2), this.clock()), this.clock()), this.clock()));
+      } else if (parseJSON(raw[MANIFEST], MANIFEST).schemaVersion === 3) {
+        requireGame(FILES.filter(file => !V3_FILES.includes(file)).every(file => raw[file] === null), 'DATABASE_INCOMPLETE');
+        this.#commit(raw, migrateBalanceV5(migrateCollectionV4(decode(raw, 3), this.clock()), this.clock()));
+      } else if (parseJSON(raw[MANIFEST], MANIFEST).schemaVersion === 4) {
+        this.#commit(raw, migrateBalanceV5(decode(raw, 4), this.clock()));
       }
       this.#load();
       this.#opened = true;

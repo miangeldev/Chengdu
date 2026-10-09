@@ -1,8 +1,11 @@
-# Chengdú Cards — MVP 0.3
+# Chengdú Cards — Alpha 0.4.1
 
 Módulo de juego para un bot de WhatsApp: registro, perfil, catálogo de ocho
 personajes, starter único, colección, equipos y combate 1 contra 1 por turnos,
 con XP, niveles independientes de jugador/unidad, ChengCoins e historial.
+Los sobres permiten conseguir nuevas unidades con rareza, rasgos y variantes.
+El balance 0.4.1 distingue la fuerza de las rarezas y limita la emisión global
+de cada personaje, conservando las unidades y partidas anteriores.
 Toda la interfaz usa mensajes compactos, emojis, negritas y un siguiente paso
 claro. Los combates muestran barras de vida de texto y dos ataques por turno.
 Los datos persisten en varios JSON, con repositorios, servicios y commits recuperables.
@@ -20,8 +23,8 @@ npm run db:validate
 
 El segundo comando inicializa la base vacía y el catálogo si se trata de una
 instalación nueva; en instalaciones existentes valida o migra el formato original
-de usuarios. Desde los esquemas 1 y 2, migra al esquema 3 con backup y recuperación,
-conservando unidades, identidades, saldos, XP y combates anteriores. La ruta por defecto es `ChengdúData/` junto al módulo, independiente
+de usuarios. Desde los esquemas 1, 2, 3 y 4, migra al esquema 5 con backup y recuperación,
+conservando unidades, identidades, saldos, XP, recibos y combates anteriores. La ruta por defecto es `ChengdúData/` junto al módulo, independiente
 del directorio desde el que se ejecute el bot.
 
 Para una ruta distinta:
@@ -40,6 +43,8 @@ no se conectan a WhatsApp ni escriben jugadores de prueba en la base del juego.
 | `.cturegistro Miguel` | Crear jugador; nombre de 1–40 caracteres. |
 | `.ctuperfil` | Ver nivel, XP hacia el siguiente nivel, monedas y estadísticas. |
 | `.ctubalance` | Ver ChengCoins y reglas de recompensa. |
+| `.ctusobres` | Ver sobres, precio y probabilidades según disponibilidad. |
+| `.ctuabrir basico` | Gastar 500 ChengCoins y obtener una unidad con rasgos/variante. |
 | `.ctuhistorial` | Ver tus partidas terminadas, cinco por página y desde cualquier chat. |
 | `.ctuhistorial BTL-…` | Consultar turnos, resultado y recompensa original de una partida propia. |
 | `.ctucatalogo` | Ver las plantillas del catálogo. |
@@ -64,6 +69,68 @@ siguiente página cuando existe. Los IDs aparecen al copiar una acción o consul
 una ficha. Registro, perfil y equipo priorizan el resumen y el próximo paso.
 Un starter repetido devuelve la unidad original; cambiar la opción no crea otra.
 El detalle público muestra el ID interno y nombre del propietario, sin su JID.
+
+## Abrir un sobre
+
+Combatir da monedas para ampliar la colección. `.ctusobres` muestra el Sobre
+Básico, de 500 ChengCoins; `.ctuabrir basico` compra y entrega una unidad en una
+sola acción. El recibo muestra personaje, rareza, variante, rasgos y saldo
+restante, con comandos para inspeccionar o seleccionar la unidad.
+
+Los pesos iniciales son 70% común, 22% raro, 7% épico y 1% legendario. El motor
+excluye personajes agotados o con emisión cerrada; si se agota una rareza,
+normaliza los pesos de las demás y muestra las probabilidades actuales. Si no
+queda ningún candidato, rechaza la apertura sin cobrar. Los seriales y límites
+de emisión se comparten entre todas las fuentes de unidades.
+
+Cada unidad de sobre tiene 80% de salir sin rasgos, 19% con uno y 1% con dos
+distintos: Robusto (+3% HP, redondeado hacia abajo), Agresivo (+1 ataque) y
+Firme (+1 defensa). Las variantes son 94% Normal, 5% Shiny y 1% Dorada; son
+cosméticas. Rasgos/variante se generan una sola vez y no cambian los stats de
+nacimiento. `.ctuficha` muestra sus efectos en los stats del nivel actual.
+
+El bot necesita el ID autenticado del mensaje para comprar: repetir el mismo
+mensaje devuelve el recibo original sin cobrar ni sortear otra vez, incluso
+después de un reinicio o fallo al enviarlo. Un mensaje nuevo solicita otra
+apertura. Se guardan precio, revisión del sobre y resultado originales para
+conservar el historial cuando cambie el contenido. Detalles en
+[Alpha 0.4](docs/alpha-0.4.md).
+
+## Balance y emisión 0.4.1
+
+Las estadísticas de combate ahora favorecen, en promedio, a las rarezas más
+altas. Los tres comunes conservan sus enfrentamientos favorables: Panda supera
+a Lobo, Lobo a Mago y Mago a Panda. Un común entrenado puede superar a una
+unidad de mayor rareza y menor nivel; la rareza no garantiza una victoria.
+
+| Rareza | Máximo global por personaje |
+| --- | ---: |
+| Común | 50 |
+| Raro | 35 |
+| Épico | 20 |
+| Legendario | 10 |
+| Mítico, para contenido futuro | 5 |
+
+El límite cuenta todas las emisiones históricas del personaje, entre todos los
+jugadores y fuentes: starters, sobres y emisiones administrativas. Rasgos y
+variantes comparten el mismo cupo. Si un personaje ya tenía un límite menor, se
+conserva. Cuando lo emitido anteriormente supera el nuevo máximo, se conservan
+esas unidades y se bloquean nuevas emisiones.
+El marcador `grandfatheredIssued` mantiene la emisión cerrada aunque después
+aumente el máximo o cambie la rareza; el contador conserva ese total heredado.
+
+La migración mantiene los stats de nacimiento y añade una base de combate
+versionada a las unidades anteriores. El ajuste conserva sus variaciones
+individuales, seriales, propietario, nivel y XP. Los combates ya aceptados y los
+recibos anteriores conservan sus valores; la nueva fuerza se aplica a la
+siguiente partida. El catálogo no se reescribe en cada arranque.
+
+Consulta los valores finales, la simulación y sus límites en
+[balance 0.4.1](docs/balance-0.4.1.md). Para reproducir la comparación:
+
+```sh
+npm run balance:simulate
+```
 
 ## Primer combate
 
@@ -109,10 +176,10 @@ anfitrión también puede llamar a `game.battle.sweepExpired()` periódicamente.
 npm run preview:whatsapp
 ```
 
-Genera [27 ejemplos de los mensajes](docs/whatsapp-preview.md) usando una base
+Genera [35 ejemplos de los mensajes](docs/whatsapp-preview.md) usando una base
 temporal y jugadores ficticios: registro, perfil, colección, starter, equipo,
 desafío, turnos, fichas detalladas, fallo de ataque, errores, recompensas,
-subidas de nivel, saldo e historial.
+subidas de nivel, saldo, historial, sobres y rasgos/variantes.
 No envía mensajes a WhatsApp real.
 
 Todas las pantallas usan el encabezado `🃏 CHENGDÚ CARDS | SECCIÓN` y un separador
@@ -235,8 +302,8 @@ independientes; rechaza modificaciones directas de colecciones administradas.
 ## Persistencia y recuperación
 
 `usuarios.json`, `personajes.json`, `unidades.json`, `estado.json`, `eventos.json`,
-`ataques.json`, `combates.json` y `recompensas.json`
-incluyen versión de esquema 3 y revisión. `_database.json` identifica la instalación.
+`ataques.json`, `combates.json`, `recompensas.json`, `sobres.json`, `aperturas.json`
+y `economia.json` incluyen versión de esquema 5 y revisión. `_database.json` identifica la instalación.
 `_journal.json` existe mientras hay un commit pendiente. Cada operación que cambia
 datos guarda previamente una copia coherente en `backups/<id-operación>/`.
 
@@ -248,8 +315,14 @@ ocurre en el mismo commit. Las acciones de combate, estadísticas y locks tambi�
 se coordinan mediante el mismo mecanismo, incluyendo saldos, XP y registros de
 recompensa. La recuperación se ejecuta antes de atender consultas. Las recompensas
 se registran una vez por jugador y batalla; repetir el mensaje final reutiliza
-el recibo sin volver a acreditarlo. Los saldos/progresos se validan contra su
-valor inicial registrado y el historial de recompensas.
+el recibo sin volver a acreditarlo. La compra de un sobre coordina gasto, unidad,
+contador, evento de emisión y recibo mediante el mismo mecanismo. El saldo se
+reconstruye desde el valor inicial y los créditos/débitos de `economia.json`, cada
+uno ligado a su recompensa o apertura. La XP se reconstruye desde sus recompensas.
+Las compras no conceden XP. Las unidades anteriores conservan sus rasgos y variantes
+sin adquirir efectos nuevos retroactivamente. El balance 0.4.1 añade una base de
+combate separada, preserva los stats de nacimiento y mantiene intactos los
+snapshots de partidas anteriores.
 
 Después de una terminación abrupta que deje el lock, detener las instancias del
 bot y ejecutar una sola vez:
@@ -278,12 +351,12 @@ activos, revisar la migración a SQLite prevista en el diseño.
 
 ## Alcance validado
 
-107 pruebas verificadas con `node --test --test-isolation=none`: persistencia al
+168 pruebas verificadas con `node --test --test-isolation=none`: persistencia al
 reabrir, registro/starter concurrentes, supply, identidades, cursores, migraciones
-desde esquemas 1 y 2, journals antiguos, integridad y recuperación de commits. También
+desde esquemas 1, 2, 3 y 4, journals antiguos, integridad y recuperación de commits. También
 cubren equipos, snapshots, turnos, precisión, duplicados, victoria, rendición,
 expiración y estadísticas. Se interrumpe realmente un proceso con `SIGKILL`.
-También se comprueban las trazas de error y los 18 plugins mediante sus
+También se comprueban las trazas de error y los 20 plugins mediante sus
 exportaciones `run`, con una base compartida y sin inyectar el juego del router.
 El debug se verifica activado y desactivado, con causas anidadas, loggers que
 sólo aceptan un argumento y límites de longitud del mensaje de WhatsApp.
@@ -298,11 +371,21 @@ pareja, historial paginado y acceso restringido a los participantes. La migraci�
 preserva saldos/progresos anteriores y snapshots de combates activos, sin premios
 retroactivos. El saldo, la XP y los recibos rechazan modificaciones sin su operación.
 
-Sobres, gasto de monedas, transferencias, mercado y combate avanzado pertenecen
+Se verifican drops por pesos enteros, disponibilidad y supply, rasgos sin
+duplicados, variantes cosméticas, compras concurrentes, reinicios y recuperación
+del pago/emisión/recibo en conjunto. Las pruebas de WhatsApp obtienen monedas
+combatiendo y recuperan una compra cuyo primer recibo no llegó por desconexión.
+El balance verifica bases de combate versionadas, conservación de variaciones,
+límites por rareza, emisiones anteriores por encima del máximo y snapshots
+históricos que conservan sus estadísticas originales.
+
+Daily, nuevos gastos, transferencias, mercado y combate avanzado pertenecen
 a las siguientes versiones. El modelo ya conserva progreso, procedencia,
 revisiones de contenido, seriales, stats individuales, traits y variante.
 
 Diseño: [fundación 0.1](docs/mvp-0.1.md), [combate 0.2](docs/mvp-0.2.md),
 [progresión 0.3](docs/mvp-0.3.md),
+[colección 0.4](docs/alpha-0.4.md),
+[balance 0.4.1](docs/balance-0.4.1.md),
 [modelo de datos](docs/database.md) y
 [visión completa](project.md).

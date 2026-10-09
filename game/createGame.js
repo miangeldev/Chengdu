@@ -6,6 +6,7 @@ import { createStarterService } from './rewards/starterService.js';
 import { createTeamService } from './teams/teamService.js';
 import { createBattleService } from './battle/battleService.js';
 import { createEconomyService } from './economy/economyService.js';
+import { createPackService } from './packs/packService.js';
 
 export function createGame(options = {}) {
   const storage = options.storage ?? new JsonUnitOfWork(options);
@@ -18,6 +19,7 @@ export function createGame(options = {}) {
     teams: createTeamService(storage, clock),
     battle: createBattleService(storage, clock, options.randomRoll),
     economy: createEconomyService(storage, clock),
+    packs: createPackService(storage, clock, options.randomDropInt),
     validateDatabase: () => storage.validateDatabase(),
     close: () => storage.close()
   };
