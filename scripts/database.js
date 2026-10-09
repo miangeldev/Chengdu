@@ -15,7 +15,7 @@ try {
     process.exitCode = 1;
   }
 } catch (error) {
-  console.error(`No se completó la operación: ${error.code ?? error.message}`);
+  console.error(`No se completó la operación: ${error?.code ?? 'UNEXPECTED_ERROR'} | Node=${process.version}`, error);
   process.exitCode = 1;
 } finally {
   await game?.close();

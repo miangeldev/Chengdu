@@ -43,8 +43,13 @@ function identityFor(sock, msg) {
   return normalizeIdentity({ provider: 'whatsapp', subject });
 }
 
+function defaultLogger(code, { command, runtime, error }) {
+  // Keep the original Error: console prints its stack and nested causes.
+  console.error(`Chengdú: ${code} | comando=${command} | Node=${runtime}`, error);
+}
+
 export function defineCommand(command, handler) {
-  function createRun(game, { logger = code => console.error(`Chengdú: ${code}`), prefix = '.' } = {}) {
+  function createRun(game, { logger = defaultLogger, prefix = '.' } = {}) {
     return async function run(sock, msg, args = []) {
       const from = msg?.key?.remoteJid;
       requireGame(typeof from === 'string' && typeof sock?.sendMessage === 'function', 'INVALID_CONTEXT');
@@ -62,7 +67,8 @@ export function defineCommand(command, handler) {
         } else if (error instanceof GameError && messages[error.code]) {
           text = card('⚠️ *Revisa tu comando*', [messages[error.code].replace(/\.ctu/g, () => `${prefix}ctu`)], `📖 Consulta los comandos:\n${commandText(prefix, 'ctuayuda')}`);
         } else {
-          logger(error.code ?? 'UNEXPECTED_ERROR');
+          const code = typeof error?.code === 'string' ? error.code : 'UNEXPECTED_ERROR';
+          logger(code, { command: commandText(prefix, command), runtime: process.version, error });
           text = card('🛠️ *No pude confirmar la operación*', ['Pide al administrador que revise el bot y vuelve a intentarlo.']);
         }
       }

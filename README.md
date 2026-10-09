@@ -129,6 +129,20 @@ const game = createGame({ directory: '/ruta/absoluta/datos' });
 No crear una instancia por mensaje ni dos instancias para la misma carpeta.
 Los servicios del juego se pueden usar sin WhatsApp.
 
+## Diagnosticar errores del bot
+
+El mensaje «No pude confirmar la operación» indica que el comando falló. El log
+del servidor incluye el comando, la versión de Node.js y el error original con
+su traza y causas; esos detalles no se envían a WhatsApp. Si inyectas un `logger`,
+recibe `logger(code, { command, runtime, error })`: registra también `error`, no
+sólo `code`, para conservar la explicación del fallo.
+
+Después de actualizar plugins, interfaces o servicios, reinicia el proceso del
+bot. La recarga de un plugin puede conservar sus módulos importados en la caché
+de Node.js y mezclar versiones. Si falla de nuevo, conserva el bloque completo
+de la consola desde `Chengdú:` hasta el final de la traza. Para comprobar los
+JSON con `npm run db:validate`, detén antes el bot que utiliza esa misma carpeta.
+
 ## Identidad y compatibilidad
 
 Los jugadores tienen ID interno permanente; los JID se guardan como identidades
@@ -201,11 +215,13 @@ activos, revisar la migración a SQLite prevista en el diseño.
 
 ## Alcance validado
 
-67 pruebas verificadas con `node --test --test-isolation=none`: persistencia al
+71 pruebas verificadas con `node --test --test-isolation=none`: persistencia al
 reabrir, registro/starter concurrentes, supply, identidades, cursores, migraciones
 desde esquema 1, journals antiguos, integridad y recuperación de commits. También
 cubren equipos, snapshots, turnos, precisión, duplicados, victoria, rendición,
 expiración y estadísticas. Se interrumpe realmente un proceso con `SIGKILL`.
+También se comprueban las trazas de error y los 15 plugins mediante sus
+exportaciones `run`, con una base compartida y sin inyectar el juego del router.
 La validación con una sesión real de WhatsApp queda pendiente del bot anfitrión.
 
 XP ganado, sobres, transferencias, mercado y combate avanzado pertenecen
