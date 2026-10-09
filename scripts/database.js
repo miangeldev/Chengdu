@@ -1,6 +1,7 @@
 import { DATA_DIR } from '../CTU-database.js';
 import { createGame } from '../game/createGame.js';
 import { unlockStaleWriter } from '../storage/writerLock.js';
+import { describeError } from '../utils/errorDiagnostics.js';
 
 const [action, directory = DATA_DIR] = process.argv.slice(2);
 let game;
@@ -15,7 +16,7 @@ try {
     process.exitCode = 1;
   }
 } catch (error) {
-  console.error(`No se completó la operación: ${error?.code ?? 'UNEXPECTED_ERROR'} | Node=${process.version}`, error);
+  console.error(`No se completó la operación: ${error?.code ?? 'UNEXPECTED_ERROR'} | Node=${process.version}\n${describeError(error)}`);
   process.exitCode = 1;
 } finally {
   await game?.close();

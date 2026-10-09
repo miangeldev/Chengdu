@@ -18,8 +18,8 @@ import { game as defaultGame } from '../../game/index.js';
 export const commands = Object.freeze([registro, perfil, catalogo, starter, personajes, unidad, ayuda, equipo, pelea, aceptar, atacar, rendirse, combate, rechazar, cancelar]);
 
 // Host supplies authenticated msg metadata and the text extracted from the message.
-export function createCommandRouter({ game = defaultGame, prefix = '.', logger } = {}) {
-  const handlers = new Map(commands.map(c => [c.command, c.createRun(game, { logger, prefix })]));
+export function createCommandRouter({ game = defaultGame, prefix = '.', logger, debug } = {}) {
+  const handlers = new Map(commands.map(c => [c.command, c.createRun(game, { logger, prefix, debug })]));
   return async function handleGameCommand(sock, msg, body) {
     if (typeof body !== 'string' || !body.startsWith(prefix)) return false;
     const [name, ...args] = body.slice(prefix.length).trim().split(/\s+/u);

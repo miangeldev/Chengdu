@@ -9,7 +9,7 @@ test('direct plugin run exports share one database and complete the game flow', 
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'chengdu-plugin-loader-'));
   t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
   const root = fileURLToPath(new URL('../', import.meta.url));
-  for (const entry of ['plugins', 'interfaces', 'game', 'storage', 'repositories', 'utils', 'CTU-database.js', 'package.json']) {
+  for (const entry of ['plugins', 'interfaces', 'game', 'storage', 'repositories', 'utils', 'CTU-database.js', 'CTU-config.js', 'package.json']) {
     fs.cpSync(path.join(root, entry), path.join(directory, entry), { recursive: true });
   }
   fs.mkdirSync(path.join(directory, 'ChengdúData'));

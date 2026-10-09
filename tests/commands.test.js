@@ -10,10 +10,12 @@ test('unexpected command failures retain the error and command in the server log
   const logs = [];
   const replies = [];
   const command = defineCommand('ctuprueba', async () => { throw error; });
-  const run = command.createRun({}, { prefix: '!', logger: (...args) => logs.push(args) });
+  const run = command.createRun({}, { prefix: '!', debug: false, logger: (...args) => logs.push(args) });
   await run({ sendMessage: async (_, payload) => replies.push(payload.text) }, { key: { remoteJid: '521999999999@s.whatsapp.net' } });
   assert.equal(logs.length, 1);
-  assert.equal(logs[0][0], 'UNEXPECTED_ERROR');
+  assert.match(logs[0][0], /^UNEXPECTED_ERROR \| comando=!ctuprueba/);
+  assert.match(logs[0][0], /TypeError: cmd is not a function/);
+  assert.equal(logs[0][1].code, 'UNEXPECTED_ERROR');
   assert.equal(logs[0][1].command, '!ctuprueba');
   assert.equal(logs[0][1].runtime, process.version);
   assert.equal(logs[0][1].error, error);
@@ -28,12 +30,14 @@ test('the default server logger includes the original stack and nested storage c
   const log = t.mock.method(console, 'error', () => {});
   const command = defineCommand('ctuprueba', async () => { throw error; });
   let reply;
-  await command.createRun({})({ sendMessage: async (_, payload) => { reply = payload.text; } }, { key: { remoteJid: '521999999999@s.whatsapp.net' } });
+  await command.createRun({}, { debug: false })({ sendMessage: async (_, payload) => { reply = payload.text; } }, { key: { remoteJid: '521999999999@s.whatsapp.net' } });
   assert.equal(log.mock.callCount(), 1);
-  const [summary, original] = log.mock.calls[0].arguments;
+  const [summary] = log.mock.calls[0].arguments;
   assert.match(summary, /Chengdú: STORAGE_WRITE_FAILED \| comando=\.ctuprueba \| Node=v/);
-  assert.equal(original, error);
-  assert.equal(original.cause, cause);
+  assert.equal(log.mock.calls[0].arguments.length, 1);
+  assert.match(summary, /GameError: STORAGE_WRITE_FAILED/);
+  assert.match(summary, /Error: permission denied/);
+  assert.match(summary, /EACCES/);
   assert.doesNotMatch(reply, /EACCES|permission denied/);
 });
 
@@ -42,7 +46,7 @@ test('a non-Error rejection still logs and sends the generic failure reply', asy
   const command = defineCommand('ctuprueba', async () => { throw null; });
   let reply;
   await command.createRun({}, { logger: (...args) => logs.push(args) })({ sendMessage: async (_, payload) => { reply = payload.text; } }, { key: { remoteJid: '521999999999@s.whatsapp.net' } });
-  assert.equal(logs[0][0], 'UNEXPECTED_ERROR');
+  assert.match(logs[0][0], /^UNEXPECTED_ERROR/);
   assert.equal(logs[0][1].error, null);
   assert.match(reply, /No pude confirmar/);
 });

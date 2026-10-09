@@ -97,13 +97,15 @@ metadatos autenticados y vincular aliases de identidad sólo después de verific
 
 ## Verificación
 
-71 pruebas ejecutadas con `node --test --test-isolation=none`: registro/starter,
+75 pruebas ejecutadas con `node --test --test-isolation=none`: registro/starter,
 colecciones, propiedad, migraciones, journals antiguos, ataques, turnos, fallos
 de precisión, snapshots, duplicados, rendición, expiración, límites, estadísticas
 y recuperación de escrituras interrumpidas. Se incluye el flujo completo con un
 socket de WhatsApp simulado y la terminación real de un proceso hijo.
 También se prueban los 15 plugins con su exportación directa `run` y el registro
-del error original en el servidor sin mostrar la traza en WhatsApp.
+del error original en el servidor. La traza en WhatsApp se muestra sólo con debug
+activado en `CTU-config.js`, el entorno `CTU_DEBUG` o la opción `debug` del router.
+En esta etapa de desarrollo, el archivo de configuración lo habilita por defecto.
 
 Ejemplos de la interfaz: [whatsapp-preview.md](whatsapp-preview.md).
 La prueba con una sesión real de WhatsApp sigue pendiente del bot anfitrión.

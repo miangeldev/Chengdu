@@ -1,7 +1,9 @@
 import { game as defaultGame } from '../../game/index.js';
 import { GameError, requireGame } from '../../utils/GameError.js';
 import { normalizeIdentity } from '../../utils/identity.js';
-import { card, commandText, displayName } from './format.js';
+import { describeError } from '../../utils/errorDiagnostics.js';
+import { whatsappConfig } from '../../CTU-config.js';
+import { card, commandText, displayName, section } from './format.js';
 export { displayName, rarityName } from './format.js';
 
 const messages = {
@@ -43,13 +45,27 @@ function identityFor(sock, msg) {
   return normalizeIdentity({ provider: 'whatsapp', subject });
 }
 
-function defaultLogger(code, { command, runtime, error }) {
-  // Keep the original Error: console prints its stack and nested causes.
-  console.error(`Chengdú: ${code} | comando=${command} | Node=${runtime}`, error);
+function defaultLogger(message) {
+  console.error(`Chengdú: ${message}`);
+}
+
+function debugEnabled(override) {
+  if (typeof override === 'boolean') return override;
+  if (process.env.CTU_DEBUG === undefined) return whatsappConfig.debug;
+  return ['1', 'true'].includes(process.env.CTU_DEBUG.trim().toLowerCase());
+}
+
+function debugSection(diagnostic) {
+  const limit = 6000;
+  const clipped = diagnostic.length > limit
+    ? `${diagnostic.slice(0, limit)}\n… [Diagnóstico recortado; traza completa en consola]`
+    : diagnostic;
+  // Prevent an exception containing backticks from closing the WhatsApp code block.
+  return section('🐛 *Debug activado*', `Copia este diagnóstico para revisar el fallo.\n\n\`\`\`\n${clipped.replace(/\`\`\`/g, '\` \` \`')}\n\`\`\``);
 }
 
 export function defineCommand(command, handler) {
-  function createRun(game, { logger = defaultLogger, prefix = '.' } = {}) {
+  function createRun(game, { logger = defaultLogger, prefix = '.', debug } = {}) {
     return async function run(sock, msg, args = []) {
       const from = msg?.key?.remoteJid;
       requireGame(typeof from === 'string' && typeof sock?.sendMessage === 'function', 'INVALID_CONTEXT');
@@ -68,8 +84,13 @@ export function defineCommand(command, handler) {
           text = card('⚠️ *Revisa tu comando*', [messages[error.code].replace(/\.ctu/g, () => `${prefix}ctu`)], `📖 Consulta los comandos:\n${commandText(prefix, 'ctuayuda')}`);
         } else {
           const code = typeof error?.code === 'string' ? error.code : 'UNEXPECTED_ERROR';
-          logger(code, { command: commandText(prefix, command), runtime: process.version, error });
-          text = card('🛠️ *No pude confirmar la operación*', ['Pide al administrador que revise el bot y vuelve a intentarlo.']);
+          const commandName = commandText(prefix, command);
+          const diagnostic = `${code} | comando=${commandName} | Node=${process.version}\n${describeError(error)}`;
+          logger(diagnostic, { code, command: commandName, runtime: process.version, error });
+          text = card('🛠️ *No pude confirmar la operación*', [
+            'Pide al administrador que revise el bot y vuelve a intentarlo.',
+            debugEnabled(debug) ? debugSection(diagnostic) : null
+          ]);
         }
       }
       // Transport failures propagate to the host; never retry a send automatically.
