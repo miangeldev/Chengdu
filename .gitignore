@@ -1,0 +1,6 @@
+node_modules/
+ChengdúData/*.json
+ChengdúData/.*.tmp
+ChengdúData/.writer.lock
+ChengdúData/backups/
+coverage/
