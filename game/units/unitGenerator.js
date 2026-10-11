@@ -10,7 +10,7 @@ export async function createUnitInTransaction(repos, { characterId, ownerId, ori
   const existing = await repos.events.find(e => e.operationKey === operationKey);
   if (existing) {
     const unit = await repos.units.get(existing.unitId);
-    requireGame(existing.toOwnerId === ownerId && unit.characterId === characterId &&
+    requireGame(existing.type === 'unit_created' && existing.toOwnerId === ownerId && unit.characterId === characterId &&
       unit.origin.type === origin.type && unit.origin.sourceId === origin.sourceId, 'OPERATION_CONFLICT');
     return unit;
   }
@@ -35,7 +35,7 @@ export async function createUnitInTransaction(repos, { characterId, ownerId, ori
   applyTraits(initialStats, collectibles.traits, collectibles.traitVersion);
   const unit = {
     id: `${character.unitPrefix}-${String(serial).padStart(6, '0')}`,
-    characterId, characterRevision: character.revision, serial, ownerId,
+    characterId, characterRevision: character.revision, serial, ownerId, ownershipVersion: 0,
     createdAt: now, updatedAt: now, origin: { type: origin.type, sourceId: origin.sourceId }, initialStats, combatBaseStats: { ...initialStats },
     progress: { level: 1, xp: 0 }, statGrowthVersion: PROGRESSION_VERSION,
     traits: [...collectibles.traits], variant: collectibles.variant, traitVersion: collectibles.traitVersion,
@@ -46,7 +46,7 @@ export async function createUnitInTransaction(repos, { characterId, ownerId, ori
   await repos.state.replace({ ...counter, lastSerial: serial, issuedCount });
   await repos.events.insert({
     id: `EVT-${randomUUID()}`, type: 'unit_created', unitId: unit.id,
-    fromOwnerId: null, toOwnerId: ownerId, reason: origin.type, operationKey, createdAt: now
+    fromOwnerId: null, toOwnerId: ownerId, reason: origin.type, operationKey, ownershipVersion: 0, createdAt: now
   });
   return unit;
 }

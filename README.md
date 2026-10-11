@@ -1,9 +1,13 @@
-# Chengdú Cards — Alpha 0.4.1
+# Chengdú Cards — Alpha 0.6
 
 Módulo de juego para un bot de WhatsApp: registro, perfil, catálogo de ocho
 personajes, starter único, colección, equipos y combate 1 contra 1 por turnos,
 con XP, niveles independientes de jugador/unidad, ChengCoins e historial.
 Los sobres permiten conseguir nuevas unidades con rareza, rasgos y variantes.
+La economía añade un diario de 100 ChengCoins cada 24 horas, tienda e historial
+de ingresos y gastos para cada jugador.
+El mercado permite comprar y vender unidades entre jugadores, con comisión,
+anuncios que vencen y un historial de propiedad que conserva cada emisión.
 El balance 0.4.1 distingue la fuerza de las rarezas y limita la emisión global
 de cada personaje, conservando las unidades y partidas anteriores.
 Toda la interfaz usa mensajes compactos, emojis, negritas y un siguiente paso
@@ -23,7 +27,7 @@ npm run db:validate
 
 El segundo comando inicializa la base vacía y el catálogo si se trata de una
 instalación nueva; en instalaciones existentes valida o migra el formato original
-de usuarios. Desde los esquemas 1, 2, 3 y 4, migra al esquema 5 con backup y recuperación,
+de usuarios. Desde los esquemas 1, 2, 3, 4, 5 y 6, migra al esquema 7 con backup y recuperación,
 conservando unidades, identidades, saldos, XP, recibos y combates anteriores. La ruta por defecto es `ChengdúData/` junto al módulo, independiente
 del directorio desde el que se ejecute el bot.
 
@@ -42,9 +46,20 @@ no se conectan a WhatsApp ni escriben jugadores de prueba en la base del juego.
 | --- | --- |
 | `.cturegistro Miguel` | Crear jugador; nombre de 1–40 caracteres. |
 | `.ctuperfil` | Ver nivel, XP hacia el siguiente nivel, monedas y estadísticas. |
-| `.ctubalance` | Ver ChengCoins y reglas de recompensa. |
+| `.ctubalance` | Ver ChengCoins, ingresos, gastos y disponibilidad del diario. |
+| `.ctudiario` | Reclamar 100 ChengCoins; se habilita de nuevo 24 horas después. |
+| `.ctutienda` | Ver sobres, precios y disponibilidad; copiar el comando de compra. |
+| `.ctumovimientos` | Ver ingresos y gastos propios, cinco por página. |
 | `.ctusobres` | Ver sobres, precio y probabilidades según disponibilidad. |
 | `.ctuabrir basico` | Gastar 500 ChengCoins y obtener una unidad con rasgos/variante. |
+| `.ctumercado` | Ver unidades en venta, cinco por página. |
+| `.ctumercado mios` | Ver anuncios propios; `raro` filtra rareza y `precio` ordena de menor a mayor. |
+| `.ctumercado ver LIST-…` | Inspeccionar la unidad y precio del anuncio; comprar o retirar según corresponda. |
+| `.ctuvender PAND-000001 100` | Publicar una unidad propia por 100 ChengCoins. |
+| `.ctucomprar LIST-…` | Comprar una unidad anunciada y recibir su propiedad. |
+| `.cturetirar LIST-…` | Retirar un anuncio propio. |
+| `.ctuventas` | Ver compras y ventas propias, cinco por página. |
+| `.ctupropiedad PAND-000001` | Consultar emisión y cambios de propietario, cinco por página. |
 | `.ctuhistorial` | Ver tus partidas terminadas, cinco por página y desde cualquier chat. |
 | `.ctuhistorial BTL-…` | Consultar turnos, resultado y recompensa original de una partida propia. |
 | `.ctucatalogo` | Ver las plantillas del catálogo. |
@@ -67,8 +82,11 @@ no se conectan a WhatsApp ni escriben jugadores de prueba en la base del juego.
 Catálogo y colección muestran cinco entradas por página, con el comando de la
 siguiente página cuando existe. Los IDs aparecen al copiar una acción o consultar
 una ficha. Registro, perfil y equipo priorizan el resumen y el próximo paso.
-Un starter repetido devuelve la unidad original; cambiar la opción no crea otra.
-El detalle público muestra el ID interno y nombre del propietario, sin su JID.
+Los movimientos también se paginan; la lista muestra primero las últimas
+operaciones confirmadas y su cursor sólo sirve al jugador que lo recibió.
+El reclamo de starter siempre conserva la unidad original. Si ya cambió de
+propietario, la respuesta dirige a la colección actual. El detalle público
+muestra el nombre del propietario y la procedencia, sin su JID.
 
 ## Abrir un sobre
 
@@ -95,6 +113,62 @@ después de un reinicio o fallo al enviarlo. Un mensaje nuevo solicita otra
 apertura. Se guardan precio, revisión del sobre y resultado originales para
 conservar el historial cuando cambie el contenido. Detalles en
 [Alpha 0.4](docs/alpha-0.4.md).
+
+## Diario, tienda y movimientos 0.5
+
+`.ctudiario` entrega 100 ChengCoins a un jugador registrado. El siguiente reclamo
+se habilita exactamente 24 horas después del anterior, incluyendo entre grupos
+y conversaciones privadas. La recompensa entrega monedas y conserva el mismo
+importe en cada reclamo; el progreso de jugador y unidades se obtiene combatiendo.
+El bot muestra la próxima fecha y hora en Ciudad de México.
+
+El ID autenticado del mensaje evita premios duplicados. Repetir el mismo mensaje
+devuelve el recibo original, incluso después de reiniciar o si no se pudo enviar
+la primera respuesta. Un mensaje nuevo durante la espera muestra cuándo vuelve
+a estar disponible. Un reloj inválido o que retrocede no adelanta otro premio.
+
+`.ctutienda` reúne los sobres existentes con precio y disponibilidad. El gasto
+actual es el Sobre Básico de 500 ChengCoins, comprado con `.ctuabrir basico`.
+`.ctusobres` conserva las probabilidades detalladas. La compra entrega una unidad
+sin cambiar la XP ni volver a generar rasgos o variantes de unidades anteriores.
+
+`.ctumovimientos` muestra créditos de combate/diario, gastos de sobres y compras
+y ventas de unidades propias.
+`.ctubalance` resume saldo, ingresos y gastos históricos; un saldo inicial
+conservado al migrar se muestra por separado. El diario, su crédito y el saldo
+se confirman en la misma transacción. Detalles en [Alpha 0.5](docs/alpha-0.5.md).
+
+## Comprar y vender unidades 0.6
+
+`.ctuvender ID PRECIO` publica una unidad propia por un precio entero entre
+20 y 1,000,000 ChengCoins. El vendedor ve precio, comisión del 5% redondeada
+hacia arriba y lo que recibirá. Por ejemplo, una venta de 21 monedas cobra
+2 de comisión y entrega 19 al vendedor. La comisión sale de circulación sólo
+al completar la compra; publicar, retirar o dejar vencer un anuncio no cobra.
+
+La unidad queda bloqueada en el mercado y sale del equipo. El anuncio dura
+siete días. Su vencimiento se procesa al consultar u operar el mercado,
+unidades o equipos; no requiere un proceso programado. Tras retirarlo o vencer,
+la unidad se puede seleccionar de nuevo para combatir.
+
+`.ctumercado` muestra los anuncios activos; `mios`, las publicaciones propias;
+`raro` y otras rarezas filtran; `precio` ordena de menor a mayor. El detalle
+conserva nombre, stats, nivel, rasgos y variante fijados al publicar. Los comandos
+de compra y retirada aparecen según quién lo consulta.
+
+`.ctucomprar LIST-…` coordina pago, importe neto del vendedor, comisión,
+propiedad, desbloqueo, recibo y auditoría en un mismo commit. La unidad conserva
+serial, emisión, stats de nacimiento, progreso y variantes; el nuevo propietario
+elige después su equipo. Dos compradores simultáneos producen una única venta.
+Las claves de mensaje recuperan recibos anteriores después de un reinicio o
+fallo de envío, sin repetir pagos ni recuperar una unidad revendida.
+
+`.ctuventas` muestra sólo las operaciones del jugador; los saldos del otro
+participante permanecen privados. `.ctupropiedad ID` muestra la emisión y
+los propietarios sucesivos por nombre. El historial de combates conserva sus
+participantes originales. Alpha 0.6 implementa transferencias por compraventa;
+regalos e intercambios directos requieren servicios posteriores. Detalles en
+[Alpha 0.6](docs/alpha-0.6.md).
 
 ## Balance y emisión 0.4.1
 
@@ -176,10 +250,11 @@ anfitrión también puede llamar a `game.battle.sweepExpired()` periódicamente.
 npm run preview:whatsapp
 ```
 
-Genera [35 ejemplos de los mensajes](docs/whatsapp-preview.md) usando una base
+Genera [73 ejemplos de los mensajes](docs/whatsapp-preview.md) usando una base
 temporal y jugadores ficticios: registro, perfil, colección, starter, equipo,
 desafío, turnos, fichas detalladas, fallo de ataque, errores, recompensas,
-subidas de nivel, saldo, historial, sobres y rasgos/variantes.
+subidas de nivel, saldo, historial, sobres, rasgos/variantes, diario, tienda
+y movimientos económicos, mercado e historial de propiedad.
 No envía mensajes a WhatsApp real.
 
 Todas las pantallas usan el encabezado `🃏 CHENGDÚ CARDS | SECCIÓN` y un separador
@@ -302,8 +377,9 @@ independientes; rechaza modificaciones directas de colecciones administradas.
 ## Persistencia y recuperación
 
 `usuarios.json`, `personajes.json`, `unidades.json`, `estado.json`, `eventos.json`,
-`ataques.json`, `combates.json`, `recompensas.json`, `sobres.json`, `aperturas.json`
-y `economia.json` incluyen versión de esquema 5 y revisión. `_database.json` identifica la instalación.
+`ataques.json`, `combates.json`, `recompensas.json`, `sobres.json`, `aperturas.json`,
+`economia.json`, `diarios.json`, `mercado.json` y `ventas.json` incluyen versión de
+esquema 7 y revisión. `_database.json` identifica la instalación.
 `_journal.json` existe mientras hay un commit pendiente. Cada operación que cambia
 datos guarda previamente una copia coherente en `backups/<id-operación>/`.
 
@@ -318,7 +394,11 @@ se registran una vez por jugador y batalla; repetir el mensaje final reutiliza
 el recibo sin volver a acreditarlo. La compra de un sobre coordina gasto, unidad,
 contador, evento de emisión y recibo mediante el mismo mecanismo. El saldo se
 reconstruye desde el valor inicial y los créditos/débitos de `economia.json`, cada
-uno ligado a su recompensa o apertura. La XP se reconstruye desde sus recompensas.
+uno ligado a su recompensa, apertura o diario. El reclamo diario tiene un recibo
+inmutable y exactamente un crédito económico; ambos se publican junto con el
+saldo. Las ventas añaden un débito del comprador y un crédito neto del vendedor,
+ligados al recibo y al evento de cambio de propiedad. La XP se reconstruye desde
+sus recompensas de combate.
 Las compras no conceden XP. Las unidades anteriores conservan sus rasgos y variantes
 sin adquirir efectos nuevos retroactivamente. El balance 0.4.1 añade una base de
 combate separada, preserva los stats de nacimiento y mantiene intactos los
@@ -351,12 +431,12 @@ activos, revisar la migración a SQLite prevista en el diseño.
 
 ## Alcance validado
 
-168 pruebas verificadas con `node --test --test-isolation=none`: persistencia al
+Las pruebas con `node --test --test-isolation=none` verifican persistencia al
 reabrir, registro/starter concurrentes, supply, identidades, cursores, migraciones
-desde esquemas 1, 2, 3 y 4, journals antiguos, integridad y recuperación de commits. También
+desde esquemas 1, 2, 3, 4, 5 y 6, journals antiguos, integridad y recuperación de commits. También
 cubren equipos, snapshots, turnos, precisión, duplicados, victoria, rendición,
 expiración y estadísticas. Se interrumpe realmente un proceso con `SIGKILL`.
-También se comprueban las trazas de error y los 20 plugins mediante sus
+También se comprueban las trazas de error y los 29 plugins mediante sus
 exportaciones `run`, con una base compartida y sin inyectar el juego del router.
 El debug se verifica activado y desactivado, con causas anidadas, loggers que
 sólo aceptan un argumento y límites de longitud del mensaje de WhatsApp.
@@ -378,14 +458,25 @@ combatiendo y recuperan una compra cuyo primer recibo no llegó por desconexión
 El balance verifica bases de combate versionadas, conservación de variaciones,
 límites por rareza, emisiones anteriores por encima del máximo y snapshots
 históricos que conservan sus estadísticas originales.
+La economía verifica diarios únicos, espera de 24 horas, reloj inválido o que
+retrocede, recibos después de reiniciar, movimientos propios paginados y compras
+financiadas por diarios. La migración añade diarios vacíos y conserva los saldos
+y registros anteriores, sin conceder recompensas retroactivas.
+El mercado verifica precios y comisión exactos, snapshots, propietarios sucesivos,
+unidad fuera del equipo al publicarla, bloqueos, cancelación, vencimiento,
+historial privado, cursores y compras simultáneas. Se recuperan pagos y propiedad
+juntos tras interrupciones, y los recibos antiguos siguen siendo válidos cuando
+la unidad se revende o cambia el catálogo.
 
-Daily, nuevos gastos, transferencias, mercado y combate avanzado pertenecen
-a las siguientes versiones. El modelo ya conserva progreso, procedencia,
+Nuevos gastos, regalos, intercambios directos y combate avanzado pertenecen
+a las siguientes versiones. El modelo conserva progreso, procedencia,
 revisiones de contenido, seriales, stats individuales, traits y variante.
 
 Diseño: [fundación 0.1](docs/mvp-0.1.md), [combate 0.2](docs/mvp-0.2.md),
 [progresión 0.3](docs/mvp-0.3.md),
 [colección 0.4](docs/alpha-0.4.md),
 [balance 0.4.1](docs/balance-0.4.1.md),
+[economía 0.5](docs/alpha-0.5.md),
+[mercado 0.6](docs/alpha-0.6.md),
 [modelo de datos](docs/database.md) y
 [visión completa](project.md).

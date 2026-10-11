@@ -1,5 +1,6 @@
 import { requireGame } from '../../utils/GameError.js';
 import { expireBattles } from '../battle/lifecycle.js';
+import { expireListings } from '../market/lifecycle.js';
 
 export function createTeamService(storage, clock) {
   async function view(repos, user) {
@@ -13,6 +14,7 @@ export function createTeamService(storage, clock) {
     return storage.withTransaction(async repos => {
       const now = clock();
       await expireBattles(repos, now);
+      await expireListings(repos, now);
       const user = await repos.users.get(userId);
       requireGame(user, 'USER_NOT_FOUND');
       requireGame(!await repos.battles.find(b => b.status === 'active' && b.players.some(p => p.userId === userId)), 'TEAM_LOCKED');
@@ -32,7 +34,9 @@ export function createTeamService(storage, clock) {
   return {
     async getTeam(userId) {
       return storage.withTransaction(async repos => {
-        await expireBattles(repos, clock());
+        const now = clock();
+        await expireBattles(repos, now);
+        await expireListings(repos, now);
         const user = await repos.users.get(userId);
         requireGame(user, 'USER_NOT_FOUND');
         return view(repos, user);

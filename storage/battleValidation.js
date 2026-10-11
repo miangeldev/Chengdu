@@ -1,6 +1,7 @@
 import { requireGame } from '../utils/GameError.js';
 import { calculateDamage, firstPlayer, MAX_TURNS } from '../game/battle/engine.js';
 import { effectiveStats } from '../game/progression/rules.js';
+import { ownershipAt } from '../game/units/ownership.js';
 
 const check = (value, field) => requireGame(value, 'DATABASE_CORRUPT', { field });
 const equal = (a, b) => JSON.stringify(a) === JSON.stringify(b);
@@ -47,7 +48,10 @@ export function validateBattleData(state, schemaVersion = 3) {
       }
       if (!accepted) { check(p.unit === null, 'battle.pendingUnit'); continue; }
       const u = p.unit;
-      check(u && units.get(u.id)?.ownerId === p.userId && units.get(u.id).characterId === u.characterId, 'battle.snapshotReferences');
+      const currentUnit = u ? units.get(u.id) : null;
+      check(currentUnit && currentUnit.characterId === u.characterId && (schemaVersion < 7 ? currentUnit.ownerId === p.userId :
+        ownershipAt(state, u.id, u.ownershipVersion ?? 0) === p.userId), 'battle.snapshotReferences');
+      if (schemaVersion >= 7) check(u.ownershipVersion === undefined || integer(u.ownershipVersion), 'battle.snapshotOwnershipVersion');
       check(text(u.characterName) && integer(u.serial, 1) && integer(u.characterRevision, 1) && integer(u.level, 1), 'battle.snapshot');
       const initialStats = units.get(u.id).initialStats;
       check(u.serial === units.get(u.id).serial && u.characterRevision <= characters.get(u.characterId).revision &&
@@ -62,6 +66,7 @@ export function validateBattleData(state, schemaVersion = 3) {
         check(attacks.has(attack.id) && integer(attack.revision, 1) && attack.revision <= attacks.get(attack.id).revision && text(attack.name) && integer(attack.power, 1) && attack.power <= 10000 && integer(attack.accuracy, 1) && attack.accuracy <= 100 && attack.type === 'physical', 'battle.snapshotAttack');
       }
       if (battle.status === 'active') {
+        if (schemaVersion >= 7) check(currentUnit.ownerId === p.userId && (u.ownershipVersion ?? 0) === currentUnit.ownershipVersion, 'battle.activeOwnership');
         check(!activeUnits.has(u.id) && equal(units.get(u.id).lock, { type: 'battle', referenceId: battle.id }), 'battle.unitLock');
         activeUnits.add(u.id);
       }
@@ -110,6 +115,7 @@ export function validateBattleData(state, schemaVersion = 3) {
     else check(date(battle.finishedAt) && battle.turnUserId === null && (accepted || ({ expired: 'challenge_timeout', rejected: 'rejected', cancelled: 'cancelled' })[battle.status] === battle.finishReason), 'battle.closedFinish');
   }
   for (const unit of units.values()) {
+    if (schemaVersion >= 7 && unit.lock?.type === 'market') continue; // Market validation checks the matching active listing.
     if (unit.lock !== null) check(unit.lock?.type === 'battle' && battles.get(unit.lock.referenceId)?.status === 'active' && activeUnits.has(unit.id), 'unit.lockReference');
   }
 }
@@ -137,6 +143,7 @@ export function validateBattleTransition(before, after) {
         const unit = before.unidades.records.find(u => u.id === player.unit.id);
         check(unit && unit.ownerId === player.userId && player.unit.level === unit.progress.level && player.unit.statsVersion === unit.statGrowthVersion && equal(player.unit.combatBaseStats, unit.combatBaseStats) &&
           player.unit.traitVersion === unit.traitVersion && equal(player.unit.traits, unit.traits) && player.unit.variant === unit.variant, 'battle.snapshotLevel');
+        if (unit.ownershipVersion !== undefined) check(player.unit.ownershipVersion === unit.ownershipVersion, 'battle.snapshotCurrentOwnership');
         check(before.usuarios.records.find(u => u.id === player.userId).team[0] === unit.id, 'battle.snapshotTeam');
       }
     }

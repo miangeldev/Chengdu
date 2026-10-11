@@ -54,14 +54,14 @@ async function v3Fixture(t) {
   }
   raw['_database.json'] = JSON.stringify({ database: 'chengdu-cards', schemaVersion: 3 }, null, 2) + '\n';
   fs.writeFileSync(path.join(c.directory, '_database.json'), raw['_database.json']);
-  for (const name of ['sobres', 'aperturas', 'economia']) fs.unlinkSync(path.join(c.directory, `${name}.json`));
+  for (const name of ['sobres', 'aperturas', 'economia', 'diarios', 'mercado', 'ventas']) fs.unlinkSync(path.join(c.directory, `${name}.json`));
   return { ...c, a, b, ua, ub, chatId, raw };
 }
 
 test('schema 3 collection migration preserves balances, rewards, identities, legacy traits and frozen battles', async t => {
   const c = await v3Fixture(t);
   const game = c.open().game;
-  assert.equal((await game.validateDatabase()).schemaVersion, 5);
+  assert.equal((await game.validateDatabase()).schemaVersion, 7);
   assert.equal((await game.economy.getBalance(c.a.id)).coins, 555);
   const unit = await game.units.getUnit(c.ua.id);
   assert.equal(unit.traitVersion, 0);
@@ -91,7 +91,7 @@ for (const stage of ['prepared', 'committed', 'published:unidades.json', 'publis
     await assert.rejects(failed.validateDatabase(), { code: 'STORAGE_WRITE_FAILED' });
     await failed.close();
     const game = c.open().game;
-    assert.equal((await game.validateDatabase()).schemaVersion, 5);
+    assert.equal((await game.validateDatabase()).schemaVersion, 7);
     assert.equal((await game.economy.getBalance(c.a.id)).coins, 555);
     assert.equal(readRecords(c.directory, 'economia').length, 2);
     assert.deepEqual(readRecords(c.directory, 'combates'), JSON.parse(c.raw['combates.json']).records);
@@ -119,7 +119,7 @@ for (const phase of ['prepared', 'committed']) {
     if (phase === 'committed') fs.writeFileSync(path.join(c.directory, 'usuarios.json'), after['usuarios.json']);
     const game = c.open().game;
     assert.equal((await game.economy.getBalance(c.a.id)).coins, phase === 'committed' ? 777 : 555);
-    assert.equal((await game.validateDatabase()).schemaVersion, 5);
+    assert.equal((await game.validateDatabase()).schemaVersion, 7);
     assert.equal(readRecords(c.directory, 'economia')[0].balanceBefore, phase === 'committed' ? 657 : 435);
   });
 }
@@ -132,6 +132,6 @@ test('corrupt schema 3 balances are rejected before creating collection files', 
   fs.writeFileSync(path.join(c.directory, 'usuarios.json'), text);
   await assert.rejects(c.open().game.validateDatabase(), { code: 'DATABASE_CORRUPT' });
   assert.equal(fs.readFileSync(path.join(c.directory, 'usuarios.json'), 'utf8'), text);
-  for (const name of ['sobres', 'aperturas', 'economia']) assert.equal(fs.existsSync(path.join(c.directory, `${name}.json`)), false);
+  for (const name of ['sobres', 'aperturas', 'economia', 'diarios', 'mercado', 'ventas']) assert.equal(fs.existsSync(path.join(c.directory, `${name}.json`)), false);
   assert.equal(JSON.parse(fs.readFileSync(path.join(c.directory, '_database.json'), 'utf8')).schemaVersion, 3);
 });

@@ -2,9 +2,17 @@ import { randomInt, randomUUID } from 'node:crypto';
 import { requireGame } from '../../utils/GameError.js';
 import { BATTLE_IDLE_MS, CHALLENGE_TTL_MS, deadline, firstPlayer, resolveAttack, selectedAttack } from './engine.js';
 import { expireBattles, isOpenBattle, settleBattle } from './lifecycle.js';
+import { expireListings } from '../market/lifecycle.js';
+
 import { effectiveStats } from '../progression/rules.js';
 import { REWARD_VERSION } from '../rewards/battlePolicy.js';
 import { paginate } from '../../utils/pagination.js';
+
+async function expireGameLocks(repos, now) {
+  const battles = await expireBattles(repos, now);
+  await expireListings(repos, now);
+  return battles;
+}
 
 function checkKey(key) {
   requireGame(key === null || (typeof key === 'string' && key.length > 0 && key.length <= 200), 'INVALID_OPERATION_KEY');
@@ -51,7 +59,7 @@ export function createBattleService(storage, clock, randomRoll = () => randomInt
       requireGame(userId !== opponentId, 'SELF_CHALLENGE');
       return storage.withTransaction(async repos => {
         const now = clock();
-        await expireBattles(repos, now);
+        await expireGameLocks(repos, now);
         if (operationKey !== null) {
           const previous = await repos.battles.find(b => b.challengeKey === operationKey);
           if (previous) {
@@ -81,7 +89,7 @@ export function createBattleService(storage, clock, randomRoll = () => randomInt
       checkKey(operationKey);
       return storage.withTransaction(async repos => {
         const now = clock();
-        await expireBattles(repos, now);
+        await expireGameLocks(repos, now);
         await participant(repos, userId);
         if (operationKey !== null) {
           const previous = await repos.battles.find(b => b.acceptKey === operationKey);
@@ -102,7 +110,7 @@ export function createBattleService(storage, clock, randomRoll = () => randomInt
           const stats = effectiveStats(unit.initialStats, unit.progress.level, unit.statGrowthVersion, unit.traits, unit.traitVersion, unit.combatBaseStats);
           p.unit = {
             id: unit.id, characterId: unit.characterId, characterRevision: character.revision,
-            characterName: character.name, serial: unit.serial, level: unit.progress.level,
+            characterName: character.name, serial: unit.serial, level: unit.progress.level, ownershipVersion: unit.ownershipVersion,
             statsVersion: unit.statGrowthVersion, traitVersion: unit.traitVersion, traits: unit.traits, variant: unit.variant,
             combatBaseStats: structuredClone(unit.combatBaseStats),
             stats, hp: stats.hp, attacks
@@ -124,7 +132,7 @@ export function createBattleService(storage, clock, randomRoll = () => randomInt
       checkKey(operationKey);
       return storage.withTransaction(async repos => {
         const now = clock();
-        await expireBattles(repos, now);
+        await expireGameLocks(repos, now);
         await participant(repos, userId);
         const replay = await replayAction(repos, { userId, chatId, battleId, operationKey }, 'attack');
         if (replay) {
@@ -142,7 +150,7 @@ export function createBattleService(storage, clock, randomRoll = () => randomInt
       checkKey(operationKey);
       return storage.withTransaction(async repos => {
         const now = clock();
-        await expireBattles(repos, now);
+        await expireGameLocks(repos, now);
         await participant(repos, userId);
         const replay = await replayAction(repos, { userId, chatId, battleId, operationKey }, 'surrender');
         if (replay) return replay;
@@ -167,7 +175,7 @@ export function createBattleService(storage, clock, randomRoll = () => randomInt
     async closeChallenge({ userId, chatId, battleId = null, reject = false }) {
       return storage.withTransaction(async repos => {
         const now = clock();
-        await expireBattles(repos, now);
+        await expireGameLocks(repos, now);
         await participant(repos, userId);
         const battle = await findBattle(repos, { userId, chatId, battleId }, ['pending']);
         requireGame(battle.players[reject ? 1 : 0].userId === userId, 'CHALLENGE_NOT_YOURS');
@@ -181,7 +189,7 @@ export function createBattleService(storage, clock, randomRoll = () => randomInt
     },
     async getMyBattle({ userId, chatId, battleId = null }) {
       return storage.withTransaction(async repos => {
-        await expireBattles(repos, clock());
+        await expireGameLocks(repos, clock());
         await participant(repos, userId);
         if (battleId) return findBattle(repos, { userId, chatId, battleId }, ['pending', 'active', 'finished', 'expired', 'rejected', 'cancelled']);
         const rows = await repos.battles.filter(b => b.chatId === chatId && b.players.some(p => p.userId === userId));
@@ -190,7 +198,7 @@ export function createBattleService(storage, clock, randomRoll = () => randomInt
     },
     async getHistory({ userId, ...options }) {
       return storage.withTransaction(async repos => {
-        await expireBattles(repos, clock());
+        await expireGameLocks(repos, clock());
         await participant(repos, userId);
         const rows = await repos.battles.filter(b => b.acceptedAt !== null && !isOpenBattle(b) && b.players.some(p => p.userId === userId));
         return paginate(rows, options, `battleHistory:${userId}`, b => [String(8_640_000_000_000_000 - Date.parse(b.finishedAt)).padStart(17, '0'), b.id]);
@@ -198,7 +206,7 @@ export function createBattleService(storage, clock, randomRoll = () => randomInt
     },
     async getHistoryBattle({ userId, battleId }) {
       return storage.withTransaction(async repos => {
-        await expireBattles(repos, clock());
+        await expireGameLocks(repos, clock());
         await participant(repos, userId);
         const battle = await repos.battles.get(battleId);
         requireGame(battle && battle.acceptedAt !== null && !isOpenBattle(battle), 'HISTORY_NOT_FOUND');
@@ -207,7 +215,7 @@ export function createBattleService(storage, clock, randomRoll = () => randomInt
       });
     },
     async sweepExpired() {
-      return storage.withTransaction(repos => expireBattles(repos, clock()));
+      return storage.withTransaction(repos => expireGameLocks(repos, clock()));
     }
   };
 }

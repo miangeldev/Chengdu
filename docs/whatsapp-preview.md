@@ -17,6 +17,65 @@ Los asteriscos muestran el formato de negrita que aplica WhatsApp.
 👉 *.ctustarter*
 ```
 
+## Diario: primera recompensa, sin XP
+
+```text
+🃏 *CHENGDÚ CARDS | DIARIO*
+━━━━━━━━━━━━━━
+🎁 *+100 ChengCoins*
+
+💰 Saldo: *100 ChengCoins*
+
+⏳ Próximo diario: *12 oct 2026, 14:00*
+📍 Hora de Ciudad de México · Un reclamo cada 24 h.
+
+👉 Conseguir personajes: *.ctutienda*
+```
+
+## Repetir el diario: recibo original, sin otro crédito
+
+```text
+🃏 *CHENGDÚ CARDS | DIARIO*
+━━━━━━━━━━━━━━
+↩️ Este mensaje ya reclamó tu diario. Aquí está su recibo original.
+
+🎁 100 ChengCoins recibidos en ese reclamo
+Saldo tras ese reclamo: *100 ChengCoins*
+
+📅 Reclamo del 11 oct 2026, 14:00
+📍 Hora de Ciudad de México.
+
+👉 Consultar saldo actual: *.ctubalance*
+```
+
+## Diario: espera hasta cumplir 24 horas
+
+```text
+🃏 *CHENGDÚ CARDS | DIARIO*
+━━━━━━━━━━━━━━
+⏳ Ya reclamaste tu diario. Se puede reclamar una vez cada 24 h.
+
+📅 Próximo diario: *12 oct 2026, 14:00*
+📍 Hora de Ciudad de México.
+
+👉 Tu saldo: *.ctubalance*
+```
+
+## Tienda: costes y disponibilidad
+
+```text
+🃏 *CHENGDÚ CARDS | TIENDA*
+━━━━━━━━━━━━━━
+🎁 *Sobre Básico*
+💰 500 ChengCoins · ✅ Disponible
+👉 *.ctuabrir basico*
+
+🎲 Un personaje por sobre.
+🔎 Probabilidades y rasgos: .ctusobres
+
+💰 Consultar saldo: *.ctubalance*
+```
+
 ## Elección de starter
 
 ```text
@@ -80,7 +139,7 @@ Fallar consume el turno.
 ━━━━━━━━━━━━━━
 👤 *Miguel*
 🌱 Nivel 1 · ✨ 0/100 XP
-💰 0 ChengCoins · 🎴 1 unidad
+💰 100 ChengCoins · 🎴 1 unidad
 
 ⚔️ 0 combates
 🏆 0 victorias · 💔 0 derrotas · ⚖️ 0 sin ganador
@@ -112,7 +171,6 @@ Fallar consume el turno.
 ⚪ Común · Tanque · Normal
 
 👤 Propietario: Miguel
-🪪 USR-f521cd40-c9dc-4c89-8d74-4537a42aa3ba
 ✅ Disponible
 
 🌱 Nivel 1 · ✨ 0/100 XP
@@ -120,9 +178,10 @@ Fallar consume el turno.
 
 🧬 Sin rasgos
 
-📜 Personaje inicial · 9 de octubre de 2026
+📜 Personaje inicial · 11 de octubre de 2026
 
 🔎 Stats y ataques: *.ctuficha PAND-000001*
+📜 Propietarios: .ctupropiedad PAND-000001
 ```
 
 ## Catálogo
@@ -192,6 +251,21 @@ Fallar consume el turno.
 🎁 *Sobres*
 .ctusobres · Precios y probabilidades
 .ctuabrir basico · Obtener un personaje
+
+💰 *Economía*
+.ctudiario · +100 ChengCoins cada 24 h
+.ctutienda · Comprar sobres
+.ctumovimientos · Tus ingresos y gastos
+
+🛍️ *Mercado*
+.ctumercado · Unidades en venta
+.ctumercado raro / .ctumercado precio · Filtrar
+.ctuvender ID PRECIO · Publicar una unidad
+.ctucomprar ANUNCIO · Comprar
+.ctumercado mios · Tus anuncios
+.cturetirar ANUNCIO · Retirar
+.ctuventas · Tus compras y ventas
+.ctupropiedad ID · Historia de propietarios
 
 🛡️ *Equipo*
 .ctuequipo · Ver equipo
@@ -443,7 +517,7 @@ Lukas: +15 XP
 ━━━━━━━━━━━━━━
 👤 *Miguel*
 🌱 Nivel 2 · ✨ 5/200 XP
-💰 360 ChengCoins · 🎴 1 unidad
+💰 460 ChengCoins · 🎴 1 unidad
 
 ⚔️ 3 combates
 🏆 3 victorias · 💔 0 derrotas · ⚖️ 0 sin ganador
@@ -456,7 +530,13 @@ Lukas: +15 XP
 ```text
 🃏 *CHENGDÚ CARDS | BALANCE*
 ━━━━━━━━━━━━━━
-💰 *360 ChengCoins*
+💰 *460 ChengCoins*
+
+📥 Ingresos: 460 · 📤 Gastos: 0
+🔎 .ctumovimientos
+
+🎁 Diario: +100 ChengCoins cada 24 h
+⏳ Próximo: 12 oct 2026, 14:00 (CDMX)
 
 🏆 Victoria: +120 ChengCoins y +35 XP
 💔 Derrota: +15 XP · ⚖️ Empate: +20 XP
@@ -466,7 +546,7 @@ Lukas: +15 XP
 🏳️ Rendirse requiere 4 ataques y que ambos hayan atacado.
 ⌛ La inactividad no otorga recompensas.
 
-👉 Conseguir personajes: *.ctusobres*
+👉 Conseguir personajes: *.ctutienda*
 ```
 
 ## Historial compacto de partidas
@@ -475,19 +555,19 @@ Lukas: +15 XP
 🃏 *CHENGDÚ CARDS | HISTORIAL*
 ━━━━━━━━━━━━━━
 🏆 Victoria vs *Lukas*
-📅 9 de octubre de 2026 · 4 turnos
+📅 11 de octubre de 2026 · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-454dbc48-0a70-4fdd-9f7d-08e564d8d549
+🔎 .ctuhistorial BTL-68c1fd68-0cde-4359-aebd-8682640600dc
 
 🏆 Victoria vs *Lukas*
-📅 9 de octubre de 2026 · 4 turnos
+📅 11 de octubre de 2026 · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-abfc0c72-a290-41b6-9569-bc13e59889f8
+🔎 .ctuhistorial BTL-803639db-c072-4db6-8ee3-db9bb5624290
 
 🏆 Victoria vs *Lukas*
-📅 9 de octubre de 2026 · 4 turnos
+📅 11 de octubre de 2026 · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-e5148b4c-83b9-4438-aa69-79c2e48f899f
+🔎 .ctuhistorial BTL-bde89dfc-21bf-4bdc-87ef-0082186c44e2
 
 👉 Tu saldo: *.ctubalance*
 ```
@@ -497,7 +577,7 @@ Lukas: +15 XP
 ```text
 🃏 *CHENGDÚ CARDS | PARTIDA*
 ━━━━━━━━━━━━━━
-🏆 Victoria · 9 de octubre de 2026
+🏆 Victoria · 11 de octubre de 2026
 Miguel · Panda Guerrero · Niv. 1
 Lukas · Lobo Sombrío · Niv. 1
 
@@ -563,6 +643,21 @@ Fallar consume el turno.
 ⚔️ Otra partida: .ctupelea @jugador
 ```
 
+## Diario: siguiente recompensa después del plazo
+
+```text
+🃏 *CHENGDÚ CARDS | DIARIO*
+━━━━━━━━━━━━━━
+🎁 *+100 ChengCoins*
+
+💰 Saldo: *800 ChengCoins*
+
+⏳ Próximo diario: *14 oct 2026, 14:00*
+📍 Hora de Ciudad de México · Un reclamo cada 24 h.
+
+👉 Conseguir personajes: *.ctutienda*
+```
+
 ## Sobres: precio y probabilidades actuales
 
 ```text
@@ -595,7 +690,7 @@ Las variantes son cosméticas; los rasgos mejoran stats.
 🧬 Firme · Agresivo
 
 💰 500 ChengCoins gastados
-Saldo restante: *100 ChengCoins*
+Saldo restante: *300 ChengCoins*
 
 👉 Stats y ataques: *.ctuficha DRGC-000001*
 🛡️ Seleccionar: .ctuequipo usar DRGC-000001
@@ -629,7 +724,6 @@ Saldo restante: *100 ChengCoins*
 🟡 Legendario · Atacante · Dorada
 
 👤 Propietario: Miguel
-🪪 USR-f521cd40-c9dc-4c89-8d74-4537a42aa3ba
 ✅ Disponible
 
 🌱 Nivel 1 · ✨ 0/100 XP
@@ -637,9 +731,10 @@ Saldo restante: *100 ChengCoins*
 
 🧬 Firme · Agresivo
 
-📜 Sobre: Sobre Básico · 11 de octubre de 2026
+📜 Sobre: Sobre Básico · 13 de octubre de 2026
 
 🔎 Stats y ataques: *.ctuficha DRGC-000001*
+📜 Propietarios: .ctupropiedad DRGC-000001
 ```
 
 ## Ficha: efectos de los rasgos y estadísticas efectivas
@@ -678,7 +773,7 @@ Fallar consume el turno.
 🧬 Firme · Agresivo
 
 💰 500 ChengCoins pagados en la apertura original
-Saldo tras esa apertura: *100 ChengCoins*
+Saldo tras esa apertura: *300 ChengCoins*
 
 👉 Stats y ataques: *.ctuficha DRGC-000001*
 🛡️ Seleccionar: .ctuequipo usar DRGC-000001
@@ -689,7 +784,13 @@ Saldo tras esa apertura: *100 ChengCoins*
 ```text
 🃏 *CHENGDÚ CARDS | BALANCE*
 ━━━━━━━━━━━━━━
-💰 *100 ChengCoins*
+💰 *300 ChengCoins*
+
+📥 Ingresos: 800 · 📤 Gastos: 500
+🔎 .ctumovimientos
+
+🎁 Diario: +100 ChengCoins cada 24 h
+⏳ Próximo: 14 oct 2026, 14:00 (CDMX)
 
 🏆 Victoria: +120 ChengCoins y +35 XP
 💔 Derrota: +15 XP · ⚖️ Empate: +20 XP
@@ -699,7 +800,66 @@ Saldo tras esa apertura: *100 ChengCoins*
 🏳️ Rendirse requiere 4 ataques y que ambos hayan atacado.
 ⌛ La inactividad no otorga recompensas.
 
-👉 Conseguir personajes: *.ctusobres*
+👉 Conseguir personajes: *.ctutienda*
+```
+
+## Repetir un diario antiguo: conserva su saldo original
+
+```text
+🃏 *CHENGDÚ CARDS | DIARIO*
+━━━━━━━━━━━━━━
+↩️ Este mensaje ya reclamó tu diario. Aquí está su recibo original.
+
+🎁 100 ChengCoins recibidos en ese reclamo
+Saldo tras ese reclamo: *100 ChengCoins*
+
+📅 Reclamo del 11 oct 2026, 14:00
+📍 Hora de Ciudad de México.
+
+👉 Consultar saldo actual: *.ctubalance*
+```
+
+## Movimientos: ingresos y gastos propios
+
+```text
+🃏 *CHENGDÚ CARDS | MOVIMIENTOS*
+━━━━━━━━━━━━━━
+📤 *-500 ChengCoins* · 🎁 Sobre
+📅 13 oct 2026, 14:00
+
+📥 *+100 ChengCoins* · 📅 Diario
+📅 13 oct 2026, 14:00
+
+📥 *+120 ChengCoins* · 🏆 Combate
+📅 13 oct 2026, 14:00
+
+📥 *+120 ChengCoins* · 🏆 Combate
+📅 13 oct 2026, 14:00
+
+📥 *+0 ChengCoins* · 🏆 Combate
+📅 11 oct 2026, 14:00
+
+📄 Siguiente: *.ctumovimientos eyJzY29wZSI6ImNvaW5MZWRnZXI6VVNSLWE0MmY3YTI3LWJlZmUtNDk1OC04OTM0LTFhZGUyMDYxMDVmOSIsImtleSI6WyI5MDA3MTk5MjU0NzQwOTg3IiwiY29pbjpyZXdhcmQ6QlRMLTNhOWE5ZTQyLWZlYTMtNDZlYy1iZGZiLTY5ODkxNzJjMmU1MjpVU1ItYTQyZjdhMjctYmVmZS00OTU4LTg5MzQtMWFkZTIwNjEwNWY5Il19*
+```
+
+## Movimientos: siguiente página
+
+```text
+🃏 *CHENGDÚ CARDS | MOVIMIENTOS*
+━━━━━━━━━━━━━━
+📥 *+120 ChengCoins* · 🏆 Combate
+📅 11 oct 2026, 14:00
+
+📥 *+120 ChengCoins* · 🏆 Combate
+📅 11 oct 2026, 14:00
+
+📥 *+120 ChengCoins* · 🏆 Combate
+📅 11 oct 2026, 14:00
+
+📥 *+100 ChengCoins* · 📅 Diario
+📅 11 oct 2026, 14:00
+
+👉 Tu saldo: *.ctubalance*
 ```
 
 ## Error: saldo insuficiente para otro sobre
@@ -707,6 +867,498 @@ Saldo tras esa apertura: *100 ChengCoins*
 ```text
 🃏 *CHENGDÚ CARDS | ERROR*
 ━━━━━━━━━━━━━━
-💰 No tienes suficientes ChengCoins para abrir ese sobre.
+💰 No tienes suficientes ChengCoins para esa compra.
 👉 Consulta .ctubalance
+```
+
+## Mercado: aún sin anuncios
+
+```text
+🃏 *CHENGDÚ CARDS | MERCADO*
+━━━━━━━━━━━━━━
+🛍️ No hay unidades en venta con esta selección.
+
+👉 Elegir una unidad para vender: *.ctupersonajes*
+```
+
+## Publicar: precio, comisión y vencimiento
+
+```text
+🃏 *CHENGDÚ CARDS | EN VENTA*
+━━━━━━━━━━━━━━
+🎴 ¡Tu unidad ya está en el mercado!
+
+🐼 *Panda Guerrero* · Nv. 2
+⚪ Común · Tanque
+
+💰 Precio: *100 ChengCoins*
+🏦 Comisión del 5%: 5 ChengCoins (redondeo hacia arriba)
+📥 Recibirás: *95 ChengCoins*
+
+🔒 En el mercado
+🛡️ Retirada del equipo mientras está en venta.
+⏳ Vence: 20 oct 2026, 14:00 (CDMX)
+
+👉 Compartir anuncio: *.ctumercado ver LIST-9d99946c-13c7-45c8-9461-bd8137022c42*
+↩️ Retirar: .cturetirar LIST-9d99946c-13c7-45c8-9461-bd8137022c42
+```
+
+## Mercado: decidir a simple vista
+
+```text
+🃏 *CHENGDÚ CARDS | MERCADO*
+━━━━━━━━━━━━━━
+🐼 *Panda Guerrero* · Nv. 2
+⚪ Común · Tanque
+💰 *100 ChengCoins* · 👤 Miguel
+👉 .ctumercado ver LIST-9d99946c-13c7-45c8-9461-bd8137022c42
+
+🎴 Tus anuncios: .ctumercado mios
+💰 Menor precio: .ctumercado precio
+```
+
+## Mercado: filtrar por rareza
+
+```text
+🃏 *CHENGDÚ CARDS | MERCADO*
+━━━━━━━━━━━━━━
+🐼 *Panda Guerrero* · Nv. 2
+⚪ Común · Tanque
+💰 *100 ChengCoins* · 👤 Miguel
+👉 .ctumercado ver LIST-9d99946c-13c7-45c8-9461-bd8137022c42
+
+🎴 Tus anuncios: .ctumercado mios
+💰 Menor precio: .ctumercado precio
+```
+
+## Mercado: ordenar por precio
+
+```text
+🃏 *CHENGDÚ CARDS | MERCADO*
+━━━━━━━━━━━━━━
+💰 Del menor al mayor precio.
+
+🐼 *Panda Guerrero* · Nv. 2
+⚪ Común · Tanque
+💰 *100 ChengCoins* · 👤 Miguel
+👉 .ctumercado ver LIST-9d99946c-13c7-45c8-9461-bd8137022c42
+
+🎴 Tus anuncios: .ctumercado mios
+💰 Menor precio: .ctumercado precio
+```
+
+## Mis anuncios: neto que recibirá el vendedor
+
+```text
+🃏 *CHENGDÚ CARDS | MIS ANUNCIOS*
+━━━━━━━━━━━━━━
+🐼 *Panda Guerrero* · Nv. 2
+⚪ Común · Tanque
+💰 *100 ChengCoins* · 📥 Recibirás 95
+👉 .cturetirar LIST-9d99946c-13c7-45c8-9461-bd8137022c42
+
+🎴 Tus anuncios: .ctumercado mios
+💰 Menor precio: .ctumercado precio
+```
+
+## Anuncio: ficha congelada y acción de compra
+
+```text
+🃏 *CHENGDÚ CARDS | ANUNCIO*
+━━━━━━━━━━━━━━
+🐼 *Panda Guerrero* · Nv. 2
+⚪ Común · Tanque
+
+👤 Vendedor: *Miguel*
+💰 Precio: *100 ChengCoins*
+
+❤️ 122 HP · ⚔️ 25 ATQ · 🛡️ 23 DEF · 💨 8 VEL
+📌 Stats al publicar.
+
+🔒 En el mercado
+⏳ Vence: 20 oct 2026, 14:00 (CDMX)
+
+🛒 Comprar: *.ctucomprar LIST-9d99946c-13c7-45c8-9461-bd8137022c42*
+🔎 Ataques y rasgos: .ctuficha PAND-000001
+```
+
+## Colección: unidad bloqueada en el mercado
+
+```text
+🃏 *CHENGDÚ CARDS | COLECCIÓN*
+━━━━━━━━━━━━━━
+🎴 *Miguel*
+
+🐼 *Panda Guerrero* · Nv. 2
+⚪ Común · 🔒 En venta
+↳ .ctumercado ver LIST-9d99946c-13c7-45c8-9461-bd8137022c42
+
+🐉 *Dragón Carmesí* · ✨ Dorada · Nv. 1
+🟡 Legendario · 🧬 2 rasgos · ✅ Disponible
+↳ .ctuequipo usar DRGC-000001
+
+🔎 Detalles: .ctuficha ID
+```
+
+## Error: una unidad en venta no puede combatir
+
+```text
+🃏 *CHENGDÚ CARDS | ERROR*
+━━━━━━━━━━━━━━
+🔒 Esa unidad está en combate o en venta.
+👉 Consulta .ctumercado mios o .ctucombate.
+```
+
+## Error: el comprador necesita saldo
+
+```text
+🃏 *CHENGDÚ CARDS | ERROR*
+━━━━━━━━━━━━━━
+💰 No tienes suficientes ChengCoins para esa compra.
+👉 Consulta .ctubalance
+```
+
+## Compra: pago y equipo bajo demanda
+
+```text
+🃏 *CHENGDÚ CARDS | COMPRA*
+━━━━━━━━━━━━━━
+🤝 ¡La unidad ya forma parte de tu colección!
+
+🐼 *Panda Guerrero* · Nv. 2
+⚪ Común · Tanque
+
+👤 Vendedor: Miguel
+💰 100 ChengCoins pagados
+Saldo restante: *0 ChengCoins*
+
+👉 Preparar equipo: *.ctuequipo usar PAND-000001*
+🔎 Consultar: .ctuficha PAND-000001
+```
+
+## Ventas: precio neto y comisión del vendedor
+
+```text
+🃏 *CHENGDÚ CARDS | COMPRAS Y VENTAS*
+━━━━━━━━━━━━━━
+🤝 Venta · +95 ChengCoins
+🐼 *Panda Guerrero* · Nv. 2
+⚪ Común · Tanque
+👤 Comprador: Lukas · Comisión: 5
+📅 13 oct 2026, 14:00 (CDMX)
+🔎 .ctupropiedad PAND-000001
+
+👉 Tu saldo: *.ctubalance*
+```
+
+## Compras: recibo personal sin saldo de la contraparte
+
+```text
+🃏 *CHENGDÚ CARDS | COMPRAS Y VENTAS*
+━━━━━━━━━━━━━━
+🛒 Compra · 100 ChengCoins
+🐼 *Panda Guerrero* · Nv. 2
+⚪ Común · Tanque
+👤 Vendedor: Miguel
+📅 13 oct 2026, 14:00 (CDMX)
+🔎 .ctupropiedad PAND-000001
+
+👉 Tu saldo: *.ctubalance*
+```
+
+## Propiedad: nacimiento y transferencia
+
+```text
+🃏 *CHENGDÚ CARDS | PROPIEDAD*
+━━━━━━━━━━━━━━
+🎴 *Panda Guerrero*
+👤 Propietario actual: *Lukas*
+
+🌱 Emitida para Miguel
+Primera emisión · 11 oct 2026, 14:00 (CDMX)
+
+🤝 Miguel → Lukas
+Compra en el mercado · 13 oct 2026, 14:00 (CDMX)
+
+👉 Stats y ataques: *.ctuficha PAND-000001*
+```
+
+## Colección del comprador: progreso conservado
+
+```text
+🃏 *CHENGDÚ CARDS | COLECCIÓN*
+━━━━━━━━━━━━━━
+🎴 *Lukas*
+
+🐺 *Lobo Sombrío* · Nv. 1
+⚪ Común · ✅ Disponible
+↳ .ctuequipo usar LOBO-000001
+
+🐼 *Panda Guerrero* · Nv. 2
+⚪ Común · ✅ Disponible
+↳ .ctuequipo usar PAND-000001
+
+🔎 Detalles: .ctuficha ID
+```
+
+## Starter antiguo: indica que cambió de propietario
+
+```text
+🃏 *CHENGDÚ CARDS | STARTER*
+━━━━━━━━━━━━━━
+🎁 Ya reclamaste tu starter.
+
+🐼 *Panda Guerrero*
+⚪ Común · Nivel 2
+
+👤 Ese personaje cambió de propietario.
+
+👉 Tu colección: *.ctupersonajes*
+```
+
+## Combate histórico: sigue perteneciendo a sus jugadores tras la venta
+
+```text
+🃏 *CHENGDÚ CARDS | PARTIDA*
+━━━━━━━━━━━━━━
+🏆 Victoria · 13 de octubre de 2026
+Miguel · Panda Guerrero · Niv. 2
+Lukas · Lobo Sombrío · Niv. 1
+
+⚔️ *TURNOS*
+T1 · Lukas: Colmillo Nocturno
+💥 44 de daño · Rival: 78 HP
+
+T2 · Miguel: Impacto del Panda
+💥 48 de daño · Rival: 47 HP
+
+T3 · Lukas: Colmillo Nocturno
+💥 44 de daño · Rival: 34 HP
+
+T4 · Miguel: Impacto del Panda
+💥 47 de daño · Rival: 0 HP
+
+🎁 *RECOMPENSAS*
+Miguel: +120 ChengCoins · +35 XP
+🐼 Unidad: +35 XP
+Lukas: +15 XP
+🐺 Unidad: +15 XP
+
+👉 *.ctuhistorial*
+```
+
+## Preparar una unidad comprada
+
+```text
+🃏 *CHENGDÚ CARDS | EQUIPO*
+━━━━━━━━━━━━━━
+🛡️ *Lukas*
+
+🐼 *Panda Guerrero* · Nv. 2
+✅ Listo para combatir
+
+👉 *.ctupelea @jugador*
+🔎 Stats y ataques: .ctuficha
+```
+
+## Repetir publicación: conserva el anuncio ya vendido
+
+```text
+🃏 *CHENGDÚ CARDS | EN VENTA*
+━━━━━━━━━━━━━━
+↩️ Este mensaje ya publicó la unidad. Aquí está su anuncio original.
+
+🐼 *Panda Guerrero* · Nv. 2
+⚪ Común · Tanque
+
+💰 Precio: *100 ChengCoins*
+🏦 Comisión del 5%: 5 ChengCoins (redondeo hacia arriba)
+📥 Neto del anuncio: *95 ChengCoins*
+
+🤝 Vendido
+⏳ Vence: 20 oct 2026, 14:00 (CDMX)
+
+👉 Tus ventas y compras: *.ctuventas*
+```
+
+## Reventa: conserva la identidad y el progreso de la unidad
+
+```text
+🃏 *CHENGDÚ CARDS | COMPRA*
+━━━━━━━━━━━━━━
+🤝 ¡La unidad ya forma parte de tu colección!
+
+🐼 *Panda Guerrero* · Nv. 2
+⚪ Común · Tanque
+
+👤 Vendedor: Lukas
+💰 75 ChengCoins pagados
+Saldo restante: *320 ChengCoins*
+
+👉 Preparar equipo: *.ctuequipo usar PAND-000001*
+🔎 Consultar: .ctuficha PAND-000001
+```
+
+## Compra antigua: recibo original después de revender
+
+```text
+🃏 *CHENGDÚ CARDS | COMPRA*
+━━━━━━━━━━━━━━
+↩️ Este mensaje ya confirmó la compra. Aquí está su recibo original.
+
+🐼 *Panda Guerrero* · Nv. 2
+⚪ Común · Tanque
+
+👤 Vendedor: Miguel
+💰 100 ChengCoins pagados en esa compra
+Saldo tras esa compra: *0 ChengCoins*
+
+👤 La unidad cambió de propietario desde esa compra.
+
+👉 Tu colección: *.ctupersonajes*
+```
+
+## Propiedad: cadena de dos ventas
+
+```text
+🃏 *CHENGDÚ CARDS | PROPIEDAD*
+━━━━━━━━━━━━━━
+🎴 *Panda Guerrero*
+👤 Propietario actual: *Miguel*
+
+🌱 Emitida para Miguel
+Primera emisión · 11 oct 2026, 14:00 (CDMX)
+
+🤝 Miguel → Lukas
+Compra en el mercado · 13 oct 2026, 14:00 (CDMX)
+
+🤝 Lukas → Miguel
+Compra en el mercado · 13 oct 2026, 14:00 (CDMX)
+
+👉 Stats y ataques: *.ctuficha PAND-000001*
+```
+
+## Apertura antigua: recibo original después de vender la unidad
+
+```text
+🃏 *CHENGDÚ CARDS | SOBRE ABIERTO*
+━━━━━━━━━━━━━━
+↩️ Este mensaje ya abrió un sobre. Aquí está su resultado original.
+
+🐉 *Dragón Carmesí*
+🟡 Legendario · Dorada
+
+🧬 Firme · Agresivo
+
+💰 500 ChengCoins pagados en la apertura original
+Saldo tras esa apertura: *300 ChengCoins*
+
+👤 Esa unidad cambió de propietario desde la apertura.
+
+👉 Tu colección: *.ctupersonajes*
+```
+
+## Retirar anuncio: libera la unidad sin comisión
+
+```text
+🃏 *CHENGDÚ CARDS | ANUNCIO*
+━━━━━━━━━━━━━━
+↩️ Anuncio retirado. Tu unidad está disponible de nuevo.
+
+🐉 *Dragón Carmesí* · Nv. 1
+🟡 Legendario · Atacante · ✨ Dorada · 🧬 2 rasgos
+
+💰 Retirar o dejar vencer el anuncio no cobra comisión.
+
+👉 Tu colección: *.ctupersonajes*
+```
+
+## Repetir retirada: conserva la cancelación
+
+```text
+🃏 *CHENGDÚ CARDS | ANUNCIO*
+━━━━━━━━━━━━━━
+↩️ Este anuncio ya se había retirado.
+
+🐉 *Dragón Carmesí* · Nv. 1
+🟡 Legendario · Atacante · ✨ Dorada · 🧬 2 rasgos
+
+💰 Retirar o dejar vencer el anuncio no cobra comisión.
+
+👉 Tu colección: *.ctupersonajes*
+```
+
+## Error: el anuncio ya fue retirado
+
+```text
+🃏 *CHENGDÚ CARDS | ERROR*
+━━━━━━━━━━━━━━
+🛍️ Ese anuncio ya se vendió, se retiró o venció.
+👉 Consulta .ctumercado
+```
+
+## Movimientos: compras y ventas junto a diarios y combates
+
+```text
+🃏 *CHENGDÚ CARDS | MOVIMIENTOS*
+━━━━━━━━━━━━━━
+📥 *+19 ChengCoins* · 🤝 Venta de unidad
+📅 13 oct 2026, 14:00
+
+📤 *-75 ChengCoins* · 🛒 Compra de unidad
+📅 13 oct 2026, 14:00
+
+📥 *+95 ChengCoins* · 🤝 Venta de unidad
+📅 13 oct 2026, 14:00
+
+📤 *-500 ChengCoins* · 🎁 Sobre
+📅 13 oct 2026, 14:00
+
+📥 *+100 ChengCoins* · 📅 Diario
+📅 13 oct 2026, 14:00
+
+📄 Siguiente: *.ctumovimientos eyJzY29wZSI6ImNvaW5MZWRnZXI6VVNSLWE0MmY3YTI3LWJlZmUtNDk1OC04OTM0LTFhZGUyMDYxMDVmOSIsImtleSI6WyI5MDA3MTk5MjU0NzQwOTg0IiwiY29pbjpEQUlMWS0zMGM0MDA4OC1jODYyLTQxMzUtYWUwZC0yM2M5OWI2YTBkMjgiXX0*
+```
+
+## Vencimiento: rechaza la compra y libera el bloqueo
+
+```text
+🃏 *CHENGDÚ CARDS | ERROR*
+━━━━━━━━━━━━━━
+⌛ El anuncio venció y la unidad quedó disponible para su propietario.
+👉 Consulta .ctumercado
+```
+
+## Anuncio vencido: conserva la ficha histórica
+
+```text
+🃏 *CHENGDÚ CARDS | ANUNCIO*
+━━━━━━━━━━━━━━
+🐺 *Lobo Sombrío* · Nv. 1
+⚪ Común · Velocista
+
+👤 Vendedor: *Lukas*
+💰 Precio: *20 ChengCoins*
+
+❤️ 95 HP · ⚔️ 27 ATQ · 🛡️ 17 DEF · 💨 16 VEL
+📌 Stats al publicar.
+
+⌛ Anuncio vencido
+⏳ Vence: 20 oct 2026, 14:00 (CDMX)
+
+🔎 Ataques y rasgos: .ctuficha LOBO-000001
+```
+
+## Equipo: unidad disponible después del vencimiento
+
+```text
+🃏 *CHENGDÚ CARDS | EQUIPO*
+━━━━━━━━━━━━━━
+🛡️ *Lukas*
+
+🐺 *Lobo Sombrío* · Nv. 1
+✅ Listo para combatir
+
+👉 *.ctupelea @jugador*
+🔎 Stats y ataques: .ctuficha
 ```

@@ -7,7 +7,11 @@ export const { command, run, createRun } = defineCommand('ctustarter', async ({ 
   requireGame(args.length <= 1, 'INVALID_STARTER');
   if (!args.length) {
     const profile = await game.users.getProfile(user.id);
-    if (profile.starterClaim) return card('STARTER', ['🎁 Ya reclamaste tu starter.'], `🔎 Ver personaje: *${cmd('ctuficha', profile.starterClaim.unitId)}*`);
+    if (profile.starterClaim) {
+      const starter = await game.units.getUnit(profile.starterClaim.unitId);
+      const stillOwned = starter.ownerId === user.id;
+      return card('STARTER', ['🎁 Ya reclamaste tu starter.', !stillOwned ? '👤 Ese personaje cambió de propietario.' : null], stillOwned ? `🔎 Ver personaje: *${cmd('ctuficha', starter.id)}*` : `👉 Tu colección: *${cmd('ctupersonajes')}*`);
+    }
     const options = await game.starter.getStarterOptions();
     return card('STARTER', [
       '🎁 Elige tu primer personaje. Solo puedes reclamar uno.',
@@ -16,8 +20,10 @@ export const { command, run, createRun } = defineCommand('ctustarter', async ({ 
   }
   const result = await game.starter.claimStarter({ userId: user.id, choice: args[0] });
   const character = await game.characters.getCharacter(result.unit.characterId);
+  const stillOwned = result.unit.ownerId === user.id;
   return card('STARTER', [
     result.alreadyClaimed ? '🎁 Ya reclamaste tu starter.' : '🎉 ¡Tu primer personaje está listo!',
-    `${characterIcon(character.id)} *${displayName(character.name)}*\n${rarityIcon(character.rarity)} ${rarityName(character.rarity)} · Nivel ${result.unit.progress.level}`
-  ], result.alreadyClaimed ? `🔎 Ver personaje: *${cmd('ctuficha', result.unit.id)}*` : `🛡️ Preparar equipo:\n👉 *${cmd('ctuequipo', `usar ${result.unit.id}`)}*`);
+    `${characterIcon(character.id)} *${displayName(character.name)}*\n${rarityIcon(character.rarity)} ${rarityName(character.rarity)} · Nivel ${result.unit.progress.level}`,
+    !stillOwned ? '👤 Ese personaje cambió de propietario.' : null
+  ], !stillOwned ? `👉 Tu colección: *${cmd('ctupersonajes')}*` : result.alreadyClaimed ? `🔎 Ver personaje: *${cmd('ctuficha', result.unit.id)}*` : `🛡️ Preparar equipo:\n👉 *${cmd('ctuequipo', `usar ${result.unit.id}`)}*`);
 });

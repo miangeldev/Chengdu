@@ -61,10 +61,10 @@ test('corrupt JSON and future schema versions do not trigger reset or overwrite'
   await assert.rejects(register(game, 'Juan', '521111111111'), { code: 'DATABASE_CORRUPT' });
   assert.equal(fs.readFileSync(file, 'utf8'), invalid);
   const future = JSON.parse(good);
-  future._meta.schemaVersion = 6;
+  future._meta.schemaVersion = 8;
   fs.writeFileSync(file, JSON.stringify(future));
   await assert.rejects(game.validateDatabase(), { code: 'UNSUPPORTED_SCHEMA_VERSION' });
-  assert.equal(JSON.parse(fs.readFileSync(file, 'utf8'))._meta.schemaVersion, 6);
+  assert.equal(JSON.parse(fs.readFileSync(file, 'utf8'))._meta.schemaVersion, 8);
 });
 
 test('read failures propagate without replacing inaccessible data with an empty array', async t => {
@@ -115,12 +115,12 @@ for (const stage of ['prepared', 'committed', 'published:usuarios.json']) {
     await assert.rejects(context.game.validateDatabase(), { code: 'STORAGE_WRITE_FAILED' });
     await context.game.close();
     const recovered = context.open({ fault: () => {} }).game;
-    assert.deepEqual(await recovered.validateDatabase(), { valid: true, schemaVersion: 5, users: 0, characters: 8, units: 0, claims: 0 });
+    assert.deepEqual(await recovered.validateDatabase(), { valid: true, schemaVersion: 7, users: 0, characters: 8, units: 0, claims: 0 });
     assert.equal(fs.existsSync(path.join(context.directory, '_journal.json')), false);
   });
 }
 
-for (const stage of ['prepared', 'committed', 'published:usuarios.json', 'published:personajes.json', 'published:unidades.json', 'published:estado.json', 'published:eventos.json', 'published:ataques.json', 'published:combates.json', 'published:recompensas.json', 'published:sobres.json', 'published:aperturas.json', 'published:economia.json', 'published:_database.json']) {
+for (const stage of ['prepared', 'committed', 'published:usuarios.json', 'published:personajes.json', 'published:unidades.json', 'published:estado.json', 'published:eventos.json', 'published:ataques.json', 'published:combates.json', 'published:recompensas.json', 'published:sobres.json', 'published:aperturas.json', 'published:economia.json', 'published:diarios.json', 'published:mercado.json', 'published:ventas.json', 'published:_database.json']) {
   test(`starter recovery after failure at ${stage}`, async t => {
     const context = setup(t);
     const user = await register(context.game);
@@ -198,12 +198,14 @@ test('normal process exit releases its writer lock', async t => {
 test('standalone helpers cannot overwrite managed game collections', async t => {
   const { game, directory } = setup(t);
   await register(game);
-  const file = path.join(directory, 'usuarios.json');
-  const original = fs.readFileSync(file, 'utf8');
-  const unsafe = crearDatabase('usuarios', [], { directory, maintenance: true });
-  assert.throws(() => unsafe.guardar([]), { code: 'MANAGED_DATABASE_FILE' });
-  assert.throws(() => unsafe.eliminar(), { code: 'MANAGED_DATABASE_FILE' });
-  assert.equal(fs.readFileSync(file, 'utf8'), original);
+  for (const name of ['usuarios', 'diarios', 'mercado', 'ventas']) {
+    const file = path.join(directory, `${name}.json`);
+    const original = fs.readFileSync(file, 'utf8');
+    const unsafe = crearDatabase(name, [], { directory, maintenance: true });
+    assert.throws(() => unsafe.guardar([]), { code: 'MANAGED_DATABASE_FILE' });
+    assert.throws(() => unsafe.eliminar(), { code: 'MANAGED_DATABASE_FILE' });
+    assert.equal(fs.readFileSync(file, 'utf8'), original);
+  }
 });
 
 test('standalone helper refuses corruption and requires maintenance for deletion', t => {

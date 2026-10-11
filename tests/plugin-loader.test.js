@@ -54,14 +54,28 @@ test('direct plugin run exports share one database and complete the game flow', 
     await run('ctupelea', alice, ['@Bob'], [bob]);
     await run('ctucancelar');
     await run('ctubalance');
+    await run('ctudiario');
+    await run('ctutienda');
+    await run('ctumovimientos');
     await run('ctuhistorial');
     await run('ctusobres');
     await run('ctuabrir', alice, ['basico']);
+    await run('ctumercado');
+    await run('ctuvender', alice, ['PAND-000001', '20']);
+    const listing = (await game.market.listListings()).items[0];
+    await run('ctumercado', alice, ['ver', listing.id]);
+    await run('ctudiario', bob);
+    await run('ctucomprar', bob, [listing.id]);
+    await run('ctuventas');
+    await run('ctupropiedad', bob, ['PAND-000001']);
+    await run('ctuvender', bob, ['PAND-000001', '20']);
+    const resale = (await game.market.listListings()).items[0];
+    await run('cturetirar', bob, [resale.id]);
     assert.deepEqual(await game.validateDatabase(), {
-      valid: true, schemaVersion: 5, users: 2, characters: 8, units: 2, claims: 2
+      valid: true, schemaVersion: 7, users: 2, characters: 8, units: 2, claims: 2
     });
-    assert.equal(replies.length, 27);
-    assert.equal(commands.length, 20);
+    assert.equal(replies.length, 39);
+    assert.equal(commands.length, 29);
   } finally {
     await game.close();
   }

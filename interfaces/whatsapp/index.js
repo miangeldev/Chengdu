@@ -18,9 +18,18 @@ import * as balance from '../../plugins/CTU-balance.js';
 import * as historial from '../../plugins/CTU-historial.js';
 import * as sobres from '../../plugins/CTU-sobres.js';
 import * as abrir from '../../plugins/CTU-abrir.js';
+import * as diario from '../../plugins/CTU-diario.js';
+import * as tienda from '../../plugins/CTU-tienda.js';
+import * as movimientos from '../../plugins/CTU-movimientos.js';
+import * as mercado from '../../plugins/CTU-mercado.js';
+import * as vender from '../../plugins/CTU-vender.js';
+import * as comprar from '../../plugins/CTU-comprar.js';
+import * as retirar from '../../plugins/CTU-retirar.js';
+import * as ventas from '../../plugins/CTU-ventas.js';
+import * as propiedad from '../../plugins/CTU-propiedad.js';
 import { game as defaultGame } from '../../game/index.js';
 
-export const commands = Object.freeze([registro, perfil, catalogo, starter, personajes, unidad, ayuda, equipo, pelea, aceptar, atacar, rendirse, combate, rechazar, cancelar, ficha, balance, historial, sobres, abrir]);
+export const commands = Object.freeze([registro, perfil, catalogo, starter, personajes, unidad, ayuda, equipo, pelea, aceptar, atacar, rendirse, combate, rechazar, cancelar, ficha, balance, historial, sobres, abrir, diario, tienda, movimientos, mercado, vender, comprar, retirar, ventas, propiedad]);
 
 // Host supplies authenticated msg metadata and the text extracted from the message.
 export function createCommandRouter({ game = defaultGame, prefix = '.', logger, debug, battleHealthBars } = {}) {

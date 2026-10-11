@@ -3,6 +3,7 @@ import { requireGame } from '../../utils/GameError.js';
 import { paginate } from '../../utils/pagination.js';
 import { expireBattles } from '../battle/lifecycle.js';
 import { effectiveStats } from '../progression/rules.js';
+import { expireListings } from '../market/lifecycle.js';
 
 async function detail(repos, unit) {
   const owner = await repos.users.get(unit.ownerId);
@@ -44,7 +45,9 @@ export function createUnitService(storage, clock) {
     async getUnit(unitId) {
       requireGame(typeof unitId === 'string', 'UNIT_NOT_FOUND');
       return storage.withTransaction(async repos => {
-        await expireBattles(repos, clock());
+        const now = clock();
+        await expireBattles(repos, now);
+        await expireListings(repos, now);
         const unit = await repos.units.get(unitId.trim().toUpperCase());
         requireGame(unit, 'UNIT_NOT_FOUND');
         return detail(repos, unit);
@@ -53,7 +56,9 @@ export function createUnitService(storage, clock) {
     async getCombatDetails({ userId = null, chatId = null, unitId = null } = {}) {
       requireGame(unitId === null || typeof unitId === 'string', 'UNIT_NOT_FOUND');
       return storage.withTransaction(async repos => {
-        await expireBattles(repos, clock());
+        const now = clock();
+        await expireBattles(repos, now);
+        await expireListings(repos, now);
         if (unitId !== null) return { units: [await combatDetail(repos, unitId.trim().toUpperCase())] };
         const user = await repos.users.get(userId);
         requireGame(user, 'USER_NOT_FOUND');
@@ -65,11 +70,31 @@ export function createUnitService(storage, clock) {
     },
     async getUserUnits(ownerId, options = {}) {
       return storage.withTransaction(async repos => {
-        await expireBattles(repos, clock());
+        const now = clock();
+        await expireBattles(repos, now);
+        await expireListings(repos, now);
         requireGame(await repos.users.get(ownerId), 'USER_NOT_FOUND');
         const page = paginate(await repos.units.getByOwner(ownerId), options, `collection:${ownerId}`);
         page.items = await Promise.all(page.items.map(unit => detail(repos, unit)));
         return page;
+      });
+    },
+    async getOwnershipHistory(unitId, options = {}) {
+      requireGame(typeof unitId === 'string', 'UNIT_NOT_FOUND');
+      return storage.withTransaction(async repos => {
+        const now = clock();
+        await expireBattles(repos, now);
+        await expireListings(repos, now);
+        const unit = await repos.units.get(unitId.trim().toUpperCase());
+        requireGame(unit, 'UNIT_NOT_FOUND');
+        const events = await repos.events.filter(event => event.unitId === unit.id);
+        const page = paginate(events, options, `ownershipHistory:${unit.id}`,
+          event => [String(event.ownershipVersion ?? 0).padStart(16, '0'), event.id]);
+        const users = new Map((await repos.users.all()).map(user => [user.id, { id: user.id, name: user.name }]));
+        page.items = page.items.map(event => ({ id: event.id, type: event.type, unitId: event.unitId,
+          reason: event.reason, createdAt: event.createdAt, ownershipVersion: event.ownershipVersion ?? 0,
+          fromOwner: event.fromOwnerId === null ? null : users.get(event.fromOwnerId), toOwner: users.get(event.toOwnerId) }));
+        return { unitId: unit.id, currentOwner: users.get(unit.ownerId), ownershipVersion: unit.ownershipVersion, ...page };
       });
     }
   };

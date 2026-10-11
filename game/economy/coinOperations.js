@@ -4,9 +4,10 @@ import { requireGame } from '../../utils/GameError.js';
 // Internal only: the caller records the source and receipt in the same transaction.
 // All earned coin credits use this operation; commands never edit a balance.
 async function recordMovement(repos, user, amount, after, now, source, type) {
-  requireGame(source && ['battle_reward', 'pack_opening'].includes(source.type) && typeof source.id === 'string', 'INVALID_COIN_SOURCE');
+  requireGame(source && ['battle_reward', 'pack_opening', 'daily_reward', 'market_purchase', 'market_sale'].includes(source.type) && typeof source.id === 'string', 'INVALID_COIN_SOURCE');
+  const role = source.type === 'market_purchase' ? ':buyer' : source.type === 'market_sale' ? ':seller' : '';
   await repos.economy.insert({
-    id: `coin:${source.id}`, userId: user.id, type, sourceType: source.type, sourceId: source.id,
+    id: `coin:${source.id}${role}`, userId: user.id, type, sourceType: source.type, sourceId: source.id,
     amount, balanceBefore: user.economy.coins, balanceAfter: after, createdAt: now
   });
 }

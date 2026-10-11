@@ -4,13 +4,18 @@ import { validateBattleData, validateBattleTransition } from './battleValidation
 import { validateProgressionData, validateProgressionTransition } from './progressionValidation.js';
 import { validatePackData, validatePackTransition } from './packValidation.js';
 import { SUPPLY_BY_RARITY } from '../game/characters/balance.js';
+import { validateEconomyData, validateEconomyTransition } from './economyValidation.js';
+import { validateMarketData, validateMarketTransition } from './marketValidation.js';
+import { validateOwnershipData, validateOwnershipTransition } from './ownershipValidation.js';
 
 export const V1_COLLECTIONS = Object.freeze(['usuarios', 'personajes', 'unidades', 'estado', 'eventos']);
 export const V2_COLLECTIONS = Object.freeze([...V1_COLLECTIONS, 'ataques', 'combates']);
 export const V3_COLLECTIONS = Object.freeze([...V2_COLLECTIONS, 'recompensas']);
 export const V4_COLLECTIONS = Object.freeze([...V3_COLLECTIONS, 'sobres', 'aperturas', 'economia']);
-export const COLLECTIONS = V4_COLLECTIONS;
-export const SCHEMA_VERSION = 5;
+export const V5_COLLECTIONS = V4_COLLECTIONS;
+export const V6_COLLECTIONS = Object.freeze([...V5_COLLECTIONS, 'diarios']);
+export const COLLECTIONS = Object.freeze([...V6_COLLECTIONS, 'mercado', 'ventas']);
+export const SCHEMA_VERSION = 7;
 const integer = (v, minimum = 0) => Number.isSafeInteger(v) && v >= minimum;
 const text = v => typeof v === 'string' && v.length > 0 && v.length <= 200;
 const date = v => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(v) && Number.isFinite(Date.parse(v));
@@ -39,8 +44,8 @@ function progress(value) {
 
 export function validateDatabase(state, schemaVersion = SCHEMA_VERSION) {
   try {
-    requireGame([1, 2, 3, 4, 5].includes(schemaVersion), 'UNSUPPORTED_SCHEMA_VERSION');
-    for (const name of schemaVersion === 1 ? V1_COLLECTIONS : schemaVersion === 2 ? V2_COLLECTIONS : schemaVersion === 3 ? V3_COLLECTIONS : COLLECTIONS) {
+    requireGame([1, 2, 3, 4, 5, 6, 7].includes(schemaVersion), 'UNSUPPORTED_SCHEMA_VERSION');
+    for (const name of schemaVersion === 1 ? V1_COLLECTIONS : schemaVersion === 2 ? V2_COLLECTIONS : schemaVersion === 3 ? V3_COLLECTIONS : schemaVersion < 6 ? V5_COLLECTIONS : schemaVersion === 6 ? V6_COLLECTIONS : COLLECTIONS) {
       const collection = state[name];
       check(collection && typeof collection._meta === 'object', name);
       requireGame(collection._meta.schemaVersion === schemaVersion, 'UNSUPPORTED_SCHEMA_VERSION', { collection: name });
@@ -127,18 +132,20 @@ export function validateDatabase(state, schemaVersion = SCHEMA_VERSION) {
     }
     check(counters.every(r => characterById.has(r.characterId)), 'counter.references');
     unique(events, r => r.operationKey, 'event.operationKey');
-    unique(events, r => r.unitId, 'event.unit');
-    check(events.length === units.length, 'event.emissions');
-    for (const event of events) {
+    const mintEvents = events.filter(e => e.type === 'unit_created');
+    unique(mintEvents, r => r.unitId, 'event.unit');
+    check(mintEvents.length === units.length, 'event.emissions');
+    if (schemaVersion < 7) check(events.length === units.length, 'event.emissions');
+    for (const event of mintEvents) {
       const unit = unitById.get(event.unitId);
-      check(event.type === 'unit_created' && unit && event.fromOwnerId === null && userById.has(event.toOwnerId) && unit.ownerId === event.toOwnerId, 'event.references');
+      check(unit && event.fromOwnerId === null && userById.has(event.toOwnerId) && (schemaVersion >= 7 || unit.ownerId === event.toOwnerId), 'event.references');
       check(text(event.operationKey) && text(event.reason) && date(event.createdAt), 'event.metadata');
       check(event.reason === unit.origin.type && event.createdAt === unit.createdAt, 'event.origin');
     }
     unique(claims, r => r.userId, 'claim.user');
     for (const claim of claims) {
       const unit = unitById.get(claim.unitId);
-      const event = events.find(r => r.unitId === claim.unitId);
+      const event = mintEvents.find(r => r.unitId === claim.unitId);
       check(claim.id === `starter:${claim.userId}` && userById.has(claim.userId) && unit, 'claim.references');
       check(claim.rewardType === 'starter' && text(claim.sourceId) && date(claim.createdAt), 'claim.metadata');
       check(unit.origin.type === 'starter' && unit.origin.sourceId === claim.sourceId && event.toOwnerId === claim.userId && event.operationKey === claim.id, 'claim.origin');
@@ -155,7 +162,14 @@ export function validateDatabase(state, schemaVersion = SCHEMA_VERSION) {
     }
     if (schemaVersion >= 2) validateBattleData(state, schemaVersion);
     if (schemaVersion >= 3) validateProgressionData(state, schemaVersion);
-    if (schemaVersion >= 4) validatePackData(state);
+    if (schemaVersion >= 4) {
+      validatePackData(state);
+      validateEconomyData(state, schemaVersion);
+    }
+    if (schemaVersion >= 7) {
+      validateOwnershipData(state, schemaVersion);
+      validateMarketData(state);
+    }
     return { valid: true, schemaVersion, users: users.length, characters: characters.length, units: units.length, claims: claims.length };
   } catch (error) {
     if (error instanceof GameError && ['DATABASE_CORRUPT', 'UNSUPPORTED_SCHEMA_VERSION'].includes(error.code)) throw error;
@@ -169,11 +183,11 @@ export function validateTransition(before, after) {
     for (const previous of before[name].records) {
       const next = nextById.get(previous.id);
       check(next, `${name}.deletion`);
-      if (['eventos', 'recompensas', 'aperturas', 'economia'].includes(name) || (name === 'estado' && previous.kind !== 'mintCounter')) {
+      if (['eventos', 'recompensas', 'aperturas', 'economia', 'diarios', 'ventas'].includes(name) || (name === 'estado' && previous.kind !== 'mintCounter')) {
         check(equal(previous, next), `${name}.immutable`);
       }
       if (name === 'unidades') {
-        for (const key of ['characterId', 'characterRevision', 'serial', 'ownerId', 'origin', 'initialStats', 'combatBaseStats', 'createdAt', 'statGrowthVersion', 'traits', 'variant', 'traitVersion']) {
+        for (const key of ['characterId', 'characterRevision', 'serial', 'origin', 'initialStats', 'combatBaseStats', 'createdAt', 'statGrowthVersion', 'traits', 'variant', 'traitVersion']) {
           check(equal(previous[key], next[key]), `unit.immutable.${key}`);
         }
       }
@@ -193,4 +207,7 @@ export function validateTransition(before, after) {
   validateBattleTransition(before, after);
   validateProgressionTransition(before, after);
   validatePackTransition(before, after);
+  validateEconomyTransition(before, after);
+  validateOwnershipTransition(before, after);
+  validateMarketTransition(before, after);
 }

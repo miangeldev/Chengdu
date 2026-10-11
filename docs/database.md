@@ -1,10 +1,11 @@
-# Modelo de datos — Alpha 0.4.1 y su evolución
+# Modelo de datos — Alpha 0.6 y su evolución
 
-Estado: contrato implementado hasta 0.4.1 (esquema 5), basado en `../project.md`.
+Estado: contrato implementado hasta 0.6 (esquema 7), basado en `../project.md`.
 Los mecanismos descritos como futuros aún requieren servicios y migraciones.
-El alcance se divide en [fundación 0.1](mvp-0.1.md), [combate 0.2](mvp-0.2.md)
-[progresión 0.3](mvp-0.3.md), [colección 0.4](alpha-0.4.md)
-y [balance 0.4.1](balance-0.4.1.md).
+El alcance se divide en [fundación 0.1](mvp-0.1.md), [combate 0.2](mvp-0.2.md),
+[progresión 0.3](mvp-0.3.md), [colección 0.4](alpha-0.4.md),
+[balance 0.4.1](balance-0.4.1.md), [economía 0.5](alpha-0.5.md)
+y [mercado 0.6](alpha-0.6.md).
 
 ## Convenciones y fuentes de verdad
 
@@ -29,25 +30,28 @@ y [balance 0.4.1](balance-0.4.1.md).
 | `personajes.json` | Plantillas de contenido versionadas. |
 | `unidades.json` | Unidades, propietario y progreso individual. |
 | `estado.json` | Contadores, reclamos y saldos/progresos iniciales auditados. |
-| `eventos.json` | Creaciones auditables; después, cambios de propiedad. |
+| `eventos.json` | Emisiones y transferencias de propiedad auditables. |
 | `ataques.json` | Definiciones de ataques versionadas, potencia y precisión. |
 | `combates.json` | Desafíos, snapshots, acciones, turnos y resultados. |
 | `recompensas.json` | Premios por jugador/batalla, motivo, cantidades y valores antes/después. |
 | `sobres.json` | Definiciones versionadas: precio, pool, pesos de rareza/rasgos/variante. |
 | `aperturas.json` | Compras únicas, snapshot del sobre, resultado y recibo originales. |
 | `economia.json` | Créditos/débitos inmutables, fuente y saldo antes/después. |
+| `diarios.json` | Reclamos diarios únicos, política, espera y recibo monetario. |
+| `mercado.json` | Anuncios con snapshot de unidad, precio, vencimiento y estado. |
+| `ventas.json` | Compras confirmadas, importes, participantes y evento de transferencia. |
 
 Además, `_database.json` marca la instalación, `_journal.json` coordina un commit
 pendiente y `backups/` conserva snapshots coherentes del estado anterior.
-El esquema 5 conserva las once colecciones del esquema 4; con el manifest,
-cada snapshot del journal contiene doce archivos.
+El esquema 7 añade mercado y ventas a las doce colecciones del esquema 6; con el
+manifest, cada snapshot del journal contiene quince archivos.
 
 Cada colección emplea esta envoltura; el adaptador oculta la envoltura a servicios:
 
 ```json
 {
   "_meta": {
-    "schemaVersion": 5,
+    "schemaVersion": 7,
     "revision": 0,
     "updatedAt": null
   },
@@ -141,6 +145,7 @@ existentes necesita una base de combate versionada y una migración explícita.
   "characterRevision": 1,
   "serial": 1,
   "ownerId": "USR-<uuid>",
+  "ownershipVersion": 0,
   "createdAt": "2026-10-07T20:00:00Z",
   "updatedAt": "2026-10-07T20:00:00Z",
   "origin": { "type": "starter", "sourceId": "starter_v1" },
@@ -174,14 +179,18 @@ ordinarios; un balance futuro requiere otra versión y migración. `ownerId` cam
 sólo mediante un servicio transaccional. Para evolución
 futura, añadir una referencia de forma/evolución separada: no cambiar el personaje
 de emisión, porque alteraría el significado del serial y el supply original.
-En 0.2 también se valida que el propietario permanezca igual al de emisión;
-habilitar transferencias requerirá extender la validación y los eventos.
+Desde 0.6, `ownershipVersion` inicia en cero y aumenta una vez por compraventa.
+El propietario actual se valida mediante el evento de emisión y las
+transferencias ordenadas por esa versión. La historia conserva el propietario
+de cada emisión y combate sin reemplazarlo por el dueño actual.
 
-`lock` actual: `null` o `{ "type": "battle", "referenceId": "BTL-..." }`.
+`lock` actual: `null`, `{ "type": "battle", "referenceId": "BTL-..." }` o
+`{ "type": "market", "referenceId": "LIST-..." }`.
 El cierre, rendición o expiración del combate libera el lock mediante un commit
-que actualiza sus estadísticas. Mercado, trade y administración requerirán tipos
-y validadores adicionales. Un deadline vencido se procesa explícitamente; no se
-ignora el lock sólo porque pasó el tiempo.
+que actualiza sus estadísticas. Un anuncio bloquea la unidad y la retira del
+equipo; compra, retirada o vencimiento liberan su lock en la misma transacción.
+Intercambios y administración requieren sus validadores. Un vencimiento se
+procesa explícitamente; no se ignora el lock sólo porque pasó el tiempo.
 
 ## Contadores, reclamos y auditoría
 
@@ -219,14 +228,16 @@ permanece independiente del número de propietarios.
 El reclamo es la fuente de verdad del starter; evitar duplicarlo en un booleano
 del usuario. Su clave es por usuario, independientemente de `starter_v1`: cambiar
 las opciones no concede automáticamente un segundo starter. La unidad referenciada
-puede pertenecer a otro jugador después de un intercambio y eso no anula el reclamo.
+puede pertenecer a otro jugador después de una venta y eso no anula el reclamo.
 Las claves de premios futuros incluirán el evento o recompensa específica.
 
 `eventos.json` guarda un registro por creación: `id`, `type = unit_created`,
 `unitId`, `fromOwnerId = null`, `toOwnerId`, `reason`, `operationKey`, `createdAt`.
 Se escribe en el mismo commit que la unidad. El ID y la clave de operación son
 únicos. El historial creciente vive fuera de la unidad; `economia.json` tiene
-referencias a las recompensas y aperturas que causaron cada crédito o débito.
+referencias a las recompensas, aperturas, diarios y ventas que causaron cada
+crédito o débito. En 0.6 se añaden eventos `unit_transferred` relacionados con
+su venta y una versión de propiedad; el evento de emisión permanece intacto.
 
 ## Persistencia consistente con varios JSON
 
@@ -286,7 +297,11 @@ En 0.3 se reconstruyen saldo y progreso desde el punto inicial y los premios;
 se verifican elegibilidad, cantidades, destinatarios, valores antes/después,
 umbral de nivel, crecimiento de stats y recibo exacto del cierre. Las transiciones
 exigen registros de recompensa append-only y estados finales inmutables.
-Las relaciones de mercado se añadirán cuando exista esa funcionalidad.
+En 0.6 se validan anuncios, precios, comisión, vencimiento y snapshots, junto
+con la correspondencia entre ventas, movimientos de monedas y eventos de
+propiedad. Cada transferencia avanza una versión; el propietario actual, los
+locks, los equipos y los participantes históricos deben concordar con esa
+cadena. Las ventas y los anuncios cerrados conservan sus recibos inmutables.
 
 ## Crecimiento y cambio de almacenamiento
 
@@ -453,10 +468,12 @@ sin romper la reconstrucción. La XP sigue recorriendo sólo recompensas de
 batalla. Crédito, débito, recibo y demás cambios se publican en la misma
 transacción; no existe una API de jugador para dar o retirar monedas libremente.
 
-El ledger actual cubre esas dos fuentes. Añadir daily, transferencias, otras
-monedas o gastos en Alpha 0.5 y posteriores exige extender y versionar las
-fuentes y validadores. Conservar IDs, baselines, orden, claves de operación y
-referencias al migrar a SQLite; no recomputar compras con precios actuales.
+En 0.4 el ledger cubre esas dos fuentes; 0.5 añade `daily_reward`, descrito más
+abajo. Transferencias, otras monedas y nuevos gastos requieren extender y
+versionar las fuentes y validadores. El mercado 0.6 incorpora `market_purchase`
+y `market_sale`, descritos más abajo. Conservar IDs, baselines, orden, claves de
+operación y referencias al migrar a SQLite; no recomputar compras con precios
+actuales.
 
 ## Migración del esquema 3 al 4
 
@@ -522,3 +539,207 @@ todos los anteriores. Desde esquemas previos, el arranque aplica la cadena
 completa con validación y un backup coherente. Un cambio posterior de balance
 debe añadir otra versión y su migración; modificar una constante histórica o
 sobrescribir catálogos al arrancar impediría validar partidas anteriores.
+
+## Diario y consultas económicas 0.5
+
+`diarios.json` guarda un recibo inmutable por reclamo confirmado:
+
+```text
+id: DAILY-<uuid>, userId, operationKey, createdAt
+policyVersion: 1, amount: 100, cooldownMs: 86400000, nextClaimAt
+balanceBefore, balanceAfter
+```
+
+La política 1 habilita un nuevo reclamo exactamente 24 horas después del
+anterior, por jugador y entre todos los chats. No depende del cambio de fecha
+local. Entrega sólo monedas; la XP continúa proviniendo de combates. El importe
+es el mismo en cada reclamo.
+
+Las reglas viven en el mapa histórico inmutable `DAILY_POLICIES`. Una nueva
+política debe añadir una versión sin reemplazar las anteriores. Se valida el
+importe, duración y fecha del próximo reclamo según la versión de cada recibo,
+para conservar la interpretación de diarios antiguos.
+
+Cada recibo tiene exactamente un movimiento `sourceType: daily_reward`,
+`sourceId: claim.id`, `type: credit` e `id: coin:<claim.id>`. Importe, jugador,
+fecha y saldos antes/después deben coincidir. El recibo, crédito y actualización
+del saldo se publican en un mismo commit. Ambos historiales sólo admiten
+registros nuevos; no se permite cobrar, borrar ni modificar un diario anterior.
+
+La clave del reclamo es única en los diarios y se deriva en WhatsApp del jugador,
+conversación e ID autenticado del mensaje. Sin ID se rechaza la operación.
+Un replay se resuelve antes de comprobar la espera: devuelve el recibo original
+sin otro crédito, aunque hayan pasado días, cambiado el saldo o reiniciado el
+bot. Una clave perteneciente a otro jugador se rechaza. Un mensaje distinto
+antes de `nextClaimAt` recibe `DAILY_NOT_READY` con la fecha de disponibilidad.
+
+Los nuevos reclamos exigen un reloj UTC válido y canónico. Un reloj que retrocede
+no permite saltar la espera del último reclamo. Las fechas y duraciones se
+validan antes de acreditar monedas; los desbordamientos o fechas inválidas
+cancelan la operación.
+
+`game.economy.getBalance(userId)` devuelve `coins`, `income`, `expenses` y
+`openingBalance`. Saldo y valor inicial siguen siendo enteros seguros. Ingresos
+y gastos acumulan todos los movimientos propios mediante `BigInt` y se devuelven
+como strings decimales: los totales históricos pueden superar el rango de un
+saldo individual sin perder precisión. El valor inicial del baseline se presenta
+por separado, sin sumarlo a los ingresos ganados.
+
+`game.economy.getMovements(userId, options)` pagina sólo los movimientos de ese
+jugador, con ámbito de cursor `coinLedger:<userId>`. El orden es el inverso de
+la secuencia de confirmación del ledger. No se ordena únicamente por timestamp:
+distintas fuentes pueden compartir una fecha o registrar un reloj anterior,
+mientras el orden de commits conserva la secuencia real de saldos. La interfaz
+muestra cinco movimientos por página, fuente, importe y hora de Ciudad de México;
+no revela IDs internos ni datos de otros jugadores.
+
+La tienda utiliza las definiciones de sobres existentes y la compra transaccional
+de 0.4. El gasto actual permanece en 500 ChengCoins por Sobre Básico. Las compras
+no conceden XP ni vuelven a generar stats, rasgos o variantes de otras unidades.
+El mercado 0.6 añade transferencias por compraventa. Regalos, intercambios
+directos y gastos adicionales necesitan sus propios servicios y validadores.
+
+## Migración del esquema 5 al 6
+
+Se añade `diarios.json` vacío y se actualizan las envolturas al esquema 6.
+Los registros de las once colecciones anteriores permanecen exactamente iguales:
+usuarios, saldo, progreso, unidades, contadores, catálogo, compras, ledger,
+recompensas y snapshots de combates. No se concede un diario retroactivo ni
+se recrean movimientos económicos existentes. El balance y los límites de
+emisión 0.4.1 siguen vigentes.
+
+El journal de esquema 6 contiene trece archivos, incluido `_database.json`.
+La recuperación sigue admitiendo journals de esquemas 1 a 5 antes de aplicar
+la cadena de migraciones. Se valida el estado anterior y el nuevo, se conserva
+un backup coherente y la publicación coordina las doce colecciones y manifest.
+Una interrupción antes del marcador de commit revierte lo preparado; después
+del marcador completa la publicación. Una operación de diario no puede dejar
+su recibo, crédito y saldo publicados por separado.
+
+## Anuncios y compraventas 0.6
+
+`mercado.json` conserva anuncios con estos campos:
+
+```text
+id: LIST-<uuid>, sellerId, unitId, ownershipVersion
+price, policyVersion, operationKey, createdAt, expiresAt, updatedAt
+status: active|sold|cancelled|expired
+closedAt, closeOperationKey, saleId
+unitSnapshot: id, characterId, characterName, characterRevision, rarity, role,
+              serial, ownershipVersion, level, progress, traits, variant,
+              traitVersion, stats
+```
+
+La política 1 permite precios enteros entre 20 y 1,000,000 ChengCoins, duración
+de siete días y comisión del 5%, redondeada hacia arriba. Su fórmula es
+`fee = ceil(price × 500 / 10000)` y el neto es `price − fee`. Las reglas se
+conservan por versión en `MARKET_POLICIES` para interpretar anuncios y ventas
+anteriores. Cambiar una política exige añadir otra versión.
+
+La publicación fija un snapshot con los stats efectivos, nombre, rareza,
+nivel, progreso, rasgos y variante de ese momento. Esos valores y el precio
+permanecen inmutables, aunque cambie el catálogo. La ficha de unidad permite
+consultar los ataques; el snapshot del anuncio no guarda ataques. Las claves
+de operación, unidad, vendedor y versión de propiedad tampoco cambian.
+
+Una unidad sólo admite un anuncio activo y debe pertenecer al vendedor y estar
+libre de otros locks. Publicarla crea el lock `market` y elimina su referencia
+del equipo en el mismo commit. Una unidad en venta no se selecciona para
+combatir ni se publica otra vez. Comprar, retirar o vencer cierra el anuncio
+y libera el lock; la unidad no se agrega automáticamente a un equipo.
+
+El vencimiento se procesa al consultar u operar el mercado, unidades y equipos.
+No hay un scheduler adicional: el tiempo vencido se convierte en estado y
+desbloqueo mediante la siguiente operación que procese anuncios. Comprar un
+anuncio vencido confirma esa liberación y devuelve `LISTING_EXPIRED`, sin cobrar.
+Retirar un anuncio ya vencido informa del vencimiento, sin crear una cancelación
+ni comisión. Los estados finales y snapshots son inmutables.
+
+`ventas.json` conserva un recibo append-only por compra:
+
+```text
+id: SALE-<uuid>, listingId, unitId, sellerId, buyerId, operationKey, createdAt
+policyVersion, price, fee, net
+buyerBalanceBefore, buyerBalanceAfter, sellerBalanceBefore, sellerBalanceAfter
+fromOwnershipVersion, toOwnershipVersion, transferEventId
+```
+
+La venta exige un anuncio activo, un comprador distinto del vendedor y saldo
+suficiente. La transacción coordina débito del precio, crédito neto al vendedor,
+transferencia, evento de propiedad, cierre del anuncio y desbloqueo. Dos compras
+simultáneas, o una compra y una retirada, pueden producir sólo un resultado final.
+El progreso, estadísticas, serial, origen y rasgos de la unidad se conservan.
+
+Los movimientos relacionados son exactamente dos:
+
+| ID | Fuente | Tipo | Importe |
+| --- | --- | --- | --- |
+| `coin:<sale.id>:buyer` | `market_purchase` | Débito | `price` |
+| `coin:<sale.id>:seller` | `market_sale` | Crédito | `net` |
+
+Ambos apuntan a `sale.id`. La diferencia es la comisión que sale de circulación;
+no se acredita en una cuenta administrativa. Publicar, retirar y vencer no
+crean cobros. El validador comprueba los importes y la relación exacta entre
+venta, movimientos, anuncio y evento de transferencia.
+
+Las claves de WhatsApp se derivan de operación, chat, jugador e ID autenticado
+del mensaje. Sin ese ID se rechaza la mutación. Un replay devuelve el anuncio
+o recibo guardado sin repetir pagos ni transferir de nuevo una unidad revendida.
+Una clave usada con parámetros distintos se rechaza. Los recibos de starter
+y sobre continúan referenciando su emisión original; su replay no concede
+la propiedad actual de una unidad vendida.
+
+## Propiedad e historial público 0.6
+
+Cada transferencia agrega a `eventos.json`:
+
+```text
+id: EVT-<uuid>, type: unit_transferred, unitId
+fromOwnerId, toOwnerId, reason: market, sourceId: sale.id
+operationKey: transfer:<sale.id>, ownershipVersion, createdAt
+```
+
+La versión aumenta exactamente uno y enlaza el dueño anterior con el nuevo.
+El propietario de emisión sigue en `unit_created` con versión cero; eventos
+antiguos sin ese campo se interpretan como cero sin reescribirlos. El validador
+reconstruye la cadena y exige que termine en `unit.ownerId` y su versión actual.
+Una transferencia nueva necesita una venta nueva; cambiar dueño directamente
+o inventar un evento sin su pago no supera la validación.
+
+Los nuevos snapshots de combate guardan la versión de propiedad. Los anteriores
+sin versión representan al dueño inicial. Se validan sus participantes contra
+la propiedad histórica, manteniendo intactos combate, recompensa y estadísticas
+previas a la venta. Una unidad con combate activo no entra en el mercado.
+
+`getOwnershipHistory(unitId, options)` devuelve la emisión y transferencias por
+versión ascendente, con cursor ligado a la unidad. Su respuesta pública usa una
+lista de campos permitidos y nombres de `fromOwner`/`toOwner`: omite claves de
+operación, identidades y referencias administrativas. `.ctupropiedad` muestra
+cinco eventos por página y al propietario actual.
+
+El mercado es público. `listListings` admite rareza, personaje, vendedor y orden
+por publicaciones o precio; los cursores están ligados al conjunto de filtros.
+La interfaz ofrece rarezas, menor precio y anuncios propios. `getSales` exige
+un jugador existente, filtra sus compras/ventas y entrega sólo los saldos de su
+lado de la operación. Un cursor de ventas pertenece a ese jugador; no permite
+leer compras de otra cuenta. Las pantallas muestran nombres y acciones,
+sin JIDs ni IDs internos de participantes.
+
+Esta versión implementa transferencias por compraventa. Regalos, intercambios
+directos y otras fuentes de transferencia necesitan sus servicios, autorización,
+movimientos y validadores; no se habilitan por modificar un campo de propiedad.
+
+## Migración del esquema 6 al 7
+
+Se añaden `mercado.json` y `ventas.json` vacíos y `ownershipVersion: 0` a todas
+las unidades existentes. Las envolturas pasan al esquema 7. Usuarios, saldos,
+progreso, contadores, stats de nacimiento/combate, seriales, identidades,
+orígenes, compras, diarios, recompensas y snapshots anteriores permanecen
+intactos. Los eventos previos tampoco se reescriben ni se crean ventas antiguas.
+
+El journal de esquema 7 incluye catorce colecciones y el manifest: quince
+archivos. El arranque recupera primero journals de esquemas anteriores y aplica
+la cadena con validación y backup coherente. Una interrupción preparada se
+revierte y una ya comprometida se completa. La recuperación coordina saldos,
+recibo, anuncio, unidad y evento, para que una venta no publique sólo su pago
+o sólo el cambio de propietario.

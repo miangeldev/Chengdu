@@ -9,9 +9,9 @@ export const { command, run, createRun } = defineCommand('ctuunidad', async ({ g
   const origin = unit.origin.type === 'starter' ? 'Personaje inicial' : unit.origin.type === 'pack' ? `Sobre: ${unit.pack?.name ?? 'Apertura de sobre'}` : unit.origin.type;
   return card('UNIDAD', [
     `${characterIcon(unit.characterId)} *${displayName(unit.character.name)} #${serialText(unit.serial)}*\n🆔 ${unit.id}\n${rarityIcon(unit.character.rarity)} ${rarityName(unit.character.rarity)} · ${roleName(unit.character.role)} · ${displayName(variantName(unit.variant))}`,
-    `👤 Propietario: ${displayName(unit.owner.name)}\n🪪 ${unit.owner.id}\n${unit.lock ? '🔒 En combate' : '✅ Disponible'}`,
+    `👤 Propietario: ${displayName(unit.owner.name)}\n${unit.lock?.type === 'market' ? '🔒 En venta' : unit.lock ? '🔒 En combate' : '✅ Disponible'}`,
     `🌱 ${progressText(unit.progress, 'unit')}\n🏆 ${unit.battleStats.wins} victorias · 💔 ${unit.battleStats.losses} derrotas`,
     `🧬 ${unit.traits?.length ? unit.traits.map(traitName).map(displayName).join(' · ') : 'Sin rasgos'}`,
     `📜 ${displayName(origin)} · ${dateText(unit.createdAt)}`
-  ], `🔎 Stats y ataques: *${cmd('ctuficha', unit.id)}*`);
+  ], `${unit.lock?.type === 'market' ? `🛍️ Anuncio: ${cmd('ctumercado', `ver ${unit.lock.referenceId}`)}\n` : ''}🔎 Stats y ataques: *${cmd('ctuficha', unit.id)}*\n📜 Propietarios: ${cmd('ctupropiedad', unit.id)}`);
 });

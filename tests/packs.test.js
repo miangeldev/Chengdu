@@ -18,7 +18,7 @@ async function funded(t, coins = 1000, options = {}) {
     if (name === 'estado') collection.records.find(r => r.id === `progression:${c.user.id}`).coins = coins;
     fs.writeFileSync(file, JSON.stringify(collection));
   }
-  for (const name of ['sobres', 'aperturas', 'economia']) fs.unlinkSync(path.join(c.directory, `${name}.json`));
+  for (const name of ['sobres', 'aperturas', 'economia', 'diarios', 'mercado', 'ventas']) fs.unlinkSync(path.join(c.directory, `${name}.json`));
   fs.writeFileSync(path.join(c.directory, '_database.json'), JSON.stringify({ database: 'chengdu-cards', schemaVersion: 3 }));
   Object.assign(c, c.open());
   await c.game.validateDatabase();

@@ -1,5 +1,4 @@
 import { requireGame } from '../utils/GameError.js';
-import { safeAdd } from '../game/progression/rules.js';
 import { validatePackDefinition } from '../game/drops/dropEngine.js';
 
 const check = (condition, field) => requireGame(condition, 'DATABASE_CORRUPT', { field });
@@ -37,7 +36,6 @@ export function validatePackData(state) {
   const characters = new Map(state.personajes.records.map(c => [c.id, c]));
   const packs = new Map(state.sobres.records.map(p => [p.id, p]));
   const openings = new Map(state.aperturas.records.map(o => [o.id, o]));
-  const rewards = new Map(state.recompensas.records.map(r => [r.id, r]));
   for (const pack of packs.values()) definition(pack, characters);
   for (const unit of units.values()) unitTraits(unit);
   const operationKeys = new Set();
@@ -53,10 +51,10 @@ export function validatePackData(state) {
     const result = opening.result;
     const character = characters.get(result?.characterId);
     const unit = units.get(opening.unitId);
-    const event = state.eventos.records.find(e => e.unitId === opening.unitId);
+    const event = state.eventos.records.find(e => e.unitId === opening.unitId && e.type === 'unit_created');
     check(character && unit && event && result.traitVersion === 1 && text(result.characterName) && rarities.includes(result.rarity) &&
       opening.packSnapshot.pool.some(p => p.rarity === result.rarity && p.characterIds.includes(result.characterId)), 'opening.result');
-    check(unit.ownerId === opening.userId && unit.characterId === result.characterId && unit.characterRevision === result.characterRevision &&
+    check(event.toOwnerId === opening.userId && unit.characterId === result.characterId && unit.characterRevision === result.characterRevision &&
       unit.serial === result.serial && equal(unit.traits, result.traits) && unit.variant === result.variant && unit.traitVersion === result.traitVersion &&
       unit.origin.type === 'pack' && unit.origin.sourceId === opening.id && unit.createdAt === opening.createdAt &&
       event.operationKey === `opening:${opening.id}`, 'opening.unitOrigin');
@@ -67,34 +65,10 @@ export function validatePackData(state) {
     if (unit.origin.type === 'pack' && unit.traitVersion === 1) check(openings.get(unit.origin.sourceId)?.unitId === unit.id, 'unit.opening');
   }
 
-  const balances = new Map(state.estado.records.filter(r => r.kind === 'progressionBaseline' && r.entityType === 'user').map(r => [r.entityId, r.coins]));
-  const linked = new Set();
-  for (const movement of state.economia.records) {
-    check(users.has(movement.userId) && ['credit', 'debit'].includes(movement.type) &&
-      ['battle_reward', 'pack_opening'].includes(movement.sourceType) && text(movement.sourceId) &&
-      movement.id === `coin:${movement.sourceId}` && !linked.has(movement.sourceId) && date(movement.createdAt) && integer(movement.amount), 'coinMovement.metadata');
-    linked.add(movement.sourceId);
-    const source = movement.sourceType === 'battle_reward' ? rewards.get(movement.sourceId) : openings.get(movement.sourceId);
-    check(source && source.userId === movement.userId && source.createdAt === movement.createdAt &&
-      source.balanceBefore === movement.balanceBefore && source.balanceAfter === movement.balanceAfter, 'coinMovement.source');
-    check(movement.balanceBefore === balances.get(movement.userId), 'coinMovement.balanceBefore');
-    if (movement.sourceType === 'battle_reward') {
-      check(movement.type === 'credit' && movement.amount === source.coins &&
-        movement.balanceAfter === safeAdd(movement.balanceBefore, movement.amount), 'coinMovement.credit');
-    } else {
-      check(movement.type === 'debit' && movement.amount === source.price && integer(movement.amount, 1) &&
-        movement.balanceBefore >= movement.amount && movement.balanceAfter === movement.balanceBefore - movement.amount, 'coinMovement.debit');
-    }
-    balances.set(movement.userId, movement.balanceAfter);
-  }
-  check(linked.size === rewards.size + openings.size && [...rewards.keys(), ...openings.keys()].every(id => linked.has(id)), 'coinMovement.complete');
-  for (const user of users.values()) check(user.economy.coins === balances.get(user.id), 'coinMovement.userTotals');
 }
 
 export function validatePackTransition(before, after) {
-  for (const name of ['aperturas', 'economia']) {
-    check(equal(before[name].records, after[name].records.slice(0, before[name].records.length)), `${name}.appendOnly`);
-  }
+  check(equal(before.aperturas.records, after.aperturas.records.slice(0, before.aperturas.records.length)), 'aperturas.appendOnly');
   const previousUnits = new Set(before.unidades.records.map(u => u.id));
   for (const unit of after.unidades.records.filter(u => !previousUnits.has(u.id))) check(unit.traitVersion === 1, 'unit.newTraitVersion');
   for (const opening of after.aperturas.records.slice(before.aperturas.records.length)) {

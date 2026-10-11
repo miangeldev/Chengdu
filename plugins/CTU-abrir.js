@@ -13,10 +13,12 @@ export const { command, run, createRun } = defineCommand('ctuabrir', async ({ ga
   const { opening, unit, alreadyOpened } = await game.packs.openPack({ userId: user.id, packId, operationKey });
   const result = opening.result;
   const traits = result.traits ?? [];
+  const stillOwned = unit.ownerId === user.id;
   return card('SOBRE ABIERTO', [
     alreadyOpened ? '↩️ Este mensaje ya abrió un sobre. Aquí está su resultado original.' : `🎁 *${displayName(opening.packSnapshot.name)}*`,
     `${characterIcon(result.characterId)} *${displayName(result.characterName)}*\n${rarityIcon(result.rarity)} ${rarityName(result.rarity)} · ${displayName(variantName(result.variant))}`,
     `🧬 ${traits.length ? traits.map(traitName).map(displayName).join(' · ') : 'Sin rasgos'}`,
-    `💰 ${opening.price} ChengCoins${alreadyOpened ? ' pagados en la apertura original' : ' gastados'}\n${alreadyOpened ? 'Saldo tras esa apertura' : 'Saldo restante'}: *${opening.balanceAfter} ChengCoins*`
-  ], `👉 Stats y ataques: *${cmd('ctuficha', unit.id)}*\n🛡️ Seleccionar: ${cmd('ctuequipo', `usar ${unit.id}`)}`);
+    `💰 ${opening.price} ChengCoins${alreadyOpened ? ' pagados en la apertura original' : ' gastados'}\n${alreadyOpened ? 'Saldo tras esa apertura' : 'Saldo restante'}: *${opening.balanceAfter} ChengCoins*`,
+    !stillOwned ? '👤 Esa unidad cambió de propietario desde la apertura.' : null
+  ], !stillOwned ? `👉 Tu colección: *${cmd('ctupersonajes')}*` : `👉 Stats y ataques: *${cmd('ctuficha', unit.id)}*\n🛡️ Seleccionar: ${cmd('ctuequipo', `usar ${unit.id}`)}`);
 });

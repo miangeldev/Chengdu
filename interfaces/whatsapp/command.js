@@ -3,13 +3,24 @@ import { GameError, requireGame } from '../../utils/GameError.js';
 import { normalizeIdentity } from '../../utils/identity.js';
 import { describeError } from '../../utils/errorDiagnostics.js';
 import { whatsappConfig } from '../../CTU-config.js';
+import { createHash } from 'node:crypto';
 import { card, commandText, displayName, section } from './format.js';
 export { displayName, rarityName } from './format.js';
 
 const messages = {
+  MARKET_MESSAGE_ID_REQUIRED: '📨 No pude identificar este mensaje para confirmar la operación del mercado.\nEnvía el comando en un mensaje nuevo.',
+  INVALID_MARKET_PRICE: '💰 El precio debe ser un número entero entre 20 y 1000000 ChengCoins.\nEjemplo: .ctuvender PAND-000001 100',
+  INVALID_MARKET_FILTER: '🛍️ Usa .ctumercado, .ctumercado mios, .ctumercado raro o .ctumercado precio.\nPara consultar un anuncio: .ctumercado ver ID',
+  LISTING_NOT_FOUND: '🛍️ Ese anuncio no existe.\n👉 Consulta .ctumercado',
+  LISTING_NOT_ACTIVE: '🛍️ Ese anuncio ya se vendió, se retiró o venció.\n👉 Consulta .ctumercado',
+  LISTING_EXPIRED: '⌛ El anuncio venció y la unidad quedó disponible para su propietario.\n👉 Consulta .ctumercado',
+  SELF_PURCHASE: '🪞 Esa unidad ya te pertenece.\n👉 Consulta .ctumercado mios para retirar el anuncio.',
+  LISTING_NOT_YOURS: '🔒 Sólo el vendedor puede retirar ese anuncio.\n👉 Tus anuncios: .ctumercado mios',
+  UNIT_ALREADY_LISTED: '🛍️ Esa unidad ya está en venta.\n👉 Consulta .ctumercado mios',
   PACK_NOT_FOUND: '🎁 Ese sobre no existe.\n👉 Consulta .ctusobres',
   PACK_UNAVAILABLE: '📦 Este sobre no tiene personajes disponibles por ahora.\n👉 Consulta .ctusobres',
-  INSUFFICIENT_COINS: '💰 No tienes suficientes ChengCoins para abrir ese sobre.\n👉 Consulta .ctubalance',
+  INSUFFICIENT_COINS: '💰 No tienes suficientes ChengCoins para esa compra.\n👉 Consulta .ctubalance',
+  ECONOMY_MESSAGE_ID_REQUIRED: '📨 No pude identificar este mensaje para confirmar el reclamo.\nEnvía de nuevo el comando en un mensaje nuevo.',
   PACK_MESSAGE_ID_REQUIRED: '📨 No pude identificar este mensaje para confirmar la compra.\nEnvía de nuevo el comando en un mensaje nuevo.',
   INVALID_OPERATION_KEY: '📨 No pude identificar esta operación. Envía el comando en un mensaje nuevo.',
   OPERATION_CONFLICT: '📨 Este mensaje ya confirmó otra operación.\nEnvía tu nuevo comando en un mensaje nuevo.',
@@ -36,7 +47,7 @@ const messages = {
   TEAM_LOCKED: '🔒 No puedes cambiar tu equipo durante un combate. Termínalo o usa .cturendirse en el grupo correspondiente.',
   UNIT_NOT_OWNED: '🔒 Esa unidad no te pertenece. Elige una de tu colección con .ctupersonajes.',
   UNIT_NOT_IN_TEAM: '🛡️ Esa unidad no está en tu equipo.',
-  UNIT_LOCKED: '🔒 Esa unidad está ocupada en otro combate.',
+  UNIT_LOCKED: '🔒 Esa unidad está en combate o en venta.\n👉 Consulta .ctumercado mios o .ctucombate.',
   BATTLE_NOT_FOUND: '⚔️ No hay un desafío o combate disponible para esta acción en este grupo. Consulta .ctucombate.',
   BATTLE_NOT_ACTIVE: '⚔️ El combate ya terminó o todavía no fue aceptado. Consulta .ctucombate.',
   BATTLE_WRONG_CHAT: '📍 Ese combate pertenece a otro grupo. Usa el comando en el grupo donde se inició.',
@@ -88,6 +99,14 @@ export function defineCommand(command, handler) {
       } catch (error) {
         if (error instanceof GameError && error.code === 'USER_ALREADY_EXISTS') {
           text = card('REGISTRO', [`👤 Ya estás registrado como ${displayName(error.details.name)}.`], `👉 *${commandText(prefix, 'ctuperfil')}*`);
+        } else if (error instanceof GameError && error.code === 'DAILY_NOT_READY') {
+          const next = error.details?.nextClaimAt;
+          const availability = typeof next === 'string' && Number.isFinite(Date.parse(next))
+            ? new Date(next).toLocaleString('es-MX', { timeZone: 'America/Mexico_City', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }) : null;
+          text = card('DIARIO', [
+            '⏳ Ya reclamaste tu diario. Se puede reclamar una vez cada 24 h.',
+            availability ? `📅 Próximo diario: *${availability}*\n📍 Hora de Ciudad de México.` : null
+          ], `👉 Tu saldo: *${commandText(prefix, 'ctubalance')}*`);
         } else if (error instanceof GameError && messages[error.code]) {
           text = card('ERROR', [messages[error.code].replace(/\.ctu/g, () => `${prefix}ctu`)]);
         } else {
@@ -115,4 +134,9 @@ export function pageArguments(args) {
 
 export function nextPage(page, command, prefix = '.') {
   return page.nextCursor ? `📄 Siguiente: ${commandText(prefix, command, page.nextCursor)}` : '';
+}
+
+export function marketOperationKey(operation, context, userId) {
+  requireGame(typeof context.messageId === 'string' && context.messageId.trim().length > 0, 'MARKET_MESSAGE_ID_REQUIRED');
+  return createHash('sha256').update(JSON.stringify([`market:${operation}`, context.chatId, userId, context.messageId])).digest('hex');
 }

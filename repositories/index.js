@@ -15,6 +15,9 @@ export function createRepositories(state, writable = false) {
     rewards: collectionRepository(state.recompensas.records, writable),
     packs: collectionRepository(state.sobres.records, writable),
     openings: collectionRepository(state.aperturas.records, writable),
-    economy: collectionRepository(state.economia.records, writable)
+    economy: collectionRepository(state.economia.records, writable),
+    dailyClaims: collectionRepository(state.diarios.records, writable),
+    listings: collectionRepository(state.mercado.records, writable),
+    sales: collectionRepository(state.ventas.records, writable)
   };
 }

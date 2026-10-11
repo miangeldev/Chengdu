@@ -27,14 +27,14 @@ async function v1Fixture(t) {
   }
   raw['_database.json'] = JSON.stringify({ database: 'chengdu-cards', schemaVersion: 1 }, null, 2) + '\n';
   fs.writeFileSync(path.join(context.directory, '_database.json'), raw['_database.json']);
-  for (const name of ['ataques', 'combates', 'recompensas', 'sobres', 'aperturas', 'economia']) fs.unlinkSync(path.join(context.directory, `${name}.json`));
+  for (const name of ['ataques', 'combates', 'recompensas', 'sobres', 'aperturas', 'economia', 'diarios', 'mercado', 'ventas']) fs.unlinkSync(path.join(context.directory, `${name}.json`));
   return { ...context, user: storedUser, unit: { ...unit, traitVersion: 0, combatBaseStats: balancedLegacyStats(unit) }, raw };
 }
 
 test('schema 1 upgrade preserves users, owned units, serials, claims, balances and teams', async t => {
   const c = await v1Fixture(t);
   const game = c.open().game;
-  assert.equal((await game.validateDatabase()).schemaVersion, 5);
+  assert.equal((await game.validateDatabase()).schemaVersion, 7);
   assert.deepEqual(await game.users.getUser(c.user.id), c.user);
   assert.deepEqual(readRecords(c.directory, 'unidades')[0], c.unit);
   assert.equal((await game.users.getProfile(c.user.id)).starterClaim.unitId, c.unit.id);
@@ -57,7 +57,7 @@ for (const stage of ['prepared', 'committed', 'published:unidades.json', 'publis
     await assert.rejects(failing.validateDatabase(), { code: 'STORAGE_WRITE_FAILED' });
     await failing.close();
     const recovered = c.open().game;
-    assert.equal((await recovered.validateDatabase()).schemaVersion, 5);
+    assert.equal((await recovered.validateDatabase()).schemaVersion, 7);
     assert.deepEqual(await recovered.users.getUser(c.user.id), c.user);
     assert.deepEqual(readRecords(c.directory, 'unidades')[0], c.unit);
     assert.equal((await recovered.starter.claimStarter({ userId: c.user.id, choice: 'mago' })).unit.id, c.unit.id);
@@ -78,7 +78,7 @@ for (const phase of ['prepared', 'committed']) {
     if (phase === 'committed') fs.writeFileSync(path.join(c.directory, 'usuarios.json'), after['usuarios.json']);
     const game = c.open().game;
     const report = await game.validateDatabase();
-    assert.equal(report.schemaVersion, 5);
+    assert.equal(report.schemaVersion, 7);
     assert.equal(report.users, phase === 'committed' ? 2 : 1);
     assert.equal((await game.units.getUnit(c.unit.id)).ownerId, c.user.id);
     assert.equal(fs.existsSync(path.join(c.directory, '_journal.json')), false);
