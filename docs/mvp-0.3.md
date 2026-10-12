@@ -24,7 +24,7 @@ El formato común conserva encabezado, separador, emojis y una acción principal
 | `.ctuperfil` | Nivel, XP restante/necesaria, saldo y estadísticas. |
 | `.ctubalance` | Saldo y condiciones de recompensa. |
 | `.ctuhistorial` | Cinco partidas propias terminadas, de más reciente a más antigua. |
-| `.ctuhistorial CURSOR` | Siguiente página, usando el comando que devuelve la lista. |
+| `.ctuhistorial 2` | Abrir la segunda página; desde 0.6.1 la navegación usa números. |
 | `.ctuhistorial BTL-…` | Turnos, participantes, niveles al inicio y recibo original. |
 | `.ctuunidad ID` | Progreso individual y procedencia. |
 | `.ctuficha ID` | Estadísticas efectivas o snapshot si la unidad está combatiendo. |

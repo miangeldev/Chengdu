@@ -1,0 +1,395 @@
+{
+  "rulesVersion": 2,
+  "contentVersion": 1,
+  "seed": 73,
+  "samplesPerPair": 100,
+  "pairs1v1": 28,
+  "pairs3v3": 15,
+  "duelsPerCandidate": 4300,
+  "totalDuels": 17200,
+  "adjustment": "Conservar reducción de defensa del 10% durante 2 turnos y añadir escudo de entrada de 10 / 14 / 18 / 22 HP durante 2 turnos, sin modificar estadísticas de nacimiento.",
+  "selectedShield": 10,
+  "reason": "Menor escudo del ensayo que deja al Lobo en el rango medio del 30% al 45%.",
+  "limits": [
+    "Heurística de referencia; no demuestra estrategia óptima.",
+    "Las ventajas de matchup son intencionales y la puntuación media no exige un 50% frente a cada rival."
+  ],
+  "candidates": [
+    {
+      "shield": 10,
+      "wolfScore": 42,
+      "wolfMatchups": [
+        {
+          "opponent": "panda_guerrero",
+          "score": 14.000000000000002
+        },
+        {
+          "opponent": "mago_carmesi",
+          "score": 84
+        },
+        {
+          "opponent": "monje_celestial",
+          "score": 86
+        },
+        {
+          "opponent": "guardian_jade",
+          "score": 14.000000000000002
+        },
+        {
+          "opponent": "bruja_lunar",
+          "score": 74
+        },
+        {
+          "opponent": "dragon_carmesi",
+          "score": 22
+        },
+        {
+          "opponent": "espiritu_bambu",
+          "score": 0
+        }
+      ],
+      "characterScores": [
+        {
+          "id": "panda_guerrero",
+          "name": "Panda Guerrero",
+          "rarity": "common",
+          "score": 52
+        },
+        {
+          "id": "mago_carmesi",
+          "name": "Mago Carmesí",
+          "rarity": "common",
+          "score": 39.714285714285715
+        },
+        {
+          "id": "lobo_sombrio",
+          "name": "Lobo Sombrío",
+          "rarity": "common",
+          "score": 42
+        },
+        {
+          "id": "monje_celestial",
+          "name": "Monje Celestial",
+          "rarity": "rare",
+          "score": 23
+        },
+        {
+          "id": "guardian_jade",
+          "name": "Guardián Jade",
+          "rarity": "rare",
+          "score": 67.57142857142857
+        },
+        {
+          "id": "bruja_lunar",
+          "name": "Bruja Lunar",
+          "rarity": "epic",
+          "score": 45
+        },
+        {
+          "id": "dragon_carmesi",
+          "name": "Dragón Carmesí",
+          "rarity": "legendary",
+          "score": 79.14285714285714
+        },
+        {
+          "id": "espiritu_bambu",
+          "name": "Espíritu Bambú",
+          "rarity": "epic",
+          "score": 51.57142857142857
+        }
+      ],
+      "teamMetrics": {
+        "totalDuels": 1500,
+        "knockouts": 1500,
+        "draws": 0,
+        "totalActions": 35852,
+        "knockoutRate": 100,
+        "drawRate": 0,
+        "meanActions": 23.901333333333334,
+        "meanSwitches": 1.854
+      }
+    },
+    {
+      "shield": 14,
+      "wolfScore": 42,
+      "wolfMatchups": [
+        {
+          "opponent": "panda_guerrero",
+          "score": 14.000000000000002
+        },
+        {
+          "opponent": "mago_carmesi",
+          "score": 84
+        },
+        {
+          "opponent": "monje_celestial",
+          "score": 86
+        },
+        {
+          "opponent": "guardian_jade",
+          "score": 14.000000000000002
+        },
+        {
+          "opponent": "bruja_lunar",
+          "score": 74
+        },
+        {
+          "opponent": "dragon_carmesi",
+          "score": 22
+        },
+        {
+          "opponent": "espiritu_bambu",
+          "score": 0
+        }
+      ],
+      "characterScores": [
+        {
+          "id": "panda_guerrero",
+          "name": "Panda Guerrero",
+          "rarity": "common",
+          "score": 52
+        },
+        {
+          "id": "mago_carmesi",
+          "name": "Mago Carmesí",
+          "rarity": "common",
+          "score": 39.714285714285715
+        },
+        {
+          "id": "lobo_sombrio",
+          "name": "Lobo Sombrío",
+          "rarity": "common",
+          "score": 42
+        },
+        {
+          "id": "monje_celestial",
+          "name": "Monje Celestial",
+          "rarity": "rare",
+          "score": 23
+        },
+        {
+          "id": "guardian_jade",
+          "name": "Guardián Jade",
+          "rarity": "rare",
+          "score": 67.57142857142857
+        },
+        {
+          "id": "bruja_lunar",
+          "name": "Bruja Lunar",
+          "rarity": "epic",
+          "score": 45
+        },
+        {
+          "id": "dragon_carmesi",
+          "name": "Dragón Carmesí",
+          "rarity": "legendary",
+          "score": 79.14285714285714
+        },
+        {
+          "id": "espiritu_bambu",
+          "name": "Espíritu Bambú",
+          "rarity": "epic",
+          "score": 51.57142857142857
+        }
+      ],
+      "teamMetrics": {
+        "totalDuels": 1500,
+        "knockouts": 1500,
+        "draws": 0,
+        "totalActions": 35908,
+        "knockoutRate": 100,
+        "drawRate": 0,
+        "meanActions": 23.938666666666666,
+        "meanSwitches": 1.836
+      }
+    },
+    {
+      "shield": 18,
+      "wolfScore": 42,
+      "wolfMatchups": [
+        {
+          "opponent": "panda_guerrero",
+          "score": 14.000000000000002
+        },
+        {
+          "opponent": "mago_carmesi",
+          "score": 84
+        },
+        {
+          "opponent": "monje_celestial",
+          "score": 86
+        },
+        {
+          "opponent": "guardian_jade",
+          "score": 14.000000000000002
+        },
+        {
+          "opponent": "bruja_lunar",
+          "score": 74
+        },
+        {
+          "opponent": "dragon_carmesi",
+          "score": 22
+        },
+        {
+          "opponent": "espiritu_bambu",
+          "score": 0
+        }
+      ],
+      "characterScores": [
+        {
+          "id": "panda_guerrero",
+          "name": "Panda Guerrero",
+          "rarity": "common",
+          "score": 52
+        },
+        {
+          "id": "mago_carmesi",
+          "name": "Mago Carmesí",
+          "rarity": "common",
+          "score": 39.714285714285715
+        },
+        {
+          "id": "lobo_sombrio",
+          "name": "Lobo Sombrío",
+          "rarity": "common",
+          "score": 42
+        },
+        {
+          "id": "monje_celestial",
+          "name": "Monje Celestial",
+          "rarity": "rare",
+          "score": 23
+        },
+        {
+          "id": "guardian_jade",
+          "name": "Guardián Jade",
+          "rarity": "rare",
+          "score": 67.57142857142857
+        },
+        {
+          "id": "bruja_lunar",
+          "name": "Bruja Lunar",
+          "rarity": "epic",
+          "score": 45
+        },
+        {
+          "id": "dragon_carmesi",
+          "name": "Dragón Carmesí",
+          "rarity": "legendary",
+          "score": 79.14285714285714
+        },
+        {
+          "id": "espiritu_bambu",
+          "name": "Espíritu Bambú",
+          "rarity": "epic",
+          "score": 51.57142857142857
+        }
+      ],
+      "teamMetrics": {
+        "totalDuels": 1500,
+        "knockouts": 1500,
+        "draws": 0,
+        "totalActions": 35999,
+        "knockoutRate": 100,
+        "drawRate": 0,
+        "meanActions": 23.999333333333333,
+        "meanSwitches": 1.788
+      }
+    },
+    {
+      "shield": 22,
+      "wolfScore": 42,
+      "wolfMatchups": [
+        {
+          "opponent": "panda_guerrero",
+          "score": 14.000000000000002
+        },
+        {
+          "opponent": "mago_carmesi",
+          "score": 84
+        },
+        {
+          "opponent": "monje_celestial",
+          "score": 86
+        },
+        {
+          "opponent": "guardian_jade",
+          "score": 14.000000000000002
+        },
+        {
+          "opponent": "bruja_lunar",
+          "score": 74
+        },
+        {
+          "opponent": "dragon_carmesi",
+          "score": 22
+        },
+        {
+          "opponent": "espiritu_bambu",
+          "score": 0
+        }
+      ],
+      "characterScores": [
+        {
+          "id": "panda_guerrero",
+          "name": "Panda Guerrero",
+          "rarity": "common",
+          "score": 52
+        },
+        {
+          "id": "mago_carmesi",
+          "name": "Mago Carmesí",
+          "rarity": "common",
+          "score": 39.714285714285715
+        },
+        {
+          "id": "lobo_sombrio",
+          "name": "Lobo Sombrío",
+          "rarity": "common",
+          "score": 42
+        },
+        {
+          "id": "monje_celestial",
+          "name": "Monje Celestial",
+          "rarity": "rare",
+          "score": 23
+        },
+        {
+          "id": "guardian_jade",
+          "name": "Guardián Jade",
+          "rarity": "rare",
+          "score": 67.57142857142857
+        },
+        {
+          "id": "bruja_lunar",
+          "name": "Bruja Lunar",
+          "rarity": "epic",
+          "score": 45
+        },
+        {
+          "id": "dragon_carmesi",
+          "name": "Dragón Carmesí",
+          "rarity": "legendary",
+          "score": 79.14285714285714
+        },
+        {
+          "id": "espiritu_bambu",
+          "name": "Espíritu Bambú",
+          "rarity": "epic",
+          "score": 51.57142857142857
+        }
+      ],
+      "teamMetrics": {
+        "totalDuels": 1500,
+        "knockouts": 1500,
+        "draws": 0,
+        "totalActions": 36042,
+        "knockoutRate": 100,
+        "drawRate": 0,
+        "meanActions": 24.028,
+        "meanSwitches": 1.842
+      }
+    }
+  ]
+}

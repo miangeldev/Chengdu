@@ -2,6 +2,8 @@ import { requireGame } from '../utils/GameError.js';
 import { calculateDamage, firstPlayer, MAX_TURNS } from '../game/battle/engine.js';
 import { effectiveStats } from '../game/progression/rules.js';
 import { ownershipAt } from '../game/units/ownership.js';
+import { validateAdvancedBattle, validateAdvancedBattleTransition } from './advancedBattleValidation.js';
+import { validateAttackCombatProfile } from '../game/battle/combatContent.js';
 
 const check = (value, field) => requireGame(value, 'DATABASE_CORRUPT', { field });
 const equal = (a, b) => JSON.stringify(a) === JSON.stringify(b);
@@ -26,11 +28,17 @@ export function validateBattleData(state, schemaVersion = 3) {
   };
   for (const a of attacks.values()) {
     check(text(a.name) && integer(a.revision, 1) && integer(a.power, 1) && a.power <= 10000 && integer(a.accuracy, 1) && a.accuracy <= 100 && a.type === 'physical', 'attack');
+    if (schemaVersion >= 8) check(validateAttackCombatProfile(a.combat), 'attack.combat');
   }
   for (const character of state.personajes.records) {
     check(character.attackIds.length === 2 && new Set(character.attackIds).size === 2 && character.attackIds.every(id => attacks.has(id)), 'character.attackReferences');
   }
   for (const battle of battles.values()) {
+    if (battle.rulesVersion === 2) {
+      check(schemaVersion >= 8, 'battle.advancedSchema');
+      validateAdvancedBattle(state, battle, { occupied, activeUnits, uniqueKey });
+      continue;
+    }
     check(/^BTL-[a-f0-9-]{36}$/.test(battle.id) && battle.rulesVersion === 1 && text(battle.chatId), 'battle.identity');
     check(['pending', 'active', 'finished', 'expired', 'rejected', 'cancelled'].includes(battle.status), 'battle.status');
     check(Array.isArray(battle.players) && battle.players.length === 2 && battle.players[0].userId !== battle.players[1].userId, 'battle.players');
@@ -138,6 +146,16 @@ export function validateBattleTransition(before, after) {
     check(updated.rewardVersion === battle.rewardVersion, 'battle.rewardVersionImmutable');
     if (!openBattle(battle)) { check(equal(battle, updated), 'battle.closedImmutable'); continue; }
     check(equal(battle.actions, updated.actions.slice(0, battle.actions.length)) && updated.actions.length <= battle.actions.length + 1, 'battle.appendActions');
+    if (battle.rulesVersion === 2) {
+      validateAdvancedBattleTransition(before, after, battle, updated);
+      if (battle.status === 'active' && !openBattle(updated)) {
+        for (const player of updated.players) {
+          add(userDeltas, player.userId, updated.winnerId === player.userId, updated.winnerId !== null);
+          for (const unit of player.units.filter(unit => unit.participated)) add(unitDeltas, unit.id, updated.winnerId === player.userId, updated.winnerId !== null);
+        }
+      }
+      continue;
+    }
     if (battle.status === 'pending' && updated.status === 'active') {
       for (const player of updated.players) {
         const unit = before.unidades.records.find(u => u.id === player.unit.id);

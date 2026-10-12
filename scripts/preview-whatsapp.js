@@ -46,13 +46,13 @@ try {
   await send(a, '.ctupersonajes', 'Colección');
   await send(a, '.ctuunidad PAND-000001', 'Ficha de unidad');
   await send(a, '.ctucatalogo', 'Catálogo');
-  const catalogPage = await game.characters.listCharacters({ limit: 5 });
-  await send(a, `.ctucatalogo ${catalogPage.nextCursor}`, 'Catálogo: siguiente página');
+  await send(a, '.ctucatalogo 2', 'Catálogo: siguiente página con un número corto');
+  await send(a, '.ctucatalogo 1', 'Catálogo: volver a la primera página');
   await send(a, '.ctuayuda', 'Guía de comandos');
   await send(a, '.ctuequipo usar PAND-000001', 'Equipo');
   await send(b, '.ctuequipo usar LOBO-000001');
   await send(a, '.ctuficha', 'Ficha del equipo: precisión y estadísticas');
-  await send(a, '.ctupelea @Lukas', 'Desafío', [b]);
+  await send(a, '.ctupelea @Lukas clasico', 'Desafío', [b]);
   await send(b, '.ctuaceptar', 'Comienzo del combate');
   await send(a, '.ctuficha', 'Ficha detallada del combate');
   await send(a, '.ctuatacar 1', 'Error: todavía no es tu turno');
@@ -70,7 +70,7 @@ try {
   samples.push({ title: 'Resultado del combate', text: latest });
   // Earn two more real victories in the temporary database to preview a level-up.
   for (let i = 0; i < 2; i++) {
-    await send(a, '.ctupelea @Lukas', null, [b]);
+    await send(a, '.ctupelea @Lukas clasico', null, [b]);
     await send(b, '.ctuaceptar');
     battle = await game.battle.getMyBattle({ userId: user.id, chatId });
     while (battle.status === 'active') {
@@ -84,7 +84,7 @@ try {
   await send(a, '.ctuhistorial', 'Historial compacto de partidas');
   await send(a, `.ctuhistorial ${battle.id}`, 'Detalle del historial: turnos y recompensa original');
   await send(a, '.ctuficha PAND-000001', 'Ficha de unidad de nivel 2: HP aumentado');
-  await send(a, '.ctupelea @Lukas', null, [b]);
+  await send(a, '.ctupelea @Lukas clasico', null, [b]);
   await send(b, '.ctuaceptar');
   battle = await game.battle.getMyBattle({ userId: user.id, chatId });
   while (battle.status === 'active') {
@@ -95,7 +95,7 @@ try {
   // Continue real play after the reward window expires, without touching account balances.
   currentTime = '2026-10-13T20:00:00Z';
   for (let i = 0; i < 2; i++) {
-    await send(a, '.ctupelea @Lukas', null, [b]);
+    await send(a, '.ctupelea @Lukas clasico', null, [b]);
     await send(b, '.ctuaceptar');
     battle = await game.battle.getMyBattle({ userId: user.id, chatId });
     while (battle.status === 'active') {
@@ -117,8 +117,11 @@ try {
   await send(a, '.ctubalance', 'Saldo después de abrir un sobre');
   await send(a, '.ctudiario', 'Repetir un diario antiguo: conserva su saldo original', [], dailyMessageId);
   await send(a, '.ctumovimientos', 'Movimientos: ingresos y gastos propios');
-  const movementPage = await game.economy.getMovements(user.id, { limit: 5 });
-  if (movementPage.nextCursor) await send(a, `.ctumovimientos ${movementPage.nextCursor}`, 'Movimientos: siguiente página');
+  const movementPage = await game.economy.getMovements(user.id, { limit: 5, page: 1 });
+  if (movementPage.nextPage) {
+    await send(a, `.ctumovimientos ${movementPage.nextPage}`, 'Movimientos: siguiente página');
+    await send(a, '.ctumovimientos 1', 'Movimientos: volver a la primera página');
+  }
   await send(a, '.ctuabrir basico', 'Error: saldo insuficiente para otro sobre');
   await send(a, '.ctumercado', 'Mercado: aún sin anuncios');
   const listingMessageId = 'preview-list-panda';
@@ -165,6 +168,60 @@ try {
   await send(a, `.ctucomprar ${expiring.id}`, 'Vencimiento: rechaza la compra y libera el bloqueo');
   await send(b, `.ctumercado ver ${expiring.id}`, 'Anuncio vencido: conserva la ficha histórica');
   await send(b, '.ctuequipo usar LOBO-000001', 'Equipo: unidad disponible después del vencimiento');
+  // Expand the same temporary collection through the trusted mint service.
+  // These preview-only units never enter the project's database.
+  const otherUser = await game.users.getUserByIdentity({ provider: 'whatsapp', subject: b });
+  const added = {};
+  for (const [ownerId, characterId] of [
+    [user.id, 'mago_carmesi'], [user.id, 'monje_celestial'],
+    [otherUser.id, 'guardian_jade'], [otherUser.id, 'bruja_lunar']
+  ]) {
+    added[characterId] = await game.units.createUnit({ ownerId, characterId,
+      origin: { type: 'admin', sourceId: 'temporary-whatsapp-preview' }, operationKey: `preview-advanced:${characterId}` });
+  }
+  const mage = added.mago_carmesi, monk = added.monje_celestial;
+  const jade = added.guardian_jade, witch = added.bruja_lunar;
+  await send(a, `.ctuequipo usar PAND-000001 ${mage.id} ${monk.id}`, 'Equipo avanzado: tres unidades y orden de entrada');
+  await send(a, '.ctuequipo ordenar 2 1 3', 'Equipo: reordenar con slots cortos');
+  await send(a, '.ctuequipo ordenar 2 1 3');
+  await send(b, `.ctuequipo usar LOBO-000001 ${jade.id} ${witch.id}`);
+  await send(a, '.ctuficha', 'Ficha avanzada del equipo: elementos, pasivas y cooldowns');
+  await send(a, '.ctupelea @Lukas 3v3', 'Desafío avanzado: formato 3v3', [b]);
+  await send(b, '.ctuaceptar', 'Inicio 3v3: pasivas, activos y reservas');
+  await send(b, `.ctuvender ${jade.id} 20`, 'Error: las reservas también están bloqueadas en combate');
+  const switchMessageId = 'preview-advanced-switch';
+  await send(b, '.ctucambiar 2', 'Cambio voluntario: consume turno y activa la pasiva', [], switchMessageId);
+  await send(b, '.ctucambiar 2', 'Repetir cambio: muestra el estado sin volver a actuar', [], switchMessageId);
+  await send(a, '.ctucambiar 2', 'Mago: ataque aumentado al entrar');
+  await send(b, '.ctucambiar 3', 'Bruja: veneno de la pasiva dentro del mismo turno');
+  await send(a, '.ctuatacar 2', 'Fuego contra agua: resistencia, quemadura y veneno visibles');
+  await send(b, '.ctuatacar 2', 'Agua contra fuego: ventaja elemental y veneno');
+  await send(a, '.ctuatacar 2', 'Error: una habilidad en cooldown no consume el turno');
+  await send(a, '.ctuatacar 1', 'Ataque básico: permite avanzar mientras se recupera la habilidad');
+  await send(b, '.ctuatacar 1', 'KO y relevo automático: entra la siguiente unidad viva');
+  await send(a, '.ctuatacar 2', 'Ataque con escudo y victoria sobre una unidad, sin cerrar el equipo');
+  await send(b, '.ctucambiar 2');
+  await send(a, '.ctuatacar 1', 'Escudo: daño bloqueado dentro de la respuesta');
+  await send(b, '.ctuatacar 2', 'Guardián: aplica aturdimiento con su habilidad');
+  await send(a, '.ctuatacar 1', 'Aturdimiento: un turno omitido y estado actualizado');
+  await send(b, '.ctuatacar 1');
+  await send(a, '.ctucambiar 3', 'Monje: entrada con regeneración');
+  await send(b, '.ctuatacar 1');
+  await send(a, '.ctuatacar 1', 'Regeneración: recuperación al comienzo del turno');
+  await send(a, `.ctuficha ${mage.id}`, 'Ficha de una unidad de banca derrotada: snapshot del combate');
+  battle = await game.battle.getMyBattle({ userId: user.id, chatId });
+  while (battle.status === 'active') {
+    await send(battle.turnUserId === user.id ? a : b, '.ctuatacar 1');
+    battle = await game.battle.getMyBattle({ userId: user.id, chatId });
+  }
+  samples.push({ title: 'Final 3v3: monedas únicas y XP repartida entre participantes', text: latest });
+  await send(a, `.ctuhistorial ${battle.id}`, 'Historial avanzado: cambios, efectos y relevo de cada turno');
+  await send(a, '.ctuequipo', 'Equipo después del combate: seis unidades desbloqueadas');
+  await send(a, '.ctuequipo usar PAND-000001');
+  await send(b, '.ctuequipo usar LOBO-000001');
+  await send(a, '.ctupelea @Lukas', 'Desafío sin modo: combate avanzado 1v1 entre starters', [b]);
+  await send(b, '.ctuaceptar', '1v1 avanzado: elementos y pasivas también con una unidad');
+  await send(a, '.cturendirse', 'Rendición temprana avanzada: cierra sin premios');
   if (!(await game.validateDatabase()).valid) throw new Error('La base temporal de la vista previa no es válida.');
   const output = fileURLToPath(new URL('../docs/whatsapp-preview.md', import.meta.url));
   fs.writeFileSync(output, '# Vista previa de los mensajes de WhatsApp\n\n' +

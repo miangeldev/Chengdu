@@ -226,7 +226,7 @@ test('WhatsApp simultaneous buyers receive one sale and a clear unavailable mess
   assert.equal((await game.units.getUnit(unit.id)).ownershipVersion, 1);
 });
 
-test('WhatsApp market pagination preserves filters and owner-specific listing cursors', async t => {
+test('WhatsApp numbered market pages preserve filters and only show the current player listings', async t => {
   const { game, directory, seller, unit } = await fixture(t);
   const { send } = messaging(game);
   const units = [unit];
@@ -235,16 +235,19 @@ test('WhatsApp market pagination preserves filters and owner-specific listing cu
   const market = await send('!ctumercado');
   assert.equal((market.match(/👉 !ctumercado ver LIST-/g) ?? []).length, 5);
   const next = market.match(/Siguiente: \*([^*]+)\*/)[1];
+  assert.equal(next, '!ctumercado 2');
+  assert.match(market, /Página 1 de 2/);
   assert.equal(((await send(next)).match(/👉 !ctumercado ver LIST-/g) ?? []).length, 1);
   const cheap = await send('!ctumercado precio');
   assert.ok(cheap.indexOf('*50 ChengCoins*') < cheap.indexOf('*60 ChengCoins*'));
-  assert.match(cheap, /Siguiente: \*!ctumercado precio /);
+  assert.match(cheap, /Siguiente: \*!ctumercado precio 2\*/);
   const common = await send('!ctumercado comun');
   const commonNext = common.match(/Siguiente: \*([^*]+)\*/)[1];
-  assert.match(commonNext, /!ctumercado comun /);
+  assert.equal(commonNext, '!ctumercado comun 2');
   assert.match(await send(commonNext.replace('comun ', 'raro ')), /página no es válida/);
   const own = await send('!ctumercado mios');
   const ownNext = own.match(/Siguiente: \*([^*]+)\*/)[1];
+  assert.equal(ownNext, '!ctumercado mios 2');
   assert.match(await send(ownNext, { actor: buyerActor }), /página no es válida/);
   assert.equal(readRecords(directory, 'mercado').length, 6);
 });

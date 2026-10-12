@@ -1,11 +1,11 @@
-import { defineCommand } from '../interfaces/whatsapp/command.js';
+import { defineCommand, pageArguments, pageNavigation } from '../interfaces/whatsapp/command.js';
 import { card, displayName } from '../interfaces/whatsapp/format.js';
 import { listingStatus, marketDateText, marketUnitText } from '../interfaces/whatsapp/marketFormat.js';
 import { GameError, requireGame } from '../utils/GameError.js';
 
 const rarities = { common: 'common', comun: 'common', 'común': 'common', rare: 'rare', raro: 'rare', epic: 'epic', epico: 'epic', 'épico': 'epic', legendary: 'legendary', legendario: 'legendary', mythic: 'mythic', mitico: 'mythic', 'mítico': 'mythic' };
 
-export const { command, run, createRun } = defineCommand('ctumercado', async ({ game, args, identity, cmd }) => {
+export const { command, run, createRun } = defineCommand('ctumercado', async ({ game, args, identity, prefix, cmd }) => {
   requireGame(args.length <= 2, 'INVALID_MARKET_FILTER');
   const mode = args[0]?.toLowerCase();
   if (mode === 'ver') {
@@ -29,14 +29,14 @@ export const { command, run, createRun } = defineCommand('ctumercado', async ({ 
   const rarity = rarities[mode] ?? null;
   const filtered = own || byPrice || rarity !== null;
   requireGame(filtered || args.length <= 1, 'INVALID_MARKET_FILTER');
-  const options = { limit: 5, cursor: filtered ? args[1] ?? null : args[0] ?? null, sort: byPrice ? 'price_asc' : 'newest', rarity };
+  const options = { ...pageArguments(filtered ? args.slice(1) : args), sort: byPrice ? 'price_asc' : 'newest', rarity };
   if (own) options.sellerId = (await game.users.getUserByIdentity(identity())).id;
   const page = await game.market.listListings(options);
   const title = own ? 'MIS ANUNCIOS' : 'MERCADO';
   if (!page.items.length) return card(title, [own ? '🎴 No tienes unidades en venta.' : '🛍️ No hay unidades en venta con esta selección.'], `👉 Elegir una unidad para vender: *${cmd('ctupersonajes')}*`);
-  const paginationMode = filtered ? `${args[0]} ` : '';
+  const paginationMode = filtered ? args[0] : '';
   return card(title, [
     byPrice ? '💰 Del menor al mayor precio.' : null,
     ...page.items.map(listing => `${marketUnitText(listing.unitSnapshot)}\n💰 *${listing.price} ChengCoins* · ${own ? `📥 Recibirás ${listing.net}` : `👤 ${displayName(listing.sellerName)}`}\n👉 ${cmd(own ? 'cturetirar' : 'ctumercado', own ? listing.id : `ver ${listing.id}`)}`)
-  ], page.nextCursor ? `📄 Siguiente: *${cmd('ctumercado', `${paginationMode}${page.nextCursor}`)}*` : `🎴 Tus anuncios: ${cmd('ctumercado', 'mios')}\n💰 Menor precio: ${cmd('ctumercado', 'precio')}`);
+  ], `${pageNavigation(page, 'ctumercado', prefix, paginationMode)}\n🎴 Tus anuncios: ${cmd('ctumercado', 'mios')}\n💰 Menor precio: ${cmd('ctumercado', 'precio')}`);
 });

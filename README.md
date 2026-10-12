@@ -1,8 +1,9 @@
-# Chengdú Cards — Alpha 0.6
+# Chengdú Cards — Alpha 0.7
 
 Módulo de juego para un bot de WhatsApp: registro, perfil, catálogo de ocho
-personajes, starter único, colección, equipos y combate 1 contra 1 por turnos,
-con XP, niveles independientes de jugador/unidad, ChengCoins e historial.
+personajes, starter único, colección, equipos de hasta tres unidades y combates
+1v1, 2v2 y 3v3 por turnos. Incluye elementos, pasivas, estados, cambios de unidad,
+XP, niveles independientes de jugador/unidad, ChengCoins e historial.
 Los sobres permiten conseguir nuevas unidades con rareza, rasgos y variantes.
 La economía añade un diario de 100 ChengCoins cada 24 horas, tienda e historial
 de ingresos y gastos para cada jugador.
@@ -27,7 +28,7 @@ npm run db:validate
 
 El segundo comando inicializa la base vacía y el catálogo si se trata de una
 instalación nueva; en instalaciones existentes valida o migra el formato original
-de usuarios. Desde los esquemas 1, 2, 3, 4, 5 y 6, migra al esquema 7 con backup y recuperación,
+de usuarios. Desde los esquemas 1 a 7, migra al esquema 8 con backup y recuperación,
 conservando unidades, identidades, saldos, XP, recibos y combates anteriores. La ruta por defecto es `ChengdúData/` junto al módulo, independiente
 del directorio desde el que se ejecute el bot.
 
@@ -68,22 +69,33 @@ no se conectan a WhatsApp ni escriben jugadores de prueba en la base del juego.
 | `.ctupersonajes` | Ver colección propia. |
 | `.ctuunidad PAND-000001` | Ver una unidad y su propietario público. |
 | `.ctuayuda` | Guía de comandos y pasos para empezar. |
-| `.ctuequipo usar PAND-000001` | Seleccionar una unidad propia; sin argumentos muestra el equipo. |
-| `.ctupelea @jugador` | Enviar un desafío en un grupo. |
+| `.ctuequipo usar PAND-000001 MAGC-000001 LOBO-000001` | Seleccionar entre una y tres unidades propias en orden; sin argumentos muestra el equipo. |
+| `.ctuequipo agregar ID` / `.ctuequipo quitar ID` | Añadir o quitar una unidad; `limpiar` vacía el equipo. |
+| `.ctuequipo ordenar 2 1 3` | Ordenar las posiciones actuales; la primera abre el combate. |
+| `.ctupelea @jugador` | Desafío avanzado en grupo; ambos equipos deben tener el mismo tamaño. |
+| `.ctupelea @jugador 3v3` | Elegir formato explícito: `1v1`, `2v2` o `3v3`. |
+| `.ctupelea @jugador clasico` | Jugar con las reglas originales usando la primera unidad de cada equipo. |
 | `.ctuaceptar` | Aceptar un desafío recibido. |
 | `.cturechazar` | Rechazarlo. |
 | `.ctucancelar` | Retirar el desafío enviado. |
 | `.ctuatacar 1` / `.ctuatacar 2` | Usar un ataque durante tu turno. |
+| `.ctucambiar 2` / `.ctucambiar 3` | Elegir una reserva viva; consume el turno. |
 | `.ctucombate` | Ver el estado o resultado reciente en ese grupo. |
-| `.ctuficha` / `.ctuficha PAND-000001` | Consultar estadísticas, potencia y precisión del combate, equipo o unidad indicada. |
+| `.ctuficha` / `.ctuficha PAND-000001` | Consultar estadísticas, precisión, elemento, pasiva, efectos y recargas; también una reserva. |
 | `.ctuficha panda` | Comparar la plantilla de un personaje antes de elegir; también `mago`, `lobo` o el ID del catálogo. |
 | `.cturendirse` | Rendirse y terminar el combate. |
 
-Catálogo y colección muestran cinco entradas por página, con el comando de la
-siguiente página cuando existe. Los IDs aparecen al copiar una acción o consultar
-una ficha. Registro, perfil y equipo priorizan el resumen y el próximo paso.
-Los movimientos también se paginan; la lista muestra primero las últimas
-operaciones confirmadas y su cursor sólo sirve al jugador que lo recibió.
+Los listados muestran cinco entradas por página y usan números cortos. Sin número
+se abre la página 1; `.ctucatalogo 2`, `.ctupersonajes 2`, `.ctuhistorial 2`,
+`.ctumovimientos 2` y `.ctuventas 2` abren la segunda. El mercado conserva el filtro:
+`.ctumercado 2`, `.ctumercado raro 2`, `.ctumercado precio 2` o `.ctumercado mios 2`.
+La propiedad se consulta con `.ctupropiedad PAND-000001 2`.
+Cada lista indica «Página 1 de 3» y ofrece Anterior/Siguiente cuando corresponde,
+sin mostrar cursores largos. Cada consulta refleja el estado actual del listado.
+Los historiales y anuncios propios siempre se filtran por el remitente autenticado.
+Los IDs aparecen al copiar una acción o consultar una ficha. Registro, perfil y
+equipo priorizan el resumen y el próximo paso. Los movimientos muestran primero
+las últimas operaciones confirmadas.
 El reclamo de starter siempre conserva la unidad original. Si ya cambió de
 propietario, la respuesta dirige a la colección actual. El detalle público
 muestra el nombre del propietario y la procedencia, sin su JID.
@@ -212,20 +224,26 @@ Ambos jugadores se registran, reclaman el starter y usan `.ctuequipo usar ID`.
 En un grupo, uno menciona al otro con `.ctupelea @jugador`; el destinatario usa
 `.ctuaceptar`. El más rápido empieza y el bot muestra los ataques disponibles.
 
-El ataque 1 tiene potencia 25 y precisión 100%; el ataque 2 tiene potencia 40 y
-precisión 80%. Cada turno muestra el resultado anterior, HP y quién debe actuar,
+El ataque 1 tiene potencia 25 y precisión 100%. El segundo es propio de cada
+personaje, con elemento, efecto y recarga. Cada turno muestra el resultado anterior, HP y quién debe actuar,
 con dos habilidades y su potencia. La precisión y los demás atributos se consultan
 en `.ctuficha`; se mantienen en el motor. Durante una batalla, la ficha muestra
-los valores fijados al aceptarla, incluidos los de ambas unidades.
-Al terminar, se actualizan estadísticas, se liberan ambas unidades y se acredita
+los valores fijados al aceptarla, incluidos los activos de ambos jugadores;
+`.ctuficha ID` permite inspeccionar una reserva.
+Al terminar, se actualizan estadísticas, se liberan todas las unidades y se acredita
 la recompensa en el mismo commit. El mensaje final incluye lo ganado por cada
 jugador y unidad y las subidas de nivel, sin enviar avisos adicionales.
 
-| Resultado elegible | ChengCoins | XP jugador | XP unidad participante |
+| Resultado elegible | ChengCoins | XP jugador | XP total para unidades participantes |
 | --- | ---: | ---: | ---: |
 | Victoria | 120 | 35 | 35 |
 | Derrota | 0 | 15 | 15 |
 | Empate | 0 | 20 | 20 |
+
+En combate avanzado, la XP total de unidades se reparte por igual entre quienes
+entraron al campo. El sobrante se asigna en orden de equipo: 35 XP entre tres
+participantes son 12, 12 y 11. Una reserva que nunca entró recibe cero XP;
+llevar un equipo mayor no multiplica las recompensas.
 
 Hasta tres partidas con recompensa por pareja de jugadores en una ventana móvil
 de 24 horas, compartida entre grupos y unidades. Una rendición requiere cuatro
@@ -244,13 +262,45 @@ Los desafíos vencen en 5 minutos y los combates tras 30 minutos sin una acción
 La expiración se procesa al consultar perfil, unidades, equipos, saldo o batallas; el
 anfitrión también puede llamar a `game.battle.sweepExpired()` periódicamente.
 
+## Combate avanzado 0.7
+
+Los equipos admiten una, dos o tres unidades distintas. `.ctupelea @jugador`
+elige el formato según ambos equipos; `1v1`, `2v2` y `3v3` permiten pedirlo
+explícitamente. `.ctuequipo ordenar 2 1 3` cambia quien inicia. El equipo y todas
+sus unidades quedan bloqueados al aceptar; los anuncios del mercado bloquean
+su unidad y la retiran del equipo como antes.
+
+`.ctucambiar 2` entra con la segunda unidad viva y consume el turno. Al caer una
+unidad, entra automáticamente la primera reserva viva sin enviar otra respuesta.
+La victoria llega cuando el rival pierde todas sus unidades. Pasivas, daño,
+estados, reservas, recargas y ataques disponibles se integran en el mensaje del turno.
+
+Fuego vence a Naturaleza, Naturaleza a Agua y Agua a Fuego. Luz y Oscuridad
+tienen ventaja mutua. Ventaja aplica 125% del daño; resistencia, 80%; Neutral
+y los demás cruces, 100%. Los estados son veneno, quemadura, aturdimiento,
+escudo, regeneración, aumento de ataque y reducción de defensa. Duración y
+recarga avanzan en turnos propios de la unidad activa y se congelan en reserva.
+Las pasivas se activan una sola vez al entrar por primera vez en la partida.
+
+Las partidas avanzadas tienen un máximo de 100 acciones. `.ctupelea @jugador
+clasico` conserva las reglas originales, con primera unidad, dos ataques sin
+efectos y máximo de 50 acciones. Los combates y recibos anteriores conservan
+sus snapshots y reglas. La API interna mantiene `mode: 'classic'` como valor
+por defecto; el adaptador WhatsApp pide `mode: 'auto'`.
+
+Consulta el contenido por personaje, reglas de duración, plan de implementación,
+compatibilidad y próximos pasos en [Alpha 0.7](docs/alpha-0.7.md).
+`npm run balance:advanced` reproduce 8.600 partidas 1v1/3v3 del motor real;
+el [informe](docs/advanced-balance-0.7.json) documenta resultados y límites
+de su estrategia de referencia.
+
 ## Revisar la interfaz
 
 ```sh
 npm run preview:whatsapp
 ```
 
-Genera [73 ejemplos de los mensajes](docs/whatsapp-preview.md) usando una base
+Genera [103 ejemplos de los mensajes](docs/whatsapp-preview.md) usando una base
 temporal y jugadores ficticios: registro, perfil, colección, starter, equipo,
 desafío, turnos, fichas detalladas, fallo de ataque, errores, recompensas,
 subidas de nivel, saldo, historial, sobres, rasgos/variantes, diario, tienda
@@ -379,7 +429,7 @@ independientes; rechaza modificaciones directas de colecciones administradas.
 `usuarios.json`, `personajes.json`, `unidades.json`, `estado.json`, `eventos.json`,
 `ataques.json`, `combates.json`, `recompensas.json`, `sobres.json`, `aperturas.json`,
 `economia.json`, `diarios.json`, `mercado.json` y `ventas.json` incluyen versión de
-esquema 7 y revisión. `_database.json` identifica la instalación.
+esquema 8 y revisión. `_database.json` identifica la instalación.
 `_journal.json` existe mientras hay un commit pendiente. Cada operación que cambia
 datos guarda previamente una copia coherente en `backups/<id-operación>/`.
 
@@ -433,10 +483,10 @@ activos, revisar la migración a SQLite prevista en el diseño.
 
 Las pruebas con `node --test --test-isolation=none` verifican persistencia al
 reabrir, registro/starter concurrentes, supply, identidades, cursores, migraciones
-desde esquemas 1, 2, 3, 4, 5 y 6, journals antiguos, integridad y recuperación de commits. También
+desde esquemas 1 a 7, journals antiguos, integridad y recuperación de commits. También
 cubren equipos, snapshots, turnos, precisión, duplicados, victoria, rendición,
 expiración y estadísticas. Se interrumpe realmente un proceso con `SIGKILL`.
-También se comprueban las trazas de error y los 29 plugins mediante sus
+También se comprueban las trazas de error y los 30 plugins mediante sus
 exportaciones `run`, con una base compartida y sin inyectar el juego del router.
 El debug se verifica activado y desactivado, con causas anidadas, loggers que
 sólo aceptan un argumento y límites de longitud del mensaje de WhatsApp.
@@ -467,8 +517,13 @@ unidad fuera del equipo al publicarla, bloqueos, cancelación, vencimiento,
 historial privado, cursores y compras simultáneas. Se recuperan pagos y propiedad
 juntos tras interrupciones, y los recibos antiguos siguen siendo válidos cuando
 la unidad se revende o cambia el catálogo.
+El combate avanzado verifica equipos de tres, selección y orden, elementos,
+pasivas únicas, ticks y duración de estados, escudos, recargas, cambios, KO,
+entradas automáticas, reservas congeladas y reparto exacto de XP. Se reproducen
+acciones para detectar estados o resultados alterados y se conserva compatibilidad
+con partidas clásicas activas e históricas.
 
-Nuevos gastos, regalos, intercambios directos y combate avanzado pertenecen
+Nuevos gastos, regalos e intercambios directos pertenecen
 a las siguientes versiones. El modelo conserva progreso, procedencia,
 revisiones de contenido, seriales, stats individuales, traits y variante.
 
@@ -478,5 +533,6 @@ Diseño: [fundación 0.1](docs/mvp-0.1.md), [combate 0.2](docs/mvp-0.2.md),
 [balance 0.4.1](docs/balance-0.4.1.md),
 [economía 0.5](docs/alpha-0.5.md),
 [mercado 0.6](docs/alpha-0.6.md),
+[combate avanzado 0.7](docs/alpha-0.7.md),
 [modelo de datos](docs/database.md) y
 [visión completa](project.md).

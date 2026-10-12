@@ -2842,6 +2842,21 @@ Resultado:
 
 > El combate tiene profundidad.
 
+Estado implementado: **Alpha 0.7**, versión `0.7.0`, esquema de datos **8**.
+La denominación Alpha corresponde a la entrega solicitada; esta etapa conserva
+la planificación de combate avanzado indicada aquí como Beta. Incluye equipos
+1v1/2v2/3v3, elementos, estados, buffs, debuffs, cambios, habilidades, recargas
+y relevos. Las fases 0.1–0.6.1 continúan integradas; partidas clásicas y datos
+históricos conservan sus reglas y recibos.
+
+La [planificación y sus siete hitos completados](docs/plan-alpha-0.7.md) y
+las [reglas de Alpha 0.7](docs/alpha-0.7.md) documentan alcance, contratos y
+criterios de cierre. Validación local: **352 pruebas**, **103 mensajes de ejemplo**,
+8.600 combates de referencia y 43.000 ensayos de afinado. La migración real
+del proyecto se verificó con respaldo y conservación de registros, sin datos
+de prueba ni journal pendiente. La sesión real de WhatsApp corresponde al
+bot anfitrión y queda para su integración.
+
 ---
 
 ## Beta 0.8 — Contenido

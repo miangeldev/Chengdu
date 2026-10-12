@@ -57,14 +57,14 @@ function assertPreserved(c) {
 test('schema 6 market migration preserves every historical record, balance and snapshot without retroactive sales or fees', async t => {
   const c = await v6Fixture(t);
   const game = c.open().game;
-  assert.equal((await game.validateDatabase()).schemaVersion, 7);
+  assert.equal((await game.validateDatabase()).schemaVersion, 8);
   assertPreserved(c);
   assert.equal((await game.economy.getBalance(c.seller.id)).coins, 20);
   assert.equal((await game.economy.getBalance(c.buyer.id)).coins, 100);
   for (const name of V6_COLLECTIONS) {
     const metadata = JSON.parse(fs.readFileSync(path.join(c.directory, `${name}.json`), 'utf8'))._meta;
-    assert.equal(metadata.schemaVersion, 7);
-    assert.equal(metadata.revision, c.state[name]._meta.revision + 1);
+    assert.equal(metadata.schemaVersion, 8);
+    assert.equal(metadata.revision, c.state[name]._meta.revision + 2);
   }
   const snapshots = fs.readdirSync(path.join(c.directory, 'backups')).map(id =>
     JSON.parse(fs.readFileSync(path.join(c.directory, 'backups', id, 'snapshot.json'), 'utf8')));
@@ -81,7 +81,7 @@ for (const stage of ['prepared', 'committed', 'published:unidades.json', 'publis
     assert.equal(Object.keys(journal.body.after).length, COLLECTIONS.length + 1);
     await failed.close();
     const game = c.open().game;
-    assert.equal((await game.validateDatabase()).schemaVersion, 7);
+    assert.equal((await game.validateDatabase()).schemaVersion, 8);
     assertPreserved(c);
     assert.equal(fs.existsSync(path.join(c.directory, '_journal.json')), false);
   });
@@ -100,7 +100,7 @@ for (const phase of ['prepared', 'committed']) {
     fs.writeFileSync(path.join(c.directory, '_journal.json'), serialize({ version: 1, phase, body, checksum }));
     if (phase === 'committed') fs.writeFileSync(path.join(c.directory, 'sobres.json'), after['sobres.json']);
     const game = c.open().game;
-    assert.equal((await game.validateDatabase()).schemaVersion, 7);
+    assert.equal((await game.validateDatabase()).schemaVersion, 8);
     if (phase === 'committed') c.state.sobres = packs;
     assertPreserved(c);
     assert.equal(readRecords(c.directory, 'sobres')[0].name, phase === 'committed' ? 'Sobre Histórico' : JSON.parse(c.raw['sobres.json']).records[0].name);

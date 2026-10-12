@@ -57,7 +57,7 @@ test('the WhatsApp commands complete the MVP flow with a simulated socket', asyn
   const sock = { sendMessage: async (from, payload) => { replies.push({ from, ...payload }); } };
   const msg = { key: { remoteJid: '120363111@g.us', participant: '521999999999@s.whatsapp.net' } };
   const route = createCommandRouter({ game });
-  assert.equal(commands.length, 29);
+  assert.equal(commands.length, 30);
   for (const body of ['.cturegistro Miguel', '.ctuperfil', '.ctucatalogo', '.ctustarter', '.ctustarter 1', '.ctupersonajes', '.ctuunidad PAND-000001']) {
     assert.equal(await route(sock, msg, body), true);
   }
@@ -67,8 +67,7 @@ test('the WhatsApp commands complete the MVP flow with a simulated socket', asyn
   assert.match(replies[0].text, /Registro completado/);
   assert.match(replies[4].text, /PAND-000001/);
   assert.match(replies[6].text, /Propietario: Miguel/);
-  const catalogPage = await game.characters.listCharacters({ limit: 5 });
-  await route(sock, msg, `.ctucatalogo ${catalogPage.nextCursor}`);
+  await route(sock, msg, '.ctucatalogo 2');
   const catalogText = replies[2].text + '\n' + replies.at(-1).text;
   for (const character of (await game.characters.listCharacters()).items) {
     assert.ok(catalogText.includes(character.name), character.name);
@@ -94,7 +93,7 @@ test('players can compare catalog stats and live attack definitions before regis
     const character = await repos.characters.get('panda_guerrero');
     await repos.characters.replace({ ...character, baseStats: { ...character.baseStats, hp: 130 }, revision: character.revision + 1 });
     const attack = await repos.attacks.get(character.attackIds[0]);
-    await repos.attacks.replace({ ...attack, power: 45, accuracy: 73, revision: attack.revision + 1 });
+    await repos.attacks.replace({ ...attack, power: 45, accuracy: 73, combat: { ...attack.combat, power: 45, accuracy: 73 }, revision: attack.revision + 1 });
   });
   await route(sock, msg, '.ctuficha panda_guerrero');
   assert.match(reply, /Vida: 130\/130 HP/);
@@ -102,7 +101,7 @@ test('players can compare catalog stats and live attack definitions before regis
   await route(sock, msg, '.ctuficha desconocido_personaje');
   assert.match(reply, /personaje no existe/);
   assert.deepEqual(await game.validateDatabase(), {
-    valid: true, schemaVersion: 7, users: 0, characters: 8, units: 0, claims: 0
+    valid: true, schemaVersion: 8, users: 0, characters: 8, units: 0, claims: 0
   });
 });
 

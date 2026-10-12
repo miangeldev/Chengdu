@@ -4,6 +4,7 @@ import { paginate } from '../../utils/pagination.js';
 import { expireBattles } from '../battle/lifecycle.js';
 import { effectiveStats } from '../progression/rules.js';
 import { expireListings } from '../market/lifecycle.js';
+import { advancedAttack, combatProfile } from '../battle/combatContent.js';
 
 async function detail(repos, unit) {
   const owner = await repos.users.get(unit.ownerId);
@@ -13,8 +14,9 @@ async function detail(repos, unit) {
     character: await repos.characters.get(unit.characterId), owner: { id: owner.id, name: owner.name } };
 }
 
-function snapshotDetail(player) {
-  return { ...player.unit, owner: { id: player.userId, name: player.name }, inBattle: true };
+function snapshotDetail(player, unit = player.units ? player.units[player.activeIndex] : player.unit) {
+  return { ...unit, owner: { id: player.userId, name: player.name }, inBattle: true,
+    advanced: Array.isArray(player.units), reserve: Array.isArray(player.units) && player.units[player.activeIndex].id !== unit.id };
 }
 
 async function combatDetail(repos, unitId) {
@@ -22,16 +24,19 @@ async function combatDetail(repos, unitId) {
   requireGame(unit, 'UNIT_NOT_FOUND');
   if (unit.lock?.type === 'battle') {
     const battle = await repos.battles.get(unit.lock.referenceId);
-    return snapshotDetail(battle.players.find(p => p.unit.id === unit.id));
+    const player = battle.players.find(p => (p.units ?? [p.unit]).some(value => value.id === unit.id));
+    return snapshotDetail(player, (player.units ?? [player.unit]).find(value => value.id === unit.id));
   }
   const character = await repos.characters.get(unit.characterId);
   const owner = await repos.users.get(unit.ownerId);
   const stats = effectiveStats(unit.initialStats, unit.progress.level, unit.statGrowthVersion, unit.traits, unit.traitVersion, unit.combatBaseStats);
+  const combat = character.combat ?? combatProfile(character.id);
   return {
     id: unit.id, characterId: unit.characterId, characterName: character.name,
     level: unit.progress.level, stats, hp: stats.hp, traits: unit.traits, variant: unit.variant, traitVersion: unit.traitVersion,
-    attacks: await Promise.all(character.attackIds.map(id => repos.attacks.get(id))),
-    owner: { id: owner.id, name: owner.name }, inBattle: false
+    attacks: (await Promise.all(character.attackIds.map(id => repos.attacks.get(id)))).map(advancedAttack),
+    element: combat.element, ability: structuredClone(combat.ability), effects: [], cooldowns: {},
+    owner: { id: owner.id, name: owner.name }, inBattle: false, advanced: true
   };
 }
 
@@ -64,7 +69,9 @@ export function createUnitService(storage, clock) {
         requireGame(user, 'USER_NOT_FOUND');
         const battle = await repos.battles.find(b => b.status === 'active' &&
           (chatId === null || b.chatId === chatId) && b.players.some(p => p.userId === userId));
-        if (battle) return { units: battle.players.map(snapshotDetail) };
+        if (battle) return { units: battle.players.map(player => snapshotDetail(player)),
+          reserves: battle.rulesVersion === 2 ? battle.players.flatMap(player => player.units.filter((_, index) => index !== player.activeIndex).map(unit => snapshotDetail(player, unit))) : [],
+          rulesVersion: battle.rulesVersion, format: battle.format ?? '1v1' };
         return { units: await Promise.all(user.team.map(id => combatDetail(repos, id))) };
       });
     },

@@ -19,7 +19,7 @@ El saldo y las operaciones se consultan cuando el jugador lo necesita.
 | `.ctusobres` | Probabilidades actuales de personajes, rasgos y variantes. |
 | `.ctubalance` | Saldo, ingresos, gastos y disponibilidad del diario. |
 | `.ctumovimientos` | Cinco movimientos propios, empezando por los últimos confirmados. |
-| `.ctumovimientos CURSOR` | Continuar con el comando que entrega la página anterior. |
+| `.ctumovimientos 2` | Abrir la segunda página; desde 0.6.1 la navegación usa números. |
 
 Los comandos funcionan en grupo y en privado. Cada acción envía un solo mensaje
 con encabezado, separador, resumen y siguiente paso. Tienda muestra precio y
@@ -70,8 +70,10 @@ inmutables. Los detalles de emisión y probabilidades están en
 ## Movimientos y saldo
 
 El historial económico integra créditos de combate, créditos de diario y gastos
-de sobres. Sólo se consulta la cuenta del remitente autenticado. Los cursores se
-vinculan a su jugador; usar uno de otra cuenta devuelve un error de página.
+de sobres. Sólo se consulta la cuenta del remitente autenticado. Desde 0.6.1,
+WhatsApp usa números de página y muestra comandos cortos para avanzar y volver.
+La API interna conserva cursores ligados al jugador; usar uno de otra cuenta
+devuelve un error de página.
 
 La lista muestra primero las operaciones confirmadas más recientes, siguiendo
 el orden del ledger. Dos movimientos pueden compartir fecha y distintas fuentes
@@ -132,8 +134,8 @@ y recuperación de interrupciones. La migración preserva los datos y comienza
 sin diarios ni premios retroactivos.
 
 El adaptador verifica una respuesta por comando, prefijo personalizado, hora
-de Ciudad de México, tienda compacta, páginas propias, rechazo de cursores
-ajenos y una compra financiada con cinco diarios. También simula una desconexión
+de Ciudad de México, tienda compacta, páginas propias, rechazo de páginas
+inválidas y una compra financiada con cinco diarios. También simula una desconexión
 al entregar el diario: tras reiniciar, repetir el mensaje recupera el recibo
 original sin pagar otra vez. La conexión con una sesión real de WhatsApp
 permanece pendiente del bot anfitrión.

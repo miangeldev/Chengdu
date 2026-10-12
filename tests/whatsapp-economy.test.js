@@ -101,10 +101,12 @@ test('WhatsApp five daily rewards fund a shop purchase and paginate only the cur
   assert.match(movements, /15 oct 2026, 14:00/);
   assert.doesNotMatch(movements, /OPEN-|BTL-|Lukas|balanceBefore|sourceType/);
   const nextCommand = movements.match(/Siguiente: \*([^*]+)\*/)?.[1];
-  assert.ok(nextCommand?.startsWith('!ctumovimientos '));
+  assert.equal(nextCommand, '!ctumovimientos 2');
   const last = await send(nextCommand);
   assert.equal((last.match(/\*\+100 ChengCoins\*/g) ?? []).length, 1);
   assert.match(last, /11 oct 2026, 14:00/);
+  assert.match(last, /Página 2 de 2/);
+  assert.match(last, /Anterior: \*!ctumovimientos 1\*/);
   assert.doesNotMatch(last, /Siguiente:/);
   assert.match(await send(nextCommand, { sender: other }), /página no es válida/);
   const otherMovements = await send('!ctumovimientos', { sender: other });

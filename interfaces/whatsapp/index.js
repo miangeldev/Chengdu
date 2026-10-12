@@ -27,9 +27,10 @@ import * as comprar from '../../plugins/CTU-comprar.js';
 import * as retirar from '../../plugins/CTU-retirar.js';
 import * as ventas from '../../plugins/CTU-ventas.js';
 import * as propiedad from '../../plugins/CTU-propiedad.js';
+import * as cambiar from '../../plugins/CTU-cambiar.js';
 import { game as defaultGame } from '../../game/index.js';
 
-export const commands = Object.freeze([registro, perfil, catalogo, starter, personajes, unidad, ayuda, equipo, pelea, aceptar, atacar, rendirse, combate, rechazar, cancelar, ficha, balance, historial, sobres, abrir, diario, tienda, movimientos, mercado, vender, comprar, retirar, ventas, propiedad]);
+export const commands = Object.freeze([registro, perfil, catalogo, starter, personajes, unidad, ayuda, equipo, pelea, aceptar, atacar, rendirse, combate, rechazar, cancelar, ficha, balance, historial, sobres, abrir, diario, tienda, movimientos, mercado, vender, comprar, retirar, ventas, propiedad, cambiar]);
 
 // Host supplies authenticated msg metadata and the text extracted from the message.
 export function createCommandRouter({ game = defaultGame, prefix = '.', logger, debug, battleHealthBars } = {}) {

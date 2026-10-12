@@ -3,11 +3,12 @@ import { card, section } from '../interfaces/whatsapp/format.js';
 
 export const { command, run, createRun } = defineCommand('ctuayuda', async ({ cmd }) => card('AYUDA', [
   section('🌱 *Empezar*', `${cmd('cturegistro', 'Nombre')} · Registro\n${cmd('ctustarter')} · Primer personaje`),
-  section('🎴 *Colección*', `${cmd('ctuperfil')} · Tu progreso\n${cmd('ctupersonajes')} · Elegir unidad\n${cmd('ctucatalogo')} · Ver personajes\n${cmd('ctuficha', '[ID o personaje]')} · Stats y precisión\n${cmd('ctuunidad', 'ID')} · Propietario y procedencia`),
+  section('🎴 *Colección*', `${cmd('ctuperfil')} · Tu progreso\n${cmd('ctupersonajes')} · Elegir unidad\n${cmd('ctucatalogo')} · Ver personajes\n${cmd('ctuficha', '[ID o personaje]')} · Stats, precisión, elemento y pasiva\n${cmd('ctuunidad', 'ID')} · Propietario y procedencia`),
   section('🎁 *Sobres*', `${cmd('ctusobres')} · Precios y probabilidades\n${cmd('ctuabrir', 'basico')} · Obtener un personaje`),
   section('💰 *Economía*', `${cmd('ctudiario')} · +100 ChengCoins cada 24 h\n${cmd('ctutienda')} · Comprar sobres\n${cmd('ctumovimientos')} · Tus ingresos y gastos`),
   section('🛍️ *Mercado*', `${cmd('ctumercado')} · Unidades en venta\n${cmd('ctumercado', 'raro')} / ${cmd('ctumercado', 'precio')} · Filtrar\n${cmd('ctuvender', 'ID PRECIO')} · Publicar una unidad\n${cmd('ctucomprar', 'ANUNCIO')} · Comprar\n${cmd('ctumercado', 'mios')} · Tus anuncios\n${cmd('cturetirar', 'ANUNCIO')} · Retirar\n${cmd('ctuventas')} · Tus compras y ventas\n${cmd('ctupropiedad', 'ID')} · Historia de propietarios`),
-  section('🛡️ *Equipo*', `${cmd('ctuequipo')} · Ver equipo\n${cmd('ctuequipo', 'usar ID')} · Seleccionar\n${cmd('ctuequipo', 'limpiar')} · Vaciar`),
+  section('🛡️ *Equipo*', `${cmd('ctuequipo')} · Ver 1 a 3 unidades\n${cmd('ctuequipo', 'usar ID1 ID2 ID3')} · Seleccionar en orden\n${cmd('ctuequipo', 'agregar ID')} / ${cmd('ctuequipo', 'quitar ID')}\n${cmd('ctuequipo', 'ordenar 2 1 3')} · Cambiar quien abre\n${cmd('ctuequipo', 'limpiar')} · Vaciar`),
   section('✨ *Progreso*', `${cmd('ctubalance')} · Saldo y recompensas\n${cmd('ctuhistorial')} · Tus partidas\n${cmd('ctuhistorial', 'ID')} · Turnos y recompensa`),
-  section('⚔️ *Combate en grupo*', `${cmd('ctupelea', '@jugador')} · Desafiar\n${cmd('ctuaceptar')} / ${cmd('cturechazar')} · Responder\n${cmd('ctucancelar')} · Retirar desafío\n${cmd('ctuatacar', '1')} / ${cmd('ctuatacar', '2')} · Atacar\n${cmd('ctucombate')} · Ver turno\n${cmd('cturendirse')} · Rendirse`)
+  section('📄 *Páginas*', `${cmd('ctucatalogo', '2')} · Ir a la página 2\n${cmd('ctumercado', 'raro 2')} · Página 2 del filtro\nLos listados muestran Anterior y Siguiente.`),
+  section('⚔️ *Combate en grupo*', `${cmd('ctupelea', '@jugador')} · Mismo tamaño de equipos\n${cmd('ctupelea', '@jugador 3v3')} · 1v1, 2v2 o 3v3\n${cmd('ctupelea', '@jugador clasico')} · Reglas originales\n${cmd('ctuaceptar')} / ${cmd('cturechazar')} · Responder\n${cmd('ctucancelar')} · Retirar desafío\n${cmd('ctuatacar', '1')} / ${cmd('ctuatacar', '2')} · Atacar\n${cmd('ctucambiar', '2')} · Entrar con reserva; consume turno\n${cmd('ctucombate')} · Ver turno\n${cmd('cturendirse')} · Rendirse`)
 ]));

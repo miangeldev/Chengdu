@@ -34,16 +34,31 @@ const messages = {
   CHARACTER_UNAVAILABLE: '❌ Ese personaje no está disponible para obtenerse.',
   SUPPLY_EXHAUSTED: '❌ Ya se emitieron todas las unidades disponibles de ese personaje.',
   INVALID_CURSOR: '❌ La página no es válida. Usa el comando sin argumentos para volver al inicio.',
+  INVALID_PAGE: '❌ La página no es válida. Escribe un número entero desde 1.\nEjemplo: .ctucatalogo 2',
+  PAGE_NOT_FOUND: '❌ La página no es válida: ese listado no tiene tantos resultados. Vuelve a la página 1.',
   INVALID_PAGE_SIZE: '❌ El tamaño de página debe estar entre 1 y 25.',
   INVALID_ARGUMENTS: '❌ Los argumentos no son válidos.\n👉 Consulta .ctuayuda',
   GROUP_ONLY: '⚔️ Los desafíos y combates se juegan en un grupo de WhatsApp. Usa el comando en el grupo donde está tu oponente.',
-  INVALID_OPPONENT: '👤 Menciona a un solo jugador o usa su ID de jugador.\nEjemplo: .ctupelea @jugador',
+  INVALID_OPPONENT: '👤 Menciona a un solo jugador o usa su ID de jugador.\nEjemplo: .ctupelea @jugador\nModo opcional: 1v1, 2v2, 3v3 o clasico.',
+  INVALID_BATTLE_MODE: '⚔️ Elige 1v1, 2v2, 3v3 o clasico.\nEjemplo: .ctupelea @jugador 3v3\nSin modo, se usa el tamaño de ambos equipos.',
+  TEAM_SIZE_MISMATCH: '🛡️ Ambos jugadores necesitan el mismo número de unidades para este modo.\nRevisen .ctuequipo antes de desafiarse.',
+  ADVANCED_BATTLE_REQUIRED: '🔀 Los cambios se usan en combates avanzados.\nInicia otro combate con .ctupelea @jugador',
+  INVALID_SWITCH: '🔀 Elige una reserva viva de tu equipo.\nUsa .ctucambiar 2 o .ctucambiar 3; cambiar consume el turno.',
+  SWITCH_SAME_UNIT: '🔀 Esa unidad ya está luchando. Elige otra reserva viva.',
+  UNIT_DEFEATED: '💤 Esa unidad fue derrotada y ya no puede entrar en este combate.',
+  ATTACK_ON_COOLDOWN: '⏳ Ese ataque aún está recuperándose.\nElige el otro ataque o cambia de unidad con .ctucambiar.',
+  ATTACK_COOLDOWN: '⏳ Ese ataque aún está recuperándose.\nElige el otro ataque o cambia de unidad con .ctucambiar.',
+  INVALID_TEAM_SLOT: '🔀 Esa posición no existe en tu equipo. Elige una reserva viva con .ctucambiar 2 o .ctucambiar 3.',
+  UNIT_ALREADY_ACTIVE: '🔀 Esa unidad ya está luchando. Elige otra reserva viva.',
+  UNIT_KNOCKED_OUT: '💤 Esa unidad fue derrotada y ya no puede entrar en este combate.',
   OPPONENT_NOT_REGISTERED: '👤 Tu oponente todavía no está registrado. Debe usar .cturegistro y elegir su starter primero.',
   SELF_CHALLENGE: '🪞 No puedes desafiarte a ti mismo. Elige otro jugador del grupo.',
   PLAYER_BUSY: '⏳ Uno de los jugadores ya tiene un desafío pendiente o un combate activo. Consulta .ctucombate en el grupo donde se inició.',
   TEAM_EMPTY: '🛡️ Ambos jugadores necesitan un equipo. Consulta .ctupersonajes y selecciona una unidad con .ctuequipo usar ID.',
-  INVALID_TEAM: '🛡️ Usa .ctuequipo para ver tu equipo, .ctuequipo usar ID para elegir una unidad o .ctuequipo limpiar para vaciarlo.',
-  TEAM_FULL: '🛡️ Tu equipo ya tiene una unidad. Usa .ctuequipo usar ID para cambiarla.',
+  INVALID_TEAM: '🛡️ Tu equipo admite de 1 a 3 unidades.\nUsa .ctuequipo usar ID1 ID2 ID3, agregar ID, quitar ID o limpiar.',
+  INVALID_TEAM_ORDER: '🔀 Escribe una vez cada posición actual de tu equipo.\nEjemplo: .ctuequipo ordenar 2 1 3',
+  DUPLICATE_TEAM_UNIT: '🛡️ Esa unidad ya está en el equipo. Cada unidad puede ocupar una sola posición.',
+  TEAM_FULL: '🛡️ Tu equipo ya tiene 3 unidades.\nQuita una con .ctuequipo quitar ID o usa .ctuequipo usar ID1 ID2 ID3.',
   TEAM_LOCKED: '🔒 No puedes cambiar tu equipo durante un combate. Termínalo o usa .cturendirse en el grupo correspondiente.',
   UNIT_NOT_OWNED: '🔒 Esa unidad no te pertenece. Elige una de tu colección con .ctupersonajes.',
   UNIT_NOT_IN_TEAM: '🛡️ Esa unidad no está en tu equipo.',
@@ -128,12 +143,20 @@ export function defineCommand(command, handler) {
 }
 
 export function pageArguments(args) {
-  requireGame(args.length <= 1, 'INVALID_CURSOR');
-  return { cursor: args[0] ?? null, limit: 5 };
+  requireGame(args.length <= 1 && (args.length === 0 || /^\d+$/.test(args[0])), 'INVALID_PAGE');
+  const page = args.length === 0 ? 1 : Number(args[0]);
+  requireGame(Number.isSafeInteger(page) && page >= 1, 'INVALID_PAGE');
+  return { page, limit: 5 };
 }
 
-export function nextPage(page, command, prefix = '.') {
-  return page.nextCursor ? `📄 Siguiente: ${commandText(prefix, command, page.nextCursor)}` : '';
+export function pageNavigation(page, command, prefix = '.', args = '') {
+  if (!page.totalItems) return '';
+  const pageCommand = number => commandText(prefix, command, `${args ? `${args} ` : ''}${number}`);
+  return [
+    `📄 *Página ${page.page} de ${page.totalPages}*`,
+    page.previousPage !== null ? `⬅️ Anterior: *${pageCommand(page.previousPage)}*` : null,
+    page.nextPage !== null ? `➡️ Siguiente: *${pageCommand(page.nextPage)}*` : null
+  ].filter(Boolean).join('\n');
 }
 
 export function marketOperationKey(operation, context, userId) {

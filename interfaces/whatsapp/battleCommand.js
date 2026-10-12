@@ -16,7 +16,7 @@ export function defineBattleCommand(command, kind) {
     const request = { userId: user.id, chatId: context.chatId, operationKey: operationKey(kind, context, user.id) };
     let result;
     if (kind === 'challenge') {
-      requireGame(args.length === 1, 'INVALID_OPPONENT');
+      requireGame(args.length >= 1 && args.length <= 2, 'INVALID_OPPONENT');
       let opponent;
       if (Array.isArray(context.mentions) && context.mentions.length === 1) {
         try { opponent = await game.users.getUserByIdentity({ provider: 'whatsapp', subject: context.mentions[0] }); }
@@ -25,10 +25,15 @@ export function defineBattleCommand(command, kind) {
         requireGame(Array.isArray(context.mentions) && context.mentions.length === 0 && args[0].startsWith('USR-'), 'INVALID_OPPONENT');
         opponent = await game.users.getUser(args[0]);
       }
-      result = await game.battle.challenge({ ...request, opponentId: opponent.id });
+      const mode = args[1]?.toLowerCase() ?? 'auto';
+      requireGame(['auto', 'advanced', 'avanzado', 'classic', 'clasico', 'clásico', '1v1', '2v2', '3v3'].includes(mode), 'INVALID_BATTLE_MODE');
+      result = await game.battle.challenge({ ...request, opponentId: opponent.id, mode: mode === 'clásico' ? 'classic' : mode });
     } else if (kind === 'attack') {
       requireGame(args.length === 1 && ['1', '2'].includes(args[0]), 'INVALID_ATTACK');
       result = await game.battle.attack({ ...request, choice: args[0] });
+    } else if (kind === 'switch') {
+      requireGame(args.length === 1 && ['1', '2', '3'].includes(args[0]), 'INVALID_SWITCH');
+      result = await game.battle.switchUnit({ ...request, choice: args[0] });
     } else {
       requireGame(args.length <= 1, 'INVALID_ARGUMENTS');
       request.battleId = args[0] ?? null;

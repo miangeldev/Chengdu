@@ -1,11 +1,11 @@
-# Modelo de datos — Alpha 0.6 y su evolución
+# Modelo de datos — Alpha 0.7 y su evolución
 
-Estado: contrato implementado hasta 0.6 (esquema 7), basado en `../project.md`.
+Estado: contrato implementado hasta 0.7 (esquema 8), basado en `../project.md`.
 Los mecanismos descritos como futuros aún requieren servicios y migraciones.
 El alcance se divide en [fundación 0.1](mvp-0.1.md), [combate 0.2](mvp-0.2.md),
 [progresión 0.3](mvp-0.3.md), [colección 0.4](alpha-0.4.md),
 [balance 0.4.1](balance-0.4.1.md), [economía 0.5](alpha-0.5.md)
-y [mercado 0.6](alpha-0.6.md).
+y [mercado 0.6](alpha-0.6.md) y [combate avanzado 0.7](alpha-0.7.md).
 
 ## Convenciones y fuentes de verdad
 
@@ -45,13 +45,15 @@ Además, `_database.json` marca la instalación, `_journal.json` coordina un com
 pendiente y `backups/` conserva snapshots coherentes del estado anterior.
 El esquema 7 añade mercado y ventas a las doce colecciones del esquema 6; con el
 manifest, cada snapshot del journal contiene quince archivos.
+El esquema 8 conserva esas catorce colecciones y añade perfiles avanzados a
+personajes y ataques; no crea archivos adicionales ni reescribe partidas anteriores.
 
 Cada colección emplea esta envoltura; el adaptador oculta la envoltura a servicios:
 
 ```json
 {
   "_meta": {
-    "schemaVersion": 7,
+    "schemaVersion": 8,
     "revision": 0,
     "updatedAt": null
   },
@@ -91,7 +93,8 @@ cuentas por coincidencia de nombre. No mostrar `identities` en perfiles público
 Monedas iniciales: 0; bonificaciones posteriores necesitan una operación económica
 auditable. Gemas y monedas adicionales se añadirán mediante migración cuando exista
 una mecánica que las use. `team` inicia vacío y admite referencias ordenadas para
-la futura capacidad de tres unidades; en 0.2 el servicio permite seleccionar una.
+una capacidad de tres unidades. Desde 0.7 el servicio permite seleccionarlas,
+ordenarlas y combatir con todas; en 0.2–0.6 seleccionaba una sola.
 
 ## Plantilla de personaje
 
@@ -304,6 +307,19 @@ locks, los equipos y los participantes históricos deben concordar con esa
 cadena. Las ventas y los anuncios cerrados conservan sus recibos inmutables.
 
 ## Crecimiento y cambio de almacenamiento
+
+Desde 0.6.1, las consultas paginadas admiten `{ page: 2, limit: 5 }`. Devuelven
+`items`, `page`, `totalItems`, `totalPages`, `previousPage` y `nextPage`; un listado
+vacío tiene página 1 con cero entradas. Se rechazan números no enteros, menores
+que 1 o fuera del total. WhatsApp usa esta modalidad en catálogo, colección,
+mercado, historial de combates, movimientos, ventas e historial de propiedad,
+con comandos numéricos y filtros conservados.
+La paginación por número refleja el estado actual de la lista. La API conserva
+la modalidad anterior por cursor y sus ámbitos para consumidores internos que
+necesiten continuar desde una entrada, pero no expone esos tokens en WhatsApp.
+No se admite combinar `page` y `cursor` en una consulta. Ambas modalidades filtran
+los resultados antes de paginar y mantienen el acceso por usuario o unidad.
+Esta mejora no modifica el esquema 7 ni los registros guardados.
 
 Las consultas por usuario se ofrecen paginadas desde 0.1, aunque el adaptador JSON
 todavía tenga que leer todos los registros. Medir tamaño de archivos y tiempos de
@@ -743,3 +759,116 @@ la cadena con validación y backup coherente. Una interrupción preparada se
 revierte y una ya comprometida se completa. La recuperación coordina saldos,
 recibo, anuncio, unidad y evento, para que una venta no publique sólo su pago
 o sólo el cambio de propietario.
+
+## Perfiles de combate avanzado 0.7
+
+`character.combat` contiene `{version: 1, element, ability}`. Los elementos
+son `neutral`, `fire`, `water`, `nature`, `light` y `dark`. La habilidad es
+`null` o `{id, name, description, trigger: "on_enter", effects}`. Cada efecto
+declarado contiene `{type, target: "self"|"enemy", duration, potency}`.
+`attack.combat` contiene `{version: 1, power, accuracy, type, element, effects,
+cooldown}`. Tipos de ataque: `physical` y `magic`; estados: `poison`, `burn`,
+`stun`, `shield`, `regeneration`, `attack_up` y `defense_down`.
+
+Los campos planos clásicos de ataques permanecen intactos. El perfil avanzado
+se aplica sólo al aceptar una partida de reglas 2 o consultar su ficha. La API
+`getCharacterDetails` conserva `attacks` y agrega `advancedAttacks` y `combat`.
+Las unidades no almacenan estados temporales ni modifican stats de nacimiento.
+Contenido detallado y fórmulas están en [Alpha 0.7](alpha-0.7.md).
+
+## Equipos, snapshots y acciones avanzadas
+
+`user.team` admite hasta tres referencias propias distintas y ordenadas. La
+posición inicial es la primera. El mercado puede retirar una unidad publicada
+sin alterar el orden restante. El equipo permanece inalterable durante batalla.
+
+Una partida avanzada agrega al contrato de combate:
+
+```text
+rulesVersion: 2, rewardVersion: 2
+mode: auto|1v1|2v2|3v3, teamSize: 1..3, format: 1v1|2v2|3v3
+players: [{userId, name, units: [snapshot], activeIndex}]
+openingEvents: [event]
+```
+
+Un desafío pendiente tiene `units: []` y `activeIndex: 0`; al aceptar se
+exige que ambos equipos conserven el tamaño solicitado. Se congela el equipo
+completo en orden y se bloquea cada unidad. Las partidas clásicas conservan
+`player.unit`, sus reglas, snapshots y límites.
+
+Cada snapshot avanzado conserva los campos de identidad, propiedad, nivel,
+stats y rasgos anteriores, además de `profileVersion`, `element`, `ability`,
+`effects`, `cooldowns`, `abilityUsed` y `participated`. Cada ataque se guarda
+plano con su perfil congelado y `combatVersion: 1`, sin depender del catálogo
+actual. Los estados runtime son `{type, remaining, potency, sourceUnitId,
+appliedAtTurn}`. `cooldowns` relaciona ID de ataque con turnos propios restantes.
+
+Cada acción avanzada contiene:
+
+```text
+seq, turnNumber, type: attack|switch|skip|surrender
+commandType: attack|switch|surrender, choice
+actorId, targetId, actorUnitId, targetUnitId
+attackId, hit, damage, beforeHp, afterHp
+operationKey, createdAt, roll, events
+```
+
+`commandType` conserva la intención si un estado provoca `type: skip`.
+`choice` conserva el número de ataque o posición solicitada; la tirada 0–99
+pertenece sólo a ataques y es `null` para cambio/rendición. La unidad actor y
+el objetivo corresponden al inicio de la acción, incluso si luego un KO causa
+entrada automática. Los eventos guardan `{type, unitId, sourceUnitId, effect,
+amount, remaining, element, fromIndex, toIndex}` con `null` cuando no aplica.
+Tipos: `ability`, `effect_applied`, `effect_tick`, `effect_expired`,
+`shield_absorbed`, `elemental`, `knockout`, `auto_switch`, `switch` y `stun`.
+
+El validador reproduce apertura y acciones con snapshots y tiradas guardadas;
+exige el mismo HP, efectos, recargas, activo, participación, eventos, turno,
+ganador y cierre. Una transición conserva snapshots e historial previo,
+agrega una acción válida y liga locks/propiedad/equipo. Nuevas reglas o perfiles
+deben mantener los reproductores históricos; no editar una constante de versión 1.
+
+## Recompensas avanzadas y reconstrucción de XP
+
+Las recompensas de versión 2 conservan `id: reward:<battleId>:<userId>`,
+importe, motivo, fecha, saldos y progreso de jugador antes/después. Sustituyen
+la unidad única por:
+
+```text
+unitXp: total de XP del conjunto
+unitRewards: [{unitId, xp, progressBefore, progressAfter}]
+```
+
+Sólo las unidades con `participated: true` reciben una entrada, incluso si
+la XP es cero. El total se divide entre participantes; el sobrante se asigna
+en orden de equipo. Los importes de jugador y monedas conservan las reglas
+0.3, con límite por pareja compartido entre modos. Una reserva sin entrar no
+recibe XP ni estadísticas de victoria/derrota. Al cerrar se liberan todas.
+
+El resumen de settlement mantiene `userId`, `coins`, `userXp`, `unitXp`,
+niveles de jugador y `unitRewards: [{unitId, xp, levelBefore, levelAfter}]`.
+Cada recompensa de jugador conserva exactamente un movimiento `battle_reward`;
+los participantes adicionales no generan movimientos adicionales. La validación
+de XP recorre tanto recibos clásicos como los premios de unidades de versión 2,
+manteniendo baselines y orden histórico. Premios, progreso, estadísticas,
+resultado y locks se publican juntos y permanecen inmutables después del cierre.
+
+## Migración del esquema 7 al 8
+
+Se conservan las catorce colecciones y los quince archivos del snapshot,
+incluido el manifest. Se añaden perfiles avanzados a personajes y ataques
+que carecen de ellos, incrementando sus revisiones de contenido. Las envolturas
+pasan al esquema 8. Catálogos personalizados reciben perfiles neutros compatibles;
+el catálogo conocido obtiene los efectos declarados de su versión.
+
+Los registros de usuarios, unidades, estado, emisiones/transferencias, combates,
+recompensas, sobres, aperturas, economía, diarios, anuncios y ventas no se
+reescriben. Las partidas pendientes, activas y cerradas de reglas 1 continúan
+como antes; no se convierten a 3v3 ni generan premios retroactivos. Un balance
+futuro requiere una migración explícita distinta de estos perfiles.
+
+El arranque recupera journals anteriores antes de migrar. Se valida esquema 7
+y luego 8; las imágenes anteriores/nuevas y el backup se coordinan con el
+marcador durable. Una migración preparada se revierte y una comprometida se
+completa. La misma recuperación protege el cierre avanzado y sus múltiples
+premios de unidades sin publicar una parte de sus cambios.

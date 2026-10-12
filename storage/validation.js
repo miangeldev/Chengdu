@@ -7,6 +7,7 @@ import { SUPPLY_BY_RARITY } from '../game/characters/balance.js';
 import { validateEconomyData, validateEconomyTransition } from './economyValidation.js';
 import { validateMarketData, validateMarketTransition } from './marketValidation.js';
 import { validateOwnershipData, validateOwnershipTransition } from './ownershipValidation.js';
+import { advancedAttack, validateCombatProfile } from '../game/battle/combatContent.js';
 
 export const V1_COLLECTIONS = Object.freeze(['usuarios', 'personajes', 'unidades', 'estado', 'eventos']);
 export const V2_COLLECTIONS = Object.freeze([...V1_COLLECTIONS, 'ataques', 'combates']);
@@ -15,7 +16,7 @@ export const V4_COLLECTIONS = Object.freeze([...V3_COLLECTIONS, 'sobres', 'apert
 export const V5_COLLECTIONS = V4_COLLECTIONS;
 export const V6_COLLECTIONS = Object.freeze([...V5_COLLECTIONS, 'diarios']);
 export const COLLECTIONS = Object.freeze([...V6_COLLECTIONS, 'mercado', 'ventas']);
-export const SCHEMA_VERSION = 7;
+export const SCHEMA_VERSION = 8;
 const integer = (v, minimum = 0) => Number.isSafeInteger(v) && v >= minimum;
 const text = v => typeof v === 'string' && v.length > 0 && v.length <= 200;
 const date = v => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(v) && Number.isFinite(Date.parse(v));
@@ -44,7 +45,7 @@ function progress(value) {
 
 export function validateDatabase(state, schemaVersion = SCHEMA_VERSION) {
   try {
-    requireGame([1, 2, 3, 4, 5, 6, 7].includes(schemaVersion), 'UNSUPPORTED_SCHEMA_VERSION');
+    requireGame([1, 2, 3, 4, 5, 6, 7, 8].includes(schemaVersion), 'UNSUPPORTED_SCHEMA_VERSION');
     for (const name of schemaVersion === 1 ? V1_COLLECTIONS : schemaVersion === 2 ? V2_COLLECTIONS : schemaVersion === 3 ? V3_COLLECTIONS : schemaVersion < 6 ? V5_COLLECTIONS : schemaVersion === 6 ? V6_COLLECTIONS : COLLECTIONS) {
       const collection = state[name];
       check(collection && typeof collection._meta === 'object', name);
@@ -97,6 +98,11 @@ export function validateDatabase(state, schemaVersion = SCHEMA_VERSION) {
       check(typeof c.obtainable === 'boolean' && typeof c.starterEligible === 'boolean', 'character.availability');
       check(c.supply?.type === 'unlimited' ? c.supply.max === null : c.supply?.type === 'limited' && integer(c.supply.max, 1), 'character.supply');
       if (schemaVersion >= 5) check(c.supply.type === 'limited' && c.supply.max <= SUPPLY_BY_RARITY[c.rarity], 'character.supplyTier');
+      if (schemaVersion >= 8) {
+        check(validateCombatProfile(c.combat), 'character.combat');
+        const basic = state.ataques.records.find(attack => attack.id === c.attackIds[0]);
+        check(basic && advancedAttack(basic).cooldown === 0, 'character.basicAttackAvailable');
+      }
     }
     unique(units, r => `${r.characterId}:${r.serial}`, 'unit.serial');
     for (const u of units) {

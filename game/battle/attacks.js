@@ -1,3 +1,5 @@
+import { attackCombatProfile } from './combatContent.js';
+
 const names = {
   panda_guerrero: ['Golpe de Bambú', 'Impacto del Panda'],
   mago_carmesi: ['Chispa Carmesí', 'Llamarada'],
@@ -16,6 +18,7 @@ export function characterAttackIds(characterId) {
 export function seedAttacks() {
   return Object.entries({ general: ['Golpe Básico', 'Golpe Potente'], ...names }).flatMap(([characterId, labels]) => labels.map((name, i) => ({
     id: characterId === 'general' ? ['golpe_basico', 'golpe_potente'][i] : `${characterId}_${i + 1}`,
-    revision: 1, name, power: i === 0 ? 25 : 40, accuracy: i === 0 ? 100 : 80, type: 'physical'
+    revision: 1, name, power: i === 0 ? 25 : 40, accuracy: i === 0 ? 100 : 80, type: 'physical',
+    combat: attackCombatProfile(characterId === 'general' ? ['golpe_basico', 'golpe_potente'][i] : `${characterId}_${i + 1}`)
   })));
 }

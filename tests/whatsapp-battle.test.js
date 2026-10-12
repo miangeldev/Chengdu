@@ -25,7 +25,7 @@ test('WhatsApp team → mentioned challenge → accept → fight completes with 
   await send(a, '.ctuequipo usar PAND-000001');
   await send(b, '.ctuequipo usar LOBO-000001');
   const battleStart = replies.length;
-  await send(a, '.ctupelea @Juan', [b]);
+  await send(a, '.ctupelea @Juan clasico', [b]);
   assert.match(replies.at(-1).text, /CHENGDÚ CARDS \| DESAFÍO/);
   await send(b, '.ctuaceptar');
   assert.match(replies.at(-1).text, /INICIO \| T1/);
@@ -75,14 +75,14 @@ test('combat ficha shows precision before choosing and preserves frozen attacks 
   assert.match(reply, /Panda Guerrero/);
   assert.match(reply, /Defensa: 23/);
   assert.match(reply, /Precisión: 100%/);
-  assert.match(reply, /Precisión: 80%/);
+  assert.match(reply, /Precisión: 85%/);
   assert.doesNotMatch(reply, /Lobo Sombrío/);
   await game.battle.challenge({ userId: a.id, opponentId: b.id, chatId: group });
   const { battle } = await game.battle.accept({ userId: b.id, chatId: group });
   const attackId = battle.players[0].unit.attacks[1].id;
   await storage.withTransaction(async repos => {
     const attack = await repos.attacks.get(attackId);
-    await repos.attacks.replace({ ...attack, power: 250, accuracy: 17, revision: attack.revision + 1 });
+    await repos.attacks.replace({ ...attack, power: 250, accuracy: 17, combat: { ...attack.combat, power: 250, accuracy: 17 }, revision: attack.revision + 1 });
   });
   await route(sock, msg, '.ctuficha');
   assert.match(reply, /Lobo Sombrío/);
@@ -173,6 +173,6 @@ test('help, error instructions and pagination keep the configured prefix', async
     await game.units.createUnit({ ownerId: user.id, characterId: 'panda_guerrero', origin: { type: 'admin', sourceId: 'test' }, operationKey: `page:${i}` });
   }
   await route(sock, msg, '!ctupersonajes');
-  assert.match(replies.at(-1), /!ctupersonajes [A-Za-z0-9_-]+/);
+  assert.match(replies.at(-1), /Siguiente: \*!ctupersonajes 2\*/);
   assert.ok(!replies.at(-1).includes('.ctu'));
 });

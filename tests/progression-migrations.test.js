@@ -62,7 +62,7 @@ async function v2Fixture(t, active = true) {
 test('schema 2 migration preserves opening balances, XP, levels, birth identities and frozen active fights without retroactive rewards', async t => {
   const c = await v2Fixture(t);
   const game = c.open().game;
-  assert.equal((await game.validateDatabase()).schemaVersion, 7);
+  assert.equal((await game.validateDatabase()).schemaVersion, 8);
   const user = await game.users.getUser(c.a.id);
   assert.deepEqual(user.progress, { level: 3, xp: 80 });
   assert.equal(user.economy.coins, 555);
@@ -98,7 +98,7 @@ for (const stage of ['prepared', 'committed', 'published:estado.json', 'publishe
     await assert.rejects(failed.validateDatabase(), { code: 'STORAGE_WRITE_FAILED' });
     await failed.close();
     const game = c.open().game;
-    assert.equal((await game.validateDatabase()).schemaVersion, 7);
+    assert.equal((await game.validateDatabase()).schemaVersion, 8);
     assert.equal((await game.economy.getBalance(c.a.id)).coins, 555);
     assert.deepEqual(readRecords(c.directory, 'recompensas'), []);
     assert.equal((await game.battle.getMyBattle({ userId: c.a.id, chatId: c.chatId })).players[0].unit.stats.hp, 120);
@@ -119,7 +119,7 @@ for (const phase of ['prepared', 'committed']) {
     if (phase === 'committed') fs.writeFileSync(path.join(c.directory, 'usuarios.json'), after['usuarios.json']);
     const game = c.open().game;
     assert.equal((await game.economy.getBalance(c.a.id)).coins, phase === 'committed' ? 777 : 555);
-    assert.equal((await game.validateDatabase()).schemaVersion, 7);
+    assert.equal((await game.validateDatabase()).schemaVersion, 8);
     assert.deepEqual(readRecords(c.directory, 'recompensas'), []);
   });
 }

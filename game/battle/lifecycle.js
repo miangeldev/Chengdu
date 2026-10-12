@@ -1,5 +1,6 @@
 import { requireGame } from '../../utils/GameError.js';
 import { rewardBattle } from '../rewards/battleRewards.js';
+import { battleUnits } from './advancedEngine.js';
 
 export const isOpenBattle = battle => ['pending', 'active'].includes(battle.status);
 
@@ -13,17 +14,21 @@ export async function settleBattle(repos, battle, now) {
   if (battle.acceptedAt !== null) {
     for (const player of battle.players) {
       const user = await repos.users.get(player.userId);
-      const unit = await repos.units.get(player.unit.id);
-      requireGame(unit.lock?.referenceId === battle.id, 'DATABASE_CORRUPT');
       let userStats = increment(user.battleStats, 'matches');
-      let unitStats = unit.battleStats;
       if (battle.winnerId !== null) {
         const field = battle.winnerId === player.userId ? 'wins' : 'losses';
         userStats = increment(userStats, field);
-        unitStats = increment(unitStats, field);
       }
       await repos.users.replace({ ...user, battleStats: userStats, updatedAt: now });
-      await repos.units.replace({ ...unit, lock: null, battleStats: unitStats, updatedAt: now });
+      for (const snapshot of battleUnits(player)) {
+        const unit = await repos.units.get(snapshot.id);
+        requireGame(unit.lock?.type === 'battle' && unit.lock.referenceId === battle.id, 'DATABASE_CORRUPT');
+        let unitStats = unit.battleStats;
+        if (battle.winnerId !== null && (battle.rulesVersion === 1 || snapshot.participated)) {
+          unitStats = increment(unitStats, battle.winnerId === player.userId ? 'wins' : 'losses');
+        }
+        await repos.units.replace({ ...unit, lock: null, battleStats: unitStats, updatedAt: now });
+      }
     }
     await rewardBattle(repos, battle, now);
   }

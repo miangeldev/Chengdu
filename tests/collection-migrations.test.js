@@ -61,7 +61,7 @@ async function v3Fixture(t) {
 test('schema 3 collection migration preserves balances, rewards, identities, legacy traits and frozen battles', async t => {
   const c = await v3Fixture(t);
   const game = c.open().game;
-  assert.equal((await game.validateDatabase()).schemaVersion, 7);
+  assert.equal((await game.validateDatabase()).schemaVersion, 8);
   assert.equal((await game.economy.getBalance(c.a.id)).coins, 555);
   const unit = await game.units.getUnit(c.ua.id);
   assert.equal(unit.traitVersion, 0);
@@ -91,7 +91,7 @@ for (const stage of ['prepared', 'committed', 'published:unidades.json', 'publis
     await assert.rejects(failed.validateDatabase(), { code: 'STORAGE_WRITE_FAILED' });
     await failed.close();
     const game = c.open().game;
-    assert.equal((await game.validateDatabase()).schemaVersion, 7);
+    assert.equal((await game.validateDatabase()).schemaVersion, 8);
     assert.equal((await game.economy.getBalance(c.a.id)).coins, 555);
     assert.equal(readRecords(c.directory, 'economia').length, 2);
     assert.deepEqual(readRecords(c.directory, 'combates'), JSON.parse(c.raw['combates.json']).records);
@@ -119,7 +119,7 @@ for (const phase of ['prepared', 'committed']) {
     if (phase === 'committed') fs.writeFileSync(path.join(c.directory, 'usuarios.json'), after['usuarios.json']);
     const game = c.open().game;
     assert.equal((await game.economy.getBalance(c.a.id)).coins, phase === 'committed' ? 777 : 555);
-    assert.equal((await game.validateDatabase()).schemaVersion, 7);
+    assert.equal((await game.validateDatabase()).schemaVersion, 8);
     assert.equal(readRecords(c.directory, 'economia')[0].balanceBefore, phase === 'committed' ? 657 : 435);
   });
 }

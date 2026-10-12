@@ -44,14 +44,14 @@ test('direct plugin run exports share one database and complete the game flow', 
     await run('ctuequipo', alice, ['usar', 'PAND-000001']);
     await run('ctuequipo', bob, ['usar', 'LOBO-000001']);
     await run('ctuficha');
-    await run('ctupelea', alice, ['@Bob'], [bob]);
+    await run('ctupelea', alice, ['@Bob', 'clasico'], [bob]);
     await run('ctuaceptar', bob);
     await run('ctucombate');
     await run('ctuatacar', bob, ['1']);
     await run('cturendirse');
-    await run('ctupelea', alice, ['@Bob'], [bob]);
+    await run('ctupelea', alice, ['@Bob', 'clasico'], [bob]);
     await run('cturechazar', bob);
-    await run('ctupelea', alice, ['@Bob'], [bob]);
+    await run('ctupelea', alice, ['@Bob', 'clasico'], [bob]);
     await run('ctucancelar');
     await run('ctubalance');
     await run('ctudiario');
@@ -71,11 +71,21 @@ test('direct plugin run exports share one database and complete the game flow', 
     await run('ctuvender', bob, ['PAND-000001', '20']);
     const resale = (await game.market.listListings()).items[0];
     await run('cturetirar', bob, [resale.id]);
+    const seller = await game.users.getUserByIdentity({ provider: 'whatsapp', subject: alice });
+    const team = [];
+    for (const characterId of ['monje_celestial', 'mago_carmesi']) team.push(await game.units.createUnit({ ownerId: seller.id, characterId,
+      origin: { type: 'admin', sourceId: 'plugin-loader-test' }, operationKey: `loader:${characterId}` }));
+    await run('ctuequipo', alice, ['usar', ...team.map(unit => unit.id)]);
+    await run('ctuequipo', bob, ['usar', 'LOBO-000001', 'PAND-000001']);
+    await run('ctupelea', alice, ['@Bob', '2v2'], [bob]);
+    await run('ctuaceptar', bob);
+    await run('ctucambiar', bob, ['2']);
+    await run('cturendirse', alice);
     assert.deepEqual(await game.validateDatabase(), {
-      valid: true, schemaVersion: 7, users: 2, characters: 8, units: 2, claims: 2
+      valid: true, schemaVersion: 8, users: 2, characters: 8, units: 4, claims: 2
     });
-    assert.equal(replies.length, 39);
-    assert.equal(commands.length, 29);
+    assert.equal(replies.length, 45);
+    assert.equal(commands.length, 30);
   } finally {
     await game.close();
   }

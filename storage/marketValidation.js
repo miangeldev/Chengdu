@@ -2,6 +2,7 @@ import { requireGame } from '../utils/GameError.js';
 import { effectiveStats, safeAdd } from '../game/progression/rules.js';
 import { MARKET_POLICY_VERSION, marketPolicy, marketExpiresAt, quoteMarket } from '../game/market/policy.js';
 import { ownershipAt } from '../game/units/ownership.js';
+import { battleUnits } from '../game/battle/advancedEngine.js';
 
 const check = (value, field) => requireGame(value, 'DATABASE_CORRUPT', { field });
 const equal = (a, b) => JSON.stringify(a) === JSON.stringify(b);
@@ -40,7 +41,7 @@ function validNextLock(after, unit, closedAt) {
   }
   if (unit?.lock?.type === 'battle') {
     const next = after.combates.records.find(b => b.id === unit.lock.referenceId);
-    return next?.status === 'active' && next.acceptedAt === closedAt && next.players.some(p => p.unit?.id === unit.id);
+    return next?.status === 'active' && next.acceptedAt === closedAt && next.players.some(p => battleUnits(p).some(snapshot => snapshot.id === unit.id));
   }
   return false;
 }

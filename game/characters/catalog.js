@@ -1,5 +1,6 @@
 import { characterAttackIds } from '../battle/attacks.js';
 import { BALANCED_STATS, SUPPLY_BY_RARITY } from './balance.js';
+import { combatProfile } from '../battle/combatContent.js';
 
 const definitions = [
   ['panda_guerrero', 'PAND', 'Panda Guerrero', 'common', 'tank', true],
@@ -20,7 +21,8 @@ export function seedCharacters() {
     statVariation: { hp: 0, attack: 0, defense: 0, speed: 0 },
     attackIds: characterAttackIds(id),
     supply: { type: 'limited', max: SUPPLY_BY_RARITY[rarity] },
-    obtainable: true, starterEligible
+    obtainable: true, starterEligible,
+    combat: combatProfile(id)
   }));
 }
 

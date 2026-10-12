@@ -22,17 +22,17 @@ async function start(context) {
 test('team selection validates ownership and adds/removes atomically', async t => {
   const c = await prepare(t);
   await assert.rejects(c.game.teams.setTeam({ userId: c.a.id, unitIds: [c.ub.id] }), { code: 'UNIT_NOT_OWNED' });
-  await assert.rejects(c.game.teams.setTeam({ userId: c.a.id, unitIds: [c.ua.id, c.ub.id] }), { code: 'INVALID_TEAM' });
+  await assert.rejects(c.game.teams.setTeam({ userId: c.a.id, unitIds: [c.ua.id, c.ub.id] }), { code: 'UNIT_NOT_OWNED' });
   const extra = await c.game.units.createUnit({ ownerId: c.a.id, characterId: 'mago_carmesi', origin: { type: 'admin', sourceId: 'test' }, operationKey: 'extra:1' });
   await c.game.teams.setTeam({ userId: c.a.id, unitIds: [] });
   const results = await Promise.allSettled([
     c.game.teams.updateTeam({ userId: c.a.id, operation: 'add', unitId: c.ua.id }),
     c.game.teams.updateTeam({ userId: c.a.id, operation: 'add', unitId: extra.id })
   ]);
-  assert.equal(results.filter(r => r.status === 'fulfilled').length, 1);
-  assert.equal(results.find(r => r.status === 'rejected').reason.code, 'TEAM_FULL');
+  assert.equal(results.filter(r => r.status === 'fulfilled').length, 2);
+  assert.deepEqual((await c.game.teams.getTeam(c.a.id)).units.map(unit => unit.id), [c.ua.id, extra.id]);
   await c.game.teams.updateTeam({ userId: c.a.id, operation: 'remove', unitId: c.ua.id });
-  assert.equal((await c.game.teams.getTeam(c.a.id)).units.length, 0);
+  assert.deepEqual((await c.game.teams.getTeam(c.a.id)).units.map(unit => unit.id), [extra.id]);
 });
 
 test('challenges require prepared distinct players and only the recipient can accept', async t => {

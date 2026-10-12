@@ -1,6 +1,6 @@
 import { requireGame } from '../utils/GameError.js';
 import { effectiveStats, grantXp, safeAdd } from '../game/progression/rules.js';
-import { rewardAmounts, rewardDecision, rewardSummary } from '../game/rewards/battlePolicy.js';
+import { advancedUnitRewards, rewardAmounts, rewardDecision, rewardSummary } from '../game/rewards/battlePolicy.js';
 
 const check = (value, field) => requireGame(value, 'DATABASE_CORRUPT', { field });
 const equal = (a, b) => JSON.stringify(a) === JSON.stringify(b);
@@ -38,8 +38,10 @@ export function validateProgressionData(state, schemaVersion = 5) {
   for (const reward of state.recompensas.records) {
     const battle = battles.get(reward.battleId);
     const player = battle?.players.find(p => p.userId === reward.userId);
-    check(battle && battle.rewardVersion === 1 && battle.acceptedAt !== null && !['pending', 'active'].includes(battle.status) &&
-      player?.unit?.id === reward.unitId && reward.id === `reward:${battle.id}:${reward.userId}` && reward.version === 1 && reward.createdAt === battle.finishedAt, 'reward.references');
+    check(battle && [1, 2].includes(battle.rewardVersion) && (schemaVersion >= 8 || battle.rewardVersion === 1) &&
+      battle.acceptedAt !== null && !['pending', 'active'].includes(battle.status) && player &&
+      (battle.rewardVersion === 1 ? player.unit?.id === reward.unitId : battle.rulesVersion === 2) &&
+      reward.id === `reward:${battle.id}:${reward.userId}` && reward.version === battle.rewardVersion && reward.createdAt === battle.finishedAt, 'reward.references');
     let entries = byBattle.get(battle.id);
     if (!entries) {
       entries = [];
@@ -60,21 +62,33 @@ export function validateProgressionData(state, schemaVersion = 5) {
     }
     check(equal(reward.userProgressBefore, userProgress.get(reward.userId)) &&
       equal(reward.userProgressAfter, grantXp(reward.userProgressBefore, reward.userXp, 'user')), 'reward.userProgress');
-    check(equal(reward.unitProgressBefore, unitProgress.get(reward.unitId)) &&
-      equal(reward.unitProgressAfter, grantXp(reward.unitProgressBefore, reward.unitXp, 'unit')), 'reward.unitProgress');
+    if (reward.version === 2) {
+      check(Array.isArray(reward.unitRewards) && equal(reward.unitRewards.map(entry => ({ unitId: entry.unitId, xp: entry.xp })),
+        advancedUnitRewards(player, reward.unitXp)), 'reward.unitShares');
+      for (const entry of reward.unitRewards) {
+        check(units.has(entry.unitId) && equal(entry.progressBefore, unitProgress.get(entry.unitId)) &&
+          equal(entry.progressAfter, grantXp(entry.progressBefore, entry.xp, 'unit')), 'reward.unitProgress');
+        unitProgress.set(entry.unitId, entry.progressAfter);
+      }
+      check(!Object.hasOwn(reward, 'unitId') && !Object.hasOwn(reward, 'unitProgressBefore') && !Object.hasOwn(reward, 'unitProgressAfter'), 'reward.advancedShape');
+    } else {
+      check(equal(reward.unitProgressBefore, unitProgress.get(reward.unitId)) &&
+        equal(reward.unitProgressAfter, grantXp(reward.unitProgressBefore, reward.unitXp, 'unit')), 'reward.unitProgress');
+      unitProgress.set(reward.unitId, reward.unitProgressAfter);
+    }
     balances.set(reward.userId, reward.balanceAfter);
     userProgress.set(reward.userId, reward.userProgressAfter);
-    unitProgress.set(reward.unitId, reward.unitProgressAfter);
     entries.push(reward);
   }
   for (const battle of battles.values()) {
-    check([0, 1].includes(battle.rewardVersion), 'reward.battleVersion');
+    check((schemaVersion >= 8 ? [0, 1, 2] : [0, 1]).includes(battle.rewardVersion) &&
+      (battle.rulesVersion !== 2 || battle.rewardVersion === 2), 'reward.battleVersion');
     check(battle.rewardVersion !== 0 || !['pending', 'active'].includes(battle.status), 'reward.legacyClosed');
     const entries = byBattle.get(battle.id) ?? [];
-    const settled = battle.rewardVersion === 1 && battle.acceptedAt !== null && !['pending', 'active'].includes(battle.status);
+    const settled = [1, 2].includes(battle.rewardVersion) && battle.acceptedAt !== null && !['pending', 'active'].includes(battle.status);
     if (!settled) check(battle.settlement === null && entries.length === 0, 'reward.noSettlement');
     else check(entries.length === 2 && equal(battle.settlement, {
-      version: 1, reason: entries[0].reason, createdAt: battle.finishedAt,
+      version: battle.rewardVersion, reason: entries[0].reason, createdAt: battle.finishedAt,
       rewards: battle.players.map(p => rewardSummary(entries.find(r => r.userId === p.userId)))
     }), 'reward.settlement');
   }

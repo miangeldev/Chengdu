@@ -108,14 +108,23 @@ Saldo tras ese reclamo: *100 ChengCoins*
 ❤️ Vida: 120/120 HP
 ⚔️ Ataque: 25 · 🛡️ Defensa: 23 · 💨 Velocidad: 8
 
+🌿 Naturaleza
+✨ *Piel de Bambú*
+Al entrar por primera vez obtiene un escudo de 12 puntos durante 2 turnos propios.
+
 1️⃣ *Golpe de Bambú* · Físico
 Potencia: 25 POT · Precisión: 100%
+🌿 Naturaleza · Sin recarga
 
 2️⃣ *Impacto del Panda* · Físico
-Potencia: 40 POT · Precisión: 80%
+Potencia: 36 POT · Precisión: 85%
+🌿 Naturaleza · Recarga: 2 turnos propios
+🛡️ Escudo 12 puntos · 2 turnos propios
 
-💡 Daño: potencia + ataque − defensa (mín. 1).
-Fallar consume el turno.
+💡 Daño base: potencia + ataque − defensa; después se aplican efectos y elemento.
+🔥 Fuego → 🌿 Naturaleza → 💧 Agua → 🔥 Fuego
+☀️ Luz ↔ 🌙 Oscuridad · Ventaja +25%; resistencia −20%.
+Fallar y cambiar consumen el turno. Los efectos avanzan sólo mientras la unidad está activa.
 ```
 
 ## Starter reclamado
@@ -158,6 +167,7 @@ Fallar consume el turno.
 ⚪ Común · ✅ Disponible
 ↳ .ctuequipo usar PAND-000001
 
+📄 *Página 1 de 1*
 🔎 Detalles: .ctuficha ID
 ```
 
@@ -209,10 +219,12 @@ Fallar consume el turno.
 ⚪ Común · Velocista · 🎁 Starter
 ↳ .ctuficha lobo_sombrio
 
-📄 Siguiente: .ctucatalogo eyJzY29wZSI6ImNhdGFsb2ciLCJrZXkiOlsiIiwibG9ib19zb21icmlvIl19
+📄 *Página 1 de 2*
+➡️ Siguiente: *.ctucatalogo 2*
+🎁 Elegir starter: .ctustarter
 ```
 
-## Catálogo: siguiente página
+## Catálogo: siguiente página con un número corto
 
 ```text
 🃏 *CHENGDÚ CARDS | CATÁLOGO*
@@ -229,6 +241,38 @@ Fallar consume el turno.
 ⚪ Común · Tanque · 🎁 Starter
 ↳ .ctuficha panda_guerrero
 
+📄 *Página 2 de 2*
+⬅️ Anterior: *.ctucatalogo 1*
+🎁 Elegir starter: .ctustarter
+```
+
+## Catálogo: volver a la primera página
+
+```text
+🃏 *CHENGDÚ CARDS | CATÁLOGO*
+━━━━━━━━━━━━━━
+🌙 *Bruja Lunar*
+🟣 Épico · Control
+↳ .ctuficha bruja_lunar
+
+🐉 *Dragón Carmesí*
+🟡 Legendario · Atacante
+↳ .ctuficha dragon_carmesi
+
+🎋 *Espíritu Bambú*
+🟣 Épico · Soporte
+↳ .ctuficha espiritu_bambu
+
+🛡️ *Guardián Jade*
+🔵 Raro · Tanque
+↳ .ctuficha guardian_jade
+
+🐺 *Lobo Sombrío*
+⚪ Común · Velocista · 🎁 Starter
+↳ .ctuficha lobo_sombrio
+
+📄 *Página 1 de 2*
+➡️ Siguiente: *.ctucatalogo 2*
 🎁 Elegir starter: .ctustarter
 ```
 
@@ -245,7 +289,7 @@ Fallar consume el turno.
 .ctuperfil · Tu progreso
 .ctupersonajes · Elegir unidad
 .ctucatalogo · Ver personajes
-.ctuficha [ID o personaje] · Stats y precisión
+.ctuficha [ID o personaje] · Stats, precisión, elemento y pasiva
 .ctuunidad ID · Propietario y procedencia
 
 🎁 *Sobres*
@@ -268,8 +312,10 @@ Fallar consume el turno.
 .ctupropiedad ID · Historia de propietarios
 
 🛡️ *Equipo*
-.ctuequipo · Ver equipo
-.ctuequipo usar ID · Seleccionar
+.ctuequipo · Ver 1 a 3 unidades
+.ctuequipo usar ID1 ID2 ID3 · Seleccionar en orden
+.ctuequipo agregar ID / .ctuequipo quitar ID
+.ctuequipo ordenar 2 1 3 · Cambiar quien abre
 .ctuequipo limpiar · Vaciar
 
 ✨ *Progreso*
@@ -277,11 +323,19 @@ Fallar consume el turno.
 .ctuhistorial · Tus partidas
 .ctuhistorial ID · Turnos y recompensa
 
+📄 *Páginas*
+.ctucatalogo 2 · Ir a la página 2
+.ctumercado raro 2 · Página 2 del filtro
+Los listados muestran Anterior y Siguiente.
+
 ⚔️ *Combate en grupo*
-.ctupelea @jugador · Desafiar
+.ctupelea @jugador · Mismo tamaño de equipos
+.ctupelea @jugador 3v3 · 1v1, 2v2 o 3v3
+.ctupelea @jugador clasico · Reglas originales
 .ctuaceptar / .cturechazar · Responder
 .ctucancelar · Retirar desafío
 .ctuatacar 1 / .ctuatacar 2 · Atacar
+.ctucambiar 2 · Entrar con reserva; consume turno
 .ctucombate · Ver turno
 .cturendirse · Rendirse
 ```
@@ -291,13 +345,16 @@ Fallar consume el turno.
 ```text
 🃏 *CHENGDÚ CARDS | EQUIPO*
 ━━━━━━━━━━━━━━
-🛡️ *Miguel*
+🛡️ *Miguel* · 1/3 unidades
 
-🐼 *Panda Guerrero* · Nv. 1
+1️⃣ 🐼 *Panda Guerrero* · Nv. 1
+⚔️ Abre el combate
+
 ✅ Listo para combatir
 
 👉 *.ctupelea @jugador*
 🔎 Stats y ataques: .ctuficha
+🔀 Orden: .ctuequipo ordenar 1
 ```
 
 ## Ficha del equipo: precisión y estadísticas
@@ -311,14 +368,23 @@ Fallar consume el turno.
 ❤️ Vida: 120/120 HP
 ⚔️ Ataque: 25 · 🛡️ Defensa: 23 · 💨 Velocidad: 8
 
+🌿 Naturaleza
+✨ *Piel de Bambú*
+Al entrar por primera vez obtiene un escudo de 12 puntos durante 2 turnos propios.
+
 1️⃣ *Golpe de Bambú* · Físico
 Potencia: 25 POT · Precisión: 100%
+🌿 Naturaleza · Sin recarga
 
 2️⃣ *Impacto del Panda* · Físico
-Potencia: 40 POT · Precisión: 80%
+Potencia: 36 POT · Precisión: 85%
+🌿 Naturaleza · Recarga: 2 turnos propios
+🛡️ Escudo 12 puntos · 2 turnos propios
 
-💡 Daño: potencia + ataque − defensa (mín. 1).
-Fallar consume el turno.
+💡 Daño base: potencia + ataque − defensa; después se aplican efectos y elemento.
+🔥 Fuego → 🌿 Naturaleza → 💧 Agua → 🔥 Fuego
+☀️ Luz ↔ 🌙 Oscuridad · Ventaja +25%; resistencia −20%.
+Fallar y cambiar consumen el turno. Los efectos avanzan sólo mientras la unidad está activa.
 ```
 
 ## Desafío
@@ -555,20 +621,21 @@ Lukas: +15 XP
 🃏 *CHENGDÚ CARDS | HISTORIAL*
 ━━━━━━━━━━━━━━
 🏆 Victoria vs *Lukas*
-📅 11 de octubre de 2026 · 4 turnos
+📅 11 de octubre de 2026 · 1v1 clásico · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-68c1fd68-0cde-4359-aebd-8682640600dc
+🔎 .ctuhistorial BTL-32a531a1-8689-41ab-aaf0-0bd4c7251631
 
 🏆 Victoria vs *Lukas*
-📅 11 de octubre de 2026 · 4 turnos
+📅 11 de octubre de 2026 · 1v1 clásico · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-803639db-c072-4db6-8ee3-db9bb5624290
+🔎 .ctuhistorial BTL-a1979aa6-05fb-49a9-be9b-c1f52bc70cf3
 
 🏆 Victoria vs *Lukas*
-📅 11 de octubre de 2026 · 4 turnos
+📅 11 de octubre de 2026 · 1v1 clásico · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-bde89dfc-21bf-4bdc-87ef-0082186c44e2
+🔎 .ctuhistorial BTL-da504c2a-9af0-4178-aff2-188bae1bc5a0
 
+📄 *Página 1 de 1*
 👉 Tu saldo: *.ctubalance*
 ```
 
@@ -577,7 +644,7 @@ Lukas: +15 XP
 ```text
 🃏 *CHENGDÚ CARDS | PARTIDA*
 ━━━━━━━━━━━━━━
-🏆 Victoria · 11 de octubre de 2026
+🏆 Victoria · 1v1 clásico · 11 de octubre de 2026
 Miguel · Panda Guerrero · Niv. 1
 Lukas · Lobo Sombrío · Niv. 1
 
@@ -616,14 +683,23 @@ Lukas: +15 XP
 ❤️ Vida: 122/122 HP
 ⚔️ Ataque: 25 · 🛡️ Defensa: 23 · 💨 Velocidad: 8
 
+🌿 Naturaleza
+✨ *Piel de Bambú*
+Al entrar por primera vez obtiene un escudo de 12 puntos durante 2 turnos propios.
+
 1️⃣ *Golpe de Bambú* · Físico
 Potencia: 25 POT · Precisión: 100%
+🌿 Naturaleza · Sin recarga
 
 2️⃣ *Impacto del Panda* · Físico
-Potencia: 40 POT · Precisión: 80%
+Potencia: 36 POT · Precisión: 85%
+🌿 Naturaleza · Recarga: 2 turnos propios
+🛡️ Escudo 12 puntos · 2 turnos propios
 
-💡 Daño: potencia + ataque − defensa (mín. 1).
-Fallar consume el turno.
+💡 Daño base: potencia + ataque − defensa; después se aplican efectos y elemento.
+🔥 Fuego → 🌿 Naturaleza → 💧 Agua → 🔥 Fuego
+☀️ Luz ↔ 🌙 Oscuridad · Ventaja +25%; resistencia −20%.
+Fallar y cambiar consumen el turno. Los efectos avanzan sólo mientras la unidad está activa.
 ```
 
 ## Victoria después de alcanzar el límite de recompensas por rival
@@ -711,6 +787,7 @@ Saldo restante: *300 ChengCoins*
 🟡 Legendario · 🧬 2 rasgos · ✅ Disponible
 ↳ .ctuequipo usar DRGC-000001
 
+📄 *Página 1 de 1*
 🔎 Detalles: .ctuficha ID
 ```
 
@@ -750,14 +827,23 @@ Saldo restante: *300 ChengCoins*
 ❤️ Vida: 124/124 HP
 ⚔️ Ataque: 36 · 🛡️ Defensa: 23 · 💨 Velocidad: 12
 
+🔥 Fuego
+✨ *Ascua Ancestral*
+Al entrar por primera vez aumenta su ataque un 10% durante 2 turnos propios.
+
 1️⃣ *Garra del Dragón* · Físico
 Potencia: 25 POT · Precisión: 100%
+🔥 Fuego · Sin recarga
 
 2️⃣ *Aliento Carmesí* · Físico
-Potencia: 40 POT · Precisión: 80%
+Potencia: 38 POT · Precisión: 80%
+🔥 Fuego · Recarga: 2 turnos propios
+🔥 Quemadura 4% · 2 turnos propios del rival
 
-💡 Daño: potencia + ataque − defensa (mín. 1).
-Fallar consume el turno.
+💡 Daño base: potencia + ataque − defensa; después se aplican efectos y elemento.
+🔥 Fuego → 🌿 Naturaleza → 💧 Agua → 🔥 Fuego
+☀️ Luz ↔ 🌙 Oscuridad · Ventaja +25%; resistencia −20%.
+Fallar y cambiar consumen el turno. Los efectos avanzan sólo mientras la unidad está activa.
 ```
 
 ## Repetir el mismo mensaje: recibo original, sin otro cobro
@@ -839,7 +925,9 @@ Saldo tras ese reclamo: *100 ChengCoins*
 📥 *+0 ChengCoins* · 🏆 Combate
 📅 11 oct 2026, 14:00
 
-📄 Siguiente: *.ctumovimientos eyJzY29wZSI6ImNvaW5MZWRnZXI6VVNSLWE0MmY3YTI3LWJlZmUtNDk1OC04OTM0LTFhZGUyMDYxMDVmOSIsImtleSI6WyI5MDA3MTk5MjU0NzQwOTg3IiwiY29pbjpyZXdhcmQ6QlRMLTNhOWE5ZTQyLWZlYTMtNDZlYy1iZGZiLTY5ODkxNzJjMmU1MjpVU1ItYTQyZjdhMjctYmVmZS00OTU4LTg5MzQtMWFkZTIwNjEwNWY5Il19*
+📄 *Página 1 de 2*
+➡️ Siguiente: *.ctumovimientos 2*
+👉 Tu saldo: *.ctubalance*
 ```
 
 ## Movimientos: siguiente página
@@ -859,6 +947,33 @@ Saldo tras ese reclamo: *100 ChengCoins*
 📥 *+100 ChengCoins* · 📅 Diario
 📅 11 oct 2026, 14:00
 
+📄 *Página 2 de 2*
+⬅️ Anterior: *.ctumovimientos 1*
+👉 Tu saldo: *.ctubalance*
+```
+
+## Movimientos: volver a la primera página
+
+```text
+🃏 *CHENGDÚ CARDS | MOVIMIENTOS*
+━━━━━━━━━━━━━━
+📤 *-500 ChengCoins* · 🎁 Sobre
+📅 13 oct 2026, 14:00
+
+📥 *+100 ChengCoins* · 📅 Diario
+📅 13 oct 2026, 14:00
+
+📥 *+120 ChengCoins* · 🏆 Combate
+📅 13 oct 2026, 14:00
+
+📥 *+120 ChengCoins* · 🏆 Combate
+📅 13 oct 2026, 14:00
+
+📥 *+0 ChengCoins* · 🏆 Combate
+📅 11 oct 2026, 14:00
+
+📄 *Página 1 de 2*
+➡️ Siguiente: *.ctumovimientos 2*
 👉 Tu saldo: *.ctubalance*
 ```
 
@@ -899,8 +1014,8 @@ Saldo tras ese reclamo: *100 ChengCoins*
 🛡️ Retirada del equipo mientras está en venta.
 ⏳ Vence: 20 oct 2026, 14:00 (CDMX)
 
-👉 Compartir anuncio: *.ctumercado ver LIST-9d99946c-13c7-45c8-9461-bd8137022c42*
-↩️ Retirar: .cturetirar LIST-9d99946c-13c7-45c8-9461-bd8137022c42
+👉 Compartir anuncio: *.ctumercado ver LIST-8c8ae0ab-d06c-4040-8ced-ec70ced44771*
+↩️ Retirar: .cturetirar LIST-8c8ae0ab-d06c-4040-8ced-ec70ced44771
 ```
 
 ## Mercado: decidir a simple vista
@@ -911,8 +1026,9 @@ Saldo tras ese reclamo: *100 ChengCoins*
 🐼 *Panda Guerrero* · Nv. 2
 ⚪ Común · Tanque
 💰 *100 ChengCoins* · 👤 Miguel
-👉 .ctumercado ver LIST-9d99946c-13c7-45c8-9461-bd8137022c42
+👉 .ctumercado ver LIST-8c8ae0ab-d06c-4040-8ced-ec70ced44771
 
+📄 *Página 1 de 1*
 🎴 Tus anuncios: .ctumercado mios
 💰 Menor precio: .ctumercado precio
 ```
@@ -925,8 +1041,9 @@ Saldo tras ese reclamo: *100 ChengCoins*
 🐼 *Panda Guerrero* · Nv. 2
 ⚪ Común · Tanque
 💰 *100 ChengCoins* · 👤 Miguel
-👉 .ctumercado ver LIST-9d99946c-13c7-45c8-9461-bd8137022c42
+👉 .ctumercado ver LIST-8c8ae0ab-d06c-4040-8ced-ec70ced44771
 
+📄 *Página 1 de 1*
 🎴 Tus anuncios: .ctumercado mios
 💰 Menor precio: .ctumercado precio
 ```
@@ -941,8 +1058,9 @@ Saldo tras ese reclamo: *100 ChengCoins*
 🐼 *Panda Guerrero* · Nv. 2
 ⚪ Común · Tanque
 💰 *100 ChengCoins* · 👤 Miguel
-👉 .ctumercado ver LIST-9d99946c-13c7-45c8-9461-bd8137022c42
+👉 .ctumercado ver LIST-8c8ae0ab-d06c-4040-8ced-ec70ced44771
 
+📄 *Página 1 de 1*
 🎴 Tus anuncios: .ctumercado mios
 💰 Menor precio: .ctumercado precio
 ```
@@ -955,8 +1073,9 @@ Saldo tras ese reclamo: *100 ChengCoins*
 🐼 *Panda Guerrero* · Nv. 2
 ⚪ Común · Tanque
 💰 *100 ChengCoins* · 📥 Recibirás 95
-👉 .cturetirar LIST-9d99946c-13c7-45c8-9461-bd8137022c42
+👉 .cturetirar LIST-8c8ae0ab-d06c-4040-8ced-ec70ced44771
 
+📄 *Página 1 de 1*
 🎴 Tus anuncios: .ctumercado mios
 💰 Menor precio: .ctumercado precio
 ```
@@ -978,7 +1097,7 @@ Saldo tras ese reclamo: *100 ChengCoins*
 🔒 En el mercado
 ⏳ Vence: 20 oct 2026, 14:00 (CDMX)
 
-🛒 Comprar: *.ctucomprar LIST-9d99946c-13c7-45c8-9461-bd8137022c42*
+🛒 Comprar: *.ctucomprar LIST-8c8ae0ab-d06c-4040-8ced-ec70ced44771*
 🔎 Ataques y rasgos: .ctuficha PAND-000001
 ```
 
@@ -991,12 +1110,13 @@ Saldo tras ese reclamo: *100 ChengCoins*
 
 🐼 *Panda Guerrero* · Nv. 2
 ⚪ Común · 🔒 En venta
-↳ .ctumercado ver LIST-9d99946c-13c7-45c8-9461-bd8137022c42
+↳ .ctumercado ver LIST-8c8ae0ab-d06c-4040-8ced-ec70ced44771
 
 🐉 *Dragón Carmesí* · ✨ Dorada · Nv. 1
 🟡 Legendario · 🧬 2 rasgos · ✅ Disponible
 ↳ .ctuequipo usar DRGC-000001
 
+📄 *Página 1 de 1*
 🔎 Detalles: .ctuficha ID
 ```
 
@@ -1048,6 +1168,7 @@ Saldo restante: *0 ChengCoins*
 📅 13 oct 2026, 14:00 (CDMX)
 🔎 .ctupropiedad PAND-000001
 
+📄 *Página 1 de 1*
 👉 Tu saldo: *.ctubalance*
 ```
 
@@ -1063,6 +1184,7 @@ Saldo restante: *0 ChengCoins*
 📅 13 oct 2026, 14:00 (CDMX)
 🔎 .ctupropiedad PAND-000001
 
+📄 *Página 1 de 1*
 👉 Tu saldo: *.ctubalance*
 ```
 
@@ -1080,6 +1202,7 @@ Primera emisión · 11 oct 2026, 14:00 (CDMX)
 🤝 Miguel → Lukas
 Compra en el mercado · 13 oct 2026, 14:00 (CDMX)
 
+📄 *Página 1 de 1*
 👉 Stats y ataques: *.ctuficha PAND-000001*
 ```
 
@@ -1098,6 +1221,7 @@ Compra en el mercado · 13 oct 2026, 14:00 (CDMX)
 ⚪ Común · ✅ Disponible
 ↳ .ctuequipo usar PAND-000001
 
+📄 *Página 1 de 1*
 🔎 Detalles: .ctuficha ID
 ```
 
@@ -1121,7 +1245,7 @@ Compra en el mercado · 13 oct 2026, 14:00 (CDMX)
 ```text
 🃏 *CHENGDÚ CARDS | PARTIDA*
 ━━━━━━━━━━━━━━
-🏆 Victoria · 13 de octubre de 2026
+🏆 Victoria · 1v1 clásico · 13 de octubre de 2026
 Miguel · Panda Guerrero · Niv. 2
 Lukas · Lobo Sombrío · Niv. 1
 
@@ -1152,13 +1276,16 @@ Lukas: +15 XP
 ```text
 🃏 *CHENGDÚ CARDS | EQUIPO*
 ━━━━━━━━━━━━━━
-🛡️ *Lukas*
+🛡️ *Lukas* · 1/3 unidades
 
-🐼 *Panda Guerrero* · Nv. 2
+1️⃣ 🐼 *Panda Guerrero* · Nv. 2
+⚔️ Abre el combate
+
 ✅ Listo para combatir
 
 👉 *.ctupelea @jugador*
 🔎 Stats y ataques: .ctuficha
+🔀 Orden: .ctuequipo ordenar 1
 ```
 
 ## Repetir publicación: conserva el anuncio ya vendido
@@ -1235,6 +1362,7 @@ Compra en el mercado · 13 oct 2026, 14:00 (CDMX)
 🤝 Lukas → Miguel
 Compra en el mercado · 13 oct 2026, 14:00 (CDMX)
 
+📄 *Página 1 de 1*
 👉 Stats y ataques: *.ctuficha PAND-000001*
 ```
 
@@ -1317,7 +1445,9 @@ Saldo tras esa apertura: *300 ChengCoins*
 📥 *+100 ChengCoins* · 📅 Diario
 📅 13 oct 2026, 14:00
 
-📄 Siguiente: *.ctumovimientos eyJzY29wZSI6ImNvaW5MZWRnZXI6VVNSLWE0MmY3YTI3LWJlZmUtNDk1OC04OTM0LTFhZGUyMDYxMDVmOSIsImtleSI6WyI5MDA3MTk5MjU0NzQwOTg0IiwiY29pbjpEQUlMWS0zMGM0MDA4OC1jODYyLTQxMzUtYWUwZC0yM2M5OWI2YTBkMjgiXX0*
+📄 *Página 1 de 3*
+➡️ Siguiente: *.ctumovimientos 2*
+👉 Tu saldo: *.ctubalance*
 ```
 
 ## Vencimiento: rechaza la compra y libera el bloqueo
@@ -1354,11 +1484,969 @@ Saldo tras esa apertura: *300 ChengCoins*
 ```text
 🃏 *CHENGDÚ CARDS | EQUIPO*
 ━━━━━━━━━━━━━━
-🛡️ *Lukas*
+🛡️ *Lukas* · 1/3 unidades
 
-🐺 *Lobo Sombrío* · Nv. 1
+1️⃣ 🐺 *Lobo Sombrío* · Nv. 1
+⚔️ Abre el combate
+
 ✅ Listo para combatir
 
 👉 *.ctupelea @jugador*
 🔎 Stats y ataques: .ctuficha
+🔀 Orden: .ctuequipo ordenar 1
+```
+
+## Equipo avanzado: tres unidades y orden de entrada
+
+```text
+🃏 *CHENGDÚ CARDS | EQUIPO*
+━━━━━━━━━━━━━━
+🛡️ *Miguel* · 3/3 unidades
+
+1️⃣ 🐼 *Panda Guerrero* · Nv. 2
+⚔️ Abre el combate
+
+2️⃣ 🔥 *Mago Carmesí* · Nv. 1
+🪑 Reserva
+
+3️⃣ 🧘 *Monje Celestial* · Nv. 1
+🪑 Reserva
+
+✅ Listo para combatir
+
+👉 *.ctupelea @jugador*
+🔎 Stats y ataques: .ctuficha
+🔀 Orden: .ctuequipo ordenar 3 2 1
+```
+
+## Equipo: reordenar con slots cortos
+
+```text
+🃏 *CHENGDÚ CARDS | EQUIPO*
+━━━━━━━━━━━━━━
+🛡️ *Miguel* · 3/3 unidades
+
+1️⃣ 🔥 *Mago Carmesí* · Nv. 1
+⚔️ Abre el combate
+
+2️⃣ 🐼 *Panda Guerrero* · Nv. 2
+🪑 Reserva
+
+3️⃣ 🧘 *Monje Celestial* · Nv. 1
+🪑 Reserva
+
+✅ Listo para combatir
+
+👉 *.ctupelea @jugador*
+🔎 Stats y ataques: .ctuficha
+🔀 Orden: .ctuequipo ordenar 3 2 1
+```
+
+## Ficha avanzada del equipo: elementos, pasivas y cooldowns
+
+```text
+🃏 *CHENGDÚ CARDS | FICHA*
+━━━━━━━━━━━━━━
+🐼 *Panda Guerrero* · Miguel
+🆔 PAND-000001
+🌱 Nivel 2
+❤️ Vida: 122/122 HP
+⚔️ Ataque: 25 · 🛡️ Defensa: 23 · 💨 Velocidad: 8
+
+🌿 Naturaleza
+✨ *Piel de Bambú*
+Al entrar por primera vez obtiene un escudo de 12 puntos durante 2 turnos propios.
+
+1️⃣ *Golpe de Bambú* · Físico
+Potencia: 25 POT · Precisión: 100%
+🌿 Naturaleza · Sin recarga
+
+2️⃣ *Impacto del Panda* · Físico
+Potencia: 36 POT · Precisión: 85%
+🌿 Naturaleza · Recarga: 2 turnos propios
+🛡️ Escudo 12 puntos · 2 turnos propios
+
+🔥 *Mago Carmesí* · Miguel
+🆔 MAGC-000001
+🌱 Nivel 1
+❤️ Vida: 100/100 HP
+⚔️ Ataque: 32 · 🛡️ Defensa: 16 · 💨 Velocidad: 10
+
+🔥 Fuego
+✨ *Sangre Carmesí*
+Al entrar por primera vez aumenta su ataque un 12% durante 2 turnos propios.
+
+1️⃣ *Chispa Carmesí* · Mágico
+Potencia: 25 POT · Precisión: 100%
+🔥 Fuego · Sin recarga
+
+2️⃣ *Llamarada* · Mágico
+Potencia: 36 POT · Precisión: 80%
+🔥 Fuego · Recarga: 2 turnos propios
+🔥 Quemadura 4% · 2 turnos propios del rival
+
+🧘 *Monje Celestial* · Miguel
+🆔 MONJ-000001
+🌱 Nivel 1
+❤️ Vida: 114/114 HP
+⚔️ Ataque: 27 · 🛡️ Defensa: 21 · 💨 Velocidad: 11
+
+☀️ Luz
+✨ *Serenidad*
+Al entrar por primera vez obtiene un escudo de 6 puntos durante 2 turnos propios y regenera un 8% de su vida máxima al comenzar cada uno de sus próximos 3 turnos, sin superar su vida máxima.
+
+1️⃣ *Palma Celestial* · Físico
+Potencia: 25 POT · Precisión: 100%
+☀️ Luz · Sin recarga
+
+2️⃣ *Puño del Alba* · Físico
+Potencia: 32 POT · Precisión: 90%
+☀️ Luz · Recarga: 2 turnos propios
+💚 Regeneración 6% · 2 turnos propios
+
+💡 Daño base: potencia + ataque − defensa; después se aplican efectos y elemento.
+🔥 Fuego → 🌿 Naturaleza → 💧 Agua → 🔥 Fuego
+☀️ Luz ↔ 🌙 Oscuridad · Ventaja +25%; resistencia −20%.
+Fallar y cambiar consumen el turno. Los efectos avanzan sólo mientras la unidad está activa.
+```
+
+## Desafío avanzado: formato 3v3
+
+```text
+🃏 *CHENGDÚ CARDS | DESAFÍO*
+━━━━━━━━━━━━━━
+⚔️ *Miguel* desafió a *Lukas* · *3v3*
+
+🛡️ 3 unidades por jugador · Elementos, pasivas y efectos
+
+📣 *Lukas, ¿aceptas?*
+👉 *.ctuaceptar* o *.cturechazar*
+
+⏳ Vence a las 14:05 (CDMX).
+↩️ Retirar: .ctucancelar
+```
+
+## Inicio 3v3: pasivas, activos y reservas
+
+```text
+🃏 *CHENGDÚ CARDS | INICIO | T1*
+━━━━━━━━━━━━━━
+⚔️ *Miguel* vs *Lukas* · *3v3*
+🐺 *Lobo Sombrío* toma la iniciativa.
+
+✨ 🐼 Panda Guerrero: *Piel de Bambú*
+🛡️ Escudo → 🐼 Panda Guerrero · 2 turnos
+✨ 🐺 Lobo Sombrío: *Mirada Nocturna*
+🛡️ Defensa reducida → 🐼 Panda Guerrero · 2 turnos
+🛡️ Escudo → 🐺 Lobo Sombrío · 2 turnos
+
+❤️ *ESTADO*
+🐼 *Miguel* · Panda Guerrero
+▓▓▓▓▓▓▓▓▓▓ 122/122 HP
+🛡️ Escudo 12 · 🛡️ Defensa reducida 2T
+🪑 2 🔥 Mago Carmesí: 100/100 HP
+3 🧘 Monje Celestial: 114/114 HP
+
+🐺 *Lukas* · Lobo Sombrío
+▓▓▓▓▓▓▓▓▓▓ 95/95 HP
+🛡️ Escudo 10
+🪑 2 🛡️ Guardián Jade: 133/133 HP
+3 🌙 Bruja Lunar: 108/108 HP
+
+🎯 *Turno de Lukas*
+1️⃣ Garra Sombría · 25 POT
+2️⃣ Colmillo Nocturno · 35 POT
+
+👉 *.ctuatacar 1* o *.ctuatacar 2*
+🔀 *.ctucambiar 2* / *.ctucambiar 3* · Consume turno
+🔎 Detalles: .ctuficha
+```
+
+## Error: las reservas también están bloqueadas en combate
+
+```text
+🃏 *CHENGDÚ CARDS | ERROR*
+━━━━━━━━━━━━━━
+🔒 Esa unidad está en combate o en venta.
+👉 Consulta .ctumercado mios o .ctucombate.
+```
+
+## Cambio voluntario: consume turno y activa la pasiva
+
+```text
+🃏 *CHENGDÚ CARDS | T2*
+━━━━━━━━━━━━━━
+🔀 *Lukas* eligió a 🛡️ *Guardián Jade*
+✨ 🛡️ Guardián Jade: *Muralla de Jade*
+🛡️ Escudo → 🛡️ Guardián Jade · 2 turnos
+
+❤️ *ESTADO*
+🐼 *Miguel* · Panda Guerrero
+▓▓▓▓▓▓▓▓▓▓ 122/122 HP
+🛡️ Escudo 12 · 🛡️ Defensa reducida 2T
+🪑 2 🔥 Mago Carmesí: 100/100 HP
+3 🧘 Monje Celestial: 114/114 HP
+
+🛡️ *Lukas* · Guardián Jade
+▓▓▓▓▓▓▓▓▓▓ 133/133 HP
+🛡️ Escudo 18
+🪑 1 🐺 Lobo Sombrío: 95/95 HP
+3 🌙 Bruja Lunar: 108/108 HP
+
+🎯 *Turno de Miguel*
+1️⃣ Golpe de Bambú · 25 POT
+2️⃣ Impacto del Panda · 36 POT
+
+👉 *.ctuatacar 1* o *.ctuatacar 2*
+🔀 *.ctucambiar 2* / *.ctucambiar 3* · Consume turno
+🔎 Detalles: .ctuficha
+```
+
+## Repetir cambio: muestra el estado sin volver a actuar
+
+```text
+🃏 *CHENGDÚ CARDS | T2*
+━━━━━━━━━━━━━━
+♻️ Esta acción ya se había registrado. Estado actual:
+
+❤️ *ESTADO*
+🐼 *Miguel* · Panda Guerrero
+▓▓▓▓▓▓▓▓▓▓ 122/122 HP
+🛡️ Escudo 12 · 🛡️ Defensa reducida 2T
+🪑 2 🔥 Mago Carmesí: 100/100 HP
+3 🧘 Monje Celestial: 114/114 HP
+
+🛡️ *Lukas* · Guardián Jade
+▓▓▓▓▓▓▓▓▓▓ 133/133 HP
+🛡️ Escudo 18
+🪑 1 🐺 Lobo Sombrío: 95/95 HP
+3 🌙 Bruja Lunar: 108/108 HP
+
+🎯 *Turno de Miguel*
+1️⃣ Golpe de Bambú · 25 POT
+2️⃣ Impacto del Panda · 36 POT
+
+👉 *.ctuatacar 1* o *.ctuatacar 2*
+🔀 *.ctucambiar 2* / *.ctucambiar 3* · Consume turno
+🔎 Detalles: .ctuficha
+```
+
+## Mago: ataque aumentado al entrar
+
+```text
+🃏 *CHENGDÚ CARDS | T3*
+━━━━━━━━━━━━━━
+🔀 *Miguel* eligió a 🔥 *Mago Carmesí*
+✨ 🔥 Mago Carmesí: *Sangre Carmesí*
+⚔️ Ataque aumentado → 🔥 Mago Carmesí · 2 turnos
+
+❤️ *ESTADO*
+🔥 *Miguel* · Mago Carmesí
+▓▓▓▓▓▓▓▓▓▓ 100/100 HP
+⚔️ Ataque aumentado 2T
+🪑 1 🐼 Panda Guerrero: 122/122 HP
+3 🧘 Monje Celestial: 114/114 HP
+
+🛡️ *Lukas* · Guardián Jade
+▓▓▓▓▓▓▓▓▓▓ 133/133 HP
+🛡️ Escudo 18
+🪑 1 🐺 Lobo Sombrío: 95/95 HP
+3 🌙 Bruja Lunar: 108/108 HP
+
+🎯 *Turno de Lukas*
+1️⃣ Golpe de Jade · 25 POT
+2️⃣ Martillo del Guardián · 30 POT
+
+👉 *.ctuatacar 1* o *.ctuatacar 2*
+🔀 *.ctucambiar 1* / *.ctucambiar 3* · Consume turno
+🔎 Detalles: .ctuficha
+```
+
+## Bruja: veneno de la pasiva dentro del mismo turno
+
+```text
+🃏 *CHENGDÚ CARDS | T4*
+━━━━━━━━━━━━━━
+🔀 *Lukas* eligió a 🌙 *Bruja Lunar*
+✨ 🌙 Bruja Lunar: *Marea Lunar*
+☠️ Veneno → 🔥 Mago Carmesí · 2 turnos
+
+❤️ *ESTADO*
+🔥 *Miguel* · Mago Carmesí
+▓▓▓▓▓▓▓▓▓▓ 100/100 HP
+☠️ Veneno 2T · ⚔️ Ataque aumentado 2T
+🪑 1 🐼 Panda Guerrero: 122/122 HP
+3 🧘 Monje Celestial: 114/114 HP
+
+🌙 *Lukas* · Bruja Lunar
+▓▓▓▓▓▓▓▓▓▓ 108/108 HP
+🪑 1 🐺 Lobo Sombrío: 95/95 HP
+2 🛡️ Guardián Jade: 133/133 HP
+
+🎯 *Turno de Miguel*
+1️⃣ Chispa Carmesí · 25 POT
+2️⃣ Llamarada · 36 POT
+
+👉 *.ctuatacar 1* o *.ctuatacar 2*
+🔀 *.ctucambiar 1* / *.ctucambiar 3* · Consume turno
+🔎 Detalles: .ctuficha
+```
+
+## Fuego contra agua: resistencia, quemadura y veneno visibles
+
+```text
+🃏 *CHENGDÚ CARDS | T5*
+━━━━━━━━━━━━━━
+🔥 *Mago Carmesí* usó _Llamarada_
+💥 *40 de daño* a Bruja Lunar
+☠️ Veneno: 🔥 Mago Carmesí pierde 3 HP
+🌿 Ataque poco eficaz
+🔥 Quemadura → 🌙 Bruja Lunar · 2 turnos
+
+❤️ *ESTADO*
+🔥 *Miguel* · Mago Carmesí
+▓▓▓▓▓▓▓▓▓▓ 97/100 HP
+☠️ Veneno 1T · ⚔️ Ataque aumentado 1T
+🪑 1 🐼 Panda Guerrero: 122/122 HP
+3 🧘 Monje Celestial: 114/114 HP
+
+🌙 *Lukas* · Bruja Lunar
+▓▓▓▓▓▓▓▒▒▒ 68/108 HP
+🔥 Quemadura 2T
+🪑 1 🐺 Lobo Sombrío: 95/95 HP
+2 🛡️ Guardián Jade: 133/133 HP
+
+🎯 *Turno de Lukas*
+1️⃣ Pulso Lunar · 25 POT
+2️⃣ Ráfaga de Medianoche · 31 POT
+
+👉 *.ctuatacar 1* o *.ctuatacar 2*
+🔀 *.ctucambiar 1* / *.ctucambiar 2* · Consume turno
+🔎 Detalles: .ctuficha
+```
+
+## Agua contra fuego: ventaja elemental y veneno
+
+```text
+🃏 *CHENGDÚ CARDS | T6*
+━━━━━━━━━━━━━━
+🌙 *Bruja Lunar* usó _Ráfaga de Medianoche_
+💥 *60 de daño* a Mago Carmesí
+🔥 Quemadura: 🌙 Bruja Lunar pierde 4 HP
+🌟 ¡Ataque muy eficaz!
+☠️ Veneno → 🔥 Mago Carmesí · 3 turnos
+
+❤️ *ESTADO*
+🔥 *Miguel* · Mago Carmesí
+▓▓▓▓▒▒▒▒▒▒ 37/100 HP
+☠️ Veneno 3T · ⚔️ Ataque aumentado 1T
+🪑 1 🐼 Panda Guerrero: 122/122 HP
+3 🧘 Monje Celestial: 114/114 HP
+
+🌙 *Lukas* · Bruja Lunar
+▓▓▓▓▓▓▒▒▒▒ 64/108 HP
+🔥 Quemadura 1T
+🪑 1 🐺 Lobo Sombrío: 95/95 HP
+2 🛡️ Guardián Jade: 133/133 HP
+
+🎯 *Turno de Miguel*
+1️⃣ Chispa Carmesí · 25 POT
+2️⃣ Llamarada · 36 POT · ⏳ 2T
+
+👉 *.ctuatacar 1*
+🔀 *.ctucambiar 1* / *.ctucambiar 3* · Consume turno
+🔎 Detalles: .ctuficha
+```
+
+## Error: una habilidad en cooldown no consume el turno
+
+```text
+🃏 *CHENGDÚ CARDS | ERROR*
+━━━━━━━━━━━━━━
+⏳ Ese ataque aún está recuperándose.
+Elige el otro ataque o cambia de unidad con .ctucambiar.
+```
+
+## Ataque básico: permite avanzar mientras se recupera la habilidad
+
+```text
+🃏 *CHENGDÚ CARDS | T7*
+━━━━━━━━━━━━━━
+🔥 *Mago Carmesí* usó _Chispa Carmesí_
+💥 *31 de daño* a Bruja Lunar
+☠️ Veneno: 🔥 Mago Carmesí pierde 5 HP
+🌿 Ataque poco eficaz
+⚔️ Ataque aumentado terminó en 🔥 Mago Carmesí
+
+❤️ *ESTADO*
+🔥 *Miguel* · Mago Carmesí
+▓▓▓▓▒▒▒▒▒▒ 32/100 HP
+☠️ Veneno 2T
+🪑 1 🐼 Panda Guerrero: 122/122 HP
+3 🧘 Monje Celestial: 114/114 HP
+
+🌙 *Lukas* · Bruja Lunar
+▓▓▓▓▒▒▒▒▒▒ 33/108 HP
+🔥 Quemadura 1T
+🪑 1 🐺 Lobo Sombrío: 95/95 HP
+2 🛡️ Guardián Jade: 133/133 HP
+
+🎯 *Turno de Lukas*
+1️⃣ Pulso Lunar · 25 POT
+2️⃣ Ráfaga de Medianoche · 31 POT · ⏳ 2T
+
+👉 *.ctuatacar 1*
+🔀 *.ctucambiar 1* / *.ctucambiar 2* · Consume turno
+🔎 Detalles: .ctuficha
+```
+
+## KO y relevo automático: entra la siguiente unidad viva
+
+```text
+🃏 *CHENGDÚ CARDS | T8*
+━━━━━━━━━━━━━━
+🌙 *Bruja Lunar* usó _Pulso Lunar_
+💥 *32 de daño* a Mago Carmesí
+🔥 Quemadura: 🌙 Bruja Lunar pierde 4 HP
+🔥 Quemadura terminó en 🌙 Bruja Lunar
+🌟 ¡Ataque muy eficaz!
+💤 🔥 Mago Carmesí quedó fuera de combate
+⚔️ 🐼 Panda Guerrero entra al combate
+
+❤️ *ESTADO*
+🐼 *Miguel* · Panda Guerrero
+▓▓▓▓▓▓▓▓▓▓ 122/122 HP
+🛡️ Escudo 12 · 🛡️ Defensa reducida 1T
+🪑 2 🔥 Mago Carmesí: 💤 KO
+3 🧘 Monje Celestial: 114/114 HP
+
+🌙 *Lukas* · Bruja Lunar
+▓▓▓▒▒▒▒▒▒▒ 29/108 HP
+🪑 1 🐺 Lobo Sombrío: 95/95 HP
+2 🛡️ Guardián Jade: 133/133 HP
+
+🎯 *Turno de Miguel*
+1️⃣ Golpe de Bambú · 25 POT
+2️⃣ Impacto del Panda · 36 POT
+
+👉 *.ctuatacar 1* o *.ctuatacar 2*
+🔀 *.ctucambiar 3* · Consume turno
+🔎 Detalles: .ctuficha
+```
+
+## Ataque con escudo y victoria sobre una unidad, sin cerrar el equipo
+
+```text
+🃏 *CHENGDÚ CARDS | T9*
+━━━━━━━━━━━━━━
+🐼 *Panda Guerrero* usó _Impacto del Panda_
+💥 *29 de daño* a Bruja Lunar
+🌟 ¡Ataque muy eficaz!
+🛡️ Escudo → 🐼 Panda Guerrero · 2 turnos
+💤 🌙 Bruja Lunar quedó fuera de combate
+⚔️ 🐺 Lobo Sombrío entra al combate
+🛡️ Defensa reducida terminó en 🐼 Panda Guerrero
+
+❤️ *ESTADO*
+🐼 *Miguel* · Panda Guerrero
+▓▓▓▓▓▓▓▓▓▓ 122/122 HP
+🛡️ Escudo 12
+🪑 2 🔥 Mago Carmesí: 💤 KO
+3 🧘 Monje Celestial: 114/114 HP
+
+🐺 *Lukas* · Lobo Sombrío
+▓▓▓▓▓▓▓▓▓▓ 95/95 HP
+🛡️ Escudo 10
+🪑 2 🛡️ Guardián Jade: 133/133 HP
+3 🌙 Bruja Lunar: 💤 KO
+
+🎯 *Turno de Lukas*
+1️⃣ Garra Sombría · 25 POT
+2️⃣ Colmillo Nocturno · 35 POT
+
+👉 *.ctuatacar 1* o *.ctuatacar 2*
+🔀 *.ctucambiar 2* · Consume turno
+🔎 Detalles: .ctuficha
+```
+
+## Escudo: daño bloqueado dentro de la respuesta
+
+```text
+🃏 *CHENGDÚ CARDS | T11*
+━━━━━━━━━━━━━━
+🐼 *Panda Guerrero* usó _Golpe de Bambú_
+💥 *4 de daño* a Guardián Jade
+🛡️ 🛡️ Guardián Jade bloqueó 18 de daño
+🛡️ Escudo terminó en 🛡️ Guardián Jade
+
+❤️ *ESTADO*
+🐼 *Miguel* · Panda Guerrero
+▓▓▓▓▓▓▓▓▓▓ 122/122 HP
+🛡️ Escudo 12
+🪑 2 🔥 Mago Carmesí: 💤 KO
+3 🧘 Monje Celestial: 114/114 HP
+
+🛡️ *Lukas* · Guardián Jade
+▓▓▓▓▓▓▓▓▓▓ 129/133 HP
+🪑 1 🐺 Lobo Sombrío: 95/95 HP
+3 🌙 Bruja Lunar: 💤 KO
+
+🎯 *Turno de Lukas*
+1️⃣ Golpe de Jade · 25 POT
+2️⃣ Martillo del Guardián · 30 POT
+
+👉 *.ctuatacar 1* o *.ctuatacar 2*
+🔀 *.ctucambiar 1* · Consume turno
+🔎 Detalles: .ctuficha
+```
+
+## Guardián: aplica aturdimiento con su habilidad
+
+```text
+🃏 *CHENGDÚ CARDS | T12*
+━━━━━━━━━━━━━━
+🛡️ *Guardián Jade* usó _Martillo del Guardián_
+💥 *18 de daño* a Panda Guerrero
+🛡️ 🐼 Panda Guerrero bloqueó 12 de daño
+🛡️ Escudo terminó en 🐼 Panda Guerrero
+❄️ Aturdido → 🐼 Panda Guerrero · 1 turnos
+
+❤️ *ESTADO*
+🐼 *Miguel* · Panda Guerrero
+▓▓▓▓▓▓▓▓▓▒ 104/122 HP
+❄️ Aturdido 1T
+🪑 2 🔥 Mago Carmesí: 💤 KO
+3 🧘 Monje Celestial: 114/114 HP
+
+🛡️ *Lukas* · Guardián Jade
+▓▓▓▓▓▓▓▓▓▓ 129/133 HP
+🪑 1 🐺 Lobo Sombrío: 95/95 HP
+3 🌙 Bruja Lunar: 💤 KO
+
+🎯 *Turno de Miguel*
+1️⃣ Golpe de Bambú · 25 POT
+2️⃣ Impacto del Panda · 36 POT · ⏳ 1T
+
+👉 *.ctuatacar 1*
+🔀 *.ctucambiar 3* · Consume turno
+🔎 Detalles: .ctuficha
+```
+
+## Aturdimiento: un turno omitido y estado actualizado
+
+```text
+🃏 *CHENGDÚ CARDS | T13*
+━━━━━━━━━━━━━━
+❄️ 🐼 Panda Guerrero no pudo actuar
+❄️ Aturdido terminó en 🐼 Panda Guerrero
+
+❤️ *ESTADO*
+🐼 *Miguel* · Panda Guerrero
+▓▓▓▓▓▓▓▓▓▒ 104/122 HP
+🪑 2 🔥 Mago Carmesí: 💤 KO
+3 🧘 Monje Celestial: 114/114 HP
+
+🛡️ *Lukas* · Guardián Jade
+▓▓▓▓▓▓▓▓▓▓ 129/133 HP
+🪑 1 🐺 Lobo Sombrío: 95/95 HP
+3 🌙 Bruja Lunar: 💤 KO
+
+🎯 *Turno de Lukas*
+1️⃣ Golpe de Jade · 25 POT
+2️⃣ Martillo del Guardián · 30 POT · ⏳ 3T
+
+👉 *.ctuatacar 1*
+🔀 *.ctucambiar 1* · Consume turno
+🔎 Detalles: .ctuficha
+```
+
+## Monje: entrada con regeneración
+
+```text
+🃏 *CHENGDÚ CARDS | T15*
+━━━━━━━━━━━━━━
+🔀 *Miguel* eligió a 🧘 *Monje Celestial*
+✨ 🧘 Monje Celestial: *Serenidad*
+💚 Regeneración → 🧘 Monje Celestial · 3 turnos
+🛡️ Escudo → 🧘 Monje Celestial · 2 turnos
+
+❤️ *ESTADO*
+🧘 *Miguel* · Monje Celestial
+▓▓▓▓▓▓▓▓▓▓ 114/114 HP
+🛡️ Escudo 6 · 💚 Regeneración 3T
+🪑 1 🐼 Panda Guerrero: 79/122 HP
+2 🔥 Mago Carmesí: 💤 KO
+
+🛡️ *Lukas* · Guardián Jade
+▓▓▓▓▓▓▓▓▓▓ 129/133 HP
+🪑 1 🐺 Lobo Sombrío: 95/95 HP
+3 🌙 Bruja Lunar: 💤 KO
+
+🎯 *Turno de Lukas*
+1️⃣ Golpe de Jade · 25 POT
+2️⃣ Martillo del Guardián · 30 POT · ⏳ 2T
+
+👉 *.ctuatacar 1*
+🔀 *.ctucambiar 1* · Consume turno
+🔎 Detalles: .ctuficha
+```
+
+## Regeneración: recuperación al comienzo del turno
+
+```text
+🃏 *CHENGDÚ CARDS | T17*
+━━━━━━━━━━━━━━
+🧘 *Monje Celestial* usó _Palma Celestial_
+💥 *24 de daño* a Guardián Jade
+💚 Regeneración: 🧘 Monje Celestial recupera 9 HP
+
+❤️ *ESTADO*
+🧘 *Miguel* · Monje Celestial
+▓▓▓▓▓▓▓▓▓▒ 102/114 HP
+💚 Regeneración 2T
+🪑 1 🐼 Panda Guerrero: 79/122 HP
+2 🔥 Mago Carmesí: 💤 KO
+
+🛡️ *Lukas* · Guardián Jade
+▓▓▓▓▓▓▓▓▒▒ 105/133 HP
+🪑 1 🐺 Lobo Sombrío: 95/95 HP
+3 🌙 Bruja Lunar: 💤 KO
+
+🎯 *Turno de Lukas*
+1️⃣ Golpe de Jade · 25 POT
+2️⃣ Martillo del Guardián · 30 POT · ⏳ 1T
+
+👉 *.ctuatacar 1*
+🔀 *.ctucambiar 1* · Consume turno
+🔎 Detalles: .ctuficha
+```
+
+## Ficha de una unidad de banca derrotada: snapshot del combate
+
+```text
+🃏 *CHENGDÚ CARDS | FICHA*
+━━━━━━━━━━━━━━
+🔥 *Mago Carmesí* · Miguel
+🆔 MAGC-000001
+🌱 Nivel 1
+❤️ Vida: 0/100 HP
+⚔️ Ataque: 32 · 🛡️ Defensa: 16 · 💨 Velocidad: 10
+
+🔥 Fuego
+✨ *Sangre Carmesí*
+Al entrar por primera vez aumenta su ataque un 12% durante 2 turnos propios.
+📌 Pasiva ya activada en este combate.
+
+1️⃣ *Chispa Carmesí* · Mágico
+Potencia: 25 POT · Precisión: 100%
+🔥 Fuego · Sin recarga
+
+2️⃣ *Llamarada* · Mágico
+Potencia: 36 POT · Precisión: 80%
+🔥 Fuego · Recarga: 2 turnos propios
+🔥 Quemadura 4% · 2 turnos propios del rival
+📌 Datos del combate activo.
+🪑 Unidad en reserva.
+
+💡 Daño base: potencia + ataque − defensa; después se aplican efectos y elemento.
+🔥 Fuego → 🌿 Naturaleza → 💧 Agua → 🔥 Fuego
+☀️ Luz ↔ 🌙 Oscuridad · Ventaja +25%; resistencia −20%.
+Fallar y cambiar consumen el turno. Los efectos avanzan sólo mientras la unidad está activa.
+```
+
+## Final 3v3: monedas únicas y XP repartida entre participantes
+
+```text
+🃏 *CHENGDÚ CARDS | VICTORIA*
+━━━━━━━━━━━━━━
+🐺 *Lobo Sombrío* usó _Garra Sombría_
+💥 *21 de daño* a Panda Guerrero
+💤 🐼 Panda Guerrero quedó fuera de combate
+
+🐺 *¡Lukas derrotó a Miguel!*
+
+⚔️ 3v3 · 31 turnos · ❤️ 29 HP restantes
+
+❤️ *ESTADO*
+🐼 *Miguel* · Panda Guerrero
+▒▒▒▒▒▒▒▒▒▒ 0/122 HP
+🪑 2 🔥 Mago Carmesí: 💤 KO
+3 🧘 Monje Celestial: 💤 KO
+
+🐺 *Lukas* · Lobo Sombrío
+▓▓▓▓▒▒▒▒▒▒ 29/95 HP
+🪑 2 🛡️ Guardián Jade: 💤 KO
+3 🌙 Bruja Lunar: 💤 KO
+
+🎁 *RECOMPENSAS*
+Miguel: +15 XP
+🐼 Panda Guerrero: +5 XP
+🔥 Mago Carmesí: +5 XP
+🧘 Monje Celestial: +5 XP
+Lukas: +120 ChengCoins · +35 XP
+🐺 Lobo Sombrío: +12 XP
+🛡️ Guardián Jade: +12 XP
+🌙 Bruja Lunar: +11 XP
+🌱 Lukas subió al nivel 2
+
+⚔️ Otra partida: .ctupelea @jugador
+```
+
+## Historial avanzado: cambios, efectos y relevo de cada turno
+
+```text
+🃏 *CHENGDÚ CARDS | PARTIDA*
+━━━━━━━━━━━━━━
+💔 Derrota · 3v3 · 20 de octubre de 2026
+Miguel · Panda Guerrero · Niv. 2 / Mago Carmesí · Niv. 1 / Monje Celestial · Niv. 1
+Lukas · Lobo Sombrío · Niv. 1 / Guardián Jade · Niv. 1 / Bruja Lunar · Niv. 1
+
+✨ *ENTRADA*
+✨ 🐼 Panda Guerrero: *Piel de Bambú*
+🛡️ Escudo → 🐼 Panda Guerrero · 2 turnos
+✨ 🐺 Lobo Sombrío: *Mirada Nocturna*
+🛡️ Defensa reducida → 🐼 Panda Guerrero · 2 turnos
+🛡️ Escudo → 🐺 Lobo Sombrío · 2 turnos
+
+⚔️ *TURNOS*
+T1 · 🔀 *Lukas* eligió a 🛡️ *Guardián Jade*
+✨ 🛡️ Guardián Jade: *Muralla de Jade*
+🛡️ Escudo → 🛡️ Guardián Jade · 2 turnos
+
+T2 · 🔀 *Miguel* eligió a 🔥 *Mago Carmesí*
+✨ 🔥 Mago Carmesí: *Sangre Carmesí*
+⚔️ Ataque aumentado → 🔥 Mago Carmesí · 2 turnos
+
+T3 · 🔀 *Lukas* eligió a 🌙 *Bruja Lunar*
+✨ 🌙 Bruja Lunar: *Marea Lunar*
+☠️ Veneno → 🔥 Mago Carmesí · 2 turnos
+
+T4 · 🔥 *Mago Carmesí* usó _Llamarada_
+💥 *40 de daño* a Bruja Lunar
+☠️ Veneno: 🔥 Mago Carmesí pierde 3 HP
+🌿 Ataque poco eficaz
+🔥 Quemadura → 🌙 Bruja Lunar · 2 turnos
+
+T5 · 🌙 *Bruja Lunar* usó _Ráfaga de Medianoche_
+💥 *60 de daño* a Mago Carmesí
+🔥 Quemadura: 🌙 Bruja Lunar pierde 4 HP
+🌟 ¡Ataque muy eficaz!
+☠️ Veneno → 🔥 Mago Carmesí · 3 turnos
+
+T6 · 🔥 *Mago Carmesí* usó _Chispa Carmesí_
+💥 *31 de daño* a Bruja Lunar
+☠️ Veneno: 🔥 Mago Carmesí pierde 5 HP
+🌿 Ataque poco eficaz
+⚔️ Ataque aumentado terminó en 🔥 Mago Carmesí
+
+T7 · 🌙 *Bruja Lunar* usó _Pulso Lunar_
+💥 *32 de daño* a Mago Carmesí
+🔥 Quemadura: 🌙 Bruja Lunar pierde 4 HP
+🔥 Quemadura terminó en 🌙 Bruja Lunar
+🌟 ¡Ataque muy eficaz!
+💤 🔥 Mago Carmesí quedó fuera de combate
+⚔️ 🐼 Panda Guerrero entra al combate
+
+T8 · 🐼 *Panda Guerrero* usó _Impacto del Panda_
+💥 *29 de daño* a Bruja Lunar
+🌟 ¡Ataque muy eficaz!
+🛡️ Escudo → 🐼 Panda Guerrero · 2 turnos
+💤 🌙 Bruja Lunar quedó fuera de combate
+⚔️ 🐺 Lobo Sombrío entra al combate
+🛡️ Defensa reducida terminó en 🐼 Panda Guerrero
+
+T9 · 🔀 *Lukas* eligió a 🛡️ *Guardián Jade*
+🛡️ Escudo terminó en 🐺 Lobo Sombrío
+
+T10 · 🐼 *Panda Guerrero* usó _Golpe de Bambú_
+💥 *4 de daño* a Guardián Jade
+🛡️ 🛡️ Guardián Jade bloqueó 18 de daño
+🛡️ Escudo terminó en 🛡️ Guardián Jade
+
+T11 · 🛡️ *Guardián Jade* usó _Martillo del Guardián_
+💥 *18 de daño* a Panda Guerrero
+🛡️ 🐼 Panda Guerrero bloqueó 12 de daño
+🛡️ Escudo terminó en 🐼 Panda Guerrero
+❄️ Aturdido → 🐼 Panda Guerrero · 1 turnos
+
+T12 · ❄️ 🐼 Panda Guerrero no pudo actuar
+❄️ Aturdido terminó en 🐼 Panda Guerrero
+
+T13 · 🛡️ *Guardián Jade* usó _Golpe de Jade_
+💥 *25 de daño* a Panda Guerrero
+
+T14 · 🔀 *Miguel* eligió a 🧘 *Monje Celestial*
+✨ 🧘 Monje Celestial: *Serenidad*
+💚 Regeneración → 🧘 Monje Celestial · 3 turnos
+🛡️ Escudo → 🧘 Monje Celestial · 2 turnos
+
+T15 · 🛡️ *Guardián Jade* usó _Golpe de Jade_
+💥 *21 de daño* a Monje Celestial
+🛡️ 🧘 Monje Celestial bloqueó 6 de daño
+🛡️ Escudo terminó en 🧘 Monje Celestial
+
+T16 · 🧘 *Monje Celestial* usó _Palma Celestial_
+💥 *24 de daño* a Guardián Jade
+💚 Regeneración: 🧘 Monje Celestial recupera 9 HP
+
+T17 · 🛡️ *Guardián Jade* usó _Golpe de Jade_
+💥 *27 de daño* a Monje Celestial
+
+T18 · 🧘 *Monje Celestial* usó _Palma Celestial_
+💥 *24 de daño* a Guardián Jade
+💚 Regeneración: 🧘 Monje Celestial recupera 9 HP
+
+T19 · 🛡️ *Guardián Jade* usó _Golpe de Jade_
+💥 *27 de daño* a Monje Celestial
+
+T20 · 🧘 *Monje Celestial* usó _Palma Celestial_
+💥 *24 de daño* a Guardián Jade
+💚 Regeneración: 🧘 Monje Celestial recupera 9 HP
+💚 Regeneración terminó en 🧘 Monje Celestial
+
+T21 · 🛡️ *Guardián Jade* usó _Golpe de Jade_
+💥 *27 de daño* a Monje Celestial
+
+T22 · 🧘 *Monje Celestial* usó _Palma Celestial_
+💥 *24 de daño* a Guardián Jade
+
+T23 · 🛡️ *Guardián Jade* usó _Golpe de Jade_
+💥 *27 de daño* a Monje Celestial
+
+T24 · 🧘 *Monje Celestial* usó _Palma Celestial_
+💥 *24 de daño* a Guardián Jade
+
+T25 · 🛡️ *Guardián Jade* usó _Golpe de Jade_
+💥 *12 de daño* a Monje Celestial
+💤 🧘 Monje Celestial quedó fuera de combate
+⚔️ 🐼 Panda Guerrero entra al combate
+
+T26 · 🐼 *Panda Guerrero* usó _Golpe de Bambú_
+💥 *9 de daño* a Guardián Jade
+💤 🛡️ Guardián Jade quedó fuera de combate
+⚔️ 🐺 Lobo Sombrío entra al combate
+
+T27 · 🐺 *Lobo Sombrío* usó _Garra Sombría_
+💥 *29 de daño* a Panda Guerrero
+
+T28 · 🐼 *Panda Guerrero* usó _Golpe de Bambú_
+💥 *33 de daño* a Lobo Sombrío
+
+T29 · 🐺 *Lobo Sombrío* usó _Garra Sombría_
+💥 *29 de daño* a Panda Guerrero
+
+T30 · 🐼 *Panda Guerrero* usó _Golpe de Bambú_
+💥 *33 de daño* a Lobo Sombrío
+
+T31 · 🐺 *Lobo Sombrío* usó _Garra Sombría_
+💥 *21 de daño* a Panda Guerrero
+💤 🐼 Panda Guerrero quedó fuera de combate
+
+🎁 *RECOMPENSAS*
+Miguel: +15 XP
+🐼 Panda Guerrero: +5 XP
+🔥 Mago Carmesí: +5 XP
+🧘 Monje Celestial: +5 XP
+Lukas: +120 ChengCoins · +35 XP
+🐺 Lobo Sombrío: +12 XP
+🛡️ Guardián Jade: +12 XP
+🌙 Bruja Lunar: +11 XP
+🌱 Lukas subió al nivel 2
+
+👉 *.ctuhistorial*
+```
+
+## Equipo después del combate: seis unidades desbloqueadas
+
+```text
+🃏 *CHENGDÚ CARDS | EQUIPO*
+━━━━━━━━━━━━━━
+🛡️ *Miguel* · 3/3 unidades
+
+1️⃣ 🐼 *Panda Guerrero* · Nv. 2
+⚔️ Abre el combate
+
+2️⃣ 🔥 *Mago Carmesí* · Nv. 1
+🪑 Reserva
+
+3️⃣ 🧘 *Monje Celestial* · Nv. 1
+🪑 Reserva
+
+✅ Listo para combatir
+
+👉 *.ctupelea @jugador*
+🔎 Stats y ataques: .ctuficha
+🔀 Orden: .ctuequipo ordenar 3 2 1
+```
+
+## Desafío sin modo: combate avanzado 1v1 entre starters
+
+```text
+🃏 *CHENGDÚ CARDS | DESAFÍO*
+━━━━━━━━━━━━━━
+⚔️ *Miguel* desafió a *Lukas* · *1v1*
+
+🛡️ 1 unidad por jugador · Elementos, pasivas y efectos
+
+📣 *Lukas, ¿aceptas?*
+👉 *.ctuaceptar* o *.cturechazar*
+
+⏳ Vence a las 14:05 (CDMX).
+↩️ Retirar: .ctucancelar
+```
+
+## 1v1 avanzado: elementos y pasivas también con una unidad
+
+```text
+🃏 *CHENGDÚ CARDS | INICIO | T1*
+━━━━━━━━━━━━━━
+⚔️ *Miguel* vs *Lukas* · *1v1*
+🐺 *Lobo Sombrío* toma la iniciativa.
+
+✨ 🐼 Panda Guerrero: *Piel de Bambú*
+🛡️ Escudo → 🐼 Panda Guerrero · 2 turnos
+✨ 🐺 Lobo Sombrío: *Mirada Nocturna*
+🛡️ Defensa reducida → 🐼 Panda Guerrero · 2 turnos
+🛡️ Escudo → 🐺 Lobo Sombrío · 2 turnos
+
+❤️ *ESTADO*
+🐼 *Miguel* · Panda Guerrero
+▓▓▓▓▓▓▓▓▓▓ 122/122 HP
+🛡️ Escudo 12 · 🛡️ Defensa reducida 2T
+
+🐺 *Lukas* · Lobo Sombrío
+▓▓▓▓▓▓▓▓▓▓ 95/95 HP
+🛡️ Escudo 10
+
+🎯 *Turno de Lukas*
+1️⃣ Garra Sombría · 25 POT
+2️⃣ Colmillo Nocturno · 35 POT
+
+👉 *.ctuatacar 1* o *.ctuatacar 2*
+🔎 Detalles: .ctuficha
+```
+
+## Rendición temprana avanzada: cierra sin premios
+
+```text
+🃏 *CHENGDÚ CARDS | VICTORIA*
+━━━━━━━━━━━━━━
+🏳️ Miguel se rindió.
+
+🐺 *¡Lukas derrotó a Miguel!*
+
+⚔️ 1v1 · 0 turnos · ❤️ 95 HP restantes
+
+❤️ *ESTADO*
+🐼 *Miguel* · Panda Guerrero
+▓▓▓▓▓▓▓▓▓▓ 122/122 HP
+🛡️ Escudo 12 · 🛡️ Defensa reducida 2T
+
+🐺 *Lukas* · Lobo Sombrío
+▓▓▓▓▓▓▓▓▓▓ 95/95 HP
+🛡️ Escudo 10
+
+🎁 Sin recompensa: rendición antes de 4 ataques entre ambos jugadores.
+
+⚔️ Otra partida: .ctupelea @jugador
 ```

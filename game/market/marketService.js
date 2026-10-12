@@ -71,7 +71,7 @@ export function createMarketService(storage, clock) {
   }
 
   return {
-    async listListings({ cursor = null, limit = 5, rarity = null, characterId = null, sellerId = null, sort = 'newest' } = {}) {
+    async listListings({ cursor = null, page = null, limit = 5, rarity = null, characterId = null, sellerId = null, sort = 'newest' } = {}) {
       requireGame(rarity === null || ['common', 'rare', 'epic', 'legendary', 'mythic'].includes(rarity), 'INVALID_MARKET_FILTER');
       requireGame(['newest', 'price_asc', 'price_desc'].includes(sort) &&
         (characterId === null || typeof characterId === 'string') && (sellerId === null || typeof sellerId === 'string'), 'INVALID_MARKET_FILTER');
@@ -86,9 +86,9 @@ export function createMarketService(storage, clock) {
         const scope = `market:${JSON.stringify([rarity, characterId, sellerId, sort])}`;
         const key = listing => [String(sort === 'newest' ? Number.MAX_SAFE_INTEGER - indices.get(listing.id)
           : sort === 'price_asc' ? listing.price : Number.MAX_SAFE_INTEGER - listing.price).padStart(16, '0'), listing.id];
-        const page = paginate(candidates, { cursor, limit }, scope, key);
-        page.items = await Promise.all(page.items.map(listing => publicListing(repos, listing)));
-        return page;
+        const result = paginate(candidates, { cursor, page, limit }, scope, key);
+        result.items = await Promise.all(result.items.map(listing => publicListing(repos, listing)));
+        return result;
       });
     },
     async getListing(listingId) {

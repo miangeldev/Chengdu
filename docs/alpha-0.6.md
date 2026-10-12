@@ -23,11 +23,15 @@ del equipo y queda bloqueada mientras el anuncio permanece activo.
 | `.ctuventas` | Compras y ventas del remitente, cinco por página. |
 | `.ctupropiedad UNIT` | Emisión y propietarios sucesivos, cinco eventos por página. |
 
-Las páginas siguientes usan el comando que muestra cada lista, conservando
-su filtro. Los cursores de anuncios propios y ventas pertenecen a su jugador;
-los de propiedad pertenecen a la unidad consultada. Los comandos funcionan en
-grupo y en privado. Consultar el mercado y sus anuncios permite comparar antes
-de registrarse; comprar o vender requiere un jugador autenticado.
+Desde 0.6.1, las páginas se eligen con números cortos: `.ctumercado 2`,
+`.ctumercado raro 2`, `.ctumercado mios 2`, `.ctuventas 2` o
+`.ctupropiedad PAND-000001 2`. Sin número se abre la página 1. Las listas muestran
+la página actual y el total, con comandos para avanzar y volver conservando el
+filtro o la unidad. Cada página refleja los resultados actuales; nuevos anuncios
+o vencimientos pueden cambiar qué entradas ocupan una página.
+Los anuncios propios y ventas se filtran siempre por el remitente autenticado.
+Los comandos funcionan en grupo y en privado. Consultar el mercado y sus anuncios
+permite comparar antes de registrarse; comprar o vender requiere un jugador autenticado.
 
 Cada acción envía un mensaje con encabezado, separador, resumen y siguiente paso.
 La lista prioriza personaje, nivel, rareza y precio. El detalle añade stats y
