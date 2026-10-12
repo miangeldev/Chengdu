@@ -291,7 +291,7 @@ los participantes con daño, con bonos separados por mayor daño y golpe final.
 El Guardián tiene 1.000 HP; el Dragón, 100.000. No alteran estadísticas PvP.
 
 La actividad del grupo tiene una comprobación de aparición por ventana de 30
-minutos, probabilidad del 25% y seis horas entre apariciones; enviar más mensajes
+minutos, probabilidad del 25% y una hora entre apariciones; enviar más mensajes
 no añade oportunidades. Capturar cuesta un ticket, dura diez minutos y sólo
 puede ganar una persona. Se comprueban supply y calendario antes de emitir.
 

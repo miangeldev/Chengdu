@@ -114,7 +114,7 @@ su resultado y nunca descuentan HP ni pagan otra vez.
 ## Apariciones y captura
 
 La actividad autenticada de un grupo habilita una comprobación por ventana de
-30 minutos, con 25% de probabilidad y un mínimo de 6 horas entre apariciones.
+30 minutos, con 25% de probabilidad y un mínimo de 1 hora entre apariciones.
 Todos los mensajes adicionales de esa ventana comparten la misma oportunidad;
 no se acumula probabilidad por volumen. `.ctuexplorar` usa exactamente esa misma
 regla. El bot ignora actividad propia y remitentes sin registro.

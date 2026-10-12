@@ -141,7 +141,7 @@ test('event issuance closes exactly at the deadline while historical units and p
   assert.equal((await c.game.validateDatabase()).valid, true);
 });
 
-test('spawn checks allow one chance per time window, ignore message volume and preserve group cooldown across restart', async t => {
+test('spawn checks allow one chance per time window, ignore message volume and preserve the one-hour group cooldown across restart', async t => {
   const c = await fixture(t);
   const first = await c.game.encounters.observeActivity({ userId: c.a.id, chatId: c.chatId, messageId: 'first' });
   assert.equal(first.spawned, true);
@@ -154,7 +154,9 @@ test('spawn checks allow one chance per time window, ignore message volume and p
   c.advance(1_200_000);
   assert.equal((await c.game.encounters.observeActivity({ userId: c.a.id, chatId: c.chatId, messageId: 'next-window' })).spawned, false);
   await c.game.close(); const reopened = c.open().game;
-  c.setTime('2026-10-12T02:00:00.000Z');
+  c.setTime('2026-10-11T20:59:59.999Z');
+  assert.equal((await reopened.encounters.observeActivity({ userId: c.b.id, chatId: c.chatId, messageId: 'before-gap' })).spawned, false);
+  c.setTime('2026-10-11T21:00:00.000Z');
   const second = await reopened.encounters.observeActivity({ userId: c.b.id, chatId: c.chatId, messageId: 'after-gap' });
   assert.equal(second.spawned, true);
   assert.notEqual(second.spawn.code, first.spawn.code);

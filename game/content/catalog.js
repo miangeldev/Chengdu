@@ -20,7 +20,7 @@ export const BOSSES = Object.freeze([
   { id: 'dragon', name: 'Dragón del Vacío', emoji: '🐉', hp: 100_000, defense: 30, cooldownMs: 30_000, maxAttacks: 20, respawnMs: 259_200_000, durationMs: 259_200_000, rewards: bossRewards() }
 ]);
 
-export const SPAWN_POLICY = Object.freeze({ checkIntervalMs: 1_800_000, minSpawnGapMs: 21_600_000, durationMs: 600_000, chancePercent: 25, ticketCost: 1,
+export const SPAWN_POLICY = Object.freeze({ checkIntervalMs: 1_800_000, minSpawnGapMs: 3_600_000, durationMs: 600_000, chancePercent: 25, ticketCost: 1,
   rarityWeights: Object.freeze({ common: 30, rare: 10, epic: 4, legendary: 1, mythic: 1 }) });
 
 export function seedCampaigns() {
