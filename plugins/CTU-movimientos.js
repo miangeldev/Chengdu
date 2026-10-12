@@ -1,7 +1,7 @@
 import { defineCommand, pageArguments, pageNavigation } from '../interfaces/whatsapp/command.js';
 import { card } from '../interfaces/whatsapp/format.js';
 
-const sources = { battle_reward: '🏆 Combate', pack_opening: '🎁 Sobre', daily_reward: '📅 Diario', market_purchase: '🛒 Compra de unidad', market_sale: '🤝 Venta de unidad' };
+const sources = { battle_reward: '🏆 Combate', pack_opening: '🎁 Sobre', daily_reward: '📅 Diario', market_purchase: '🛒 Compra de unidad', market_sale: '🤝 Venta de unidad', content_reward: '🌿 Misiones y aventuras' };
 const movementDate = value => new Date(value).toLocaleString('es-MX', {
   timeZone: 'America/Mexico_City', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
 });

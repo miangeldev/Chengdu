@@ -28,15 +28,46 @@ import * as retirar from '../../plugins/CTU-retirar.js';
 import * as ventas from '../../plugins/CTU-ventas.js';
 import * as propiedad from '../../plugins/CTU-propiedad.js';
 import * as cambiar from '../../plugins/CTU-cambiar.js';
+import * as misiones from '../../plugins/CTU-misiones.js';
+import * as logros from '../../plugins/CTU-logros.js';
+import * as inventario from '../../plugins/CTU-inventario.js';
+import * as boss from '../../plugins/CTU-boss.js';
+import * as bossatacar from '../../plugins/CTU-bossatacar.js';
+import * as bosstop from '../../plugins/CTU-bosstop.js';
+import * as spawn from '../../plugins/CTU-spawn.js';
+import * as capturar from '../../plugins/CTU-capturar.js';
+import * as explorar from '../../plugins/CTU-explorar.js';
+import * as eventos from '../../plugins/CTU-eventos.js';
+import * as evento from '../../plugins/CTU-evento.js';
+import { identityFor } from './command.js';
+import { commandText } from './format.js';
+import { renderSpawn } from './contentFormat.js';
 import { game as defaultGame } from '../../game/index.js';
 
-export const commands = Object.freeze([registro, perfil, catalogo, starter, personajes, unidad, ayuda, equipo, pelea, aceptar, atacar, rendirse, combate, rechazar, cancelar, ficha, balance, historial, sobres, abrir, diario, tienda, movimientos, mercado, vender, comprar, retirar, ventas, propiedad, cambiar]);
+export const commands = Object.freeze([registro, perfil, catalogo, starter, personajes, unidad, ayuda, equipo, pelea, aceptar, atacar, rendirse, combate, rechazar, cancelar, ficha, balance, historial, sobres, abrir, diario, tienda, movimientos, mercado, vender, comprar, retirar, ventas, propiedad, cambiar, misiones, logros, inventario, boss, bossatacar, bosstop, spawn, capturar, explorar, eventos, evento]);
+
+export async function observeGameActivity(sock, msg, { game = defaultGame, prefix = '.', logger = console.error } = {}) {
+  if (!msg?.key?.remoteJid?.endsWith('@g.us') || msg.key.fromMe || !msg.key.id || !msg.key.participant) return false;
+  let user;
+  try { user = await game.users.getUserByIdentity(identityFor(sock, msg)); }
+  catch (error) { if (['USER_NOT_FOUND', 'INVALID_IDENTITY'].includes(error.code)) return false; throw error; }
+  let result;
+  try { result = await game.encounters.observeActivity({ userId: user.id, chatId: msg.key.remoteJid, messageId: msg.key.id }); }
+  catch (error) { logger(`Chengdú: aparición | ${error.code ?? 'UNEXPECTED_ERROR'}`, error); return false; }
+  if (!result.spawned) return false;
+  await sock.sendMessage(msg.key.remoteJid, { text: renderSpawn(result.spawn, (command, args = '') => commandText(prefix, command, args)) });
+  return true;
+}
 
 // Host supplies authenticated msg metadata and the text extracted from the message.
-export function createCommandRouter({ game = defaultGame, prefix = '.', logger, debug, battleHealthBars } = {}) {
+export function createCommandRouter({ game = defaultGame, prefix = '.', logger, debug, battleHealthBars, automaticSpawns = true } = {}) {
   const handlers = new Map(commands.map(c => [c.command, c.createRun(game, { logger, prefix, debug, battleHealthBars })]));
   return async function handleGameCommand(sock, msg, body) {
-    if (typeof body !== 'string' || !body.startsWith(prefix)) return false;
+    if (typeof body !== 'string') return false;
+    if (!body.startsWith(prefix)) {
+      if (automaticSpawns && body.trim()) await observeGameActivity(sock, msg, { game, prefix, logger });
+      return false;
+    }
     const [name, ...args] = body.slice(prefix.length).trim().split(/\s+/u);
     const run = handlers.get(name.toLowerCase());
     if (!run) return false;

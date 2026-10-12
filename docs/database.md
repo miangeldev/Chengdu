@@ -1,11 +1,82 @@
-# Modelo de datos — Alpha 0.7 y su evolución
+# Modelo de datos — Beta 0.8 y su evolución
 
-Estado: contrato implementado hasta 0.7 (esquema 8), basado en `../project.md`.
+Estado: contrato implementado hasta 0.8 (esquema 9), basado en `../project.md`.
 Los mecanismos descritos como futuros aún requieren servicios y migraciones.
 El alcance se divide en [fundación 0.1](mvp-0.1.md), [combate 0.2](mvp-0.2.md),
 [progresión 0.3](mvp-0.3.md), [colección 0.4](alpha-0.4.md),
 [balance 0.4.1](balance-0.4.1.md), [economía 0.5](alpha-0.5.md)
-y [mercado 0.6](alpha-0.6.md) y [combate avanzado 0.7](alpha-0.7.md).
+y [mercado 0.6](alpha-0.6.md), [combate avanzado 0.7](alpha-0.7.md)
+y [contenido 0.8](beta-0.8.md).
+
+## Contenido y calendario 0.8
+
+Las seis colecciones nuevas separan definiciones de campañas, recibos económicos,
+desbloqueos, estado de encuentros, acciones y actividad temporal. No se reutiliza
+`eventos.json` para mensajes de juego: esa colección sigue dedicada a emisión y
+propiedad. No se insertan bots ni bosses como jugadores o partidas PvP.
+
+`premioscontenido` conserva `kind`, `sourceId`, `userId`, `operationKey`,
+`policyVersion`, fecha, monedas, XP, tickets ganados/gastados y valores antes y
+después. La fuente única es `(kind, sourceId, userId)`. Cada recibo tiene un crédito
+`content_reward` en el ledger, incluso si las monedas son cero en una captura.
+Esto proporciona un orden común para reproducir la XP de jugador entre dominios.
+La XP de unidades continúa reproduciéndose desde premios PvP.
+
+Los tickets empiezan en cero y se reproducen en orden de recibos:
+`ticketsAfter = ticketsBefore + tickets − ticketCost`, siempre enteros seguros
+no negativos. Cada captura vincula premio, acción y unidad emitida; un ticket
+no se consume sin su unidad ni se concede una captura sin su gasto.
+
+Misiones y logros derivan progreso de partidas verificadas y eventos de
+adquisición. El recibo conserva evidencia: IDs de partidas de aquel día,
+especies participantes o unidades distintas. La validación comprueba esa
+evidencia sin invalidarla cuando se añaden partidas de la misma fecha/hora.
+Un desbloqueo guarda snapshot de definición, evidencia y fecha; no se elimina
+al vender, perder una racha o cambiar de día.
+
+Los encuentros conservan posición global y añaden vistas `B<n>`/`S<n>`; orden,
+tipo y referencias no cambian. Acciones y premios son append-only. Bosses
+guardan HP y plantilla congelada; el daño se reproduce desde tirada, ataque y
+stats. Propiedad se comprueba por la versión histórica de la unidad. La acción
+final exige premios completos para todos los contribuyentes con daño positivo.
+
+Las comprobaciones de grupo guardan tirada, pool y pesos congelados, resultado
+y fecha. `actividad` conserva la próxima ventana y última aparición, comprobadas
+contra esas acciones. La probabilidad no se acumula por número de mensajes.
+Los encuentros vencidos se cierran al operar su servicio; no mantienen locks
+de unidad persistentes ni requieren un scheduler para su integridad.
+
+Campañas tienen ID de edición, código corto, revisión, política, inicio, fin,
+personajes y bienvenida. El intervalo es `[startsAt, endsAt)`. Un personaje
+con `eventId` sólo se emite dentro de ese intervalo, cualquiera que sea su origen.
+La fábrica comprueba el calendario después de resolver emisiones idempotentes
+anteriores. Sobres excluyen personajes de eventos inactivos antes del sorteo.
+Calendario y asociación de edición permanecen inmutables; nuevas ediciones usan
+IDs nuevos para evitar reabrir supply histórico.
+
+## Migración del esquema 8 al 9
+
+Se valida el esquema 8, se conservan sus catorce colecciones y se añaden las seis
+del contenido. Sólo se agregan dos personajes, sus counters y cuatro ataques;
+las definiciones, IDs, propietarios, seriales, saldos, XP, logs y recibos previos
+permanecen iguales. Los archivos antiguos aumentan una revisión y cambian su
+envoltura al esquema 9; los archivos nuevos empiezan en revisión cero.
+Desbloqueos, premios, encuentros, acciones y actividad empiezan vacíos. No se
+inventan premios retroactivos ni personajes emitidos.
+
+El journal de esquema 9 contiene 21 archivos. `collectionsForVersion` reconoce
+todos los conjuntos anteriores; un journal del esquema 8 conserva sus 15 archivos
+y se recupera antes de migrar. La migración completa usa backup y un solo commit.
+Un fallo preparado conserva la base original; un commit confirmado se publica
+por completo antes de servir solicitudes. `crearDatabase` protege las nuevas
+colecciones frente a escritura directa, igual que las anteriores.
+
+Para cambios futuros de reglas, mantener las definiciones de política 1 como
+históricas y añadir una nueva política, sus validadores y pruebas; no cambiar
+su interpretación ni los snapshots existentes. Una migración a SQLite debe
+materializar códigos y preservar orden del ledger/acciones, fuentes únicas,
+recibos, tickets, seriales y relaciones de propiedad. Archivar encuentros no
+puede borrar sus referencias ni reutilizar códigos.
 
 ## Convenciones y fuentes de verdad
 
@@ -40,6 +111,12 @@ y [mercado 0.6](alpha-0.6.md) y [combate avanzado 0.7](alpha-0.7.md).
 | `diarios.json` | Reclamos diarios únicos, política, espera y recibo monetario. |
 | `mercado.json` | Anuncios con snapshot de unidad, precio, vencimiento y estado. |
 | `ventas.json` | Compras confirmadas, importes, participantes y evento de transferencia. |
+| `campanas.json` | Ediciones de eventos con calendario, personajes y bienvenida. |
+| `premioscontenido.json` | Premios únicos de misiones, logros, bosses, bienvenida y gastos de captura. |
+| `logros.json` | Hitos permanentes desbloqueados con snapshot y evidencia. |
+| `encuentros.json` | Bosses mundiales y apariciones de grupo, con snapshots y estados. |
+| `accionescontenido.json` | Ataques, capturas y comprobaciones temporales inmutables. |
+| `actividad.json` | Próxima comprobación y última aparición de cada grupo. |
 
 Además, `_database.json` marca la instalación, `_journal.json` coordina un commit
 pendiente y `backups/` conserva snapshots coherentes del estado anterior.
@@ -47,13 +124,15 @@ El esquema 7 añade mercado y ventas a las doce colecciones del esquema 6; con e
 manifest, cada snapshot del journal contiene quince archivos.
 El esquema 8 conserva esas catorce colecciones y añade perfiles avanzados a
 personajes y ataques; no crea archivos adicionales ni reescribe partidas anteriores.
+El esquema 9 añade seis colecciones, dos personajes y cuatro ataques de evento;
+cada snapshot del journal contiene veinte colecciones y el manifest: 21 archivos.
 
 Cada colección emplea esta envoltura; el adaptador oculta la envoltura a servicios:
 
 ```json
 {
   "_meta": {
-    "schemaVersion": 8,
+    "schemaVersion": 9,
     "revision": 0,
     "updatedAt": null
   },
@@ -651,6 +730,26 @@ de siete días y comisión del 5%, redondeada hacia arriba. Su fórmula es
 `fee = ceil(price × 500 / 10000)` y el neto es `price − fee`. Las reglas se
 conservan por versión en `MARKET_POLICIES` para interpretar anuncios y ventas
 anteriores. Cambiar una política exige añadir otra versión.
+
+Desde 0.7.1, las respuestas de anuncios añaden `code: "M1"`. El código se deriva
+de la posición global, empezando en 1, del anuncio en `mercado.records`, que
+conserva todas las publicaciones, incluidas vendidas, retiradas y vencidas.
+No se calcula sobre resultados filtrados ni páginas. Las transiciones protegen
+el orden de los IDs existentes: sólo permiten añadir al final y cerrar anuncios
+sin borrarlos, reordenarlos ni reutilizar códigos. Las unidades en venta añaden
+`marketCode` a su vista pública para enlazar al mismo anuncio.
+
+`getListing`, `buyListing` y `cancelListing` aceptan el código corto o el UUID
+anterior; resuelven ambos al mismo ID dentro de la transacción. Los reintentos
+conservan su recibo aunque alternen entre ambos formatos. La UI usa
+`.ctumercado M1`, `.ctucomprar M1` y `.cturetirar M1`. La página 1 se consulta
+con `.ctumercado 1`, sin el prefijo `M`.
+
+Esta mejora conserva el esquema 8 y no modifica los registros existentes.
+Una migración a SQLite o una política de archivo debe materializar y conservar
+la relación código–UUID a partir de este orden, con una restricción única por
+código. No reconstruir códigos a partir de fechas, anuncios activos o un orden
+de consulta diferente; tampoco eliminar las referencias a anuncios cerrados.
 
 La publicación fija un snapshot con los stats efectivos, nombre, rareza,
 nivel, progreso, rasgos y variante de ese momento. Esos valores y el precio

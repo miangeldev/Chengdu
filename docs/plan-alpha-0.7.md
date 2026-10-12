@@ -84,6 +84,11 @@ La validación aquí usa el mismo adaptador con un socket simulado.
 - [x] 0.7.6: 30 comandos, páginas cortas y 103 vistas previas.
 - [x] 0.7.7: 352 pruebas y revisión de integración, balance y recuperación.
 
+Ajuste posterior de la versión 0.7.1: el mercado muestra comprar y consultar
+directamente con códigos cortos estables (`M1`, `M2`…). Publicación, colección,
+ficha y retirada usan la misma referencia. La suite completa pasa 358 pruebas
+y los 103 mensajes de ejemplo reflejan el cambio, sin modificar el esquema 8.
+
 La simulación final cubre 8.600 combates y los ensayos de afinado otras 43.000
 partidas. La base del proyecto conserva exactamente los registros de doce
 colecciones; personajes y ataques conservan sus datos y añaden perfiles.

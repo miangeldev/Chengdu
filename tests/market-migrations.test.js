@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
 import { COLLECTIONS, V6_COLLECTIONS, validateDatabase } from '../storage/validation.js';
-import { readRecords, register, setup } from './helpers.js';
+import { readRecords, register, setup, stripBetaContentFixture } from './helpers.js';
 
 const serialize = value => JSON.stringify(value, null, 2) + '\n';
 
@@ -29,6 +29,7 @@ async function v6Fixture(t) {
   await c.game.battle.challenge({ userId: seller.id, opponentId: buyer.id, chatId });
   await c.game.battle.accept({ userId: buyer.id, chatId });
   await c.game.close();
+  stripBetaContentFixture(c.directory);
   const state = Object.fromEntries(V6_COLLECTIONS.map(name => [name,
     JSON.parse(fs.readFileSync(path.join(c.directory, `${name}.json`), 'utf8'))]));
   for (const collection of Object.values(state)) collection._meta.schemaVersion = 6;
@@ -46,7 +47,7 @@ async function v6Fixture(t) {
 function assertPreserved(c) {
   for (const name of V6_COLLECTIONS) {
     const expected = name === 'unidades' ? c.state[name].records.map(unit => ({ ...unit, ownershipVersion: 0 })) : c.state[name].records;
-    assert.deepEqual(readRecords(c.directory, name), expected, name);
+    assert.deepEqual(readRecords(c.directory, name).slice(0, expected.length), expected, name);
   }
   assert.deepEqual(readRecords(c.directory, 'mercado'), []);
   assert.deepEqual(readRecords(c.directory, 'ventas'), []);
@@ -57,14 +58,14 @@ function assertPreserved(c) {
 test('schema 6 market migration preserves every historical record, balance and snapshot without retroactive sales or fees', async t => {
   const c = await v6Fixture(t);
   const game = c.open().game;
-  assert.equal((await game.validateDatabase()).schemaVersion, 8);
+  assert.equal((await game.validateDatabase()).schemaVersion, 9);
   assertPreserved(c);
   assert.equal((await game.economy.getBalance(c.seller.id)).coins, 20);
   assert.equal((await game.economy.getBalance(c.buyer.id)).coins, 100);
   for (const name of V6_COLLECTIONS) {
     const metadata = JSON.parse(fs.readFileSync(path.join(c.directory, `${name}.json`), 'utf8'))._meta;
-    assert.equal(metadata.schemaVersion, 8);
-    assert.equal(metadata.revision, c.state[name]._meta.revision + 2);
+    assert.equal(metadata.schemaVersion, 9);
+    assert.equal(metadata.revision, c.state[name]._meta.revision + 3);
   }
   const snapshots = fs.readdirSync(path.join(c.directory, 'backups')).map(id =>
     JSON.parse(fs.readFileSync(path.join(c.directory, 'backups', id, 'snapshot.json'), 'utf8')));
@@ -81,7 +82,7 @@ for (const stage of ['prepared', 'committed', 'published:unidades.json', 'publis
     assert.equal(Object.keys(journal.body.after).length, COLLECTIONS.length + 1);
     await failed.close();
     const game = c.open().game;
-    assert.equal((await game.validateDatabase()).schemaVersion, 8);
+    assert.equal((await game.validateDatabase()).schemaVersion, 9);
     assertPreserved(c);
     assert.equal(fs.existsSync(path.join(c.directory, '_journal.json')), false);
   });
@@ -100,7 +101,7 @@ for (const phase of ['prepared', 'committed']) {
     fs.writeFileSync(path.join(c.directory, '_journal.json'), serialize({ version: 1, phase, body, checksum }));
     if (phase === 'committed') fs.writeFileSync(path.join(c.directory, 'sobres.json'), after['sobres.json']);
     const game = c.open().game;
-    assert.equal((await game.validateDatabase()).schemaVersion, 8);
+    assert.equal((await game.validateDatabase()).schemaVersion, 9);
     if (phase === 'committed') c.state.sobres = packs;
     assertPreserved(c);
     assert.equal(readRecords(c.directory, 'sobres')[0].name, phase === 'committed' ? 'Sobre Histórico' : JSON.parse(c.raw['sobres.json']).records[0].name);

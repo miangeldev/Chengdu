@@ -8,7 +8,8 @@ import { createCommandRouter } from '../interfaces/whatsapp/index.js';
 const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'chengdu-preview-'));
 let roll = 0;
 let currentTime = '2026-10-11T20:00:00Z';
-const game = createGame({ directory, clock: () => currentTime, randomRoll: () => roll, randomDropInt: upper => upper - 1 });
+let contentRoll = null;
+const game = createGame({ directory, clock: () => currentTime, randomRoll: () => roll, randomDropInt: upper => contentRoll ? contentRoll(upper) : upper - 1 });
 const route = createCommandRouter({ game });
 const samples = [];
 let latest;
@@ -127,17 +128,17 @@ try {
   const listingMessageId = 'preview-list-panda';
   await send(a, '.ctuvender PAND-000001 100', 'Publicar: precio, comisión y vencimiento', [], listingMessageId);
   const pandaListing = (await game.market.listListings({ sellerId: user.id })).items[0];
-  await send(a, '.ctumercado', 'Mercado: decidir a simple vista');
+  await send(b, '.ctumercado', 'Mercado: decidir y comprar a simple vista');
   await send(b, '.ctumercado comun', 'Mercado: filtrar por rareza');
   await send(b, '.ctumercado precio', 'Mercado: ordenar por precio');
   await send(a, '.ctumercado mios', 'Mis anuncios: neto que recibirá el vendedor');
-  await send(b, `.ctumercado ver ${pandaListing.id}`, 'Anuncio: ficha congelada y acción de compra');
+  await send(b, `.ctumercado ${pandaListing.code}`, 'Anuncio: ficha congelada y acción de compra');
   await send(a, '.ctupersonajes', 'Colección: unidad bloqueada en el mercado');
   await send(a, '.ctuequipo usar PAND-000001', 'Error: una unidad en venta no puede combatir');
-  await send(b, `.ctucomprar ${pandaListing.id}`, 'Error: el comprador necesita saldo');
+  await send(b, `.ctucomprar ${pandaListing.code}`, 'Error: el comprador necesita saldo');
   await send(b, '.ctudiario');
   const purchaseMessageId = 'preview-purchase-panda';
-  await send(b, `.ctucomprar ${pandaListing.id}`, 'Compra: pago y equipo bajo demanda', [], purchaseMessageId);
+  await send(b, `.ctucomprar ${pandaListing.code}`, 'Compra: pago y equipo bajo demanda', [], purchaseMessageId);
   await send(a, '.ctuventas', 'Ventas: precio neto y comisión del vendedor');
   await send(b, '.ctuventas', 'Compras: recibo personal sin saldo de la contraparte');
   await send(b, '.ctupropiedad PAND-000001', 'Propiedad: nacimiento y transferencia');
@@ -148,25 +149,25 @@ try {
   await send(a, '.ctuvender PAND-000001 100', 'Repetir publicación: conserva el anuncio ya vendido', [], listingMessageId);
   await send(b, '.ctuvender PAND-000001 75');
   const resale = (await game.market.listListings()).items[0];
-  await send(a, `.ctucomprar ${resale.id}`, 'Reventa: conserva la identidad y el progreso de la unidad');
-  await send(b, `.ctucomprar ${pandaListing.id}`, 'Compra antigua: recibo original después de revender', [], purchaseMessageId);
+  await send(a, `.ctucomprar ${resale.code}`, 'Reventa: conserva la identidad y el progreso de la unidad');
+  await send(b, `.ctucomprar ${pandaListing.code}`, 'Compra antigua: recibo original después de revender', [], purchaseMessageId);
   await send(a, '.ctupropiedad PAND-000001', 'Propiedad: cadena de dos ventas');
   await send(a, `.ctuvender ${obtained.id} 20`);
   const packListing = (await game.market.listListings()).items[0];
-  await send(b, `.ctucomprar ${packListing.id}`);
+  await send(b, `.ctucomprar ${packListing.code}`);
   await send(a, '.ctuabrir basico', 'Apertura antigua: recibo original después de vender la unidad', [], openingMessageId);
   await send(b, `.ctuvender ${obtained.id} 60`);
   const withdrawn = (await game.market.listListings()).items[0];
   const cancelMessageId = 'preview-withdraw';
-  await send(b, `.cturetirar ${withdrawn.id}`, 'Retirar anuncio: libera la unidad sin comisión', [], cancelMessageId);
-  await send(b, `.cturetirar ${withdrawn.id}`, 'Repetir retirada: conserva la cancelación', [], cancelMessageId);
-  await send(a, `.ctucomprar ${withdrawn.id}`, 'Error: el anuncio ya fue retirado');
+  await send(b, `.cturetirar ${withdrawn.code}`, 'Retirar anuncio: libera la unidad sin comisión', [], cancelMessageId);
+  await send(b, `.cturetirar ${withdrawn.code}`, 'Repetir retirada: conserva la cancelación', [], cancelMessageId);
+  await send(a, `.ctucomprar ${withdrawn.code}`, 'Error: el anuncio ya fue retirado');
   await send(a, '.ctumovimientos', 'Movimientos: compras y ventas junto a diarios y combates');
   await send(b, '.ctuvender LOBO-000001 20');
   const expiring = (await game.market.listListings()).items[0];
   currentTime = expiring.expiresAt;
-  await send(a, `.ctucomprar ${expiring.id}`, 'Vencimiento: rechaza la compra y libera el bloqueo');
-  await send(b, `.ctumercado ver ${expiring.id}`, 'Anuncio vencido: conserva la ficha histórica');
+  await send(a, `.ctucomprar ${expiring.code}`, 'Vencimiento: rechaza la compra y libera el bloqueo');
+  await send(b, `.ctumercado ${expiring.code}`, 'Anuncio vencido: conserva la ficha histórica');
   await send(b, '.ctuequipo usar LOBO-000001', 'Equipo: unidad disponible después del vencimiento');
   // Expand the same temporary collection through the trusted mint service.
   // These preview-only units never enter the project's database.
@@ -222,6 +223,59 @@ try {
   await send(a, '.ctupelea @Lukas', 'Desafío sin modo: combate avanzado 1v1 entre starters', [b]);
   await send(b, '.ctuaceptar', '1v1 avanzado: elementos y pasivas también con una unidad');
   await send(a, '.cturendirse', 'Rendición temprana avanzada: cierra sin premios');
+  currentTime = new Date(Date.parse(currentTime) + 2 * 86_400_000).toISOString();
+  for (let index = 0; index < 2; index++) {
+    await send(a, '.ctupelea @Lukas clasico', null, [b]);
+    await send(b, '.ctuaceptar');
+    battle = await game.battle.getMyBattle({ userId: user.id, chatId });
+    while (battle.status === 'active') {
+      await send(battle.turnUserId === user.id ? a : b, '.ctuatacar 2');
+      battle = await game.battle.getMyBattle({ userId: user.id, chatId });
+    }
+  }
+  await send(a, '.ctumisiones', 'Misiones: progreso de hoy y comandos cortos para cobrar');
+  await send(a, '.ctumisiones reclamar 1', 'Misión cumplida: monedas, XP y ticket de captura', [], 'preview-mission');
+  await send(a, '.ctumisiones reclamar 1', 'Misión repetida: recibo original sin otro premio', [], 'preview-mission');
+  await send(a, '.ctulogros', 'Logros: historia permanente, títulos e insignias');
+  await send(a, '.ctulogros reclamar L1', 'Primera sangre: premio único y título');
+  await send(a, '.ctuinventario', 'Inventario: tickets y títulos desbloqueados');
+  await send(a, '.ctueventos', 'Calendario: festival con fechas y personajes exclusivos');
+  await send(a, '.ctuevento faroles', 'Festival: supply global y bienvenida');
+  await send(a, '.ctuevento faroles reclamar', 'Bienvenida del festival: una vez por jugador');
+  await send(b, '.ctuevento faroles reclamar');
+  contentRoll = upper => upper === 100 ? 0 : upper - 1;
+  await send(a, '.ctuexplorar', 'Aparición: un compañero exclusivo y captura por un ticket');
+  const apparition = await game.encounters.getSpawn({ chatId });
+  if (!apparition) throw new Error('No apareció un personaje en la ventana de ejemplo.');
+  await send(a, `.ctucapturar ${apparition.code}`, 'Captura: emisión única y procedencia del festival', [], 'preview-capture');
+  await send(a, `.ctucapturar ${apparition.code}`, 'Captura repetida: no consume otro ticket', [], 'preview-capture');
+  await send(b, `.ctucapturar ${apparition.code}`, 'Captura perdida: la aparición ya tiene propietario');
+  const eventUnit = (await game.units.getUserUnits(user.id, { limit: 25 })).items.find(unit => unit.origin.sourceId === apparition.id);
+  await send(a, `.ctuficha ${eventUnit.id}`, 'Personaje del festival: ataques y pasiva propios');
+  await send(a, `.ctuunidad ${eventUnit.id}`, 'Procedencia: el festival permanece en la unidad');
+  await send(a, `.ctuequipo usar ${eventUnit.id}`);
+  await send(a, '.ctuboss', 'Boss cooperativo: vida compartida y ataques disponibles');
+  let boss = await game.encounters.getBoss({ userId: user.id });
+  await send(a, `.ctubossatacar 2 ${boss.code}`, 'Boss: golpe crítico dentro del mismo mensaje', [], 'preview-boss-first');
+  await send(a, `.ctubossatacar 2 ${boss.code}`, 'Boss: un reintento no duplica daño', [], 'preview-boss-first');
+  await send(a, `.ctubossatacar 1 ${boss.code}`, 'Boss: cooldown compartido entre grupos');
+  boss = await game.encounters.getBoss({ userId: user.id });
+  let bossTurn = 0;
+  while (boss.status === 'active') {
+    currentTime = new Date(Date.parse(currentTime) + 30_000).toISOString();
+    await send(bossTurn++ % 2 ? a : b, `.ctubossatacar 2 ${boss.code}`);
+    boss = await game.encounters.getBoss({ userId: user.id });
+  }
+  samples.push({ title: 'Boss derrotado: premios por participar, mayor daño y último golpe', text: latest });
+  await send(a, `.ctubosstop ${boss.code}`, 'Boss: aportaciones de todos los participantes');
+  await send(a, '.ctuinventario', 'Inventario después de misiones, festival, captura y boss');
+  await send(a, '.ctuperfil', 'Perfil: logros y tickets integrados con el progreso');
+  await send(a, `.ctuvender ${eventUnit.id} 20`, 'Mercado: un personaje exclusivo también se puede vender');
+  const eventListing = (await game.market.listListings({ sellerId: user.id })).items.find(listing => listing.unitId === eventUnit.id);
+  currentTime = '2026-10-25T06:00:00.000Z';
+  await send(a, '.ctuevento faroles', 'Festival terminado: emisión cerrada y unidades conservadas');
+  await send(b, `.ctucomprar ${eventListing.code}`, 'Después del festival: comercio sin nueva emisión');
+  await send(b, `.ctuunidad ${eventUnit.id}`, 'Unidad histórica: conserva el festival después de cambiar de dueño');
   if (!(await game.validateDatabase()).valid) throw new Error('La base temporal de la vista previa no es válida.');
   const output = fileURLToPath(new URL('../docs/whatsapp-preview.md', import.meta.url));
   fs.writeFileSync(output, '# Vista previa de los mensajes de WhatsApp\n\n' +

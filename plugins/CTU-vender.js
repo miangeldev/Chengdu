@@ -14,5 +14,5 @@ export const { command, run, createRun } = defineCommand('ctuvender', async ({ g
     marketUnitText(listing.unitSnapshot),
     `💰 Precio: *${listing.price} ChengCoins*\n🏦 Comisión del 5%: ${listing.fee} ChengCoins (redondeo hacia arriba)\n📥 ${listing.status === 'active' ? 'Recibirás' : 'Neto del anuncio'}: *${listing.net} ChengCoins*`,
     `${listingStatus(listing.status)}${listing.status === 'active' ? '\n🛡️ Retirada del equipo mientras está en venta.' : ''}\n⏳ Vence: ${marketDateText(listing.expiresAt)} (CDMX)`
-  ], listing.status === 'active' ? `👉 Compartir anuncio: *${cmd('ctumercado', `ver ${listing.id}`)}*\n↩️ Retirar: ${cmd('cturetirar', listing.id)}` : `👉 Tus ventas y compras: *${cmd('ctuventas')}*`);
+  ], listing.status === 'active' ? `👉 Compartir anuncio: *${cmd('ctumercado', listing.code)}*\n↩️ Retirar: ${cmd('cturetirar', listing.code)}` : `👉 Tus ventas y compras: *${cmd('ctuventas')}*`);
 });

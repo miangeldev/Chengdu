@@ -30,14 +30,14 @@ export function createAdvancedRoll(seed = DEFAULT_SEED) {
   };
 }
 
-function snapshot(characterId, ownerId, index, level) {
-  const character = templates.find(c => c.id === characterId);
+function snapshot(characterId, ownerId, index, level, catalog = templates, attackDefinitions = attacks) {
+  const character = catalog.find(c => c.id === characterId);
   if (!character) throw new RangeError(`Personaje desconocido: ${characterId}.`);
   const profile = character.combat ?? combatProfile(characterId);
   const stats = effectiveStats(character.baseStats, level);
   return { id: `${ownerId}:${index}:${characterId}`, characterId, characterName: character.name, characterRevision: character.revision,
     level, stats, hp: stats.hp, profileVersion: profile.version, element: profile.element, ability: structuredClone(profile.ability),
-    attacks: character.attackIds.map(id => advancedAttack(attacks.get(id))) };
+    attacks: character.attackIds.map(id => advancedAttack(attackDefinitions.get(id))) };
 }
 
 function shieldAmount(unit) { return unit.effects.find(e => e.type === 'shield')?.potency ?? 0; }
@@ -97,15 +97,15 @@ export function chooseAdvancedAction(battle, { strategy = 'adaptive', allowSwitc
 }
 
 export function simulateAdvancedDuel({ firstCharacters, secondCharacters, level = 1, strategy = 'adaptive', allowSwitch = true,
-  challenger = 'first', seed = DEFAULT_SEED, roll = createAdvancedRoll(seed) } = {}) {
+  challenger = 'first', seed = DEFAULT_SEED, roll = createAdvancedRoll(seed), catalog = templates, attackDefinitions = attacks } = {}) {
   if (!Number.isSafeInteger(level) || level < 1 || level > LEVEL_CAPS.unit) throw new RangeError(`El nivel debe estar entre 1 y ${LEVEL_CAPS.unit}.`);
   if (!Array.isArray(firstCharacters) || !Array.isArray(secondCharacters) || firstCharacters.length < 1 || firstCharacters.length > 3 ||
     firstCharacters.length !== secondCharacters.length) throw new RangeError('Los equipos deben tener el mismo tamaño, entre 1 y 3 unidades.');
   if (!['adaptive', 'basic'].includes(strategy)) throw new RangeError('Estrategia válida: adaptive o basic.');
   if (!['first', 'second'].includes(challenger)) throw new RangeError('El retador debe ser first o second.');
   if (typeof roll !== 'function') throw new TypeError('roll debe ser una función.');
-  const first = { userId: 'first', name: 'Primero', units: firstCharacters.map((id, i) => snapshot(id, 'first', i, level)), activeIndex: 0 };
-  const second = { userId: 'second', name: 'Segundo', units: secondCharacters.map((id, i) => snapshot(id, 'second', i, level)), activeIndex: 0 };
+  const first = { userId: 'first', name: 'Primero', units: firstCharacters.map((id, i) => snapshot(id, 'first', i, level, catalog, attackDefinitions)), activeIndex: 0 };
+  const second = { userId: 'second', name: 'Segundo', units: secondCharacters.map((id, i) => snapshot(id, 'second', i, level, catalog, attackDefinitions)), activeIndex: 0 };
   let battle = initializeAdvancedBattle({ id: 'BTL-reference', rulesVersion: 2, acceptedAt: NOW, createdAt: NOW,
     mode: 'advanced', teamSize: firstCharacters.length, players: challenger === 'first' ? [first, second] : [second, first] });
   const switches = { first: 0, second: 0 };

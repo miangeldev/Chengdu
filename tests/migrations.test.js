@@ -5,7 +5,7 @@ import path from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
 import { V1_COLLECTIONS } from '../storage/validation.js';
 import { balancedLegacyStats } from '../game/characters/balance.js';
-import { readRecords, register, setup } from './helpers.js';
+import { readRecords, register, setup, stripBetaContentFixture } from './helpers.js';
 
 async function v1Fixture(t) {
   const context = setup(t);
@@ -14,6 +14,7 @@ async function v1Fixture(t) {
   await context.game.teams.setTeam({ userId: user.id, unitIds: [unit.id] });
   const storedUser = await context.game.users.getUser(user.id);
   await context.game.close();
+  stripBetaContentFixture(context.directory);
   const raw = {};
   for (const name of V1_COLLECTIONS) {
     const file = path.join(context.directory, `${name}.json`);
@@ -34,11 +35,11 @@ async function v1Fixture(t) {
 test('schema 1 upgrade preserves users, owned units, serials, claims, balances and teams', async t => {
   const c = await v1Fixture(t);
   const game = c.open().game;
-  assert.equal((await game.validateDatabase()).schemaVersion, 8);
+  assert.equal((await game.validateDatabase()).schemaVersion, 9);
   assert.deepEqual(await game.users.getUser(c.user.id), c.user);
   assert.deepEqual(readRecords(c.directory, 'unidades')[0], c.unit);
   assert.equal((await game.users.getProfile(c.user.id)).starterClaim.unitId, c.unit.id);
-  assert.equal(readRecords(c.directory, 'ataques').length, 18);
+  assert.equal(readRecords(c.directory, 'ataques').length, 22);
   assert.deepEqual(readRecords(c.directory, 'combates'), []);
   assert.equal((await game.characters.getCharacter('panda_guerrero')).revision, 3);
   assert.equal(readRecords(c.directory, 'personajes')[0].attackIds.length, 2);
@@ -57,7 +58,7 @@ for (const stage of ['prepared', 'committed', 'published:unidades.json', 'publis
     await assert.rejects(failing.validateDatabase(), { code: 'STORAGE_WRITE_FAILED' });
     await failing.close();
     const recovered = c.open().game;
-    assert.equal((await recovered.validateDatabase()).schemaVersion, 8);
+    assert.equal((await recovered.validateDatabase()).schemaVersion, 9);
     assert.deepEqual(await recovered.users.getUser(c.user.id), c.user);
     assert.deepEqual(readRecords(c.directory, 'unidades')[0], c.unit);
     assert.equal((await recovered.starter.claimStarter({ userId: c.user.id, choice: 'mago' })).unit.id, c.unit.id);
@@ -78,7 +79,7 @@ for (const phase of ['prepared', 'committed']) {
     if (phase === 'committed') fs.writeFileSync(path.join(c.directory, 'usuarios.json'), after['usuarios.json']);
     const game = c.open().game;
     const report = await game.validateDatabase();
-    assert.equal(report.schemaVersion, 8);
+    assert.equal(report.schemaVersion, 9);
     assert.equal(report.users, phase === 'committed' ? 2 : 1);
     assert.equal((await game.units.getUnit(c.unit.id)).ownerId, c.user.id);
     assert.equal(fs.existsSync(path.join(c.directory, '_journal.json')), false);

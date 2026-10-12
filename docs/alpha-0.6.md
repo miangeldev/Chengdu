@@ -16,10 +16,10 @@ del equipo y queda bloqueada mientras el anuncio permanece activo.
 | `.ctumercado mios` | Anuncios activos del remitente y acción para retirarlos. |
 | `.ctumercado raro` | Filtrar rareza; también común, épico y legendario, o sus IDs en inglés. |
 | `.ctumercado precio` | Ordenar de menor a mayor precio. |
-| `.ctumercado ver LIST-…` | Snapshot, precio, vendedor, vencimiento y acción correspondiente. |
+| `.ctumercado M1` | Detalles, precio, vendedor, vencimiento y acción correspondiente del anuncio M1. |
 | `.ctuvender UNIT PRECIO` | Publicar una unidad propia. |
-| `.ctucomprar LIST-…` | Pagar el precio y recibir la unidad. |
-| `.cturetirar LIST-…` | Retirar un anuncio propio. |
+| `.ctucomprar M1` | Pagar el precio del anuncio M1 y recibir la unidad. |
+| `.cturetirar M1` | Retirar tu anuncio M1. |
 | `.ctuventas` | Compras y ventas del remitente, cinco por página. |
 | `.ctupropiedad UNIT` | Emisión y propietarios sucesivos, cinco eventos por página. |
 
@@ -34,9 +34,18 @@ Los comandos funcionan en grupo y en privado. Consultar el mercado y sus anuncio
 permite comparar antes de registrarse; comprar o vender requiere un jugador autenticado.
 
 Cada acción envía un mensaje con encabezado, separador, resumen y siguiente paso.
-La lista prioriza personaje, nivel, rareza y precio. El detalle añade stats y
-vencimiento; el vendedor ve retirar y los demás ven comprar. Los IDs aparecen
-en los comandos que se copian, sin identidades de WhatsApp ni saldos ajenos.
+La lista prioriza personaje, nivel, rareza y precio. Desde 0.7.1 muestra una acción
+de compra directa y un enlace a detalles, ambos con códigos cortos como `M1`.
+El vendedor ve retirar en sus propios anuncios. El detalle añade stats y
+vencimiento. Colección, ficha de unidad y publicación usan el mismo código;
+los mensajes no exponen UUIDs de anuncios, identidades de WhatsApp ni saldos ajenos.
+
+El código identifica una publicación en todo el mercado: no es la posición en
+una página ni en un filtro. Permanece después de retirar, vender o vencer, y
+reiniciar conserva la misma referencia. Publicar de nuevo crea otro código.
+Las consultas `.ctumercado ver M1` y los comandos antiguos con UUID siguen
+funcionando. Los códigos se resuelven en la misma transacción que la compra
+o retirada, con las reglas originales de autorización y pagos únicos.
 
 ## Precio, comisión y duración
 
@@ -141,7 +150,7 @@ Pago y propiedad no se publican como resultados separados.
 
 Los eventos de emisión y transferencia, recibos y movimientos crecen fuera
 de las unidades. Una migración futura a SQLite debe preservar IDs, seriales,
-versiones, claves de operación, cursores equivalentes y orden de movimientos,
+versiones, claves de operación, códigos de anuncios, cursores equivalentes y orden de movimientos,
 con restricciones únicas por anuncio/venta y vínculos de propiedad verificables.
 Las nuevas mecánicas deben añadir políticas y fuentes sin reinterpretar datos
 históricos. Contrato completo: [database.md](database.md).

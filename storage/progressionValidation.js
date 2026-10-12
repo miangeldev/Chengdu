@@ -28,6 +28,26 @@ export function validateProgressionData(state, schemaVersion = 5) {
     }
   }
   check(userProgress.size === users.size && unitProgress.size === units.size, 'progression.baselineComplete');
+  // Coin movements provide the shared commit order for PvP and content awards.
+  // Iterating each domain separately would replay interleaved XP incorrectly.
+  if (schemaVersion >= 9) {
+    const battleAwards = new Map(state.recompensas.records.map(reward => [reward.id, reward]));
+    const contentAwards = new Map(state.premioscontenido.records.map(reward => [reward.id, reward]));
+    const replayed = new Set();
+    for (const movement of state.economia.records) {
+      const source = movement.sourceType === 'battle_reward' ? battleAwards :
+        movement.sourceType === 'content_reward' ? contentAwards : null;
+      if (!source) continue;
+      const reward = source.get(movement.sourceId);
+      check(reward && reward.userId === movement.userId && integer(reward.userXp) &&
+        !replayed.has(reward.id), 'reward.xpLedgerSource');
+      check(equal(reward.userProgressBefore, userProgress.get(reward.userId)) &&
+        equal(reward.userProgressAfter, grantXp(reward.userProgressBefore, reward.userXp, 'user')), 'reward.userProgress');
+      userProgress.set(reward.userId, reward.userProgressAfter);
+      replayed.add(reward.id);
+    }
+    check(replayed.size === battleAwards.size + contentAwards.size, 'reward.xpLedgerComplete');
+  }
   for (const unit of units.values()) {
     check(unit.statGrowthVersion === (schemaVersion >= 5 ? 2 : 1), 'progression.statVersion');
     effectiveStats(unit.initialStats, unit.progress.level, unit.statGrowthVersion, unit.traits, unit.traitVersion ?? 0, unit.combatBaseStats ?? null);
@@ -60,7 +80,7 @@ export function validateProgressionData(state, schemaVersion = 5) {
         movement.balanceBefore === reward.balanceBefore && movement.balanceAfter === reward.balanceAfter &&
         movement.createdAt === reward.createdAt, 'reward.coinMovement');
     }
-    check(equal(reward.userProgressBefore, userProgress.get(reward.userId)) &&
+    if (schemaVersion < 9) check(equal(reward.userProgressBefore, userProgress.get(reward.userId)) &&
       equal(reward.userProgressAfter, grantXp(reward.userProgressBefore, reward.userXp, 'user')), 'reward.userProgress');
     if (reward.version === 2) {
       check(Array.isArray(reward.unitRewards) && equal(reward.unitRewards.map(entry => ({ unitId: entry.unitId, xp: entry.xp })),
@@ -77,7 +97,7 @@ export function validateProgressionData(state, schemaVersion = 5) {
       unitProgress.set(reward.unitId, reward.unitProgressAfter);
     }
     balances.set(reward.userId, reward.balanceAfter);
-    userProgress.set(reward.userId, reward.userProgressAfter);
+    if (schemaVersion < 9) userProgress.set(reward.userId, reward.userProgressAfter);
     entries.push(reward);
   }
   for (const battle of battles.values()) {

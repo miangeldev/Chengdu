@@ -122,6 +122,8 @@ export function validateMarketData(state) {
 }
 
 export function validateMarketTransition(before, after) {
+  check(equal(before.mercado.records.map(listing => listing.id),
+    after.mercado.records.slice(0, before.mercado.records.length).map(listing => listing.id)), 'listings.appendOrder');
   check(equal(before.ventas.records, after.ventas.records.slice(0, before.ventas.records.length)), 'sales.appendOnly');
   const previous = new Map(before.mercado.records.map(l => [l.id, l]));
   for (const listing of after.mercado.records) {

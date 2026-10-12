@@ -2842,7 +2842,7 @@ Resultado:
 
 > El combate tiene profundidad.
 
-Estado implementado: **Alpha 0.7**, versión `0.7.0`, esquema de datos **8**.
+Estado implementado: **Alpha 0.7**, versión `0.7.1`, esquema de datos **8**.
 La denominación Alpha corresponde a la entrega solicitada; esta etapa conserva
 la planificación de combate avanzado indicada aquí como Beta. Incluye equipos
 1v1/2v2/3v3, elementos, estados, buffs, debuffs, cambios, habilidades, recargas
@@ -2851,11 +2851,16 @@ históricos conservan sus reglas y recibos.
 
 La [planificación y sus siete hitos completados](docs/plan-alpha-0.7.md) y
 las [reglas de Alpha 0.7](docs/alpha-0.7.md) documentan alcance, contratos y
-criterios de cierre. Validación local: **352 pruebas**, **103 mensajes de ejemplo**,
+criterios de cierre. Validación local: **358 pruebas**, **103 mensajes de ejemplo**,
 8.600 combates de referencia y 43.000 ensayos de afinado. La migración real
 del proyecto se verificó con respaldo y conservación de registros, sin datos
 de prueba ni journal pendiente. La sesión real de WhatsApp corresponde al
 bot anfitrión y queda para su integración.
+
+El ajuste 0.7.1 simplifica el mercado con códigos globales `M1`, `M2`… y
+comandos de compra visibles en cada anuncio. Detalles y retirada usan esos
+mismos códigos, conservados al filtrar, paginar, cerrar o reiniciar. Los
+comandos antiguos con UUID siguen admitidos y el esquema 8 permanece vigente.
 
 ---
 
@@ -2872,6 +2877,21 @@ eventos
 Resultado:
 
 > Hay razones diversas para jugar.
+
+Estado implementado: **Beta 0.8**, versión `0.8.0`, esquema de datos **9**.
+Las fases anteriores permanecen integradas. Incluye las tres misiones diarias,
+cuatro logros permanentes con títulos e insignias, tickets de captura, bosses
+mundiales cooperativos con premios por participación/mayor daño/último golpe,
+apariciones en grupos sin incentivos al spam y eventos con calendario y emisión
+cerrada al terminar. El Festival de los Faroles añade dos personajes con ataques
+y pasivas propios, limitados a 35 y 20 unidades globales.
+
+La [planificación con sus ocho hitos completados](docs/plan-beta-0.8.md) y la
+[guía de reglas e integración](docs/beta-0.8.md) documentan la entrega.
+Verificación local: **439 pruebas**, **130 mensajes de ejemplo** y **9.000 duelos**
+de balance. La migración real 8→9 conserva todas las colecciones históricas y
+los códigos del mercado, con respaldo coherente y sin datos de prueba ni journal
+pendiente. La sesión real de WhatsApp se conecta desde el bot anfitrión.
 
 ---
 

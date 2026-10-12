@@ -211,13 +211,13 @@ Fallar y cambiar consumen el turno. Los efectos avanzan sólo mientras la unidad
 🟣 Épico · Soporte
 ↳ .ctuficha espiritu_bambu
 
+👻 *Guardián Espectral*
+🟣 Épico · Tanque · 🏮 Evento
+↳ .ctuficha guardian_espectral
+
 🛡️ *Guardián Jade*
 🔵 Raro · Tanque
 ↳ .ctuficha guardian_jade
-
-🐺 *Lobo Sombrío*
-⚪ Común · Velocista · 🎁 Starter
-↳ .ctuficha lobo_sombrio
 
 📄 *Página 1 de 2*
 ➡️ Siguiente: *.ctucatalogo 2*
@@ -229,6 +229,10 @@ Fallar y cambiar consumen el turno. Los efectos avanzan sólo mientras la unidad
 ```text
 🃏 *CHENGDÚ CARDS | CATÁLOGO*
 ━━━━━━━━━━━━━━
+🐺 *Lobo Sombrío*
+⚪ Común · Velocista · 🎁 Starter
+↳ .ctuficha lobo_sombrio
+
 🔥 *Mago Carmesí*
 ⚪ Común · Atacante · 🎁 Starter
 ↳ .ctuficha mago_carmesi
@@ -240,6 +244,10 @@ Fallar y cambiar consumen el turno. Los efectos avanzan sólo mientras la unidad
 🐼 *Panda Guerrero*
 ⚪ Común · Tanque · 🎁 Starter
 ↳ .ctuficha panda_guerrero
+
+🦊 *Zorro de los Faroles*
+🔵 Raro · Velocista · 🏮 Evento
+↳ .ctuficha zorro_faroles
 
 📄 *Página 2 de 2*
 ⬅️ Anterior: *.ctucatalogo 1*
@@ -263,13 +271,13 @@ Fallar y cambiar consumen el turno. Los efectos avanzan sólo mientras la unidad
 🟣 Épico · Soporte
 ↳ .ctuficha espiritu_bambu
 
+👻 *Guardián Espectral*
+🟣 Épico · Tanque · 🏮 Evento
+↳ .ctuficha guardian_espectral
+
 🛡️ *Guardián Jade*
 🔵 Raro · Tanque
 ↳ .ctuficha guardian_jade
-
-🐺 *Lobo Sombrío*
-⚪ Común · Velocista · 🎁 Starter
-↳ .ctuficha lobo_sombrio
 
 📄 *Página 1 de 2*
 ➡️ Siguiente: *.ctucatalogo 2*
@@ -304,10 +312,11 @@ Fallar y cambiar consumen el turno. Los efectos avanzan sólo mientras la unidad
 🛍️ *Mercado*
 .ctumercado · Unidades en venta
 .ctumercado raro / .ctumercado precio · Filtrar
+.ctumercado M1 · Detalles del anuncio M1
+.ctucomprar M1 · Comprar ese anuncio
 .ctuvender ID PRECIO · Publicar una unidad
-.ctucomprar ANUNCIO · Comprar
 .ctumercado mios · Tus anuncios
-.cturetirar ANUNCIO · Retirar
+.cturetirar M1 · Retirar tu anuncio M1
 .ctuventas · Tus compras y ventas
 .ctupropiedad ID · Historia de propietarios
 
@@ -327,6 +336,20 @@ Fallar y cambiar consumen el turno. Los efectos avanzan sólo mientras la unidad
 .ctucatalogo 2 · Ir a la página 2
 .ctumercado raro 2 · Página 2 del filtro
 Los listados muestran Anterior y Siguiente.
+
+🌿 *Aventuras*
+.ctumisiones · Misiones de hoy
+.ctumisiones reclamar 1 · Cobrar una misión completada
+.ctulogros · Logros y títulos permanentes
+.ctulogros reclamar L1 · Cobrar un logro
+.ctuinventario · Tickets, títulos e insignias
+.ctuboss · Boss cooperativo mundial
+.ctubossatacar 2 B1 · Atacar con tu primera unidad equipada
+.ctubosstop · Aportaciones y participación
+.ctuspawn / .ctuexplorar · Aparición del grupo
+.ctucapturar S1 · Capturar por un ticket
+.ctueventos · Calendario
+.ctuevento faroles reclamar · Bienvenida del festival
 
 ⚔️ *Combate en grupo*
 .ctupelea @jugador · Mismo tamaño de equipos
@@ -588,6 +611,9 @@ Lukas: +15 XP
 ⚔️ 3 combates
 🏆 3 victorias · 💔 0 derrotas · ⚖️ 0 sin ganador
 
+🏅 1 logro desbloqueado · 🎟️ 0 tickets
+↳ .ctuinventario
+
 👉 Tu colección: *.ctupersonajes*
 ```
 
@@ -623,17 +649,17 @@ Lukas: +15 XP
 🏆 Victoria vs *Lukas*
 📅 11 de octubre de 2026 · 1v1 clásico · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-32a531a1-8689-41ab-aaf0-0bd4c7251631
+🔎 .ctuhistorial BTL-15c576f2-708d-4616-8774-b0e1bdda35c8
 
 🏆 Victoria vs *Lukas*
 📅 11 de octubre de 2026 · 1v1 clásico · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-a1979aa6-05fb-49a9-be9b-c1f52bc70cf3
+🔎 .ctuhistorial BTL-4c6a1936-b3dd-4618-ab1f-aca98576e065
 
 🏆 Victoria vs *Lukas*
 📅 11 de octubre de 2026 · 1v1 clásico · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-da504c2a-9af0-4178-aff2-188bae1bc5a0
+🔎 .ctuhistorial BTL-6fb28d44-9a92-45ef-8779-1202f30342eb
 
 📄 *Página 1 de 1*
 👉 Tu saldo: *.ctubalance*
@@ -1014,11 +1040,11 @@ Saldo tras ese reclamo: *100 ChengCoins*
 🛡️ Retirada del equipo mientras está en venta.
 ⏳ Vence: 20 oct 2026, 14:00 (CDMX)
 
-👉 Compartir anuncio: *.ctumercado ver LIST-8c8ae0ab-d06c-4040-8ced-ec70ced44771*
-↩️ Retirar: .cturetirar LIST-8c8ae0ab-d06c-4040-8ced-ec70ced44771
+👉 Compartir anuncio: *.ctumercado M1*
+↩️ Retirar: .cturetirar M1
 ```
 
-## Mercado: decidir a simple vista
+## Mercado: decidir y comprar a simple vista
 
 ```text
 🃏 *CHENGDÚ CARDS | MERCADO*
@@ -1026,7 +1052,8 @@ Saldo tras ese reclamo: *100 ChengCoins*
 🐼 *Panda Guerrero* · Nv. 2
 ⚪ Común · Tanque
 💰 *100 ChengCoins* · 👤 Miguel
-👉 .ctumercado ver LIST-8c8ae0ab-d06c-4040-8ced-ec70ced44771
+🛒 Comprar: *.ctucomprar M1*
+🔎 Detalles: .ctumercado M1
 
 📄 *Página 1 de 1*
 🎴 Tus anuncios: .ctumercado mios
@@ -1041,7 +1068,8 @@ Saldo tras ese reclamo: *100 ChengCoins*
 🐼 *Panda Guerrero* · Nv. 2
 ⚪ Común · Tanque
 💰 *100 ChengCoins* · 👤 Miguel
-👉 .ctumercado ver LIST-8c8ae0ab-d06c-4040-8ced-ec70ced44771
+🛒 Comprar: *.ctucomprar M1*
+🔎 Detalles: .ctumercado M1
 
 📄 *Página 1 de 1*
 🎴 Tus anuncios: .ctumercado mios
@@ -1058,7 +1086,8 @@ Saldo tras ese reclamo: *100 ChengCoins*
 🐼 *Panda Guerrero* · Nv. 2
 ⚪ Común · Tanque
 💰 *100 ChengCoins* · 👤 Miguel
-👉 .ctumercado ver LIST-8c8ae0ab-d06c-4040-8ced-ec70ced44771
+🛒 Comprar: *.ctucomprar M1*
+🔎 Detalles: .ctumercado M1
 
 📄 *Página 1 de 1*
 🎴 Tus anuncios: .ctumercado mios
@@ -1073,7 +1102,8 @@ Saldo tras ese reclamo: *100 ChengCoins*
 🐼 *Panda Guerrero* · Nv. 2
 ⚪ Común · Tanque
 💰 *100 ChengCoins* · 📥 Recibirás 95
-👉 .cturetirar LIST-8c8ae0ab-d06c-4040-8ced-ec70ced44771
+↩️ Retirar: *.cturetirar M1*
+🔎 Detalles: .ctumercado M1
 
 📄 *Página 1 de 1*
 🎴 Tus anuncios: .ctumercado mios
@@ -1083,7 +1113,7 @@ Saldo tras ese reclamo: *100 ChengCoins*
 ## Anuncio: ficha congelada y acción de compra
 
 ```text
-🃏 *CHENGDÚ CARDS | ANUNCIO*
+🃏 *CHENGDÚ CARDS | ANUNCIO M1*
 ━━━━━━━━━━━━━━
 🐼 *Panda Guerrero* · Nv. 2
 ⚪ Común · Tanque
@@ -1097,7 +1127,7 @@ Saldo tras ese reclamo: *100 ChengCoins*
 🔒 En el mercado
 ⏳ Vence: 20 oct 2026, 14:00 (CDMX)
 
-🛒 Comprar: *.ctucomprar LIST-8c8ae0ab-d06c-4040-8ced-ec70ced44771*
+🛒 Comprar: *.ctucomprar M1*
 🔎 Ataques y rasgos: .ctuficha PAND-000001
 ```
 
@@ -1110,7 +1140,7 @@ Saldo tras ese reclamo: *100 ChengCoins*
 
 🐼 *Panda Guerrero* · Nv. 2
 ⚪ Común · 🔒 En venta
-↳ .ctumercado ver LIST-8c8ae0ab-d06c-4040-8ced-ec70ced44771
+↳ .ctumercado M1
 
 🐉 *Dragón Carmesí* · ✨ Dorada · Nv. 1
 🟡 Legendario · 🧬 2 rasgos · ✅ Disponible
@@ -1462,7 +1492,7 @@ Saldo tras esa apertura: *300 ChengCoins*
 ## Anuncio vencido: conserva la ficha histórica
 
 ```text
-🃏 *CHENGDÚ CARDS | ANUNCIO*
+🃏 *CHENGDÚ CARDS | ANUNCIO M5*
 ━━━━━━━━━━━━━━
 🐺 *Lobo Sombrío* · Nv. 1
 ⚪ Común · Velocista
@@ -2449,4 +2479,556 @@ Lukas: +120 ChengCoins · +35 XP
 🎁 Sin recompensa: rendición antes de 4 ataques entre ambos jugadores.
 
 ⚔️ Otra partida: .ctupelea @jugador
+```
+
+## Misiones: progreso de hoy y comandos cortos para cobrar
+
+```text
+🃏 *CHENGDÚ CARDS | MISIONES DIARIAS*
+━━━━━━━━━━━━━━
+📋 *1. Dos victorias*
+Gana 2 combates válidos.
+📊 1/2 · En progreso
+💰 +40 ChengCoins · ✨ +15 XP de jugador · 🎟️ +1 ticket
+
+📋 *2. En la arena*
+Juega 5 combates válidos.
+📊 2/5 · En progreso
+💰 +60 ChengCoins · ✨ +20 XP de jugador · 🎟️ +1 ticket
+
+📋 *3. Tres estilos*
+Usa 3 personajes diferentes en combates válidos.
+📊 1/3 · En progreso
+💰 +50 ChengCoins · ✨ +20 XP de jugador · 🎟️ +1 ticket
+
+🔄 Cambian: 23 oct 2026, 00:00
+📍 Hora de Ciudad de México. Sólo cuentan partidas con recompensa.
+```
+
+## Misión cumplida: monedas, XP y ticket de captura
+
+```text
+🃏 *CHENGDÚ CARDS | ERROR*
+━━━━━━━━━━━━━━
+📋 Aún falta completar esa misión.
+Consulta tu progreso con .ctumisiones
+```
+
+## Misión repetida: recibo original sin otro premio
+
+```text
+🃏 *CHENGDÚ CARDS | ERROR*
+━━━━━━━━━━━━━━
+📋 Aún falta completar esa misión.
+Consulta tu progreso con .ctumisiones
+```
+
+## Logros: historia permanente, títulos e insignias
+
+```text
+🃏 *CHENGDÚ CARDS | LOGROS*
+━━━━━━━━━━━━━━
+🏅 *L1 · Primera sangre*
+Gana tu primera batalla válida.
+📊 1/1 · Desbloqueado
+🎖️ Título: Primer filo
+🏵️ ⚔️
+💰 +60 ChengCoins · ✨ +20 XP de jugador · 🎟️ +1 ticket
+👉 *.ctulogros reclamar L1*
+
+🔒 *L2 · Coleccionista*
+Obtén 25 unidades distintas a lo largo de tu historia.
+📊 4/25 · En progreso
+🎖️ Título: Guardián de la colección
+🏵️ 🃏
+💰 +250 ChengCoins · ✨ +75 XP de jugador · 🎟️ +3 tickets
+
+🔒 *L3 · Veterano*
+Juega 100 combates válidos.
+📊 8/100 · En progreso
+🎖️ Título: Veterano de Chengdú
+🏵️ 🛡️
+💰 +350 ChengCoins · ✨ +100 XP de jugador · 🎟️ +3 tickets
+
+🔒 *L4 · Invicto*
+Gana 10 combates válidos consecutivos.
+📊 3/10 · En progreso
+🎖️ Título: Invicto
+🏵️ 🏆
+💰 +200 ChengCoins · ✨ +80 XP de jugador · 🎟️ +2 tickets
+
+📄 *Página 1 de 1*
+🎟️ Tu inventario: .ctuinventario
+```
+
+## Primera sangre: premio único y título
+
+```text
+🃏 *CHENGDÚ CARDS | LOGRO | PREMIO*
+━━━━━━━━━━━━━━
+🎁 *¡Premio reclamado!*
+
+💰 +60 ChengCoins · ✨ +20 XP de jugador · 🎟️ +1 ticket
+
+💰 Saldo actual: *519 ChengCoins*
+🎟️ Tickets disponibles: *1*
+
+🏅 Tus logros: *.ctulogros*
+```
+
+## Inventario: tickets y títulos desbloqueados
+
+```text
+🃏 *CHENGDÚ CARDS | INVENTARIO*
+━━━━━━━━━━━━━━
+👤 *Miguel*
+🎟️ *1 ticket de captura*
+
+🎖️ *Títulos*
+Primer filo
+
+🏵️ *Insignias*
+⚔️
+
+🎟️ Cada captura usa un ticket. Consíguelos completando misiones, logros y eventos.
+
+📋 Misiones: .ctumisiones
+🏅 Logros: .ctulogros
+🎴 Aparición del grupo: .ctuspawn
+```
+
+## Calendario: festival con fechas y personajes exclusivos
+
+```text
+🃏 *CHENGDÚ CARDS | EVENTOS*
+━━━━━━━━━━━━━━
+🏮 *Festival de los Faroles* · 🟢 Disponible
+📅 11 oct 2026, 00:00 → 25 oct 2026, 00:00
+🎴 2 personajes exclusivos
+👉 *.ctuevento faroles*
+
+📄 *Página 1 de 1*
+📍 Horarios de Ciudad de México.
+```
+
+## Festival: supply global y bienvenida
+
+```text
+🃏 *CHENGDÚ CARDS | EVENTO*
+━━━━━━━━━━━━━━
+🏮 *Festival de los Faroles*
+🟢 ¡El festival está abierto!
+
+📅 11 oct 2026, 00:00 → 25 oct 2026, 00:00
+📍 Hora de Ciudad de México.
+
+🎴 *Personajes exclusivos*
+🔵 Zorro de los Faroles · Raro
+↳ 0/35 emitidos · Disponible
+🟣 Guardián Espectral · Épico
+↳ 0/20 emitidos · Disponible
+
+🎁 *Bienvenida*
+💰 +25 ChengCoins · ✨ +10 XP de jugador · 🎟️ +1 ticket
+Un premio por jugador.
+
+🌿 Los personajes del festival pueden aparecer en los grupos; necesitas tickets para capturarlos.
+
+👉 Reclamar: *.ctuevento faroles reclamar*
+```
+
+## Bienvenida del festival: una vez por jugador
+
+```text
+🃏 *CHENGDÚ CARDS | EVENTO | BIENVENIDA*
+━━━━━━━━━━━━━━
+🎁 *¡Premio reclamado!*
+
+💰 +25 ChengCoins · ✨ +10 XP de jugador · 🎟️ +1 ticket
+
+💰 Saldo actual: *544 ChengCoins*
+🎟️ Tickets disponibles: *2*
+
+🏮 Ver evento: *.ctuevento faroles*
+🎴 Apariciones: .ctuspawn
+```
+
+## Aparición: un compañero exclusivo y captura por un ticket
+
+```text
+🃏 *CHENGDÚ CARDS | ¡APARECIÓ UN PERSONAJE!*
+━━━━━━━━━━━━━━
+👻 *Guardián Espectral*
+🟣 Épico · 🏮 Exclusivo de evento
+
+🎟️ Capturar cuesta *1 ticket*
+⌛ Disponible hasta 22 oct 2026, 14:10
+
+👉 Capturar: *.ctucapturar S1*
+🎟️ Tus tickets: .ctuinventario
+```
+
+## Captura: emisión única y procedencia del festival
+
+```text
+🃏 *CHENGDÚ CARDS | CAPTURA*
+━━━━━━━━━━━━━━
+🎉 *¡Miguel capturó un personaje!*
+
+👻 *Guardián Espectral*
+🟣 Épico · 🏮 Exclusivo de evento
+
+🎟️ 1 ticket gastado
+🎟️ Tickets disponibles: *1*
+
+🎴 Unidad: *ESPE-000001*
+
+👉 Tu colección: *.ctupersonajes*
+🔎 Ficha: .ctuunidad ESPE-000001
+```
+
+## Captura repetida: no consume otro ticket
+
+```text
+🃏 *CHENGDÚ CARDS | CAPTURA*
+━━━━━━━━━━━━━━
+✅ Este mensaje ya confirmó la captura. No se gastó otro ticket.
+
+👻 *Guardián Espectral*
+🟣 Épico · 🏮 Exclusivo de evento
+
+🎟️ 1 ticket gastado
+🎟️ Tickets tras esa captura: *1*
+
+🎴 Unidad: *ESPE-000001*
+
+👉 Tu colección: *.ctupersonajes*
+🔎 Ficha: .ctuunidad ESPE-000001
+```
+
+## Captura perdida: la aparición ya tiene propietario
+
+```text
+🃏 *CHENGDÚ CARDS | ERROR*
+━━━━━━━━━━━━━━
+🎴 Esa aparición ya fue capturada o venció.
+Consulta .ctuspawn
+```
+
+## Personaje del festival: ataques y pasiva propios
+
+```text
+🃏 *CHENGDÚ CARDS | FICHA*
+━━━━━━━━━━━━━━
+👻 *Guardián Espectral* · Miguel
+🆔 ESPE-000001
+🌱 Nivel 1
+❤️ Vida: 132/132 HP
+⚔️ Ataque: 25 · 🛡️ Defensa: 26 · 💨 Velocidad: 9
+
+🌙 Oscuridad
+✨ *Custodia de los Faroles*
+Al entrar obtiene un escudo de 12 puntos durante 2 turnos propios.
+
+1️⃣ *Puño Espectral* · Físico
+Potencia: 25 POT · Precisión: 100%
+🌙 Oscuridad · Sin recarga
+
+2️⃣ *Velo Espectral* · Físico
+Potencia: 28 POT · Precisión: 85%
+🌙 Oscuridad · Recarga: 2 turnos propios
+🛡️ Escudo 10 puntos · 2 turnos propios
+
+💡 Daño base: potencia + ataque − defensa; después se aplican efectos y elemento.
+🔥 Fuego → 🌿 Naturaleza → 💧 Agua → 🔥 Fuego
+☀️ Luz ↔ 🌙 Oscuridad · Ventaja +25%; resistencia −20%.
+Fallar y cambiar consumen el turno. Los efectos avanzan sólo mientras la unidad está activa.
+```
+
+## Procedencia: el festival permanece en la unidad
+
+```text
+🃏 *CHENGDÚ CARDS | UNIDAD*
+━━━━━━━━━━━━━━
+👻 *Guardián Espectral #0001*
+🆔 ESPE-000001
+🟣 Épico · Tanque · Normal
+
+👤 Propietario: Miguel
+✅ Disponible
+
+🌱 Nivel 1 · ✨ 0/100 XP
+🏆 0 victorias · 💔 0 derrotas
+
+🧬 Sin rasgos
+
+📜 Evento: Festival de los Faroles · 22 de octubre de 2026
+
+🔎 Stats y ataques: *.ctuficha ESPE-000001*
+📜 Propietarios: .ctupropiedad ESPE-000001
+```
+
+## Boss cooperativo: vida compartida y ataques disponibles
+
+```text
+🃏 *CHENGDÚ CARDS | BOSS MUNDIAL*
+━━━━━━━━━━━━━━
+👹 *Guardián de la Niebla* · B2
+❤️ ▓▓▓▓▓▓▓▓▓▓ 1000/1000 HP
+
+🤝 0 participantes · 💥 0 de daño conjunto
+
+⌛ Termina: 23 oct 2026, 14:00
+
+🛡️ Resiste los efectos de estado.
+
+🙌 Tu aporte: *0 de daño* · 0 ataques
+
+⚔️ Te quedan 20 ataques en este encuentro.
+
+1️⃣ Puño Espectral · 25 POT
+2️⃣ Velo Espectral · 28 POT
+
+👉 Atacar: *.ctubossatacar 1 B2* / *.ctubossatacar 2 B2*
+🏅 Aportaciones: .ctubosstop B2
+```
+
+## Boss: golpe crítico dentro del mismo mensaje
+
+```text
+🃏 *CHENGDÚ CARDS | BOSS MUNDIAL*
+━━━━━━━━━━━━━━
+👹 *Guardián de la Niebla* · B2
+❤️ ▓▓▓▓▓▓▓▓▓▓ 932/1000 HP
+
+⚔️ Velo Espectral
+🔥 ¡CRÍTICO! *68 de daño*
+
+🤝 1 participante · 💥 68 de daño conjunto
+
+⌛ Termina: 23 oct 2026, 14:00
+
+🛡️ Resiste los efectos de estado.
+
+🙌 Tu aporte: *68 de daño* · 1 ataques
+
+⏳ Puedes volver a atacar: 14:00:30 (CDMX)
+
+⚔️ Te quedan 19 ataques en este encuentro.
+
+1️⃣ Puño Espectral · 25 POT
+2️⃣ Velo Espectral · 28 POT
+
+👉 Atacar: *.ctubossatacar 1 B2* / *.ctubossatacar 2 B2*
+🏅 Aportaciones: .ctubosstop B2
+```
+
+## Boss: un reintento no duplica daño
+
+```text
+🃏 *CHENGDÚ CARDS | BOSS MUNDIAL*
+━━━━━━━━━━━━━━
+👹 *Guardián de la Niebla* · B2
+❤️ ▓▓▓▓▓▓▓▓▓▓ 932/1000 HP
+
+🔁 Ataque ya confirmado; se conserva el resultado original.
+⚔️ Velo Espectral
+🔥 ¡CRÍTICO! *68 de daño*
+
+🤝 1 participante · 💥 68 de daño conjunto
+
+⌛ Termina: 23 oct 2026, 14:00
+
+🛡️ Resiste los efectos de estado.
+
+🙌 Tu aporte: *68 de daño* · 1 ataques
+
+⏳ Puedes volver a atacar: 14:00:30 (CDMX)
+
+⚔️ Te quedan 19 ataques en este encuentro.
+
+1️⃣ Puño Espectral · 25 POT
+2️⃣ Velo Espectral · 28 POT
+
+👉 Atacar: *.ctubossatacar 1 B2* / *.ctubossatacar 2 B2*
+🏅 Aportaciones: .ctubosstop B2
+```
+
+## Boss: cooldown compartido entre grupos
+
+```text
+🃏 *CHENGDÚ CARDS | ERROR*
+━━━━━━━━━━━━━━
+⏳ Tu ataque al boss aún se está recuperando.
+Consulta .ctuboss para ver cuándo puedes volver.
+```
+
+## Boss derrotado: premios por participar, mayor daño y último golpe
+
+```text
+🃏 *CHENGDÚ CARDS | BOSS | RESULTADO*
+━━━━━━━━━━━━━━
+👹 *Guardián de la Niebla* · B2
+❤️ ▒▒▒▒▒▒▒▒▒▒ 0/1000 HP
+
+⚔️ Colmillo Nocturno
+🔥 ¡CRÍTICO! *44 de daño*
+
+🤝 2 participantes · 💥 1000 de daño conjunto
+
+🏆 *¡Boss derrotado!*
+Los premios de participación, mayor daño y último golpe se entregaron automáticamente.
+
+🙌 Tu aporte: *524 de daño* · 7 ataques
+
+💰 +140 ChengCoins · ✨ +35 XP de jugador · 🎟️ +1 ticket
+
+🌅 Próximo encuentro desde: 23 oct 2026, 14:00
+
+🏅 Aportaciones: .ctubosstop B2
+```
+
+## Boss: aportaciones de todos los participantes
+
+```text
+🃏 *CHENGDÚ CARDS | BOSS | APORTACIONES*
+━━━━━━━━━━━━━━
+👹 *Guardián de la Niebla* · B2
+
+🥇 *1. Lukas*
+💥 524 de daño · ⚔️ 7 ataques
+
+🤝 *2. Miguel*
+💥 476 de daño · ⚔️ 7 ataques
+
+📄 *Página 1 de 1*
+👹 Ver boss: .ctuboss B2
+```
+
+## Inventario después de misiones, festival, captura y boss
+
+```text
+🃏 *CHENGDÚ CARDS | INVENTARIO*
+━━━━━━━━━━━━━━
+👤 *Miguel*
+🎟️ *2 tickets de captura*
+
+🎖️ *Títulos*
+Primer filo
+
+🏵️ *Insignias*
+⚔️
+
+🎟️ Cada captura usa un ticket. Consíguelos completando misiones, logros y eventos.
+
+📋 Misiones: .ctumisiones
+🏅 Logros: .ctulogros
+🎴 Aparición del grupo: .ctuspawn
+```
+
+## Perfil: logros y tickets integrados con el progreso
+
+```text
+🃏 *CHENGDÚ CARDS | PERFIL*
+━━━━━━━━━━━━━━
+👤 *Miguel*
+🌱 Nivel 2 · ✨ 190/200 XP
+💰 624 ChengCoins · 🎴 4 unidades
+
+⚔️ 10 combates
+🏆 7 victorias · 💔 3 derrotas · ⚖️ 0 sin ganador
+
+🏅 1 logro desbloqueado · 🎟️ 2 tickets
+↳ .ctuinventario
+
+👉 Tu colección: *.ctupersonajes*
+```
+
+## Mercado: un personaje exclusivo también se puede vender
+
+```text
+🃏 *CHENGDÚ CARDS | EN VENTA*
+━━━━━━━━━━━━━━
+🎴 ¡Tu unidad ya está en el mercado!
+
+👻 *Guardián Espectral* · Nv. 1
+🟣 Épico · Tanque
+
+💰 Precio: *20 ChengCoins*
+🏦 Comisión del 5%: 1 ChengCoins (redondeo hacia arriba)
+📥 Recibirás: *19 ChengCoins*
+
+🔒 En el mercado
+🛡️ Retirada del equipo mientras está en venta.
+⏳ Vence: 29 oct 2026, 14:06 (CDMX)
+
+👉 Compartir anuncio: *.ctumercado M6*
+↩️ Retirar: .cturetirar M6
+```
+
+## Festival terminado: emisión cerrada y unidades conservadas
+
+```text
+🃏 *CHENGDÚ CARDS | EVENTO*
+━━━━━━━━━━━━━━
+🏮 *Festival de los Faroles*
+⌛ Evento finalizado
+
+📅 11 oct 2026, 00:00 → 25 oct 2026, 00:00
+📍 Hora de Ciudad de México.
+
+🎴 *Personajes exclusivos*
+🔵 Zorro de los Faroles · Raro
+↳ 0/35 emitidos · Emisión cerrada o agotada
+🟣 Guardián Espectral · Épico
+↳ 1/20 emitidos · Emisión cerrada o agotada
+
+🎁 *Bienvenida*
+💰 +25 ChengCoins · ✨ +10 XP de jugador · 🎟️ +1 ticket
+✅ Ya reclamaste este premio.
+
+🎴 Las unidades obtenidas conservan su progreso y pueden comerciarse.
+
+📅 Calendario: .ctueventos
+```
+
+## Después del festival: comercio sin nueva emisión
+
+```text
+🃏 *CHENGDÚ CARDS | COMPRA*
+━━━━━━━━━━━━━━
+🤝 ¡La unidad ya forma parte de tu colección!
+
+👻 *Guardián Espectral* · Nv. 1
+🟣 Épico · Tanque
+
+👤 Vendedor: Miguel
+💰 20 ChengCoins pagados
+Saldo restante: *436 ChengCoins*
+
+👉 Preparar equipo: *.ctuequipo usar ESPE-000001*
+🔎 Consultar: .ctuficha ESPE-000001
+```
+
+## Unidad histórica: conserva el festival después de cambiar de dueño
+
+```text
+🃏 *CHENGDÚ CARDS | UNIDAD*
+━━━━━━━━━━━━━━
+👻 *Guardián Espectral #0001*
+🆔 ESPE-000001
+🟣 Épico · Tanque · Normal
+
+👤 Propietario: Lukas
+✅ Disponible
+
+🌱 Nivel 1 · ✨ 0/100 XP
+🏆 0 victorias · 💔 0 derrotas
+
+🧬 Sin rasgos
+
+📜 Evento: Festival de los Faroles · 22 de octubre de 2026
+
+🔎 Stats y ataques: *.ctuficha ESPE-000001*
+📜 Propietarios: .ctupropiedad ESPE-000001
 ```

@@ -3,10 +3,10 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
-import { COLLECTIONS, validateDatabase } from '../storage/validation.js';
+import { V8_COLLECTIONS as COLLECTIONS, validateDatabase } from '../storage/validation.js';
 import { combatProfile, attackCombatProfile } from '../game/battle/combatContent.js';
 import { advancedSetup } from './advanced-helpers.js';
-import { readRecords } from './helpers.js';
+import { readRecords, stripBetaContentFixture } from './helpers.js';
 
 const serialize = value => JSON.stringify(value, null, 2) + '\n';
 
@@ -27,6 +27,7 @@ async function v7Fixture(t) {
   await context.game.market.createListing({ sellerId: context.a.id, unitId: context.units[0][2].id,
     price: 35, operationKey: 'migration-open-listing' });
   await context.game.close();
+  stripBetaContentFixture(context.directory);
   const state = Object.fromEntries(COLLECTIONS.map(name => [name,
     JSON.parse(fs.readFileSync(path.join(context.directory, `${name}.json`), 'utf8'))]));
   for (const collection of Object.values(state)) collection._meta.schemaVersion = 7;
@@ -49,19 +50,19 @@ function assertPreserved(context) {
       combat: combatProfile(character.id) }));
     if (name === 'ataques') expected = expected.map(attack => ({ ...attack, revision: attack.revision + 1,
       combat: attackCombatProfile(attack.id, attack) }));
-    assert.deepEqual(readRecords(context.directory, name), expected, name);
+    assert.deepEqual(readRecords(context.directory, name).slice(0, expected.length), expected, name);
   }
 }
 
 test('schema 7 combat migration preserves owners, supply, XP, economy, market and every frozen classic battle', async t => {
   const context = await v7Fixture(t);
   const game = context.open().game;
-  assert.equal((await game.validateDatabase()).schemaVersion, 8);
+  assert.equal((await game.validateDatabase()).schemaVersion, 9);
   assertPreserved(context);
   for (const name of COLLECTIONS) {
     const metadata = JSON.parse(fs.readFileSync(path.join(context.directory, `${name}.json`), 'utf8'))._meta;
-    assert.equal(metadata.schemaVersion, 8);
-    assert.equal(metadata.revision, context.state[name]._meta.revision + 1);
+    assert.equal(metadata.schemaVersion, 9);
+    assert.equal(metadata.revision, context.state[name]._meta.revision + 2);
   }
   assert.equal(readRecords(context.directory, 'combates').find(battle => battle.status === 'active').rulesVersion, 1);
   const backups = fs.readdirSync(path.join(context.directory, 'backups')).map(id =>
@@ -76,7 +77,7 @@ for (const stage of ['prepared', 'committed', 'published:personajes.json', 'publ
     await assert.rejects(failed.validateDatabase(), { code: 'STORAGE_WRITE_FAILED' });
     await failed.close();
     const game = context.open().game;
-    assert.equal((await game.validateDatabase()).schemaVersion, 8);
+    assert.equal((await game.validateDatabase()).schemaVersion, 9);
     assertPreserved(context);
     assert.equal(fs.existsSync(path.join(context.directory, '_journal.json')), false);
   });
@@ -95,7 +96,7 @@ for (const phase of ['prepared', 'committed']) {
     fs.writeFileSync(path.join(context.directory, '_journal.json'), serialize({ version: 1, phase, body, checksum }));
     if (phase === 'committed') fs.writeFileSync(path.join(context.directory, 'sobres.json'), after['sobres.json']);
     const game = context.open().game;
-    assert.equal((await game.validateDatabase()).schemaVersion, 8);
+    assert.equal((await game.validateDatabase()).schemaVersion, 9);
     if (phase === 'committed') context.state.sobres = packs;
     assertPreserved(context);
   });
@@ -107,7 +108,7 @@ test('preexisting valid custom combat profiles are preserved rather than overwri
   context.state.ataques.records[0].combat = { ...attackCombatProfile(context.state.ataques.records[0].id), power: 31 };
   for (const name of ['personajes', 'ataques']) fs.writeFileSync(path.join(context.directory, `${name}.json`), serialize(context.state[name]));
   const game = context.open().game;
-  assert.equal((await game.validateDatabase()).schemaVersion, 8);
+  assert.equal((await game.validateDatabase()).schemaVersion, 9);
   for (const name of ['personajes', 'ataques']) {
     assert.deepEqual(readRecords(context.directory, name)[0], context.state[name].records[0]);
   }

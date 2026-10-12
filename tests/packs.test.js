@@ -3,13 +3,14 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { COLLECTIONS, V3_COLLECTIONS, validateDatabase } from '../storage/validation.js';
-import { readRecords, register, setup, updateCharacter } from './helpers.js';
+import { readRecords, register, setup, updateCharacter, stripBetaContentFixture } from './helpers.js';
 
 // A real schema-3 opening balance: migrate it instead of bypassing coin auditing.
 async function funded(t, coins = 1000, options = {}) {
   const c = setup(t, { randomDropInt: () => 0, randomRoll: () => 0, ...options });
   c.user = await register(c.game);
   await c.game.close();
+  stripBetaContentFixture(c.directory);
   for (const name of V3_COLLECTIONS) {
     const file = path.join(c.directory, `${name}.json`);
     const collection = JSON.parse(fs.readFileSync(file, 'utf8'));

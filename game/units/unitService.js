@@ -4,14 +4,19 @@ import { paginate } from '../../utils/pagination.js';
 import { expireBattles } from '../battle/lifecycle.js';
 import { effectiveStats } from '../progression/rules.js';
 import { expireListings } from '../market/lifecycle.js';
+import { getListingCode } from '../market/references.js';
 import { advancedAttack, combatProfile } from '../battle/combatContent.js';
 
 async function detail(repos, unit) {
   const owner = await repos.users.get(unit.ownerId);
+  const character = await repos.characters.get(unit.characterId);
+  const campaign = character.eventId ? await repos.campaigns.get(character.eventId) : null;
   const opening = unit.origin.type === 'pack' ? await repos.openings.get(unit.origin.sourceId) : null;
-  return { ...unit, currentStats: effectiveStats(unit.initialStats, unit.progress.level, unit.statGrowthVersion, unit.traits, unit.traitVersion, unit.combatBaseStats),
+  return { ...unit, ...(unit.lock?.type === 'market' ? { marketCode: await getListingCode(repos, unit.lock.referenceId) } : {}),
+    currentStats: effectiveStats(unit.initialStats, unit.progress.level, unit.statGrowthVersion, unit.traits, unit.traitVersion, unit.combatBaseStats),
     pack: opening ? { id: opening.packId, name: opening.packSnapshot.name, revision: opening.packRevision } : null,
-    character: await repos.characters.get(unit.characterId), owner: { id: owner.id, name: owner.name } };
+    campaign: campaign ? { id: campaign.id, code: campaign.code, name: campaign.name } : null,
+    character, owner: { id: owner.id, name: owner.name } };
 }
 
 function snapshotDetail(player, unit = player.units ? player.units[player.activeIndex] : player.unit) {

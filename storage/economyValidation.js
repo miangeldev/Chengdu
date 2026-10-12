@@ -14,6 +14,7 @@ export function validateEconomyData(state, schemaVersion = 7) {
   const openings = new Map(state.aperturas.records.map(o => [o.id, o]));
   const claims = new Map((schemaVersion >= 6 ? state.diarios.records : []).map(d => [d.id, d]));
   const sales = new Map((schemaVersion >= 7 ? state.ventas.records : []).map(s => [s.id, s]));
+  const contentRewards = new Map((schemaVersion >= 9 ? state.premioscontenido.records : []).map(r => [r.id, r]));
   const operationKeys = new Set();
   const latest = new Map();
   for (const claim of claims.values()) {
@@ -31,7 +32,8 @@ export function validateEconomyData(state, schemaVersion = 7) {
   const balances = new Map(state.estado.records.filter(r => r.kind === 'progressionBaseline' && r.entityType === 'user').map(r => [r.entityId, r.coins]));
   const linked = new Set();
   const sources = { battle_reward: rewards, pack_opening: openings, ...(schemaVersion >= 6 ? { daily_reward: claims } : {}),
-    ...(schemaVersion >= 7 ? { market_purchase: sales, market_sale: sales } : {}) };
+    ...(schemaVersion >= 7 ? { market_purchase: sales, market_sale: sales } : {}),
+    ...(schemaVersion >= 9 ? { content_reward: contentRewards } : {}) };
   for (const movement of state.economia.records) {
     const purchase = movement.sourceType === 'market_purchase';
     const resale = movement.sourceType === 'market_sale';
@@ -50,7 +52,7 @@ export function validateEconomyData(state, schemaVersion = 7) {
       check(movement.type === 'debit' && movement.amount === source.price && integer(movement.amount, 1) &&
         movement.balanceBefore >= movement.amount && movement.balanceAfter === movement.balanceBefore - movement.amount, 'coinMovement.debit');
     } else {
-      check(movement.type === 'credit' && movement.amount === (resale ? source.net : movement.sourceType === 'battle_reward' ? source.coins : source.amount) &&
+      check(movement.type === 'credit' && movement.amount === (resale ? source.net : ['battle_reward', 'content_reward'].includes(movement.sourceType) ? source.coins : source.amount) &&
         movement.balanceAfter === safeAdd(movement.balanceBefore, movement.amount), 'coinMovement.credit');
     }
     balances.set(movement.userId, movement.balanceAfter);

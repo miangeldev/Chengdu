@@ -61,10 +61,10 @@ test('corrupt JSON and future schema versions do not trigger reset or overwrite'
   await assert.rejects(register(game, 'Juan', '521111111111'), { code: 'DATABASE_CORRUPT' });
   assert.equal(fs.readFileSync(file, 'utf8'), invalid);
   const future = JSON.parse(good);
-  future._meta.schemaVersion = 9;
+  future._meta.schemaVersion = 10;
   fs.writeFileSync(file, JSON.stringify(future));
   await assert.rejects(game.validateDatabase(), { code: 'UNSUPPORTED_SCHEMA_VERSION' });
-  assert.equal(JSON.parse(fs.readFileSync(file, 'utf8'))._meta.schemaVersion, 9);
+  assert.equal(JSON.parse(fs.readFileSync(file, 'utf8'))._meta.schemaVersion, 10);
 });
 
 test('read failures propagate without replacing inaccessible data with an empty array', async t => {
@@ -115,7 +115,7 @@ for (const stage of ['prepared', 'committed', 'published:usuarios.json']) {
     await assert.rejects(context.game.validateDatabase(), { code: 'STORAGE_WRITE_FAILED' });
     await context.game.close();
     const recovered = context.open({ fault: () => {} }).game;
-    assert.deepEqual(await recovered.validateDatabase(), { valid: true, schemaVersion: 8, users: 0, characters: 8, units: 0, claims: 0 });
+    assert.deepEqual(await recovered.validateDatabase(), { valid: true, schemaVersion: 9, users: 0, characters: 10, units: 0, claims: 0 });
     assert.equal(fs.existsSync(path.join(context.directory, '_journal.json')), false);
   });
 }

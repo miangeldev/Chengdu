@@ -13,21 +13,19 @@ import { migrateBalanceV5 } from './migrations/005-balance.js';
 import { migrateEconomyV6 } from './migrations/006-economy.js';
 import { migrateMarketV7 } from './migrations/007-market.js';
 import { migrateCombatV8 } from './migrations/008-combat.js';
+import { migrateContentV9 } from './migrations/009-content.js';
+import { seedCampaigns, seedEventAttacks, seedEventCharacters } from '../game/content/catalog.js';
 import { progressionBaseline } from '../game/progression/rules.js';
 import { seedAttacks } from '../game/battle/attacks.js';
 import { seedPacks } from '../game/packs/catalog.js';
-import { COLLECTIONS, V1_COLLECTIONS, V2_COLLECTIONS, V3_COLLECTIONS, V5_COLLECTIONS, V6_COLLECTIONS, SCHEMA_VERSION, validateDatabase, validateTransition } from './validation.js';
+import { COLLECTIONS, collectionsForVersion, SCHEMA_VERSION, validateDatabase, validateTransition } from './validation.js';
 import { acquireWriterLock } from './writerLock.js';
 import { atomicWrite, parseJSON, readText, syncDirectory } from './files.js';
 
 const MANIFEST = '_database.json';
 const JOURNAL = '_journal.json';
 const FILES = [...COLLECTIONS.map(name => `${name}.json`), MANIFEST];
-const V1_FILES = [...V1_COLLECTIONS.map(name => `${name}.json`), MANIFEST];
-const V2_FILES = [...V2_COLLECTIONS.map(name => `${name}.json`), MANIFEST];
-const V3_FILES = [...V3_COLLECTIONS.map(name => `${name}.json`), MANIFEST];
-const V5_FILES = [...V5_COLLECTIONS.map(name => `${name}.json`), MANIFEST];
-const V6_FILES = [...V6_COLLECTIONS.map(name => `${name}.json`), MANIFEST];
+const filesForVersion = version => [...collectionsForVersion(version).map(name => `${name}.json`), MANIFEST];
 const serialize = value => JSON.stringify(value, null, 2) + '\n';
 const digest = body => createHash('sha256').update(JSON.stringify(body)).digest('hex');
 
@@ -37,18 +35,20 @@ function envelope(records = []) {
 
 function initialState() {
   const state = Object.fromEntries(COLLECTIONS.map(name => [name, envelope()]));
-  state.personajes.records = seedCharacters();
-  state.ataques.records = seedAttacks();
+  state.personajes.records = [...seedCharacters(), ...seedEventCharacters()];
+  state.ataques.records = [...seedAttacks(), ...seedEventAttacks()];
   state.sobres.records = seedPacks();
+  state.campanas.records = seedCampaigns();
   state.estado.records = state.personajes.records.map(c => ({ id: `mint:${c.id}`, kind: 'mintCounter', characterId: c.id, lastSerial: 0, issuedCount: 0 }));
   return state;
 }
 
 function decode(raw, expectedVersion = null) {
   const manifest = parseJSON(raw[MANIFEST], MANIFEST);
-  requireGame([1, 2, 3, 4, 5, 6, 7, 8].includes(manifest?.schemaVersion) && (expectedVersion === null || manifest.schemaVersion === expectedVersion), 'UNSUPPORTED_SCHEMA_VERSION', { file: MANIFEST });
+  requireGame(Number.isSafeInteger(manifest?.schemaVersion) && manifest.schemaVersion >= 1 && manifest.schemaVersion <= SCHEMA_VERSION &&
+    (expectedVersion === null || manifest.schemaVersion === expectedVersion), 'UNSUPPORTED_SCHEMA_VERSION', { file: MANIFEST });
   requireGame(manifest.database === 'chengdu-cards', 'DATABASE_CORRUPT');
-  const names = manifest.schemaVersion === 1 ? V1_COLLECTIONS : manifest.schemaVersion === 2 ? V2_COLLECTIONS : manifest.schemaVersion === 3 ? V3_COLLECTIONS : manifest.schemaVersion < 6 ? V5_COLLECTIONS : manifest.schemaVersion === 6 ? V6_COLLECTIONS : COLLECTIONS;
+  const names = collectionsForVersion(manifest.schemaVersion);
   requireGame(names.every(name => typeof raw[`${name}.json`] === 'string'), 'DATABASE_INCOMPLETE');
   const state = Object.fromEntries(names.map(name => [name, parseJSON(raw[`${name}.json`], `${name}.json`)]));
   validateDatabase(state, manifest.schemaVersion);
@@ -99,8 +99,7 @@ export class JsonUnitOfWork {
       typeof body.id === 'string' && journal.checksum === digest(body), 'DATABASE_CORRUPT', { file: JOURNAL });
     requireGame(body.after && typeof body.after[MANIFEST] === 'string', 'DATABASE_CORRUPT');
     const version = parseJSON(body.after[MANIFEST], MANIFEST).schemaVersion;
-    requireGame([1, 2, 3, 4, 5, 6, 7, 8].includes(version), 'UNSUPPORTED_SCHEMA_VERSION');
-    const files = version === 1 ? V1_FILES : version === 2 ? V2_FILES : version === 3 ? V3_FILES : version < 6 ? V5_FILES : version === 6 ? V6_FILES : FILES;
+    const files = filesForVersion(version);
     for (const state of [body.before, body.after]) {
       requireGame(state && Object.keys(state).length === files.length && files.every(file => Object.hasOwn(state, file)), 'DATABASE_CORRUPT', { file: JOURNAL });
     }
@@ -181,28 +180,18 @@ export class JsonUnitOfWork {
         state.estado.records.push(migrated.mapping);
         state.estado.records.push(...migrated.users.map(user => progressionBaseline('user', user)));
         this.#commit(raw, state);
-      } else if (parseJSON(raw[MANIFEST], MANIFEST).schemaVersion === 1) {
-        requireGame(FILES.filter(file => !V1_FILES.includes(file)).every(file => raw[file] === null), 'DATABASE_INCOMPLETE');
-        this.#commit(raw, migrateCombatV8(migrateMarketV7(migrateEconomyV6(migrateBalanceV5(migrateCollectionV4(migrateProgressionV3(migrateBattlesV2(decode(raw, 1), this.clock()), this.clock()), this.clock()), this.clock()), this.clock()), this.clock()), this.clock()));
-      } else if (parseJSON(raw[MANIFEST], MANIFEST).schemaVersion === 2) {
-        requireGame(FILES.filter(file => !V2_FILES.includes(file)).every(file => raw[file] === null), 'DATABASE_INCOMPLETE');
-        this.#commit(raw, migrateCombatV8(migrateMarketV7(migrateEconomyV6(migrateBalanceV5(migrateCollectionV4(migrateProgressionV3(decode(raw, 2), this.clock()), this.clock()), this.clock()), this.clock()), this.clock()), this.clock()));
-      } else if (parseJSON(raw[MANIFEST], MANIFEST).schemaVersion === 3) {
-        requireGame(FILES.filter(file => !V3_FILES.includes(file)).every(file => raw[file] === null), 'DATABASE_INCOMPLETE');
-        this.#commit(raw, migrateCombatV8(migrateMarketV7(migrateEconomyV6(migrateBalanceV5(migrateCollectionV4(decode(raw, 3), this.clock()), this.clock()), this.clock()), this.clock()), this.clock()));
-      } else if (parseJSON(raw[MANIFEST], MANIFEST).schemaVersion === 4) {
-        requireGame(FILES.filter(file => !V5_FILES.includes(file)).every(file => raw[file] === null), 'DATABASE_INCOMPLETE');
-        this.#commit(raw, migrateCombatV8(migrateMarketV7(migrateEconomyV6(migrateBalanceV5(decode(raw, 4), this.clock()), this.clock()), this.clock()), this.clock()));
-      } else if (parseJSON(raw[MANIFEST], MANIFEST).schemaVersion === 5) {
-        requireGame(FILES.filter(file => !V5_FILES.includes(file)).every(file => raw[file] === null), 'DATABASE_INCOMPLETE');
-        this.#commit(raw, migrateCombatV8(migrateMarketV7(migrateEconomyV6(decode(raw, 5), this.clock()), this.clock()), this.clock()));
-      } else if (parseJSON(raw[MANIFEST], MANIFEST).schemaVersion === 6) {
-        requireGame(FILES.filter(file => !V6_FILES.includes(file)).every(file => raw[file] === null), 'DATABASE_INCOMPLETE');
-        this.#commit(raw, migrateCombatV8(migrateMarketV7(decode(raw, 6), this.clock()), this.clock()));
-      }
-      if (parseJSON(this.#raw()[MANIFEST], MANIFEST).schemaVersion === 7) {
-        const legacy = this.#raw();
-        this.#commit(legacy, migrateCombatV8(decode(legacy, 7), this.clock()));
+      } else {
+        const version = parseJSON(raw[MANIFEST], MANIFEST).schemaVersion;
+        const oldFiles = filesForVersion(version);
+        requireGame(FILES.filter(file => !oldFiles.includes(file)).every(file => raw[file] === null), 'DATABASE_INCOMPLETE');
+        if (version < SCHEMA_VERSION) {
+          let state = decode(raw, version);
+          const migrations = [null, null, migrateBattlesV2, migrateProgressionV3, migrateCollectionV4,
+            migrateBalanceV5, migrateEconomyV6, migrateMarketV7, migrateCombatV8, migrateContentV9];
+          const now = this.clock();
+          for (let next = version + 1; next <= SCHEMA_VERSION; next++) state = migrations[next](state, now);
+          this.#commit(raw, state);
+        }
       }
       this.#load();
       this.#opened = true;

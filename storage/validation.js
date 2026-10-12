@@ -8,6 +8,8 @@ import { validateEconomyData, validateEconomyTransition } from './economyValidat
 import { validateMarketData, validateMarketTransition } from './marketValidation.js';
 import { validateOwnershipData, validateOwnershipTransition } from './ownershipValidation.js';
 import { advancedAttack, validateCombatProfile } from '../game/battle/combatContent.js';
+import { validateContentData, validateContentTransition } from './contentValidation.js';
+import { validateEncounterData, validateEncounterTransition } from './encounterValidation.js';
 
 export const V1_COLLECTIONS = Object.freeze(['usuarios', 'personajes', 'unidades', 'estado', 'eventos']);
 export const V2_COLLECTIONS = Object.freeze([...V1_COLLECTIONS, 'ataques', 'combates']);
@@ -15,8 +17,17 @@ export const V3_COLLECTIONS = Object.freeze([...V2_COLLECTIONS, 'recompensas']);
 export const V4_COLLECTIONS = Object.freeze([...V3_COLLECTIONS, 'sobres', 'aperturas', 'economia']);
 export const V5_COLLECTIONS = V4_COLLECTIONS;
 export const V6_COLLECTIONS = Object.freeze([...V5_COLLECTIONS, 'diarios']);
-export const COLLECTIONS = Object.freeze([...V6_COLLECTIONS, 'mercado', 'ventas']);
-export const SCHEMA_VERSION = 8;
+export const V7_COLLECTIONS = Object.freeze([...V6_COLLECTIONS, 'mercado', 'ventas']);
+export const V8_COLLECTIONS = V7_COLLECTIONS;
+export const CONTENT_COLLECTIONS = Object.freeze(['campanas', 'premioscontenido', 'logros', 'encuentros', 'accionescontenido', 'actividad']);
+export const COLLECTIONS = Object.freeze([...V8_COLLECTIONS, ...CONTENT_COLLECTIONS]);
+export const SCHEMA_VERSION = 9;
+
+export function collectionsForVersion(version) {
+  requireGame(Number.isSafeInteger(version) && version >= 1 && version <= SCHEMA_VERSION, 'UNSUPPORTED_SCHEMA_VERSION');
+  return version === 1 ? V1_COLLECTIONS : version === 2 ? V2_COLLECTIONS : version === 3 ? V3_COLLECTIONS :
+    version < 6 ? V5_COLLECTIONS : version === 6 ? V6_COLLECTIONS : version < 9 ? V8_COLLECTIONS : COLLECTIONS;
+}
 const integer = (v, minimum = 0) => Number.isSafeInteger(v) && v >= minimum;
 const text = v => typeof v === 'string' && v.length > 0 && v.length <= 200;
 const date = v => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(v) && Number.isFinite(Date.parse(v));
@@ -45,8 +56,7 @@ function progress(value) {
 
 export function validateDatabase(state, schemaVersion = SCHEMA_VERSION) {
   try {
-    requireGame([1, 2, 3, 4, 5, 6, 7, 8].includes(schemaVersion), 'UNSUPPORTED_SCHEMA_VERSION');
-    for (const name of schemaVersion === 1 ? V1_COLLECTIONS : schemaVersion === 2 ? V2_COLLECTIONS : schemaVersion === 3 ? V3_COLLECTIONS : schemaVersion < 6 ? V5_COLLECTIONS : schemaVersion === 6 ? V6_COLLECTIONS : COLLECTIONS) {
+    for (const name of collectionsForVersion(schemaVersion)) {
       const collection = state[name];
       check(collection && typeof collection._meta === 'object', name);
       requireGame(collection._meta.schemaVersion === schemaVersion, 'UNSUPPORTED_SCHEMA_VERSION', { collection: name });
@@ -176,6 +186,10 @@ export function validateDatabase(state, schemaVersion = SCHEMA_VERSION) {
       validateOwnershipData(state, schemaVersion);
       validateMarketData(state);
     }
+    if (schemaVersion >= 9) {
+      validateContentData(state);
+      validateEncounterData(state);
+    }
     return { valid: true, schemaVersion, users: users.length, characters: characters.length, units: units.length, claims: claims.length };
   } catch (error) {
     if (error instanceof GameError && ['DATABASE_CORRUPT', 'UNSUPPORTED_SCHEMA_VERSION'].includes(error.code)) throw error;
@@ -189,7 +203,7 @@ export function validateTransition(before, after) {
     for (const previous of before[name].records) {
       const next = nextById.get(previous.id);
       check(next, `${name}.deletion`);
-      if (['eventos', 'recompensas', 'aperturas', 'economia', 'diarios', 'ventas'].includes(name) || (name === 'estado' && previous.kind !== 'mintCounter')) {
+      if (['eventos', 'recompensas', 'aperturas', 'economia', 'diarios', 'ventas', 'premioscontenido', 'logros', 'accionescontenido'].includes(name) || (name === 'estado' && previous.kind !== 'mintCounter')) {
         check(equal(previous, next), `${name}.immutable`);
       }
       if (name === 'unidades') {
@@ -216,4 +230,6 @@ export function validateTransition(before, after) {
   validateEconomyTransition(before, after);
   validateOwnershipTransition(before, after);
   validateMarketTransition(before, after);
+  validateContentTransition(before, after);
+  validateEncounterTransition(before, after);
 }

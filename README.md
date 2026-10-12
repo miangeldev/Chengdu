@@ -1,6 +1,6 @@
-# Chengdú Cards — Alpha 0.7
+# Chengdú Cards — Beta 0.8
 
-Módulo de juego para un bot de WhatsApp: registro, perfil, catálogo de ocho
+Módulo de juego para un bot de WhatsApp: registro, perfil, catálogo de diez
 personajes, starter único, colección, equipos de hasta tres unidades y combates
 1v1, 2v2 y 3v3 por turnos. Incluye elementos, pasivas, estados, cambios de unidad,
 XP, niveles independientes de jugador/unidad, ChengCoins e historial.
@@ -9,6 +9,8 @@ La economía añade un diario de 100 ChengCoins cada 24 horas, tienda e historia
 de ingresos y gastos para cada jugador.
 El mercado permite comprar y vender unidades entre jugadores, con comisión,
 anuncios que vencen y un historial de propiedad que conserva cada emisión.
+La Beta 0.8 añade misiones diarias, logros con títulos e insignias, tickets de
+captura, bosses mundiales, apariciones en grupos y el Festival de los Faroles.
 El balance 0.4.1 distingue la fuerza de las rarezas y limita la emisión global
 de cada personaje, conservando las unidades y partidas anteriores.
 Toda la interfaz usa mensajes compactos, emojis, negritas y un siguiente paso
@@ -28,7 +30,7 @@ npm run db:validate
 
 El segundo comando inicializa la base vacía y el catálogo si se trata de una
 instalación nueva; en instalaciones existentes valida o migra el formato original
-de usuarios. Desde los esquemas 1 a 7, migra al esquema 8 con backup y recuperación,
+de usuarios. Desde los esquemas 1 a 8, migra al esquema 9 con backup y recuperación,
 conservando unidades, identidades, saldos, XP, recibos y combates anteriores. La ruta por defecto es `ChengdúData/` junto al módulo, independiente
 del directorio desde el que se ejecute el bot.
 
@@ -55,12 +57,22 @@ no se conectan a WhatsApp ni escriben jugadores de prueba en la base del juego.
 | `.ctuabrir basico` | Gastar 500 ChengCoins y obtener una unidad con rasgos/variante. |
 | `.ctumercado` | Ver unidades en venta, cinco por página. |
 | `.ctumercado mios` | Ver anuncios propios; `raro` filtra rareza y `precio` ordena de menor a mayor. |
-| `.ctumercado ver LIST-…` | Inspeccionar la unidad y precio del anuncio; comprar o retirar según corresponda. |
+| `.ctumercado M1` | Inspeccionar el anuncio M1; comprar o retirar según corresponda. |
 | `.ctuvender PAND-000001 100` | Publicar una unidad propia por 100 ChengCoins. |
-| `.ctucomprar LIST-…` | Comprar una unidad anunciada y recibir su propiedad. |
-| `.cturetirar LIST-…` | Retirar un anuncio propio. |
+| `.ctucomprar M1` | Comprar el anuncio M1 y recibir la unidad. |
+| `.cturetirar M1` | Retirar tu anuncio M1. |
 | `.ctuventas` | Ver compras y ventas propias, cinco por página. |
 | `.ctupropiedad PAND-000001` | Consultar emisión y cambios de propietario, cinco por página. |
+| `.ctumisiones` / `.ctumisiones reclamar 1` | Ver y cobrar los objetivos diarios; también 2 y 3. |
+| `.ctulogros` / `.ctulogros reclamar L1` | Logros permanentes, títulos e insignias. |
+| `.ctuinventario` | Tickets de captura y títulos obtenidos. |
+| `.ctuboss` / `.ctuboss dragon` | Guardián de la Niebla o Dragón del Vacío, compartidos por todos los grupos. |
+| `.ctubossatacar 2 B1` | Atacar al boss con la primera unidad equipada, desde un grupo. |
+| `.ctubosstop B1` | Aportaciones de participantes, con páginas numéricas. |
+| `.ctuspawn` / `.ctuexplorar` | Apariciones del grupo; una oportunidad por ventana temporal. |
+| `.ctucapturar S1` | Capturar por un ticket, con propietario y serial únicos. |
+| `.ctueventos` / `.ctuevento faroles` | Calendario, personajes exclusivos y supply del festival. |
+| `.ctuevento faroles reclamar` | Bienvenida única: 25 monedas, 10 XP y un ticket. |
 | `.ctuhistorial` | Ver tus partidas terminadas, cinco por página y desde cualquier chat. |
 | `.ctuhistorial BTL-…` | Consultar turnos, resultado y recompensa original de una partida propia. |
 | `.ctucatalogo` | Ver las plantillas del catálogo. |
@@ -165,10 +177,14 @@ la unidad se puede seleccionar de nuevo para combatir.
 
 `.ctumercado` muestra los anuncios activos; `mios`, las publicaciones propias;
 `raro` y otras rarezas filtran; `precio` ordena de menor a mayor. El detalle
-conserva nombre, stats, nivel, rasgos y variante fijados al publicar. Los comandos
-de compra y retirada aparecen según quién lo consulta.
+conserva nombre, stats, nivel, rasgos y variante fijados al publicar. Desde 0.7.1,
+cada anuncio tiene un código corto global (`M1`, `M2`…). La lista muestra
+directamente `.ctucomprar M1` y `.ctumercado M1` para ver detalles; en anuncios
+propios aparece retirar. El código se conserva al cambiar páginas, filtros,
+estado o reiniciar, y nunca se reasigna a otra publicación. Los mensajes antiguos
+con UUID siguen funcionando.
 
-`.ctucomprar LIST-…` coordina pago, importe neto del vendedor, comisión,
+`.ctucomprar M1` coordina pago, importe neto del vendedor, comisión,
 propiedad, desbloqueo, recibo y auditoría en un mismo commit. La unidad conserva
 serial, emisión, stats de nacimiento, progreso y variantes; el nuevo propietario
 elige después su equipo. Dos compradores simultáneos producen una única venta.
@@ -262,6 +278,33 @@ Los desafíos vencen en 5 minutos y los combates tras 30 minutos sin una acción
 La expiración se procesa al consultar perfil, unidades, equipos, saldo o batallas; el
 anfitrión también puede llamar a `game.battle.sweepExpired()` periódicamente.
 
+## Contenido Beta 0.8
+
+Las misiones diarias premian dos victorias, cinco partidas y tres personajes
+usados en partidas válidas. Cambian a medianoche de CDMX. Los cuatro logros
+permanentes reconocen primera victoria, 25 unidades distintas, 100 partidas
+y 10 victorias consecutivas; vender unidades no borra el progreso.
+
+Los bosses conservan HP mundial compartido, ataques con snapshot, cooldown de
+30 segundos y límite de 20 por jugador/encuentro. El último golpe paga a todos
+los participantes con daño, con bonos separados por mayor daño y golpe final.
+El Guardián tiene 1.000 HP; el Dragón, 100.000. No alteran estadísticas PvP.
+
+La actividad del grupo tiene una comprobación de aparición por ventana de 30
+minutos, probabilidad del 25% y seis horas entre apariciones; enviar más mensajes
+no añade oportunidades. Capturar cuesta un ticket, dura diez minutos y sólo
+puede ganar una persona. Se comprueban supply y calendario antes de emitir.
+
+El Festival de los Faroles abre del 11 al 25 de octubre de 2026 a las 00:00 CDMX.
+Zorro de los Faroles tiene 35 emisiones y Guardián Espectral, 20. Ambos usan
+ataques y pasivas propios. El cierre impide nuevas emisiones, también por sobres
+o administración, y conserva unidades, progreso y mercado.
+
+Reglas y límites en [Beta 0.8](docs/beta-0.8.md), planificación en
+[sus ocho hitos](docs/plan-beta-0.8.md). `npm run balance:content` simula el catálogo
+completo; el [informe de 9.000 duelos](docs/content-balance-0.8.json) guarda las
+definiciones utilizadas y los límites de la comparación.
+
 ## Combate avanzado 0.7
 
 Los equipos admiten una, dos o tres unidades distintas. `.ctupelea @jugador`
@@ -300,11 +343,12 @@ de su estrategia de referencia.
 npm run preview:whatsapp
 ```
 
-Genera [103 ejemplos de los mensajes](docs/whatsapp-preview.md) usando una base
+Genera [130 ejemplos de los mensajes](docs/whatsapp-preview.md) usando una base
 temporal y jugadores ficticios: registro, perfil, colección, starter, equipo,
 desafío, turnos, fichas detalladas, fallo de ataque, errores, recompensas,
 subidas de nivel, saldo, historial, sobres, rasgos/variantes, diario, tienda
-y movimientos económicos, mercado e historial de propiedad.
+y movimientos económicos, mercado e historial de propiedad, misiones, logros,
+apariciones, capturas, bosses y eventos.
 No envía mensajes a WhatsApp real.
 
 Todas las pantallas usan el encabezado `🃏 CHENGDÚ CARDS | SECCIÓN` y un separador
@@ -342,6 +386,19 @@ export async function onIncomingMessage(sock, msg, body) {
   // Continuar con otros comandos del bot.
 }
 ```
+
+El router procesa texto normal del grupo para las apariciones automáticas;
+entrégale también esos mensajes. No anuncia nada si no hay una nueva aparición.
+`automaticSpawns: false` desactiva ese comportamiento.
+Si el anfitrión usa el cargador de plugins, puede importar `observeGameActivity`
+del mismo módulo e invocarlo únicamente para mensajes normales autenticados:
+
+```js
+import { observeGameActivity } from './interfaces/whatsapp/index.js';
+await observeGameActivity(sock, msg);
+```
+
+No pasar mensajes del bot ni ejecutar ambos caminos para un mismo comando.
 
 El socket debe proporcionar `sendMessage(chatId, { text })`. Se usa
 `msg.key.remoteJid` como chat y `msg.key.participant` como remitente en grupos.
@@ -428,8 +485,10 @@ independientes; rechaza modificaciones directas de colecciones administradas.
 
 `usuarios.json`, `personajes.json`, `unidades.json`, `estado.json`, `eventos.json`,
 `ataques.json`, `combates.json`, `recompensas.json`, `sobres.json`, `aperturas.json`,
-`economia.json`, `diarios.json`, `mercado.json` y `ventas.json` incluyen versión de
-esquema 8 y revisión. `_database.json` identifica la instalación.
+`economia.json`, `diarios.json`, `mercado.json`, `ventas.json`, `campanas.json`,
+`premioscontenido.json`, `logros.json`, `encuentros.json`, `accionescontenido.json`
+y `actividad.json` incluyen versión de esquema 9 y revisión. Son veinte colecciones
+y el manifest por snapshot. `_database.json` identifica la instalación.
 `_journal.json` existe mientras hay un commit pendiente. Cada operación que cambia
 datos guarda previamente una copia coherente en `backups/<id-operación>/`.
 
@@ -448,7 +507,10 @@ uno ligado a su recompensa, apertura o diario. El reclamo diario tiene un recibo
 inmutable y exactamente un crédito económico; ambos se publican junto con el
 saldo. Las ventas añaden un débito del comprador y un crédito neto del vendedor,
 ligados al recibo y al evento de cambio de propiedad. La XP se reconstruye desde
-sus recompensas de combate.
+sus recompensas de combate y contenido, en el orden común del ledger. Los tickets
+se reconstruyen desde ganancias y gastos de recibos de contenido. El golpe final
+de boss publica todos los premios juntos; una captura publica unidad y gasto de
+ticket en el mismo commit.
 Las compras no conceden XP. Las unidades anteriores conservan sus rasgos y variantes
 sin adquirir efectos nuevos retroactivamente. El balance 0.4.1 añade una base de
 combate separada, preserva los stats de nacimiento y mantiene intactos los
@@ -481,12 +543,16 @@ activos, revisar la migración a SQLite prevista en el diseño.
 
 ## Alcance validado
 
+Beta 0.8 pasa **439 pruebas**, genera **130 mensajes de ejemplo** y tiene **41
+comandos**. La simulación de contenido verifica **9.000 duelos**. La base local
+se migró al esquema 9 con respaldo y conservación de sus registros anteriores.
+
 Las pruebas con `node --test --test-isolation=none` verifican persistencia al
 reabrir, registro/starter concurrentes, supply, identidades, cursores, migraciones
-desde esquemas 1 a 7, journals antiguos, integridad y recuperación de commits. También
+desde esquemas 1 a 8, journals antiguos, integridad y recuperación de commits. También
 cubren equipos, snapshots, turnos, precisión, duplicados, victoria, rendición,
 expiración y estadísticas. Se interrumpe realmente un proceso con `SIGKILL`.
-También se comprueban las trazas de error y los 30 plugins mediante sus
+También se comprueban las trazas de error y los 41 plugins mediante sus
 exportaciones `run`, con una base compartida y sin inyectar el juego del router.
 El debug se verifica activado y desactivado, con causas anidadas, loggers que
 sólo aceptan un argumento y límites de longitud del mensaje de WhatsApp.
@@ -534,5 +600,6 @@ Diseño: [fundación 0.1](docs/mvp-0.1.md), [combate 0.2](docs/mvp-0.2.md),
 [economía 0.5](docs/alpha-0.5.md),
 [mercado 0.6](docs/alpha-0.6.md),
 [combate avanzado 0.7](docs/alpha-0.7.md),
+[contenido 0.8](docs/beta-0.8.md),
 [modelo de datos](docs/database.md) y
 [visión completa](project.md).

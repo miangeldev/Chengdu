@@ -4,6 +4,6 @@ import { card, characterIcon, displayName, rarityIcon, rarityName, roleName } fr
 export const { command, run, createRun } = defineCommand('ctucatalogo', async ({ game, args, prefix, cmd }) => {
   const page = await game.characters.listCharacters(pageArguments(args));
   return card('CATÁLOGO', page.items.length ? page.items.map(c =>
-    `${characterIcon(c.id)} *${displayName(c.name)}*\n${rarityIcon(c.rarity)} ${rarityName(c.rarity)} · ${roleName(c.role)}${!c.obtainable ? ' · 🔒 Emisión cerrada' : c.starterEligible ? ' · 🎁 Starter' : ''}\n↳ ${cmd('ctuficha', c.id)}`
+    `${characterIcon(c.id)} *${displayName(c.name)}*\n${rarityIcon(c.rarity)} ${rarityName(c.rarity)} · ${roleName(c.role)}${c.eventStatus === 'ended' ? ' · 🔒 Evento cerrado' : c.eventStatus === 'upcoming' ? ' · ⏳ Próximo evento' : c.eventStatus === 'active' ? ' · 🏮 Evento' : !c.obtainable ? ' · 🔒 Emisión cerrada' : c.starterEligible ? ' · 🎁 Starter' : ''}\n↳ ${cmd('ctuficha', c.id)}`
   ) : ['📚 No hay personajes en esta página.'], [pageNavigation(page, 'ctucatalogo', prefix), `🎁 Elegir starter: ${cmd('ctustarter')}`].filter(Boolean).join('\n'));
 });

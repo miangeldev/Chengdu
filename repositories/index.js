@@ -18,6 +18,12 @@ export function createRepositories(state, writable = false) {
     economy: collectionRepository(state.economia.records, writable),
     dailyClaims: collectionRepository(state.diarios.records, writable),
     listings: collectionRepository(state.mercado.records, writable),
-    sales: collectionRepository(state.ventas.records, writable)
+    sales: collectionRepository(state.ventas.records, writable),
+    campaigns: collectionRepository(state.campanas.records, writable),
+    contentRewards: collectionRepository(state.premioscontenido.records, writable),
+    achievements: collectionRepository(state.logros.records, writable),
+    encounters: collectionRepository(state.encuentros.records, writable),
+    contentActions: collectionRepository(state.accionescontenido.records, writable),
+    groupActivity: collectionRepository(state.actividad.records, writable)
   };
 }

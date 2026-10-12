@@ -1,0 +1,1189 @@
+{
+  "policyVersion": 1,
+  "rulesVersion": 2,
+  "samplesPerPair": 200,
+  "seed": 73,
+  "totalDuels": 9000,
+  "characters": [
+    {
+      "id": "panda_guerrero",
+      "name": "Panda Guerrero",
+      "rarity": "common",
+      "event": false,
+      "stats": {
+        "hp": 120,
+        "attack": 25,
+        "defense": 23,
+        "speed": 8
+      },
+      "combat": {
+        "version": 1,
+        "element": "nature",
+        "ability": {
+          "id": "piel_bambu",
+          "name": "Piel de Bambú",
+          "description": "Al entrar por primera vez obtiene un escudo de 12 puntos durante 2 turnos propios.",
+          "trigger": "on_enter",
+          "effects": [
+            {
+              "type": "shield",
+              "target": "self",
+              "duration": 2,
+              "potency": 12
+            }
+          ]
+        }
+      },
+      "attacks": [
+        {
+          "id": "panda_guerrero_1",
+          "revision": 1,
+          "name": "Golpe de Bambú",
+          "power": 25,
+          "accuracy": 100,
+          "type": "physical",
+          "combat": {
+            "version": 1,
+            "power": 25,
+            "accuracy": 100,
+            "type": "physical",
+            "element": "nature",
+            "effects": [],
+            "cooldown": 0
+          }
+        },
+        {
+          "id": "panda_guerrero_2",
+          "revision": 1,
+          "name": "Impacto del Panda",
+          "power": 40,
+          "accuracy": 80,
+          "type": "physical",
+          "combat": {
+            "version": 1,
+            "power": 36,
+            "accuracy": 85,
+            "type": "physical",
+            "element": "nature",
+            "effects": [
+              {
+                "type": "shield",
+                "target": "self",
+                "duration": 2,
+                "potency": 12
+              }
+            ],
+            "cooldown": 2
+          }
+        }
+      ],
+      "supply": 50,
+      "score": 41.666666666666664
+    },
+    {
+      "id": "mago_carmesi",
+      "name": "Mago Carmesí",
+      "rarity": "common",
+      "event": false,
+      "stats": {
+        "hp": 100,
+        "attack": 32,
+        "defense": 16,
+        "speed": 10
+      },
+      "combat": {
+        "version": 1,
+        "element": "fire",
+        "ability": {
+          "id": "sangre_carmesi",
+          "name": "Sangre Carmesí",
+          "description": "Al entrar por primera vez aumenta su ataque un 12% durante 2 turnos propios.",
+          "trigger": "on_enter",
+          "effects": [
+            {
+              "type": "attack_up",
+              "target": "self",
+              "duration": 2,
+              "potency": 12
+            }
+          ]
+        }
+      },
+      "attacks": [
+        {
+          "id": "mago_carmesi_1",
+          "revision": 1,
+          "name": "Chispa Carmesí",
+          "power": 25,
+          "accuracy": 100,
+          "type": "physical",
+          "combat": {
+            "version": 1,
+            "power": 25,
+            "accuracy": 100,
+            "type": "magic",
+            "element": "fire",
+            "effects": [],
+            "cooldown": 0
+          }
+        },
+        {
+          "id": "mago_carmesi_2",
+          "revision": 1,
+          "name": "Llamarada",
+          "power": 40,
+          "accuracy": 80,
+          "type": "physical",
+          "combat": {
+            "version": 1,
+            "power": 36,
+            "accuracy": 80,
+            "type": "magic",
+            "element": "fire",
+            "effects": [
+              {
+                "type": "burn",
+                "target": "enemy",
+                "duration": 2,
+                "potency": 4
+              }
+            ],
+            "cooldown": 2
+          }
+        }
+      ],
+      "supply": 50,
+      "score": 33.44444444444444
+    },
+    {
+      "id": "lobo_sombrio",
+      "name": "Lobo Sombrío",
+      "rarity": "common",
+      "event": false,
+      "stats": {
+        "hp": 95,
+        "attack": 27,
+        "defense": 17,
+        "speed": 16
+      },
+      "combat": {
+        "version": 1,
+        "element": "dark",
+        "ability": {
+          "id": "mirada_nocturna",
+          "name": "Mirada Nocturna",
+          "description": "Al entrar por primera vez obtiene un escudo de 10 puntos durante 2 turnos propios y reduce la defensa del rival un 10% durante 2 turnos propios del rival.",
+          "trigger": "on_enter",
+          "effects": [
+            {
+              "type": "defense_down",
+              "target": "enemy",
+              "duration": 2,
+              "potency": 10
+            },
+            {
+              "type": "shield",
+              "target": "self",
+              "duration": 2,
+              "potency": 10
+            }
+          ]
+        }
+      },
+      "attacks": [
+        {
+          "id": "lobo_sombrio_1",
+          "revision": 1,
+          "name": "Garra Sombría",
+          "power": 25,
+          "accuracy": 100,
+          "type": "physical",
+          "combat": {
+            "version": 1,
+            "power": 25,
+            "accuracy": 100,
+            "type": "physical",
+            "element": "dark",
+            "effects": [],
+            "cooldown": 0
+          }
+        },
+        {
+          "id": "lobo_sombrio_2",
+          "revision": 1,
+          "name": "Colmillo Nocturno",
+          "power": 40,
+          "accuracy": 80,
+          "type": "physical",
+          "combat": {
+            "version": 1,
+            "power": 35,
+            "accuracy": 85,
+            "type": "physical",
+            "element": "dark",
+            "effects": [
+              {
+                "type": "defense_down",
+                "target": "enemy",
+                "duration": 2,
+                "potency": 15
+              }
+            ],
+            "cooldown": 2
+          }
+        }
+      ],
+      "supply": 50,
+      "score": 25.166666666666668
+    },
+    {
+      "id": "monje_celestial",
+      "name": "Monje Celestial",
+      "rarity": "rare",
+      "event": false,
+      "stats": {
+        "hp": 114,
+        "attack": 27,
+        "defense": 21,
+        "speed": 11
+      },
+      "combat": {
+        "version": 1,
+        "element": "light",
+        "ability": {
+          "id": "serenidad",
+          "name": "Serenidad",
+          "description": "Al entrar por primera vez obtiene un escudo de 6 puntos durante 2 turnos propios y regenera un 8% de su vida máxima al comenzar cada uno de sus próximos 3 turnos, sin superar su vida máxima.",
+          "trigger": "on_enter",
+          "effects": [
+            {
+              "type": "regeneration",
+              "target": "self",
+              "duration": 3,
+              "potency": 8
+            },
+            {
+              "type": "shield",
+              "target": "self",
+              "duration": 2,
+              "potency": 6
+            }
+          ]
+        }
+      },
+      "attacks": [
+        {
+          "id": "monje_celestial_1",
+          "revision": 1,
+          "name": "Palma Celestial",
+          "power": 25,
+          "accuracy": 100,
+          "type": "physical",
+          "combat": {
+            "version": 1,
+            "power": 25,
+            "accuracy": 100,
+            "type": "physical",
+            "element": "light",
+            "effects": [],
+            "cooldown": 0
+          }
+        },
+        {
+          "id": "monje_celestial_2",
+          "revision": 1,
+          "name": "Puño del Alba",
+          "power": 40,
+          "accuracy": 80,
+          "type": "physical",
+          "combat": {
+            "version": 1,
+            "power": 32,
+            "accuracy": 90,
+            "type": "physical",
+            "element": "light",
+            "effects": [
+              {
+                "type": "regeneration",
+                "target": "self",
+                "duration": 2,
+                "potency": 6
+              }
+            ],
+            "cooldown": 2
+          }
+        }
+      ],
+      "supply": 35,
+      "score": 42.5
+    },
+    {
+      "id": "guardian_jade",
+      "name": "Guardián Jade",
+      "rarity": "rare",
+      "event": false,
+      "stats": {
+        "hp": 133,
+        "attack": 23,
+        "defense": 28,
+        "speed": 7
+      },
+      "combat": {
+        "version": 1,
+        "element": "nature",
+        "ability": {
+          "id": "muralla_jade",
+          "name": "Muralla de Jade",
+          "description": "Al entrar por primera vez obtiene un escudo de 18 puntos durante 2 turnos propios.",
+          "trigger": "on_enter",
+          "effects": [
+            {
+              "type": "shield",
+              "target": "self",
+              "duration": 2,
+              "potency": 18
+            }
+          ]
+        }
+      },
+      "attacks": [
+        {
+          "id": "guardian_jade_1",
+          "revision": 1,
+          "name": "Golpe de Jade",
+          "power": 25,
+          "accuracy": 100,
+          "type": "physical",
+          "combat": {
+            "version": 1,
+            "power": 25,
+            "accuracy": 100,
+            "type": "physical",
+            "element": "nature",
+            "effects": [],
+            "cooldown": 0
+          }
+        },
+        {
+          "id": "guardian_jade_2",
+          "revision": 1,
+          "name": "Martillo del Guardián",
+          "power": 40,
+          "accuracy": 80,
+          "type": "physical",
+          "combat": {
+            "version": 1,
+            "power": 30,
+            "accuracy": 85,
+            "type": "physical",
+            "element": "nature",
+            "effects": [
+              {
+                "type": "stun",
+                "target": "enemy",
+                "duration": 1,
+                "potency": 1
+              }
+            ],
+            "cooldown": 3
+          }
+        }
+      ],
+      "supply": 35,
+      "score": 68.83333333333333
+    },
+    {
+      "id": "bruja_lunar",
+      "name": "Bruja Lunar",
+      "rarity": "epic",
+      "event": false,
+      "stats": {
+        "hp": 108,
+        "attack": 33,
+        "defense": 21,
+        "speed": 13
+      },
+      "combat": {
+        "version": 1,
+        "element": "water",
+        "ability": {
+          "id": "marea_lunar",
+          "name": "Marea Lunar",
+          "description": "Al entrar por primera vez envenena al rival: 3% de vida máxima durante 2 turnos propios del rival.",
+          "trigger": "on_enter",
+          "effects": [
+            {
+              "type": "poison",
+              "target": "enemy",
+              "duration": 2,
+              "potency": 3
+            }
+          ]
+        }
+      },
+      "attacks": [
+        {
+          "id": "bruja_lunar_1",
+          "revision": 1,
+          "name": "Pulso Lunar",
+          "power": 25,
+          "accuracy": 100,
+          "type": "physical",
+          "combat": {
+            "version": 1,
+            "power": 25,
+            "accuracy": 100,
+            "type": "magic",
+            "element": "water",
+            "effects": [],
+            "cooldown": 0
+          }
+        },
+        {
+          "id": "bruja_lunar_2",
+          "revision": 1,
+          "name": "Ráfaga de Medianoche",
+          "power": 40,
+          "accuracy": 80,
+          "type": "physical",
+          "combat": {
+            "version": 1,
+            "power": 31,
+            "accuracy": 85,
+            "type": "magic",
+            "element": "water",
+            "effects": [
+              {
+                "type": "poison",
+                "target": "enemy",
+                "duration": 3,
+                "potency": 5
+              }
+            ],
+            "cooldown": 2
+          }
+        }
+      ],
+      "supply": 20,
+      "score": 52.611111111111114
+    },
+    {
+      "id": "dragon_carmesi",
+      "name": "Dragón Carmesí",
+      "rarity": "legendary",
+      "event": false,
+      "stats": {
+        "hp": 124,
+        "attack": 35,
+        "defense": 22,
+        "speed": 12
+      },
+      "combat": {
+        "version": 1,
+        "element": "fire",
+        "ability": {
+          "id": "ascua_ancestral",
+          "name": "Ascua Ancestral",
+          "description": "Al entrar por primera vez aumenta su ataque un 10% durante 2 turnos propios.",
+          "trigger": "on_enter",
+          "effects": [
+            {
+              "type": "attack_up",
+              "target": "self",
+              "duration": 2,
+              "potency": 10
+            }
+          ]
+        }
+      },
+      "attacks": [
+        {
+          "id": "dragon_carmesi_1",
+          "revision": 1,
+          "name": "Garra del Dragón",
+          "power": 25,
+          "accuracy": 100,
+          "type": "physical",
+          "combat": {
+            "version": 1,
+            "power": 25,
+            "accuracy": 100,
+            "type": "physical",
+            "element": "fire",
+            "effects": [],
+            "cooldown": 0
+          }
+        },
+        {
+          "id": "dragon_carmesi_2",
+          "revision": 1,
+          "name": "Aliento Carmesí",
+          "power": 40,
+          "accuracy": 80,
+          "type": "physical",
+          "combat": {
+            "version": 1,
+            "power": 38,
+            "accuracy": 80,
+            "type": "physical",
+            "element": "fire",
+            "effects": [
+              {
+                "type": "burn",
+                "target": "enemy",
+                "duration": 2,
+                "potency": 4
+              }
+            ],
+            "cooldown": 2
+          }
+        }
+      ],
+      "supply": 10,
+      "score": 78.94444444444444
+    },
+    {
+      "id": "espiritu_bambu",
+      "name": "Espíritu Bambú",
+      "rarity": "epic",
+      "event": false,
+      "stats": {
+        "hp": 124,
+        "attack": 27,
+        "defense": 24,
+        "speed": 12
+      },
+      "combat": {
+        "version": 1,
+        "element": "nature",
+        "ability": {
+          "id": "pulso_bosque",
+          "name": "Pulso del Bosque",
+          "description": "Al entrar por primera vez recupera un 6% de su vida máxima durante 3 turnos propios.",
+          "trigger": "on_enter",
+          "effects": [
+            {
+              "type": "regeneration",
+              "target": "self",
+              "duration": 3,
+              "potency": 6
+            }
+          ]
+        }
+      },
+      "attacks": [
+        {
+          "id": "espiritu_bambu_1",
+          "revision": 1,
+          "name": "Toque del Bosque",
+          "power": 25,
+          "accuracy": 100,
+          "type": "physical",
+          "combat": {
+            "version": 1,
+            "power": 25,
+            "accuracy": 100,
+            "type": "magic",
+            "element": "nature",
+            "effects": [],
+            "cooldown": 0
+          }
+        },
+        {
+          "id": "espiritu_bambu_2",
+          "revision": 1,
+          "name": "Tormenta de Hojas",
+          "power": 40,
+          "accuracy": 80,
+          "type": "physical",
+          "combat": {
+            "version": 1,
+            "power": 30,
+            "accuracy": 90,
+            "type": "magic",
+            "element": "nature",
+            "effects": [
+              {
+                "type": "regeneration",
+                "target": "self",
+                "duration": 2,
+                "potency": 7
+              }
+            ],
+            "cooldown": 2
+          }
+        }
+      ],
+      "supply": 20,
+      "score": 49.666666666666664
+    },
+    {
+      "id": "zorro_faroles",
+      "name": "Zorro de los Faroles",
+      "rarity": "rare",
+      "event": true,
+      "stats": {
+        "hp": 110,
+        "attack": 27,
+        "defense": 20,
+        "speed": 17
+      },
+      "combat": {
+        "version": 1,
+        "element": "fire",
+        "ability": {
+          "id": "brillo_farol",
+          "name": "Brillo del Farol",
+          "description": "Al entrar obtiene un escudo de 6 puntos durante 2 turnos propios y aumenta su ataque un 6% durante 2 turnos propios.",
+          "trigger": "on_enter",
+          "effects": [
+            {
+              "type": "shield",
+              "target": "self",
+              "duration": 2,
+              "potency": 6
+            },
+            {
+              "type": "attack_up",
+              "target": "self",
+              "duration": 2,
+              "potency": 6
+            }
+          ]
+        }
+      },
+      "attacks": [
+        {
+          "id": "zorro_faroles_1",
+          "name": "Chispa del Farol",
+          "revision": 1,
+          "power": 25,
+          "accuracy": 100,
+          "type": "physical",
+          "combat": {
+            "version": 1,
+            "element": "fire",
+            "power": 25,
+            "accuracy": 100,
+            "type": "physical",
+            "effects": [],
+            "cooldown": 0
+          }
+        },
+        {
+          "id": "zorro_faroles_2",
+          "name": "Danza de Luz",
+          "revision": 1,
+          "power": 30,
+          "accuracy": 85,
+          "type": "physical",
+          "combat": {
+            "version": 1,
+            "element": "fire",
+            "power": 30,
+            "accuracy": 85,
+            "type": "magic",
+            "effects": [
+              {
+                "type": "burn",
+                "target": "enemy",
+                "duration": 2,
+                "potency": 2
+              }
+            ],
+            "cooldown": 2
+          }
+        }
+      ],
+      "supply": 35,
+      "score": 49.77777777777778
+    },
+    {
+      "id": "guardian_espectral",
+      "name": "Guardián Espectral",
+      "rarity": "epic",
+      "event": true,
+      "stats": {
+        "hp": 132,
+        "attack": 25,
+        "defense": 26,
+        "speed": 9
+      },
+      "combat": {
+        "version": 1,
+        "element": "dark",
+        "ability": {
+          "id": "custodia_faroles",
+          "name": "Custodia de los Faroles",
+          "description": "Al entrar obtiene un escudo de 12 puntos durante 2 turnos propios.",
+          "trigger": "on_enter",
+          "effects": [
+            {
+              "type": "shield",
+              "target": "self",
+              "duration": 2,
+              "potency": 12
+            }
+          ]
+        }
+      },
+      "attacks": [
+        {
+          "id": "guardian_espectral_1",
+          "name": "Puño Espectral",
+          "revision": 1,
+          "power": 25,
+          "accuracy": 100,
+          "type": "physical",
+          "combat": {
+            "version": 1,
+            "element": "dark",
+            "power": 25,
+            "accuracy": 100,
+            "type": "physical",
+            "effects": [],
+            "cooldown": 0
+          }
+        },
+        {
+          "id": "guardian_espectral_2",
+          "name": "Velo Espectral",
+          "revision": 1,
+          "power": 28,
+          "accuracy": 85,
+          "type": "physical",
+          "combat": {
+            "version": 1,
+            "element": "dark",
+            "power": 28,
+            "accuracy": 85,
+            "type": "physical",
+            "effects": [
+              {
+                "type": "shield",
+                "target": "self",
+                "duration": 2,
+                "potency": 10
+              }
+            ],
+            "cooldown": 2
+          }
+        }
+      ],
+      "supply": 20,
+      "score": 57.388888888888886
+    }
+  ],
+  "pairs": [
+    {
+      "firstId": "panda_guerrero",
+      "secondId": "mago_carmesi",
+      "firstWins": 5,
+      "secondWins": 195,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 2.5
+    },
+    {
+      "firstId": "panda_guerrero",
+      "secondId": "lobo_sombrio",
+      "firstWins": 172,
+      "secondWins": 28,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 86
+    },
+    {
+      "firstId": "panda_guerrero",
+      "secondId": "monje_celestial",
+      "firstWins": 152,
+      "secondWins": 48,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 76
+    },
+    {
+      "firstId": "panda_guerrero",
+      "secondId": "guardian_jade",
+      "firstWins": 53,
+      "secondWins": 147,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 26.5
+    },
+    {
+      "firstId": "panda_guerrero",
+      "secondId": "bruja_lunar",
+      "firstWins": 175,
+      "secondWins": 25,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 87.5
+    },
+    {
+      "firstId": "panda_guerrero",
+      "secondId": "dragon_carmesi",
+      "firstWins": 0,
+      "secondWins": 200,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 0
+    },
+    {
+      "firstId": "panda_guerrero",
+      "secondId": "espiritu_bambu",
+      "firstWins": 145,
+      "secondWins": 55,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 72.5
+    },
+    {
+      "firstId": "panda_guerrero",
+      "secondId": "zorro_faroles",
+      "firstWins": 5,
+      "secondWins": 195,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 2.5
+    },
+    {
+      "firstId": "panda_guerrero",
+      "secondId": "guardian_espectral",
+      "firstWins": 43,
+      "secondWins": 157,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 21.5
+    },
+    {
+      "firstId": "mago_carmesi",
+      "secondId": "lobo_sombrio",
+      "firstWins": 21,
+      "secondWins": 179,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 10.5
+    },
+    {
+      "firstId": "mago_carmesi",
+      "secondId": "monje_celestial",
+      "firstWins": 0,
+      "secondWins": 200,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 0
+    },
+    {
+      "firstId": "mago_carmesi",
+      "secondId": "guardian_jade",
+      "firstWins": 137,
+      "secondWins": 63,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 68.5
+    },
+    {
+      "firstId": "mago_carmesi",
+      "secondId": "bruja_lunar",
+      "firstWins": 0,
+      "secondWins": 200,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 0
+    },
+    {
+      "firstId": "mago_carmesi",
+      "secondId": "dragon_carmesi",
+      "firstWins": 36,
+      "secondWins": 164,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 18
+    },
+    {
+      "firstId": "mago_carmesi",
+      "secondId": "espiritu_bambu",
+      "firstWins": 167,
+      "secondWins": 33,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 83.5
+    },
+    {
+      "firstId": "mago_carmesi",
+      "secondId": "zorro_faroles",
+      "firstWins": 22,
+      "secondWins": 178,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 11
+    },
+    {
+      "firstId": "mago_carmesi",
+      "secondId": "guardian_espectral",
+      "firstWins": 24,
+      "secondWins": 176,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 12
+    },
+    {
+      "firstId": "lobo_sombrio",
+      "secondId": "monje_celestial",
+      "firstWins": 12,
+      "secondWins": 188,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 6
+    },
+    {
+      "firstId": "lobo_sombrio",
+      "secondId": "guardian_jade",
+      "firstWins": 27,
+      "secondWins": 173,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 13.5
+    },
+    {
+      "firstId": "lobo_sombrio",
+      "secondId": "bruja_lunar",
+      "firstWins": 172,
+      "secondWins": 28,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 86
+    },
+    {
+      "firstId": "lobo_sombrio",
+      "secondId": "dragon_carmesi",
+      "firstWins": 35,
+      "secondWins": 165,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 17.5
+    },
+    {
+      "firstId": "lobo_sombrio",
+      "secondId": "espiritu_bambu",
+      "firstWins": 0,
+      "secondWins": 200,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 0
+    },
+    {
+      "firstId": "lobo_sombrio",
+      "secondId": "zorro_faroles",
+      "firstWins": 0,
+      "secondWins": 200,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 0
+    },
+    {
+      "firstId": "lobo_sombrio",
+      "secondId": "guardian_espectral",
+      "firstWins": 0,
+      "secondWins": 200,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 0
+    },
+    {
+      "firstId": "monje_celestial",
+      "secondId": "guardian_jade",
+      "firstWins": 18,
+      "secondWins": 182,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 9
+    },
+    {
+      "firstId": "monje_celestial",
+      "secondId": "bruja_lunar",
+      "firstWins": 30,
+      "secondWins": 170,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 15
+    },
+    {
+      "firstId": "monje_celestial",
+      "secondId": "dragon_carmesi",
+      "firstWins": 49,
+      "secondWins": 151,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 24.5
+    },
+    {
+      "firstId": "monje_celestial",
+      "secondId": "espiritu_bambu",
+      "firstWins": 31,
+      "secondWins": 169,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 15.5
+    },
+    {
+      "firstId": "monje_celestial",
+      "secondId": "zorro_faroles",
+      "firstWins": 185,
+      "secondWins": 15,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 92.5
+    },
+    {
+      "firstId": "monje_celestial",
+      "secondId": "guardian_espectral",
+      "firstWins": 16,
+      "secondWins": 184,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 8
+    },
+    {
+      "firstId": "guardian_jade",
+      "secondId": "bruja_lunar",
+      "firstWins": 172,
+      "secondWins": 28,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 86
+    },
+    {
+      "firstId": "guardian_jade",
+      "secondId": "dragon_carmesi",
+      "firstWins": 37,
+      "secondWins": 163,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 18.5
+    },
+    {
+      "firstId": "guardian_jade",
+      "secondId": "espiritu_bambu",
+      "firstWins": 143,
+      "secondWins": 57,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 71.5
+    },
+    {
+      "firstId": "guardian_jade",
+      "secondId": "zorro_faroles",
+      "firstWins": 163,
+      "secondWins": 37,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 81.5
+    },
+    {
+      "firstId": "guardian_jade",
+      "secondId": "guardian_espectral",
+      "firstWins": 159,
+      "secondWins": 41,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 79.5
+    },
+    {
+      "firstId": "bruja_lunar",
+      "secondId": "dragon_carmesi",
+      "firstWins": 166,
+      "secondWins": 34,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 83
+    },
+    {
+      "firstId": "bruja_lunar",
+      "secondId": "espiritu_bambu",
+      "firstWins": 0,
+      "secondWins": 200,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 0
+    },
+    {
+      "firstId": "bruja_lunar",
+      "secondId": "zorro_faroles",
+      "firstWins": 176,
+      "secondWins": 24,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 88
+    },
+    {
+      "firstId": "bruja_lunar",
+      "secondId": "guardian_espectral",
+      "firstWins": 154,
+      "secondWins": 46,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 77
+    },
+    {
+      "firstId": "dragon_carmesi",
+      "secondId": "espiritu_bambu",
+      "firstWins": 198,
+      "secondWins": 2,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 99
+    },
+    {
+      "firstId": "dragon_carmesi",
+      "secondId": "zorro_faroles",
+      "firstWins": 152,
+      "secondWins": 48,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 76
+    },
+    {
+      "firstId": "dragon_carmesi",
+      "secondId": "guardian_espectral",
+      "firstWins": 194,
+      "secondWins": 6,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 97
+    },
+    {
+      "firstId": "espiritu_bambu",
+      "secondId": "zorro_faroles",
+      "firstWins": 4,
+      "secondWins": 196,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 2
+    },
+    {
+      "firstId": "espiritu_bambu",
+      "secondId": "guardian_espectral",
+      "firstWins": 174,
+      "secondWins": 26,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 87
+    },
+    {
+      "firstId": "zorro_faroles",
+      "secondId": "guardian_espectral",
+      "firstWins": 3,
+      "secondWins": 197,
+      "draws": 0,
+      "samples": 200,
+      "firstScore": 1.5
+    }
+  ],
+  "limits": [
+    "Heurística de referencia; no demuestra estrategia óptima.",
+    "Nivel 1, sin rasgos ni variantes. Iniciativa alternada; todas las parejas incluidas.",
+    "Los personajes del evento comparten el límite por rareza y no cambian estadísticas de unidades anteriores."
+  ]
+}

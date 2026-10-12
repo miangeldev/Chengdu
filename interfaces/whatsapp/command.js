@@ -8,9 +8,37 @@ import { card, commandText, displayName, section } from './format.js';
 export { displayName, rarityName } from './format.js';
 
 const messages = {
+  CONTENT_MESSAGE_ID_REQUIRED: '📨 No pude identificar este mensaje para confirmar la recompensa.\nEnvía el comando en un mensaje nuevo.',
+  CONTENT_GROUP_ONLY: '📍 Las apariciones, capturas y ataques a bosses se juegan en un grupo de WhatsApp.\nUsa el comando desde tu grupo.',
+  INVALID_MISSION: '📋 Elige una misión con 1, 2 o 3.\nConsulta .ctumisiones',
+  MISSION_NOT_FOUND: '📋 Esa misión no existe.\nConsulta .ctumisiones',
+  MISSION_NOT_READY: '📋 Aún falta completar esa misión.\nConsulta tu progreso con .ctumisiones',
+  INVALID_ACHIEVEMENT: '🏅 Usa el código corto del logro, por ejemplo L1.\nConsulta .ctulogros',
+  ACHIEVEMENT_NOT_FOUND: '🏅 Ese logro no existe.\nConsulta .ctulogros',
+  ACHIEVEMENT_NOT_UNLOCKED: '🏅 Ese logro todavía no está desbloqueado.\nConsulta tu progreso con .ctulogros',
+  ACHIEVEMENT_NOT_READY: '🏅 Ese logro todavía no está desbloqueado.\nConsulta tu progreso con .ctulogros',
+  EVENT_NOT_FOUND: '🏮 Ese evento no existe.\nConsulta .ctueventos',
+  EVENT_NOT_ACTIVE: '🏮 Ese evento aún no empieza o ya terminó.\nConsulta .ctueventos para ver las fechas.',
+  EVENT_NOT_STARTED: '🏮 Ese evento aún no empieza.\nConsulta .ctueventos para ver las fechas.',
+  EVENT_CLOSED: '🏮 El evento terminó; sus personajes existentes conservan su progreso y pueden comerciarse.\nConsulta .ctueventos',
+  CAMPAIGN_CLOSED: '🏮 La emisión de personajes de ese evento está cerrada.\nConsulta .ctueventos',
+  INSUFFICIENT_TICKETS: '🎟️ Necesitas un ticket para capturar.\nGánalos con .ctumisiones, .ctulogros o la bienvenida de .ctuevento faroles reclamar',
+  BOSS_NOT_FOUND: '👹 Ese boss no existe.\nConsulta .ctuboss niebla o .ctuboss dragon',
+  BOSS_NOT_ACTIVE: '👹 Ese boss ya terminó.\nConsulta .ctuboss para ver el encuentro actual.',
+  BOSS_EXPIRED: '⌛ El encuentro con ese boss venció.\nConsulta .ctuboss',
+  BOSS_ATTACK_LIMIT: '👹 Ya alcanzaste tu límite de ataques en este encuentro.\nConsulta tus aportaciones con .ctubosstop',
+  BOSS_ATTACK_COOLDOWN: '⏳ Tu ataque al boss aún se está recuperando.\nConsulta .ctuboss para ver cuándo puedes volver.',
+  BOSS_COOLDOWN: '⏳ Tu ataque al boss aún se está recuperando.\nConsulta .ctuboss para ver cuándo puedes volver.',
+  INVALID_BOSS_ATTACK: '⚔️ Elige el ataque 1 o 2.\nEjemplo: .ctubossatacar 1 B1',
+  SPAWN_NOT_FOUND: '🎴 No hay una aparición disponible en este grupo.\nConsulta .ctuspawn o usa .ctuexplorar',
+  SPAWN_NOT_ACTIVE: '🎴 Esa aparición ya fue capturada o venció.\nConsulta .ctuspawn',
+  SPAWN_EXPIRED: '⌛ Esa aparición venció.\nConsulta .ctuspawn',
+  SPAWN_WRONG_CHAT: '📍 Esa aparición pertenece a otro grupo.\nCaptúrala desde el grupo donde apareció.',
+  ENCOUNTER_NOT_FOUND: '🎴 Ese encuentro no existe.\nConsulta .ctuspawn o .ctuboss',
+  INVALID_ENCOUNTER: '🎴 Usa el código corto del encuentro, por ejemplo B1 o S1.',
   MARKET_MESSAGE_ID_REQUIRED: '📨 No pude identificar este mensaje para confirmar la operación del mercado.\nEnvía el comando en un mensaje nuevo.',
   INVALID_MARKET_PRICE: '💰 El precio debe ser un número entero entre 20 y 1000000 ChengCoins.\nEjemplo: .ctuvender PAND-000001 100',
-  INVALID_MARKET_FILTER: '🛍️ Usa .ctumercado, .ctumercado mios, .ctumercado raro o .ctumercado precio.\nPara consultar un anuncio: .ctumercado ver ID',
+  INVALID_MARKET_FILTER: '🛍️ Usa .ctumercado, .ctumercado mios, .ctumercado raro o .ctumercado precio.\n🔎 Detalles: .ctumercado M1\n🛒 Comprar: .ctucomprar M1',
   LISTING_NOT_FOUND: '🛍️ Ese anuncio no existe.\n👉 Consulta .ctumercado',
   LISTING_NOT_ACTIVE: '🛍️ Ese anuncio ya se vendió, se retiró o venció.\n👉 Consulta .ctumercado',
   LISTING_EXPIRED: '⌛ El anuncio venció y la unidad quedó disponible para su propietario.\n👉 Consulta .ctumercado',
@@ -72,7 +100,7 @@ const messages = {
   INVALID_ATTACK: '⚔️ Elige uno de los dos ataques de tu personaje.\nUsa .ctuatacar 1 o .ctuatacar 2.'
 };
 
-function identityFor(sock, msg) {
+export function identityFor(sock, msg) {
   const subject = msg.key.fromMe ? sock.user?.id
     : msg.key.remoteJid.endsWith('@g.us') ? msg.key.participant : msg.key.remoteJid;
   return normalizeIdentity({ provider: 'whatsapp', subject });
@@ -162,4 +190,14 @@ export function pageNavigation(page, command, prefix = '.', args = '') {
 export function marketOperationKey(operation, context, userId) {
   requireGame(typeof context.messageId === 'string' && context.messageId.trim().length > 0, 'MARKET_MESSAGE_ID_REQUIRED');
   return createHash('sha256').update(JSON.stringify([`market:${operation}`, context.chatId, userId, context.messageId])).digest('hex');
+}
+
+export function contentOperationKey(operation, context, userId) {
+  requireGame(typeof context.messageId === 'string' && context.messageId.trim().length > 0, 'CONTENT_MESSAGE_ID_REQUIRED');
+  return createHash('sha256').update(JSON.stringify([`content:${operation}`, context.chatId, userId, context.messageId])).digest('hex');
+}
+
+export function groupContext(context) {
+  requireGame(typeof context.chatId === 'string' && context.chatId.endsWith('@g.us'), 'CONTENT_GROUP_ONLY');
+  return context.chatId;
 }

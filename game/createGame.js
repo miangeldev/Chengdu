@@ -8,13 +8,15 @@ import { createBattleService } from './battle/battleService.js';
 import { createEconomyService } from './economy/economyService.js';
 import { createPackService } from './packs/packService.js';
 import { createMarketService } from './market/marketService.js';
+import { createContentService } from './content/contentService.js';
+import { createEncounterService } from './content/encounterService.js';
 
 export function createGame(options = {}) {
   const storage = options.storage ?? new JsonUnitOfWork(options);
   const clock = options.clock ?? storage.clock ?? (() => new Date().toISOString());
   return {
     users: createUserService(storage, clock),
-    characters: createCharacterService(storage),
+    characters: createCharacterService(storage, clock),
     units: createUnitService(storage, clock),
     starter: createStarterService(storage, clock),
     teams: createTeamService(storage, clock),
@@ -22,6 +24,8 @@ export function createGame(options = {}) {
     economy: createEconomyService(storage, clock),
     packs: createPackService(storage, clock, options.randomDropInt),
     market: createMarketService(storage, clock),
+    content: createContentService(storage, clock),
+    encounters: createEncounterService(storage, clock, options.randomDropInt),
     validateDatabase: () => storage.validateDatabase(),
     close: () => storage.close()
   };

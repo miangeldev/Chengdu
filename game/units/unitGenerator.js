@@ -18,6 +18,11 @@ export async function createUnitInTransaction(repos, { characterId, ownerId, ori
   const character = await repos.characters.get(characterId);
   requireGame(character, 'CHARACTER_NOT_FOUND');
   requireGame(character.obtainable, 'CHARACTER_UNAVAILABLE');
+  const now = clock();
+  if (character.eventId) {
+    const campaign = await repos.campaigns.get(character.eventId);
+    requireGame(campaign && Date.parse(now) >= Date.parse(campaign.startsAt) && Date.parse(now) < Date.parse(campaign.endsAt), 'EVENT_NOT_ACTIVE');
+  }
   const counter = await repos.state.get(`mint:${character.id}`);
   requireGame(counter, 'DATABASE_CORRUPT');
   requireGame(character.supply.grandfatheredIssued === undefined &&
@@ -30,7 +35,6 @@ export async function createUnitInTransaction(repos, { characterId, ownerId, ori
     const variation = character.statVariation[key];
     initialStats[key] = character.baseStats[key] + (variation ? randomInt(-variation, variation + 1) : 0);
   }
-  const now = clock();
   requireGame(collectibles.traitVersion === TRAIT_VERSION && VARIANTS.some(v => v.id === collectibles.variant), 'INVALID_COLLECTIBLE');
   applyTraits(initialStats, collectibles.traits, collectibles.traitVersion);
   const unit = {
