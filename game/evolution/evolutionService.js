@@ -6,7 +6,8 @@ import { expireBattles } from '../battle/lifecycle.js';
 import { expireListings } from '../market/lifecycle.js';
 import { debitCoinsInTransaction } from '../economy/coinOperations.js';
 import { consumeEvolutionSeal, craftingInventory } from '../crafting/craftingService.js';
-import { effectiveUnitStats, EVOLUTION_COINS, EVOLUTION_MIN_LEVEL, EVOLUTION_POLICY_VERSION, formForCharacter } from './rules.js';
+import { effectiveUnitStats, evolutionBonusPercent, evolutionPolicy, EVOLUTION_COINS, EVOLUTION_MIN_LEVEL,
+  EVOLUTION_POLICY_VERSION, formForCharacter } from './rules.js';
 
 async function ownUnit(repos, userId, unitId) {
   const user = await repos.users.get(userId);
@@ -30,6 +31,8 @@ export function createEvolutionService(storage, clock) {
         const form = formForCharacter(unit.characterId);
         const inventory = await craftingInventory(repos, userId);
         return { unit, form, minimumLevel: EVOLUTION_MIN_LEVEL, coins: EVOLUTION_COINS, seals: 1,
+          bonusPercent: evolutionBonusPercent(unit.evolution ?? { version: EVOLUTION_POLICY_VERSION }, Math.max(unit.progress.level, EVOLUTION_MIN_LEVEL)),
+          stages: structuredClone(evolutionPolicy(unit.evolution?.version).stages),
           materials: inventory.materials, balance: user.economy.coins,
           available: Boolean(form && !unit.evolution && !unit.lock && unit.progress.level >= EVOLUTION_MIN_LEVEL &&
             inventory.materials.sellos >= 1 && user.economy.coins >= EVOLUTION_COINS) };

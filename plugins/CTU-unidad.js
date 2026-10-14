@@ -1,3 +1,4 @@
+import { evolutionBonusPercent } from '../game/evolution/rules.js';
 import { defineCommand } from '../interfaces/whatsapp/command.js';
 import { requireGame } from '../utils/GameError.js';
 import { card, characterIcon, dateText, displayName, progressText, rarityIcon, rarityName, roleName, serialText } from '../interfaces/whatsapp/format.js';
@@ -11,7 +12,7 @@ export const { command, run, createRun } = defineCommand('ctuunidad', async ({ g
     `${characterIcon(unit.characterId)} *${displayName(unit.characterName ?? unit.character.name)} #${serialText(unit.serial)}*\n🆔 ${unit.id}\n${rarityIcon(unit.character.rarity)} ${rarityName(unit.character.rarity)} · ${roleName(unit.character.role)} · ${displayName(variantName(unit.variant))}`,
     `👤 Propietario: ${displayName(unit.owner.name)}\n${unit.lock?.type === 'market' ? '🔒 En venta' : unit.lock?.type === 'trade' ? '🔒 En intercambio' : unit.lock ? '🔒 En combate' : '✅ Disponible'}`,
     `🌱 ${progressText(unit.progress, 'unit')}\n🏆 ${unit.battleStats.wins} victorias · 💔 ${unit.battleStats.losses} derrotas`,
-    unit.evolution ? '🔮 Forma evolucionada · +5% de estadísticas' : null,
+    unit.evolution ? `🔮 Forma evolucionada · +${evolutionBonusPercent(unit.evolution, unit.progress.level)}% de estadísticas` : null,
     `🧬 ${unit.traits?.length ? unit.traits.map(traitName).map(displayName).join(' · ') : 'Sin rasgos'}`,
     `📜 ${displayName(origin)} · ${dateText(unit.createdAt)}`
   ], `${unit.lock?.type === 'market' ? `🛍️ Anuncio: ${cmd('ctumercado', unit.marketCode)}\n` : ''}🔎 Stats y ataques: *${cmd('ctuficha', unit.id)}*\n📜 Propietarios: ${cmd('ctupropiedad', unit.id)}`);

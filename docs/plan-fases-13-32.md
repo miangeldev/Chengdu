@@ -11,7 +11,7 @@ los 4.235 renglones originales y 118 apartados en
 | 1 · Revisión integral | Separar huecos jugables de ejemplos y recomendaciones futuras. | Auditoría con las 33 fases y dependencias de datos. |
 | 2 · Persistencia | Esquema 11, once colecciones nuevas, migración sin premios automáticos, fuentes del ledger. | Migración 011, validadores por dominio, recuperación en todos los archivos. |
 | 3 · Intercambios | Ofertas de unidades/monedas, doble confirmación, escrow, locks, transferencia central y devolución. | `game/trades/`, pruebas de servicio, concurrencia y recuperación. |
-| 4 · Crafting y evolución | Recursos auditables, recetas reales, forma con +5% y nacimiento intacto. | `game/crafting/`, `game/evolution/`, snapshots históricos y fuentes de coste. |
+| 4 · Crafting y evolución | Recursos auditables, recetas reales, forma desde nivel 5 con +4%, +5% desde el 10, y nacimiento intacto. | `game/crafting/`, `game/evolution/`, snapshots históricos y fuentes de coste. |
 | 5 · Social | Perfil y colección públicos, showcase, títulos ganados, favoritos y comparación. | `game/social/`, preferencias con proof de propiedad, tests de privacidad/transferencia. |
 | 6 · Clanes | Roles, miembros, permisos, tesorería, clasificación, guerras, premios y moderación. | `game/clans/`, replay de acciones, autoridad histórica, pruebas de guerras completas. |
 | 7 · Orígenes anteriores | Personajes directos de PvP, misión, logro, boss, evento, podio y promoción. | `game/acquisition/`, fuentes verdaderas, resultado único y supply global. |
@@ -53,3 +53,10 @@ nuevos si su proceso ya estaba iniciado.
 Los ocho hitos están cerrados con el alcance funcional descrito. La sesión de
 WhatsApp real continúa siendo responsabilidad del anfitrión; reiniciarlo carga
 los nuevos plugins del módulo.
+
+## Ajuste 0.10.1 de evoluciones
+
+La evolución ahora se desbloquea al nivel 5 de unidad (1.000 XP acumuladas),
+con +4%; al nivel 10 alcanza +5% sin nuevo cobro ni sello. La política 1 se
+conserva para datos anteriores. La inversión y receta se mantienen.
+[Informe de balance y comandos](evolution-balance-0.10.1.md).

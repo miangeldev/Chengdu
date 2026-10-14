@@ -65,7 +65,7 @@ export function validateBattleData(state, schemaVersion = 3) {
       check(text(u.characterName) && integer(u.serial, 1) && integer(u.characterRevision, 1) && integer(u.level, 1), 'battle.snapshot');
       const initialStats = units.get(u.id).initialStats;
       check(u.serial === units.get(u.id).serial && u.characterRevision <= characters.get(u.characterId).revision &&
-        equal(u.stats, schemaVersion < 3 ? initialStats : evolvedStats(effectiveStats(initialStats, u.level, u.statsVersion ?? 0, u.traits ?? [], u.traitVersion ?? 0, u.combatBaseStats), u.evolution, u.characterId)), 'battle.snapshotOrigin');
+        equal(u.stats, schemaVersion < 3 ? initialStats : evolvedStats(effectiveStats(initialStats, u.level, u.statsVersion ?? 0, u.traits ?? [], u.traitVersion ?? 0, u.combatBaseStats), u.evolution, u.characterId, u.level)), 'battle.snapshotOrigin');
       validateEvolutionSnapshot(state, u, battle.acceptedAt);
       if (u.statsVersion === 2) check(schemaVersion >= 5 && equal(u.combatBaseStats, units.get(u.id).combatBaseStats), 'battle.snapshotBalance');
       if (u.traitVersion !== undefined) {

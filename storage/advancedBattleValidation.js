@@ -42,7 +42,7 @@ function validateSnapshot(state, player, unit, battle, activeUnits) {
   'battle.advancedSnapshotOrigin');
   validateEvolutionSnapshot(state, unit, battle.acceptedAt);
   check(equal(unit.stats, evolvedStats(effectiveStats(current.initialStats, unit.level, unit.statsVersion, unit.traits,
-    unit.traitVersion, unit.combatBaseStats), unit.evolution, unit.characterId)), 'battle.advancedSnapshotStats');
+    unit.traitVersion, unit.combatBaseStats), unit.evolution, unit.characterId, unit.level)), 'battle.advancedSnapshotStats');
   check(integer(unit.hp) && unit.hp <= unit.stats.hp && validateCombatProfile(profileOf(unit)) &&
     Array.isArray(unit.effects) && unit.cooldowns && typeof unit.cooldowns === 'object' && !Array.isArray(unit.cooldowns) &&
     typeof unit.abilityUsed === 'boolean' && typeof unit.participated === 'boolean', 'battle.advancedRuntime');

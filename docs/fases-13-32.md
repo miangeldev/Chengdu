@@ -1,4 +1,4 @@
-# Comunidad y clanes — versión 0.10.0
+# Comunidad y clanes — versión 0.10.1
 
 Entrega de las fases 13, 15, 29, 30, 31 y 32 de `project.md`, con revisión
 completa de sus fases anteriores. Esquema JSON **11**. Las funciones anteriores
@@ -173,8 +173,18 @@ material de una derrota por inactividad o una rendición sin premio válido.
 | `insignia_bambu` | 3 fragmentos | 50 | Insignia y título A1, cosméticos permanentes |
 
 Panda Guerrero → Panda Maestro; Mago Carmesí → Mago Arcano; Lobo Sombrío → Lobo
-Lunar. Evolucionar exige nivel 10, una unidad propia disponible, un sello y
-300 ChengCoins. Mejora los cuatro stats un **5%, redondeado hacia abajo**.
+Lunar. Evolucionar exige **nivel 5 de unidad**, una unidad propia disponible,
+un sello y 300 ChengCoins. El bono es **4% en niveles 5–9 y 5% desde nivel 10**,
+redondeado hacia abajo por estadística. Sube automáticamente al ganar nivel;
+no exige otro sello, otro pago ni una segunda evolución. El sello cuesta
+100 monedas y mantiene sus 5 fragmentos + 2 esencias: la inversión completa
+sigue siendo 400 ChengCoins más los materiales.
+
+Nivel 5 requiere 1.000 XP acumuladas de unidad; nivel 10, 4.500. La nueva
+política 2 permite llegar antes sin entregar el bono máximo de inmediato.
+Las evoluciones ya registradas con política 1 conservan su 5% y sus recibos.
+La revisión, simulaciones y límites están en
+[el balance de evoluciones 0.10.1](evolution-balance-0.10.1.md).
 
 El `characterId` de nacimiento permanece intacto. La forma actual vive en un
 campo `evolution` versionado y tiene su recibo. Se conservan ID, serial, rareza,

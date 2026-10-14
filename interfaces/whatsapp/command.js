@@ -1,3 +1,4 @@
+import { EVOLUTION_MIN_LEVEL } from '../../game/evolution/rules.js';
 import { game as defaultGame } from '../../game/index.js';
 import { GameError, requireGame } from '../../utils/GameError.js';
 import { normalizeIdentity } from '../../utils/identity.js';
@@ -47,7 +48,7 @@ const messages = {
   RECIPE_NOT_FOUND: "🔨 Esa receta no existe. Consulta .ctucrafting",
   EVOLUTION_UNAVAILABLE: "🍃 Este personaje aún no tiene evolución disponible.",
   UNIT_ALREADY_EVOLVED: "🔮 Esa unidad ya evolucionó.",
-  EVOLUTION_LEVEL_REQUIRED: "🌱 La evolución requiere nivel 10. Consulta .ctuficha ID",
+  EVOLUTION_LEVEL_REQUIRED: `🌱 La evolución requiere nivel ${EVOLUTION_MIN_LEVEL} de unidad. Consulta .ctuficha ID`,
   NOT_UNIT_OWNER: "🔒 Esa unidad no te pertenece. Consulta .ctupersonajes",
   NO_ACQUISITION_REWARDS: "🍃 No tienes premios pendientes de esa categoría. Consulta .cturecompensas",
   PROMO_UNAVAILABLE: "🎁 Ese código no existe o está fuera de sus fechas.",

@@ -28,7 +28,10 @@ hasta doble confirmación, cancelación o vencimiento; las transferencias siguen
 la cadena central de propiedad.
 
 La evolución añade una forma versionada, manteniendo `characterId`, ID y serial
-de nacimiento. Combate, mercado y bosses congelan la forma junto con los stats,
+de nacimiento. La política 1 conserva nivel mínimo 10 y bono fijo 5%; la política
+2 permite nivel 5 con 4% y alcanza 5% desde el nivel 10. Recibos y snapshots
+conservan su versión y nivel; un aumento futuro del bono no los reinterpreta.
+La política 2 cabe en el esquema 11, sin reescribir las evoluciones existentes. Combate, mercado y bosses congelan la forma junto con los stats,
 para preservar los snapshots previos. Los materiales se reconstruyen desde
 fuentes de premio únicas y recetas versionadas; no son balances editables.
 

@@ -1,0 +1,282 @@
+{
+  "policyVersion": 2,
+  "samplesPerPair": 100,
+  "seed": 73,
+  "stages": [
+    {
+      "minimumLevel": 5,
+      "bonusPercent": 4
+    },
+    {
+      "minimumLevel": 10,
+      "bonusPercent": 5
+    }
+  ],
+  "totalDuels": 18000,
+  "comparisons": [
+    {
+      "level": 5,
+      "variant": "baseline",
+      "bonusPercent": 0,
+      "individual": [
+        {
+          "id": "panda_guerrero",
+          "duels": 800,
+          "wins": 326,
+          "draws": 0,
+          "scorePercent": 40.75,
+          "meanActions": 8.485,
+          "deltaPoints": 0
+        },
+        {
+          "id": "mago_carmesi",
+          "duels": 800,
+          "wins": 321,
+          "draws": 0,
+          "scorePercent": 40.125,
+          "meanActions": 5.43375,
+          "deltaPoints": 0
+        },
+        {
+          "id": "lobo_sombrio",
+          "duels": 800,
+          "wins": 188,
+          "draws": 0,
+          "scorePercent": 23.5,
+          "meanActions": 6.5125,
+          "deltaPoints": 0
+        }
+      ],
+      "team": {
+        "id": "starters",
+        "duels": 600,
+        "wins": 107,
+        "draws": 0,
+        "scorePercent": 17.833333333333332,
+        "meanActions": 23.961666666666666,
+        "deltaPoints": 0
+      }
+    },
+    {
+      "level": 5,
+      "variant": "flat3",
+      "bonusPercent": 3,
+      "individual": [
+        {
+          "id": "panda_guerrero",
+          "duels": 800,
+          "wins": 331,
+          "draws": 0,
+          "scorePercent": 41.375,
+          "meanActions": 8.49625,
+          "deltaPoints": 0.625
+        },
+        {
+          "id": "mago_carmesi",
+          "duels": 800,
+          "wins": 323,
+          "draws": 0,
+          "scorePercent": 40.375,
+          "meanActions": 5.49125,
+          "deltaPoints": 0.25
+        },
+        {
+          "id": "lobo_sombrio",
+          "duels": 800,
+          "wins": 189,
+          "draws": 0,
+          "scorePercent": 23.625,
+          "meanActions": 6.61875,
+          "deltaPoints": 0.125
+        }
+      ],
+      "team": {
+        "id": "starters",
+        "duels": 600,
+        "wins": 156,
+        "draws": 0,
+        "scorePercent": 26,
+        "meanActions": 24.11,
+        "deltaPoints": 8.166666666666668
+      }
+    },
+    {
+      "level": 5,
+      "variant": "current",
+      "bonusPercent": 4,
+      "individual": [
+        {
+          "id": "panda_guerrero",
+          "duels": 800,
+          "wins": 360,
+          "draws": 0,
+          "scorePercent": 45,
+          "meanActions": 8.37875,
+          "deltaPoints": 4.25
+        },
+        {
+          "id": "mago_carmesi",
+          "duels": 800,
+          "wins": 346,
+          "draws": 0,
+          "scorePercent": 43.25,
+          "meanActions": 5.52125,
+          "deltaPoints": 3.125
+        },
+        {
+          "id": "lobo_sombrio",
+          "duels": 800,
+          "wins": 189,
+          "draws": 0,
+          "scorePercent": 23.625,
+          "meanActions": 6.61875,
+          "deltaPoints": 0.125
+        }
+      ],
+      "team": {
+        "id": "starters",
+        "duels": 600,
+        "wins": 196,
+        "draws": 0,
+        "scorePercent": 32.666666666666664,
+        "meanActions": 23.865,
+        "deltaPoints": 14.833333333333332
+      }
+    },
+    {
+      "level": 5,
+      "variant": "flat5",
+      "bonusPercent": 5,
+      "individual": [
+        {
+          "id": "panda_guerrero",
+          "duels": 800,
+          "wins": 389,
+          "draws": 0,
+          "scorePercent": 48.625,
+          "meanActions": 8.8425,
+          "deltaPoints": 7.875
+        },
+        {
+          "id": "mago_carmesi",
+          "duels": 800,
+          "wins": 346,
+          "draws": 0,
+          "scorePercent": 43.25,
+          "meanActions": 5.52125,
+          "deltaPoints": 3.125
+        },
+        {
+          "id": "lobo_sombrio",
+          "duels": 800,
+          "wins": 190,
+          "draws": 0,
+          "scorePercent": 23.75,
+          "meanActions": 6.62,
+          "deltaPoints": 0.25
+        }
+      ],
+      "team": {
+        "id": "starters",
+        "duels": 600,
+        "wins": 207,
+        "draws": 0,
+        "scorePercent": 34.5,
+        "meanActions": 24.18166666666667,
+        "deltaPoints": 16.666666666666668
+      }
+    },
+    {
+      "level": 10,
+      "variant": "baseline",
+      "bonusPercent": 0,
+      "individual": [
+        {
+          "id": "panda_guerrero",
+          "duels": 800,
+          "wins": 336,
+          "draws": 0,
+          "scorePercent": 42,
+          "meanActions": 9.4875,
+          "deltaPoints": 0
+        },
+        {
+          "id": "mago_carmesi",
+          "duels": 800,
+          "wins": 256,
+          "draws": 0,
+          "scorePercent": 32,
+          "meanActions": 6.375,
+          "deltaPoints": 0
+        },
+        {
+          "id": "lobo_sombrio",
+          "duels": 800,
+          "wins": 190,
+          "draws": 0,
+          "scorePercent": 23.75,
+          "meanActions": 6.9175,
+          "deltaPoints": 0
+        }
+      ],
+      "team": {
+        "id": "starters",
+        "duels": 600,
+        "wins": 108,
+        "draws": 0,
+        "scorePercent": 18,
+        "meanActions": 24.878333333333334,
+        "deltaPoints": 0
+      }
+    },
+    {
+      "level": 10,
+      "variant": "current",
+      "bonusPercent": 5,
+      "individual": [
+        {
+          "id": "panda_guerrero",
+          "duels": 800,
+          "wins": 487,
+          "draws": 0,
+          "scorePercent": 60.875,
+          "meanActions": 9.60625,
+          "deltaPoints": 18.875
+        },
+        {
+          "id": "mago_carmesi",
+          "duels": 800,
+          "wins": 325,
+          "draws": 0,
+          "scorePercent": 40.625,
+          "meanActions": 6.12,
+          "deltaPoints": 8.625
+        },
+        {
+          "id": "lobo_sombrio",
+          "duels": 800,
+          "wins": 223,
+          "draws": 0,
+          "scorePercent": 27.875,
+          "meanActions": 6.74875,
+          "deltaPoints": 4.125
+        }
+      ],
+      "team": {
+        "id": "starters",
+        "duels": 600,
+        "wins": 153,
+        "draws": 0,
+        "scorePercent": 25.5,
+        "meanActions": 25.676666666666666,
+        "deltaPoints": 7.5
+      }
+    }
+  ],
+  "limitations": [
+    "Simulación con heurística adaptativa; no prueba una estrategia óptima ni tasas de producción.",
+    "Sin rasgos ni variantes; ocho personajes base y seis composiciones de referencia.",
+    "En 3v3 se evoluciona el trío inicial completo y el adversario conserva su equipo base.",
+    "Los porcentajes son puntuación media contra los rivales de referencia; un empate vale medio punto."
+  ]
+}

@@ -3,8 +3,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { readRecords } from './helpers.js';
-import { craftingFixture, craftSeal, earnSealMaterials } from './crafting-fixtures.js';
-import { effectiveUnitStats, evolvedStats, evolutionSnapshot, displayUnitCharacterName, formForCharacter } from '../game/evolution/rules.js';
+import { COLLECTIONS, validateDatabase, validateTransition } from '../storage/validation.js';
+import { craftingFixture, craftSeal, earnSealMaterials, fightForMaterials } from './crafting-fixtures.js';
+import { effectiveUnitStats, evolvedStats, evolutionSnapshot, displayUnitCharacterName, formForCharacter, evolutionBonusPercent, evolutionPolicy, validEvolutionShape } from '../game/evolution/rules.js';
 
 test('evolution forms preserve rarity and apply a bounded versioned five-percent improvement', () => {
   const after = { version: 1, formId: 'panda_maestro', receiptId: 'EVO-00000000-0000-0000-0000-000000000000', evolvedAt: '2026-10-13T12:00:00.000Z' };
@@ -123,18 +124,110 @@ test('editing a form or forging an evolution without its authoritative receipt i
   records.records[0].statsAfter.attack += 10;
   fs.writeFileSync(filename, JSON.stringify(records));
   await assert.rejects(c.game.validateDatabase(), { code: 'DATABASE_CORRUPT' });
+  const missingPolicy = JSON.parse(clean);
+  delete missingPolicy.records[0].policyVersion;
+  fs.writeFileSync(filename, JSON.stringify(missingPolicy));
+  await assert.rejects(c.game.validateDatabase(), { code: 'DATABASE_CORRUPT' });
   fs.writeFileSync(filename, clean);
   assert.equal((await c.game.validateDatabase()).valid, true);
 });
 
-test('evolved combat, market and boss snapshots keep their forms while old histories retain original stats',async t=>{
- const c=await craftingFixture(t,{level:10});
+test('early evolved combat, market and boss snapshots keep their four-percent form while old histories retain original stats',async t=>{
+ const c=await craftingFixture(t,{level:5});
  await c.game.battle.challenge({userId:c.user.id,opponentId:c.rival.id,chatId:c.chatId,mode:'1v1'});await c.game.battle.accept({userId:c.rival.id,chatId:c.chatId});await c.game.battle.surrender({userId:c.rival.id,chatId:c.chatId});
  const oldBattle=readRecords(c.directory,'combates')[0];await earnSealMaterials(c);await craftSeal(c);
  const oldBoss=readRecords(c.directory,'accionescontenido').filter(a=>a.kind==='boss_attack');
  await c.game.evolution.evolve({userId:c.user.id,unitId:c.unit.id,operationKey:'form'});assert.deepEqual(readRecords(c.directory,'combates')[0],oldBattle);assert.deepEqual(readRecords(c.directory,'accionescontenido').filter(a=>a.kind==='boss_attack'),oldBoss);
- await c.game.battle.challenge({userId:c.user.id,opponentId:c.rival.id,chatId:c.chatId,mode:'1v1'});const b=(await c.game.battle.accept({userId:c.rival.id,chatId:c.chatId})).battle;assert.equal(b.players[0].units[0].characterName,'Panda Maestro');assert.equal(b.players[0].units[0].evolution.formId,'panda_maestro');await c.game.battle.surrender({userId:c.rival.id,chatId:c.chatId});
+ await c.game.battle.challenge({userId:c.user.id,opponentId:c.rival.id,chatId:c.chatId,mode:'1v1'});const b=(await c.game.battle.accept({userId:c.rival.id,chatId:c.chatId})).battle;assert.equal(b.players[0].units[0].characterName,'Panda Maestro');assert.equal(b.players[0].units[0].evolution.formId,'panda_maestro');assert.equal(b.players[0].units[0].stats.hp,133);await c.game.battle.surrender({userId:c.rival.id,chatId:c.chatId});
  const listing=(await c.game.market.createListing({sellerId:c.user.id,unitId:c.unit.id,price:100,operationKey:'evolved-listing'})).listing;assert.equal(listing.unitSnapshot.characterName,'Panda Maestro');await c.game.market.cancelListing({sellerId:c.user.id,listingId:listing.code,operationKey:'cancel-listing'});
  await c.game.teams.setTeam({userId:c.user.id,unitIds:[c.unit.id]});c.advance(86400000);const boss=await c.game.encounters.getBoss({bossId:'niebla',userId:c.user.id});await c.game.encounters.attackBoss({userId:c.user.id,chatId:c.chatId,code:boss.code,choice:'1',operationKey:'evolved-boss'});
  assert.equal(readRecords(c.directory,'accionescontenido').at(-1).details.unitSnapshot.evolution.formId,'panda_maestro');assert.equal((await c.game.validateDatabase()).valid,true);
+});
+
+const databaseState = directory => Object.fromEntries(COLLECTIONS.map(name => [name,
+  JSON.parse(fs.readFileSync(path.join(directory, `${name}.json`), 'utf8'))]));
+
+test('new evolution scaling unlocks at five with four percent and caps at five percent from ten', () => {
+  const form = { version: 2, formId: 'panda_maestro', receiptId: 'EVO-00000000-0000-0000-0000-000000000000', evolvedAt: '2026-10-13T12:00:00.000Z' };
+  assert.equal(evolutionPolicy().minimumLevel, 5);
+  assert.deepEqual(evolutionPolicy().stages, [{ minimumLevel: 5, bonusPercent: 4 }, { minimumLevel: 10, bonusPercent: 5 }]);
+  for (const level of [5, 6, 7, 8, 9]) assert.equal(evolutionBonusPercent(form, level), 4);
+  for (const level of [10, 11, 15, 20]) assert.equal(evolutionBonusPercent(form, level), 5);
+  assert.equal(evolutionBonusPercent(null, 5), 0);
+  assert.equal(validEvolutionShape({ ...form, version: '2' }, 'panda_guerrero'), false);
+  assert.throws(() => evolutionPolicy(99), { code: 'INVALID_EVOLUTION' });
+  assert.throws(() => evolvedStats({ hp: 128, attack: 25, defense: 23, speed: 8 }, form, 'panda_guerrero'), { code: 'INVALID_PROGRESSION' });
+  assert.deepEqual(evolvedStats({ hp: 128, attack: 25, defense: 23, speed: 8 }, form, 'panda_guerrero', 5),
+    { hp: 133, attack: 26, defense: 23, speed: 8 });
+});
+
+test('level four cannot spend resources, while level five can evolve with the same seal and monetary investment', async t => {
+  for (const level of [4, 5]) {
+    const c = await craftingFixture(t, { level }); await earnSealMaterials(c); await craftSeal(c);
+    const options = await c.game.evolution.getOptions({ userId: c.user.id, unitId: c.unit.id });
+    assert.equal(options.minimumLevel, 5); assert.equal(options.coins, 300); assert.equal(options.bonusPercent, 4);
+    assert.equal(options.available, level === 5);
+    const before = databaseState(c.directory);
+    if (level === 4) {
+      await assert.rejects(c.game.evolution.evolve({ userId: c.user.id, unitId: c.unit.id, operationKey: 'too-soon' }),
+        { code: 'EVOLUTION_LEVEL_REQUIRED', details: { minimum: 5, level: 4 } });
+      assert.deepEqual(databaseState(c.directory), before);
+      continue;
+    }
+    const r = await c.game.evolution.evolve({ userId: c.user.id, unitId: c.unit.id, operationKey: 'level-five' });
+    assert.equal(r.evolution.policyVersion, 2); assert.equal(r.evolution.after.version, 2); assert.equal(r.evolution.level, 5);
+    assert.equal(r.evolution.coins, 300);
+    assert.deepEqual(r.evolution.statsAfter, { hp: 133, attack: 26, defense: 23, speed: 8 });
+    assert.equal((await c.game.crafting.getInventory(c.user.id)).materials.sellos, 0);
+    assert.equal((await c.game.validateDatabase()).valid, true);
+  }
+});
+
+test('earning level ten grows the bonus automatically without another seal, charge or rewriting level-nine history', async t => {
+  const c = await craftingFixture(t, { level: 9, xp: 890 }); await earnSealMaterials(c); await craftSeal(c);
+  const r = await c.game.evolution.evolve({ userId: c.user.id, unitId: c.unit.id, operationKey: 'level-nine' });
+  const battlesBefore = readRecords(c.directory, 'combates').length;
+  const battle = await fightForMaterials(c);
+  const snapshot = battle.players.find(p => p.userId === c.user.id).unit;
+  assert.equal(snapshot.level, 9); assert.equal(snapshot.evolution.version, 2);
+  assert.deepEqual(snapshot.stats, r.evolution.statsAfter);
+  const unit = await c.game.units.getUnit(c.unit.id);
+  assert.equal(unit.progress.level, 10); assert.equal(evolutionBonusPercent(unit.evolution, unit.progress.level), 5);
+  assert.equal(unit.currentStats.defense, 25);
+  assert.equal(readRecords(c.directory, 'evoluciones').length, 1);
+  assert.deepEqual(readRecords(c.directory, 'evoluciones')[0], r.evolution);
+  assert.equal(readRecords(c.directory, 'economia').filter(m => m.sourceType === 'evolution_cost').length, 1);
+  assert.equal(readRecords(c.directory, 'combates').length, battlesBefore + 1);
+  const historicalBattle = readRecords(c.directory, 'combates').at(-1);
+  assert.deepEqual(historicalBattle.players.find(p => p.userId === c.user.id).unit.stats, snapshot.stats);
+  assert.equal((await c.game.validateDatabase()).valid, true);
+  await c.game.close();
+  assert.equal((await c.open().game.validateDatabase()).valid, true);
+});
+
+test('original policy-one receipts, forms and five-percent snapshots remain valid and replayable', async t => {
+  const c = await craftingFixture(t, { level: 10 }); await earnSealMaterials(c); await craftSeal(c);
+  const before = databaseState(c.directory);
+  const r = await c.game.evolution.evolve({ userId: c.user.id, unitId: c.unit.id, operationKey: 'historical' });
+  const historical = databaseState(c.directory);
+  historical.evoluciones.records[0].policyVersion = 1;
+  historical.evoluciones.records[0].after.version = 1;
+  historical.unidades.records.find(u => u.id === c.unit.id).evolution.version = 1;
+  assert.equal(validateDatabase(historical).valid, true);
+  assert.throws(() => validateTransition(before, historical, { now: r.evolution.createdAt }),
+    { code: 'DATABASE_CORRUPT', details: { field: 'evolution.currentPolicy' } });
+  await c.game.close();
+  for (const name of ['evoluciones', 'unidades']) fs.writeFileSync(path.join(c.directory, `${name}.json`), JSON.stringify(historical[name], null, 2) + '\n');
+  Object.assign(c, c.open());
+  assert.equal((await c.game.validateDatabase()).valid, true);
+  const legacyOptions = await c.game.evolution.getOptions({ userId: c.user.id, unitId: c.unit.id });
+  assert.equal(legacyOptions.bonusPercent, 5);
+  await c.game.battle.challenge({ userId: c.user.id, opponentId: c.rival.id, chatId: c.chatId, mode: '1v1' });
+  const b = (await c.game.battle.accept({ userId: c.rival.id, chatId: c.chatId })).battle;
+  assert.equal(b.players[0].units[0].evolution.version, 1);
+  assert.deepEqual(b.players[0].units[0].stats, r.evolution.statsAfter);
+  const stored = databaseState(c.directory); c.setTime(null);
+  const replay = await c.game.evolution.evolve({ userId: c.user.id, unitId: c.unit.id, operationKey: 'historical' });
+  assert.equal(replay.alreadyEvolved, true); assert.equal(replay.evolution.policyVersion, 1);
+  assert.deepEqual(databaseState(c.directory), stored);
 });

@@ -1,6 +1,6 @@
 import { expiredStoredLock } from './lockProof.js';
 import { requireGame } from '../utils/GameError.js';
-import { effectiveUnitStats, evolvedStats, EVOLUTION_COINS, EVOLUTION_MIN_LEVEL, EVOLUTION_POLICY_VERSION,
+import { effectiveUnitStats, evolvedStats, evolutionPolicy, EVOLUTION_POLICY_VERSION,
   formForCharacter, validEvolutionShape } from '../game/evolution/rules.js';
 import { effectiveStats } from '../game/progression/rules.js';
 
@@ -20,16 +20,18 @@ export function validateEvolutionData(state) {
   for (const evolution of state.evoluciones.records) {
     const unit = units.get(evolution.unitId);
     const form = formForCharacter(evolution.characterId);
-    check(/^EVO-[a-f0-9-]{36}$/.test(evolution.id) && unit && form && evolution.policyVersion === EVOLUTION_POLICY_VERSION &&
+    const policy = evolutionPolicy(evolution.policyVersion);
+    check(/^EVO-[a-f0-9-]{36}$/.test(evolution.id) && unit && form && evolution.policyVersion === policy.version &&
       unit.characterId === evolution.characterId && state.usuarios.records.some(user => user.id === evolution.userId) &&
       integer(evolution.ownershipVersion) && evolution.ownershipVersion <= unit.ownershipVersion &&
       ownerAtVersion(state, unit, evolution.ownershipVersion) === evolution.userId && date(evolution.createdAt) &&
       typeof evolution.operationKey === 'string' && evolution.operationKey.length > 0 && evolution.operationKey.length <= 200 &&
       evolution.operationKey.trim() === evolution.operationKey && !keys.has(evolution.operationKey) && !seenUnits.has(unit.id) &&
-      integer(evolution.level, EVOLUTION_MIN_LEVEL) && evolution.level <= unit.progress.level &&
-      evolution.coins === EVOLUTION_COINS && integer(evolution.balanceBefore, evolution.coins) &&
+      integer(evolution.level, policy.minimumLevel) && evolution.level <= unit.progress.level &&
+      evolution.coins === policy.coins && integer(evolution.balanceBefore, evolution.coins) &&
       evolution.balanceAfter === evolution.balanceBefore - evolution.coins && evolution.before === null &&
-      validEvolutionShape(evolution.after, unit.characterId) && evolution.after?.receiptId === evolution.id && evolution.after.evolvedAt === evolution.createdAt &&
+      validEvolutionShape(evolution.after, unit.characterId) && evolution.after?.version === policy.version &&
+      evolution.after?.receiptId === evolution.id && evolution.after.evolvedAt === evolution.createdAt &&
       equal(unit.evolution, evolution.after), 'evolution.receipt');
     keys.add(evolution.operationKey); seenUnits.add(unit.id);
     check(!seenSpends.has(evolution.craftingActionId), 'evolution.uniqueSpend');
@@ -38,7 +40,7 @@ export function validateEvolutionData(state) {
     check(spend?.kind === 'evolution_spend' && spend.userId === evolution.userId && spend.operationKey === evolution.operationKey &&
       spend.createdAt === evolution.createdAt, 'evolution.sealReceipt');
     const beforeStats = effectiveStats(unit.initialStats, evolution.level, unit.statGrowthVersion, unit.traits, unit.traitVersion ?? 0, unit.combatBaseStats);
-    check(equal(evolution.statsBefore, beforeStats) && equal(evolution.statsAfter, evolvedStats(beforeStats, evolution.after, unit.characterId)), 'evolution.statsProof');
+    check(equal(evolution.statsBefore, beforeStats) && equal(evolution.statsAfter, evolvedStats(beforeStats, evolution.after, unit.characterId, evolution.level)), 'evolution.statsProof');
   }
   for (const unit of units.values()) {
     check(validEvolutionShape(unit.evolution, unit.characterId) && Boolean(unit.evolution) === seenUnits.has(unit.id), 'evolution.unitProof');
@@ -50,9 +52,11 @@ export function validateEvolutionTransition(before, after, context = {}) {
   check(equal(before.evoluciones.records, after.evoluciones.records.slice(0, before.evoluciones.records.length)), 'evolution.appendOnly');
   const newReceipts = after.evoluciones.records.slice(before.evoluciones.records.length);
   for (const receipt of newReceipts) {
+    check(receipt.policyVersion === EVOLUTION_POLICY_VERSION, 'evolution.currentPolicy');
+    const policy = evolutionPolicy(receipt.policyVersion);
     const unit = before.unidades.records.find(row => row.id === receipt.unitId);
     check(unit && unit.ownerId === receipt.userId && unit.ownershipVersion === receipt.ownershipVersion && !unit.evolution && expiredStoredLock(before, after, unit, receipt.createdAt) &&
-      unit.progress.level >= EVOLUTION_MIN_LEVEL && receipt.level === unit.progress.level && receipt.characterId === unit.characterId &&
+      unit.progress.level >= policy.minimumLevel && receipt.level === unit.progress.level && receipt.characterId === unit.characterId &&
       equal(receipt.statsBefore, effectiveUnitStats(unit)), 'evolution.beforeAuthority');
     const user = before.usuarios.records.find(row => row.id === receipt.userId);
     check(user && Date.parse(receipt.createdAt) >= Date.parse(user.updatedAt) && Date.parse(receipt.createdAt) >= Date.parse(unit.updatedAt) &&

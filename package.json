@@ -1,6 +1,6 @@
 {
   "name": "chengdu-cards",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "private": true,
   "type": "module",
   "engines": { "node": ">=22" },
@@ -10,6 +10,7 @@
     "balance:simulate": "node scripts/simulate-balance.js",
     "balance:advanced": "node scripts/simulate-advanced-balance.js",
     "balance:content": "node scripts/simulate-content-balance.js",
+    "balance:evolution": "node scripts/simulate-evolution-balance.js",
     "db:validate": "node scripts/database.js validate",
     "db:unlock": "node scripts/database.js unlock"
   }

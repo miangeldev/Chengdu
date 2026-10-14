@@ -2962,6 +2962,19 @@ Las recomendaciones de fases 33–36 y V1.0 permanecen visibles en el roadmap;
 la entrega no pretende sustituir telemetría de producción ni una prueba del
 bot conectado a WhatsApp real.
 
+### Ajuste 0.10.1 — Evoluciones más accesibles
+
+Desde nivel 5 de unidad: +4% de estadísticas; desde el 10: +5% automático,
+sin repetir pago ni consumir otro sello. El nivel inicial pasa de 4.500 XP
+acumuladas requeridas a 1.000. Se mantienen el sello, su receta y los 300
+ChengCoins de evolución; la inversión completa sigue siendo 400 monedas más
+materiales. La política 1 y sus snapshots históricos permanecen interpretables.
+
+La [revisión de balance](docs/evolution-balance-0.10.1.md) compara alternativas
+con el motor real y documenta pruebas, versión 2 y comandos actualizados.
+Verificación: **690 pruebas**, **18.000 duelos de comparación**, **188 ejemplos**
+regenerados; esquema 11 válido y datos locales sin reescrituras.
+
 ---
 
 ## V1.0

@@ -1,5 +1,6 @@
 import { requireGame } from '../../utils/GameError.js';
 import { safeAdd } from '../progression/rules.js';
+import { EVOLUTION_MIN_LEVEL } from '../evolution/rules.js';
 
 export const CRAFTING_POLICY_VERSION = 1;
 export const MATERIAL_KEYS = Object.freeze(['fragmentos', 'esencias', 'sellos']);
@@ -9,7 +10,7 @@ export const RECIPES = Object.freeze([
   Object.freeze({ id: 'sello_evolucion', name: 'Sello de evolución', coins: 100,
     inputs: Object.freeze({ fragmentos: 5, esencias: 2, sellos: 0 }),
     outputs: Object.freeze({ fragmentos: 0, esencias: 0, sellos: 1 }), badge: null,
-    description: 'Permite evolucionar una unidad compatible de nivel 10.' }),
+    description: `Permite evolucionar una unidad compatible desde el nivel ${EVOLUTION_MIN_LEVEL}.` }),
   Object.freeze({ id: 'insignia_bambu', name: 'Insignia de bambú', coins: 50,
     inputs: Object.freeze({ fragmentos: 3, esencias: 0, sellos: 0 }),
     outputs: Object.freeze({ fragmentos: 0, esencias: 0, sellos: 0 }), badge: 'bambu_artesano',

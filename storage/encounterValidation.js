@@ -76,7 +76,7 @@ export function validateEncounterData(state) {
           state.eventos.records.some(event => event.unitId === unit.id && (event.ownershipVersion ?? 0) === snapshot.ownershipVersion && event.toOwnerId === action.userId && Date.parse(event.createdAt) <= Date.parse(action.createdAt)) &&
           snapshot.progress?.level <= unit.progress.level && integer(snapshot.progress?.level, 1) && integer(snapshot.progress?.xp) &&
           equal(snapshot.traits, unit.traits) && snapshot.variant === unit.variant && snapshot.traitVersion === unit.traitVersion &&
-          equal(snapshot.stats, evolvedStats(effectiveStats(unit.initialStats, snapshot.progress.level, unit.statGrowthVersion, unit.traits, unit.traitVersion, unit.combatBaseStats), snapshot.evolution, unit.characterId)) &&
+          equal(snapshot.stats, evolvedStats(effectiveStats(unit.initialStats, snapshot.progress.level, unit.statGrowthVersion, unit.traits, unit.traitVersion, unit.combatBaseStats), snapshot.evolution, unit.characterId, snapshot.progress.level)) &&
           Array.isArray(snapshot.attacks) && snapshot.attacks.length === 2 && snapshot.attacks.every(attack => typeof attack.name === 'string' && integer(attack.power, 1) && attack.power <= 10000 && integer(attack.accuracy, 1) && attack.accuracy <= 100 &&
             integer(attack.revision, 1) && attack.revision <= (state.ataques.records.find(row => row.id === attack.id)?.revision ?? 0)), 'encounter.bossUnit');
         const previous = own.get(action.userId) ?? { attacks: 0, last: null };

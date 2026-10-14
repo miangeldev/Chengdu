@@ -677,17 +677,17 @@ Lukas: +15 XP
 🏆 Victoria vs *Lukas*
 📅 11 de octubre de 2026 · 1v1 clásico · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-353ecddf-3ba8-4a8a-8b4f-a08e8c545538
+🔎 .ctuhistorial BTL-065e9e74-54c2-4d1d-bdcf-1b73f65adc00
 
 🏆 Victoria vs *Lukas*
 📅 11 de octubre de 2026 · 1v1 clásico · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-b00c33ee-7729-4148-9499-f6f8da7944c9
+🔎 .ctuhistorial BTL-4132c922-300e-4ec1-817f-fe230f91b4de
 
 🏆 Victoria vs *Lukas*
 📅 11 de octubre de 2026 · 1v1 clásico · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-eb9d5dde-0cd0-4545-9fd2-7acda37d5648
+🔎 .ctuhistorial BTL-62b62c22-4d68-460a-8e71-8a47eaf71835
 
 📄 *Página 1 de 1*
 👉 Tu saldo: *.ctubalance*
@@ -3310,26 +3310,26 @@ Lukas: +15 XP
 📅 25 de octubre de 2026 · 1v1 · 8 turnos
 🎁 +120 ChengCoins · +35 XP
 🏅 Ranked T1 · 1016 Elo (+16)
-🔎 .ctuhistorial BTL-b826c3cd-a4a8-454e-a944-f0aaea95763c
+🔎 .ctuhistorial BTL-6d4cc900-7941-468d-b946-25ce30540375
 
 💔 Derrota vs *Lukas*
 📅 22 de octubre de 2026 · 1v1 clásico · 5 turnos
 🎁 +0 ChengCoins · +15 XP
-🔎 .ctuhistorial BTL-59a86db6-4360-4369-bd86-b39dae30bc0f
+🔎 .ctuhistorial BTL-1acd9f42-c937-4e3e-bb44-e1f60fddb141
 
 🏆 Victoria vs *Lukas*
 📅 22 de octubre de 2026 · 1v1 clásico · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-bbe4d59e-5422-45ec-8fa8-9d2beb2dc4a5
+🔎 .ctuhistorial BTL-ef49445b-ef47-4849-9dff-d2c43855bf45
 
 💔 Derrota vs *Lukas*
 📅 20 de octubre de 2026 · 1v1 · 0 turnos
-🔎 .ctuhistorial BTL-2c84c613-b16a-414a-9893-77be41f9609f
+🔎 .ctuhistorial BTL-1e63607f-81d6-4108-92c8-a9803ef639ac
 
 💔 Derrota vs *Lukas*
 📅 20 de octubre de 2026 · 3v3 · 31 turnos
 🎁 +0 ChengCoins · +15 XP
-🔎 .ctuhistorial BTL-4683a236-5b9c-46ee-b626-b8c1de67365e
+🔎 .ctuhistorial BTL-93cb4521-a73b-4613-8ee3-bf36e06d8d3d
 
 📄 *Página 1 de 3*
 ➡️ Siguiente: *.ctuhistorial 2*
@@ -3857,8 +3857,12 @@ sello＿evolucion
 🔮 *Panda Maestro*
 🎴 PAND-000001 · Nv. 3
 
-📋 Requisitos: nivel 10 · 300 ChengCoins · 1 sello
+📋 Requisitos: nivel 5 · 300 ChengCoins · 1 sello
 💰 Tienes 2543 · 🔮 1 sellos
+
+✨ Nv. 5: +4% · Nv. 10: +5%
+Bono al cumplir los requisitos: +4% · redondeo hacia abajo.
+🌱 El bono crece con el nivel, sin otro sello ni pago.
 
 🌱 Completa los requisitos y libera la unidad si está reservada.
 

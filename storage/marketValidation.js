@@ -81,7 +81,7 @@ export function validateMarketData(state) {
       ['common', 'rare', 'epic', 'legendary', 'mythic'].includes(s.rarity) && integer(s.level, 1) && s.level === s.progress?.level &&
       integer(s.progress.xp) && s.level <= unit.progress.level && (s.level !== unit.progress.level || s.progress.xp <= unit.progress.xp) &&
       equal(s.traits, unit.traits) && s.variant === unit.variant && s.traitVersion === unit.traitVersion &&
-      equal(s.stats, evolvedStats(effectiveStats(unit.initialStats, s.level, unit.statGrowthVersion, unit.traits, unit.traitVersion, unit.combatBaseStats), s.evolution, unit.characterId)), 'listing.snapshot');
+      equal(s.stats, evolvedStats(effectiveStats(unit.initialStats, s.level, unit.statGrowthVersion, unit.traits, unit.traitVersion, unit.combatBaseStats), s.evolution, unit.characterId, s.level)), 'listing.snapshot');
     check(ownershipAt(state, listing.unitId, listing.ownershipVersion) === listing.sellerId, 'listing.historicalOwner');
     const acquisition = state.eventos.records.find(event => event.unitId === listing.unitId &&
       (listing.ownershipVersion === 0 ? event.type === 'unit_created' :

@@ -16,6 +16,9 @@ clasificación global y premios de cierre con títulos permanentes.
 La versión 0.10 incorpora clanes completos, guerras, tesorería y moderación;
 intercambios bilaterales, materiales, crafting, evoluciones, perfiles públicos
 y personajes obtenidos directamente de premios y promociones.
+El ajuste 0.10.1 permite evolucionar desde el nivel 5 con +4% y llegar a +5%
+al nivel 10 automáticamente. [Reglas y balance](docs/evolution-balance-0.10.1.md).
+Verificado con 690 pruebas y 18.000 duelos de comparación.
 Guía: [fases 13–32](docs/fases-13-32.md), [auditoría integral](docs/auditoria-fases-0-32.md)
 y [plan de entrega](docs/plan-fases-13-32.md).
 El balance 0.4.1 distingue la fuerza de las rarezas y limita la emisión global

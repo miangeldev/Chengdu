@@ -26,3 +26,12 @@ test('crafting, evolution and direct acquisition each deliver one concise recove
  assert.match(await m.send('!ctucrafting',{actor}),/!ctucrafting crear sello_evolucion/);await m.send('!ctucrafting crear sello_evolucion',{actor});assert.match(await m.send(`!ctuevolucion ${c.unit.id}`,{actor}),/confirmar/);assert.match(await m.send(`!ctuevolucion ${c.unit.id} confirmar`,{actor,id:'evo'}),/evolucionó/);assert.match(await m.send(`!ctuevolucion ${c.unit.id} confirmar`,{actor,id:'evo'}),/ya confirmada/);
  assert.match(await m.send('!cturecompensas',{actor}),/codigo CHENGDU/);assert.match(await m.send('!cturecompensas codigo CHENGDU',{actor,id:'promo'}),/Obtuviste/);assert.match(await m.send('!cturecompensas codigo CHENGDU',{actor,id:'promo'}),/ya fue procesado/);assert.match(await m.send('!ctuinventario',{actor}),/fragmentos/);
 });
+
+test('early evolution UI shows the real level-five requirement, four-percent bonus and automatic next stage',async t=>{
+ const c=await craftingFixture(t,{level:5}),m=messenger(c),actor='521999999999@s.whatsapp.net';await earnSealMaterials(c);await craftSeal(c);
+ const options=await m.send(`!ctuevolucion ${c.unit.id}`,{actor});assert.match(options,/Requisitos: nivel 5/);assert.match(options,/Nv\. 5: \+4% · Nv\. 10: \+5%/);assert.match(options,/sin otro sello ni pago/);
+ const evolved=await m.send(`!ctuevolucion ${c.unit.id} confirmar`,{actor,id:'early-evolution'});assert.match(evolved,/Bono al evolucionar: \+4%/);assert.match(evolved,/nivel 10 sube a \+5% automáticamente/);
+ assert.match(await m.send(`!ctuunidad ${c.unit.id}`,{actor}),/Forma evolucionada · \+4%/);
+ const lower=await craftingFixture(t,{level:4}),messages=messenger(lower);
+ assert.match(await messages.send(`!ctuevolucion ${lower.unit.id} confirmar`,{actor}),/requiere nivel 5 de unidad/);
+});

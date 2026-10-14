@@ -196,7 +196,7 @@ concretos se resolvieron en esta entrega, con las siguientes implementaciones:
 | 15 · Intercambio | Dos ofertas, unidades/monedas, doble confirmación, escrow, locks y devolución al cancelar/vencer. | `game/trades/`, `tradeValidation.js`, tests de seis unidades, concurrencia, restart y recovery. |
 | 21 · Propiedad | Fuente de transferencia de trade verificada, conservando la cadena de mercado. | `ownership.js`, `ownershipValidation.js`, `.ctupropiedad` distingue ambos métodos. |
 | 29 · Crafting | Materiales de fuentes únicas, sello evolutivo e insignia cosmética con coste real. | `game/crafting/`, `craftingValidation.js`, tests de gasto, corrupción y replay. |
-| 30 · Evolución | Tres formas, +5% moderado, nivel 10, sello y coste; identidad y supply intactos. | `game/evolution/`, recibos y pruebas de snapshots previos/futuros en combate, mercado y boss. |
+| 30 · Evolución | Tres formas: desde nivel 5 con +4%, +5% desde nivel 10, sello y coste; identidad y supply intactos. | `game/evolution/`, recibos y pruebas de snapshots previos/futuros en combate, mercado y boss. |
 | 31 · Social | Perfil y colección pública por mención, vitrina, favorito, destacados, títulos ganados y comparación. | `game/social/`, preferencias auditadas, ocultación tras transferir, privacidad y UI. |
 | 32 · Clanes | Roles, miembros, permisos, tesorería, ranking, guerras, premios y moderación. | `game/clans/`, `clanValidation.js`, guerras completas, autoridad, cooldowns y recovery de monedas. |
 

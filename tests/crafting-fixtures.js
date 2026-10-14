@@ -18,7 +18,7 @@ export async function craftingFixture(t, options = {}) {
       const filename = path.join(context.directory, `${name}.json`);
       const collection = JSON.parse(fs.readFileSync(filename, 'utf8'));
       const record = collection.records.find(row => name === 'unidades' ? row.id === unit.id : row.id === `progression:${unit.id}`);
-      record.progress = { level: options.level, xp: 0 };
+      record.progress = { level: options.level, xp: options.xp ?? 0 };
       fs.writeFileSync(filename, JSON.stringify(collection, null, 2) + '\n');
     }
     Object.assign(context, context.open());
