@@ -1,6 +1,8 @@
+import { settleClanWarBattle } from '../clans/lifecycle.js';
 import { requireGame } from '../../utils/GameError.js';
 import { rewardBattle } from '../rewards/battleRewards.js';
 import { battleUnits } from './advancedEngine.js';
+import { settleCompetitiveBattle } from '../competitive/lifecycle.js';
 
 export const isOpenBattle = battle => ['pending', 'active'].includes(battle.status);
 
@@ -10,7 +12,7 @@ function increment(stats, field) {
   return { ...stats, [field]: value };
 }
 
-export async function settleBattle(repos, battle, now) {
+export async function settleBattle(repos, battle, now, { idleUserId = null } = {}) {
   if (battle.acceptedAt !== null) {
     for (const player of battle.players) {
       const user = await repos.users.get(player.userId);
@@ -31,20 +33,24 @@ export async function settleBattle(repos, battle, now) {
       }
     }
     await rewardBattle(repos, battle, now);
+    if (battle.competitive) await settleCompetitiveBattle(repos, battle, now, { idleUserId });
+    await settleClanWarBattle(repos, battle, now);
   }
   await repos.battles.replace(battle);
   return battle;
 }
 
 export async function expireBattles(repos, now) {
-  const expired = await repos.battles.filter(b => isOpenBattle(b) && Date.parse(b.expiresAt) <= Date.parse(now));
+  const expired = await repos.battles.filter(b => isOpenBattle(b) &&
+    (Date.parse(b.expiresAt) <= Date.parse(now) || (b.competitive && Date.parse(b.competitive.endsAt) <= Date.parse(now))));
   for (const battle of expired) {
+    const idleUserId = battle.acceptedAt === null ? null : battle.turnUserId;
     battle.status = 'expired';
     battle.finishReason = battle.acceptedAt === null ? 'challenge_timeout' : 'inactivity';
     battle.finishedAt = now;
     battle.updatedAt = now;
     battle.turnUserId = null;
-    await settleBattle(repos, battle, now);
+    await settleBattle(repos, battle, now, { idleUserId });
   }
   return expired.length;
 }

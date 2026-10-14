@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
-import { COLLECTIONS, CONTENT_COLLECTIONS, V8_COLLECTIONS, validateDatabase } from '../storage/validation.js';
+import { SCHEMA_VERSION, COLLECTIONS, CONTENT_COLLECTIONS, V8_COLLECTIONS, validateDatabase } from '../storage/validation.js';
 import { readRecords, register, setup, stripBetaContentFixture } from './helpers.js';
 import { crearDatabase } from '../CTU-database.js';
 
@@ -59,7 +59,7 @@ function preserved(c) {
 test('schema 8 upgrades to content without resetting market aliases, owners, XP, supply or historical awards', async t => {
   const c = await legacy(t);
   const game = c.open().game;
-  assert.equal((await game.validateDatabase()).schemaVersion, 9);
+  assert.equal((await game.validateDatabase()).schemaVersion, SCHEMA_VERSION);
   preserved(c);
   assert.equal((await game.market.getListing('M1')).status, 'sold');
   const snapshots = fs.readdirSync(path.join(c.directory, 'backups')).map(id => JSON.parse(fs.readFileSync(path.join(c.directory, 'backups', id, 'snapshot.json'), 'utf8')));
@@ -67,12 +67,12 @@ test('schema 8 upgrades to content without resetting market aliases, owners, XP,
 });
 
 for (const stage of ['prepared', 'committed', ...COLLECTIONS.map(name => `published:${name}.json`), 'published:_database.json']) {
-  test(`content migration recovers all twenty-one files at ${stage}`, async t => {
+  test(`content migration recovers every managed file at ${stage}`, async t => {
     const c = await legacy(t);
     const interrupted = c.open({ fault: current => { if (current === stage) throw new Error('interrupted beta migration'); } }).game;
     await assert.rejects(interrupted.validateDatabase(), { code: 'STORAGE_WRITE_FAILED' });
     await interrupted.close(); const game = c.open().game;
-    assert.equal((await game.validateDatabase()).schemaVersion, 9);
+    assert.equal((await game.validateDatabase()).schemaVersion, SCHEMA_VERSION);
     preserved(c);
     assert.equal(fs.existsSync(path.join(c.directory, '_journal.json')), false);
   });
@@ -88,7 +88,7 @@ for (const phase of ['prepared', 'committed']) {
     const checksum = createHash('sha256').update(JSON.stringify(body)).digest('hex');
     fs.writeFileSync(path.join(c.directory, '_journal.json'), serialize({ version: 1, phase, body, checksum }));
     if (phase === 'committed') { fs.writeFileSync(path.join(c.directory, 'sobres.json'), after['sobres.json']); c.state.sobres = packs; }
-    assert.equal((await c.open().game.validateDatabase()).schemaVersion, 9);
+    assert.equal((await c.open().game.validateDatabase()).schemaVersion, SCHEMA_VERSION);
     preserved(c);
   });
 }

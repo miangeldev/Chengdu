@@ -1,8 +1,9 @@
+import { expireTrades } from '../trades/lifecycle.js';
 import { createUnitInTransaction } from './unitGenerator.js';
 import { requireGame } from '../../utils/GameError.js';
 import { paginate } from '../../utils/pagination.js';
 import { expireBattles } from '../battle/lifecycle.js';
-import { effectiveStats } from '../progression/rules.js';
+import { effectiveUnitStats, displayUnitCharacterName, evolutionSnapshot } from '../evolution/rules.js';
 import { expireListings } from '../market/lifecycle.js';
 import { getListingCode } from '../market/references.js';
 import { advancedAttack, combatProfile } from '../battle/combatContent.js';
@@ -13,7 +14,8 @@ async function detail(repos, unit) {
   const campaign = character.eventId ? await repos.campaigns.get(character.eventId) : null;
   const opening = unit.origin.type === 'pack' ? await repos.openings.get(unit.origin.sourceId) : null;
   return { ...unit, ...(unit.lock?.type === 'market' ? { marketCode: await getListingCode(repos, unit.lock.referenceId) } : {}),
-    currentStats: effectiveStats(unit.initialStats, unit.progress.level, unit.statGrowthVersion, unit.traits, unit.traitVersion, unit.combatBaseStats),
+    currentStats: effectiveUnitStats(unit), characterName: displayUnitCharacterName(unit, character),
+    evolution: evolutionSnapshot(unit),
     pack: opening ? { id: opening.packId, name: opening.packSnapshot.name, revision: opening.packRevision } : null,
     campaign: campaign ? { id: campaign.id, code: campaign.code, name: campaign.name } : null,
     character, owner: { id: owner.id, name: owner.name } };
@@ -34,10 +36,10 @@ async function combatDetail(repos, unitId) {
   }
   const character = await repos.characters.get(unit.characterId);
   const owner = await repos.users.get(unit.ownerId);
-  const stats = effectiveStats(unit.initialStats, unit.progress.level, unit.statGrowthVersion, unit.traits, unit.traitVersion, unit.combatBaseStats);
+  const stats = effectiveUnitStats(unit);
   const combat = character.combat ?? combatProfile(character.id);
   return {
-    id: unit.id, characterId: unit.characterId, characterName: character.name,
+    id: unit.id, characterId: unit.characterId, characterName: displayUnitCharacterName(unit, character), evolution: evolutionSnapshot(unit),
     level: unit.progress.level, stats, hp: stats.hp, traits: unit.traits, variant: unit.variant, traitVersion: unit.traitVersion,
     attacks: (await Promise.all(character.attackIds.map(id => repos.attacks.get(id)))).map(advancedAttack),
     element: combat.element, ability: structuredClone(combat.ability), effects: [], cooldowns: {},
@@ -58,6 +60,7 @@ export function createUnitService(storage, clock) {
         const now = clock();
         await expireBattles(repos, now);
         await expireListings(repos, now);
+    await expireTrades(repos, now);
         const unit = await repos.units.get(unitId.trim().toUpperCase());
         requireGame(unit, 'UNIT_NOT_FOUND');
         return detail(repos, unit);
@@ -69,6 +72,7 @@ export function createUnitService(storage, clock) {
         const now = clock();
         await expireBattles(repos, now);
         await expireListings(repos, now);
+    await expireTrades(repos, now);
         if (unitId !== null) return { units: [await combatDetail(repos, unitId.trim().toUpperCase())] };
         const user = await repos.users.get(userId);
         requireGame(user, 'USER_NOT_FOUND');
@@ -85,6 +89,7 @@ export function createUnitService(storage, clock) {
         const now = clock();
         await expireBattles(repos, now);
         await expireListings(repos, now);
+    await expireTrades(repos, now);
         requireGame(await repos.users.get(ownerId), 'USER_NOT_FOUND');
         const page = paginate(await repos.units.getByOwner(ownerId), options, `collection:${ownerId}`);
         page.items = await Promise.all(page.items.map(unit => detail(repos, unit)));
@@ -97,6 +102,7 @@ export function createUnitService(storage, clock) {
         const now = clock();
         await expireBattles(repos, now);
         await expireListings(repos, now);
+    await expireTrades(repos, now);
         const unit = await repos.units.get(unitId.trim().toUpperCase());
         requireGame(unit, 'UNIT_NOT_FOUND');
         const events = await repos.events.filter(event => event.unitId === unit.id);

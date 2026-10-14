@@ -1,3 +1,7 @@
+import { expiredStoredLock } from './lockProof.js';
+import { displayUnitCharacterName } from '../game/evolution/rules.js';
+import { validateEvolutionSnapshot } from './evolutionSnapshot.js';
+import { evolvedStats } from '../game/evolution/rules.js';
 import { createHash } from 'node:crypto';
 import { requireGame } from '../utils/GameError.js';
 import { BOSSES, CONTENT_POLICY_VERSION, SPAWN_POLICY } from '../game/content/catalog.js';
@@ -65,13 +69,14 @@ export function validateEncounterData(state) {
       for (const action of actions) {
         const d = action.details, unit = state.unidades.records.find(row => row.id === d.unitSnapshot?.id);
         const snapshot = d.unitSnapshot;
+        validateEvolutionSnapshot(state, snapshot, action.createdAt);
         check(action.kind === 'boss_attack' && hp > 0 && group(d.chatId) && Date.parse(action.createdAt) >= Date.parse(lastTime) &&
           Date.parse(action.createdAt) < Date.parse(encounter.expiresAt) && unit && snapshot.ownerId === action.userId &&
           ownershipAt(state, unit.id, snapshot.ownershipVersion) === action.userId && snapshot.characterId === unit.characterId &&
           state.eventos.records.some(event => event.unitId === unit.id && (event.ownershipVersion ?? 0) === snapshot.ownershipVersion && event.toOwnerId === action.userId && Date.parse(event.createdAt) <= Date.parse(action.createdAt)) &&
           snapshot.progress?.level <= unit.progress.level && integer(snapshot.progress?.level, 1) && integer(snapshot.progress?.xp) &&
           equal(snapshot.traits, unit.traits) && snapshot.variant === unit.variant && snapshot.traitVersion === unit.traitVersion &&
-          equal(snapshot.stats, effectiveStats(unit.initialStats, snapshot.progress.level, unit.statGrowthVersion, unit.traits, unit.traitVersion, unit.combatBaseStats)) &&
+          equal(snapshot.stats, evolvedStats(effectiveStats(unit.initialStats, snapshot.progress.level, unit.statGrowthVersion, unit.traits, unit.traitVersion, unit.combatBaseStats), snapshot.evolution, unit.characterId)) &&
           Array.isArray(snapshot.attacks) && snapshot.attacks.length === 2 && snapshot.attacks.every(attack => typeof attack.name === 'string' && integer(attack.power, 1) && attack.power <= 10000 && integer(attack.accuracy, 1) && attack.accuracy <= 100 &&
             integer(attack.revision, 1) && attack.revision <= (state.ataques.records.find(row => row.id === attack.id)?.revision ?? 0)), 'encounter.bossUnit');
         const previous = own.get(action.userId) ?? { attacks: 0, last: null };
@@ -150,9 +155,9 @@ export function validateEncounterTransition(before, after) {
     const user = before.usuarios.records.find(row => row.id === action.userId), s = action.details.unitSnapshot;
     const unit = before.unidades.records.find(row => row.id === s.id);
     const character = before.personajes.records.find(row => row.id === unit?.characterId);
-    const expired = unit?.lock && (unit.lock.type === 'battle' ? after.combates.records : after.mercado.records).find(row => row.id === unit.lock.referenceId)?.status === 'expired';
+    const expired = expiredStoredLock(before, after, unit, action.createdAt);
     check(user?.team[0] === unit?.id && unit.ownerId === action.userId && unit.ownershipVersion === s.ownershipVersion &&
-      (unit.lock === null || expired) && equal(unit.progress, s.progress) && s.characterName === character.name &&
+      (unit.lock === null || expired) && equal(unit.progress, s.progress) && s.characterName === displayUnitCharacterName(unit, character) && equal(s.evolution ?? null, unit.evolution ?? null) &&
       equal(s.attacks, character.attackIds.map(id => advancedAttack(before.ataques.records.find(row => row.id === id)))), 'encounter.attackSource');
   }
 }

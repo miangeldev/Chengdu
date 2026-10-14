@@ -24,6 +24,21 @@ export function createRepositories(state, writable = false) {
     achievements: collectionRepository(state.logros.records, writable),
     encounters: collectionRepository(state.encuentros.records, writable),
     contentActions: collectionRepository(state.accionescontenido.records, writable),
-    groupActivity: collectionRepository(state.actividad.records, writable)
+    groupActivity: collectionRepository(state.actividad.records, writable),
+    seasons: collectionRepository(state.temporadas.records, writable),
+    rankings: collectionRepository(state.clasificacion.records, writable),
+    competitiveResults: collectionRepository(state.resultadoscompetitivos.records, writable),
+    seasonRewards: collectionRepository(state.premiostemporada.records, writable),
+    trades: collectionRepository(state.intercambios.records, writable),
+    tradeActions: collectionRepository(state.accionesintercambio.records, writable),
+    craftingActions: collectionRepository(state.artesania.records, writable),
+    evolutionActions: collectionRepository(state.evoluciones.records, writable),
+    socialProfiles: collectionRepository(state.perfilessociales.records, writable),
+    socialActions: collectionRepository(state.accionessociales.records, writable),
+    clans: collectionRepository(state.clanes.records, writable),
+    clanActions: collectionRepository(state.accionesclan.records, writable),
+    clanWars: collectionRepository(state.guerrasclan.records, writable),
+    clanWarActions: collectionRepository(state.accionesguerra.records, writable),
+    acquisitions: collectionRepository(state.obtenciones.records, writable)
   };
 }

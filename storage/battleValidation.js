@@ -1,3 +1,5 @@
+import { validateEvolutionSnapshot } from './evolutionSnapshot.js';
+import { evolvedStats } from '../game/evolution/rules.js';
 import { requireGame } from '../utils/GameError.js';
 import { calculateDamage, firstPlayer, MAX_TURNS } from '../game/battle/engine.js';
 import { effectiveStats } from '../game/progression/rules.js';
@@ -63,7 +65,8 @@ export function validateBattleData(state, schemaVersion = 3) {
       check(text(u.characterName) && integer(u.serial, 1) && integer(u.characterRevision, 1) && integer(u.level, 1), 'battle.snapshot');
       const initialStats = units.get(u.id).initialStats;
       check(u.serial === units.get(u.id).serial && u.characterRevision <= characters.get(u.characterId).revision &&
-        equal(u.stats, schemaVersion < 3 ? initialStats : effectiveStats(initialStats, u.level, u.statsVersion ?? 0, u.traits ?? [], u.traitVersion ?? 0, u.combatBaseStats)), 'battle.snapshotOrigin');
+        equal(u.stats, schemaVersion < 3 ? initialStats : evolvedStats(effectiveStats(initialStats, u.level, u.statsVersion ?? 0, u.traits ?? [], u.traitVersion ?? 0, u.combatBaseStats), u.evolution, u.characterId)), 'battle.snapshotOrigin');
+      validateEvolutionSnapshot(state, u, battle.acceptedAt);
       if (u.statsVersion === 2) check(schemaVersion >= 5 && equal(u.combatBaseStats, units.get(u.id).combatBaseStats), 'battle.snapshotBalance');
       if (u.traitVersion !== undefined) {
         check(u.traitVersion === units.get(u.id).traitVersion && equal(u.traits, units.get(u.id).traits) && u.variant === units.get(u.id).variant, 'battle.snapshotTraits');
@@ -123,7 +126,7 @@ export function validateBattleData(state, schemaVersion = 3) {
     else check(date(battle.finishedAt) && battle.turnUserId === null && (accepted || ({ expired: 'challenge_timeout', rejected: 'rejected', cancelled: 'cancelled' })[battle.status] === battle.finishReason), 'battle.closedFinish');
   }
   for (const unit of units.values()) {
-    if (schemaVersion >= 7 && unit.lock?.type === 'market') continue; // Market validation checks the matching active listing.
+    if ((schemaVersion >= 7 && unit.lock?.type === 'market' || schemaVersion >= 11 && unit.lock?.type === 'trade')) continue; // Market validation checks the matching active listing.
     if (unit.lock !== null) check(unit.lock?.type === 'battle' && battles.get(unit.lock.referenceId)?.status === 'active' && activeUnits.has(unit.id), 'unit.lockReference');
   }
 }
@@ -160,7 +163,7 @@ export function validateBattleTransition(before, after) {
       for (const player of updated.players) {
         const unit = before.unidades.records.find(u => u.id === player.unit.id);
         check(unit && unit.ownerId === player.userId && player.unit.level === unit.progress.level && player.unit.statsVersion === unit.statGrowthVersion && equal(player.unit.combatBaseStats, unit.combatBaseStats) &&
-          player.unit.traitVersion === unit.traitVersion && equal(player.unit.traits, unit.traits) && player.unit.variant === unit.variant, 'battle.snapshotLevel');
+          player.unit.traitVersion === unit.traitVersion && equal(player.unit.traits, unit.traits) && player.unit.variant === unit.variant && equal(player.unit.evolution ?? null, unit.evolution ?? null), 'battle.snapshotLevel');
         if (unit.ownershipVersion !== undefined) check(player.unit.ownershipVersion === unit.ownershipVersion, 'battle.snapshotCurrentOwnership');
         check(before.usuarios.records.find(u => u.id === player.userId).team[0] === unit.id, 'battle.snapshotTeam');
       }

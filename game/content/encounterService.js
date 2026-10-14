@@ -1,3 +1,5 @@
+import { expireTrades } from '../trades/lifecycle.js';
+import { effectiveUnitStats, evolutionSnapshot, displayUnitCharacterName } from '../evolution/rules.js';
 import { createHash, randomInt, randomUUID } from 'node:crypto';
 import { GameError, requireGame } from '../../utils/GameError.js';
 import { paginate } from '../../utils/pagination.js';
@@ -76,9 +78,9 @@ async function unitSnapshot(repos, user) {
   requireGame(unit.lock === null, 'UNIT_LOCKED');
   const character = await repos.characters.get(unit.characterId);
   return {
-    id: unit.id, characterId: unit.characterId, characterName: character.name, ownerId: user.id,
+    id: unit.id, characterId: unit.characterId, characterName: displayUnitCharacterName(unit, character), evolution: evolutionSnapshot(unit), ownerId: user.id,
     ownershipVersion: unit.ownershipVersion, progress: structuredClone(unit.progress),
-    stats: effectiveStats(unit.initialStats, unit.progress.level, unit.statGrowthVersion, unit.traits, unit.traitVersion, unit.combatBaseStats),
+    stats: effectiveUnitStats(unit),
     attacks: (await Promise.all(character.attackIds.map(id => repos.attacks.get(id)))).map(advancedAttack),
     traits: [...unit.traits], variant: unit.variant, traitVersion: unit.traitVersion
   };
@@ -96,6 +98,7 @@ export function createEncounterService(storage, clock, randomDropInt = upper => 
     dailyTimestamp(now);
     await expireBattles(repos, now);
     await expireListings(repos, now);
+    await expireTrades(repos, now);
     await expireEncounters(repos, now);
     return now;
   }

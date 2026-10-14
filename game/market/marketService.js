@@ -1,3 +1,5 @@
+import { effectiveUnitStats, evolutionSnapshot, displayUnitCharacterName } from '../evolution/rules.js';
+import { expireTrades } from '../trades/lifecycle.js';
 import { randomUUID } from 'node:crypto';
 import { GameError, requireGame } from '../../utils/GameError.js';
 import { paginate } from '../../utils/pagination.js';
@@ -55,10 +57,10 @@ async function publicSale(repos, sale, userId) {
 function snapshot(unit, character) {
   return {
     id: unit.id, characterId: unit.characterId, characterRevision: unit.characterRevision,
-    characterName: character.name, rarity: character.rarity, role: character.role,
+    characterName: displayUnitCharacterName(unit, character), evolution: evolutionSnapshot(unit), rarity: character.rarity, role: character.role,
     serial: unit.serial, ownershipVersion: unit.ownershipVersion, level: unit.progress.level,
     progress: structuredClone(unit.progress), traits: [...unit.traits], variant: unit.variant, traitVersion: unit.traitVersion,
-    stats: effectiveStats(unit.initialStats, unit.progress.level, unit.statGrowthVersion, unit.traits, unit.traitVersion, unit.combatBaseStats)
+    stats: effectiveUnitStats(unit)
   };
 }
 
@@ -68,6 +70,7 @@ export function createMarketService(storage, clock) {
     dailyTimestamp(now);
     await expireBattles(repos, now);
     await expireListings(repos, now);
+    await expireTrades(repos, now);
     return now;
   }
 

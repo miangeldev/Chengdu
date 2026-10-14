@@ -1,3 +1,10 @@
+import * as clan from '../../plugins/CTU-clan.js';
+import * as intercambio from '../../plugins/CTU-intercambio.js';
+import * as crafting from '../../plugins/CTU-crafting.js';
+import * as evolucion from '../../plugins/CTU-evolucion.js';
+import * as recompensas from '../../plugins/CTU-recompensas.js';
+import * as social from '../../plugins/CTU-social.js';
+import * as showcase from '../../plugins/CTU-showcase.js';
 import * as registro from '../../plugins/CTU-registro.js';
 import * as perfil from '../../plugins/CTU-perfil.js';
 import * as catalogo from '../../plugins/CTU-catalogo.js';
@@ -39,12 +46,17 @@ import * as capturar from '../../plugins/CTU-capturar.js';
 import * as explorar from '../../plugins/CTU-explorar.js';
 import * as eventos from '../../plugins/CTU-eventos.js';
 import * as evento from '../../plugins/CTU-evento.js';
+import * as ranked from '../../plugins/CTU-ranked.js';
+import * as rank from '../../plugins/CTU-rank.js';
+import * as top from '../../plugins/CTU-top.js';
+import * as temporada from '../../plugins/CTU-temporada.js';
+import * as temporadas from '../../plugins/CTU-temporadas.js';
 import { identityFor } from './command.js';
 import { commandText } from './format.js';
 import { renderSpawn } from './contentFormat.js';
 import { game as defaultGame } from '../../game/index.js';
 
-export const commands = Object.freeze([registro, perfil, catalogo, starter, personajes, unidad, ayuda, equipo, pelea, aceptar, atacar, rendirse, combate, rechazar, cancelar, ficha, balance, historial, sobres, abrir, diario, tienda, movimientos, mercado, vender, comprar, retirar, ventas, propiedad, cambiar, misiones, logros, inventario, boss, bossatacar, bosstop, spawn, capturar, explorar, eventos, evento]);
+export const commands = Object.freeze([registro, perfil, catalogo, starter, personajes, unidad, ayuda, equipo, pelea, aceptar, atacar, rendirse, combate, rechazar, cancelar, ficha, balance, historial, sobres, abrir, diario, tienda, movimientos, mercado, vender, comprar, retirar, ventas, propiedad, cambiar, misiones, logros, inventario, boss, bossatacar, bosstop, spawn, capturar, explorar, eventos, evento, ranked, rank, top, temporada, temporadas, clan, intercambio, crafting, evolucion, recompensas, social, showcase]);
 
 export async function observeGameActivity(sock, msg, { game = defaultGame, prefix = '.', logger = console.error } = {}) {
   if (!msg?.key?.remoteJid?.endsWith('@g.us') || msg.key.fromMe || !msg.key.id || !msg.key.participant) return false;

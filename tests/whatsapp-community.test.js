@@ -1,0 +1,28 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import { clansFixture } from './community-fixtures.js';import { craftingFixture,earnSealMaterials,craftSeal } from './crafting-fixtures.js';
+import { createCommandRouter,commands } from '../interfaces/whatsapp/index.js';import { register,setup } from './helpers.js';
+function messenger(c){const outputs=[],logs=[],route=createCommandRouter({game:c.game,prefix:'!',automaticSpawns:false,debug:false,logger:(...a)=>logs.push(a)});let seq=0;
+ return {logs,send:async(body,{actor='521550000000@s.whatsapp.net',mentions=[],id=`ui:${++seq}`}={})=>{const before=outputs.length;const message={key:{remoteJid:'community@g.us',participant:actor,id},message:{extendedTextMessage:{contextInfo:{mentionedJid:mentions}}}};assert.equal(await route({sendMessage:async(_,p)=>outputs.push(p.text)},message,body),true);assert.equal(outputs.length,before+1);const text=outputs.at(-1);assert.doesNotMatch(text,/No pude confirmar|Debug activado|USR-|CLN-|WAR-|TRD-|TA-|CLA-|WACT-|SOC-|ACQ-|@s.whatsapp.net|[a-f0-9]{8}-[a-f0-9]{4}-|\.ctu/);assert.equal(logs.length,0);return text;}};
+}
+test('clan UI explains creation, treasury, role permissions, short codes and full war workflow',async t=>{const c=await clansFixture(t),m=messenger(c);const leader='521550000000@s.whatsapp.net',opponent='521550000003@s.whatsapp.net';
+ for(const command of ['ctuclan','ctuintercambio','ctucrafting','ctuevolucion','ctusocial','ctushowcase','cturecompensas'])assert.ok(commands.some(p=>p.command===command));
+ const visitor='521556667777@s.whatsapp.net';await register(c.game,'Visitante','521556667777');
+ assert.match(await m.send('!ctuclan invitar @Visitante',{mentions:[visitor]}),/Invitación enviada.*unirse C1/);
+ assert.match(await m.send('!ctuclan',{actor:visitor}),/Invitación.*Casa Bambú/s);
+ assert.match(await m.send('!ctuclan'),/Casa Bambú/);assert.match(await m.send('!ctuclan top'),/!ctuclan ver C1/);assert.match(await m.send('!ctuclan ayuda'),/!ctuclan guerra C2/);
+ assert.match(await m.send('!ctuclan depositar 10',{actor:'521550000001@s.whatsapp.net'}),/110 en tesorería/);assert.match(await m.send('!ctuclan retirar 10',{actor:'521550000001@s.whatsapp.net'}),/rol no permite/);
+ assert.match(await m.send('!ctuclan guerra C2'),/!ctuclan aceptar G1/);assert.match(await m.send('!ctuclan aceptar G1',{actor:opponent}),/marcador \*0–0\*/);assert.match(await m.send('!ctuclan war G1'),/!ctupelea @jugador/);assert.match(await m.send('!ctuclan guerras'),/!ctuclan war G1/);assert.match(await m.send('!ctuclan salir'),/reservada/);assert.match(await m.send('!ctuclan historial'),/Entrada de guerra/);
+});
+test('trade UI exposes two offers, confirmation, cancellation and stable short inspection commands',async t=>{const c=await craftingFixture(t),m=messenger(c),a='521999999999@s.whatsapp.net',b='521111111111@s.whatsapp.net';
+ assert.match(await m.send('!ctuintercambio crear @Lukas',{actor:a,mentions:[b]}),/!ctuintercambio confirmar I1/);
+ await m.send(`!ctuintercambio oferta I1 0 ${c.unit.id}`,{actor:a});await m.send(`!ctuintercambio oferta I1 0 ${c.opponentUnit.id}`,{actor:b});assert.match(await m.send('!ctuintercambio confirmar I1',{actor:a}),/reservados/);
+ assert.match(await m.send('!ctuintercambio confirmar I1',{actor:b}),/Intercambio completado/);assert.match(await m.send('!ctuintercambio mios',{actor:a}),/!ctuintercambio ver I1/);assert.match(await m.send('!ctupropiedad '+c.unit.id,{actor:a}),/Intercambio entre jugadores/);
+});
+test('social public collection, favorites and comparison hide identity and give actionable commands',async t=>{const c=await craftingFixture(t),m=messenger(c),a='521999999999@s.whatsapp.net',b='521111111111@s.whatsapp.net';
+ assert.match(await m.send(`!ctusocial favorito ${c.unit.id}`,{actor:a}),/Favorito/);assert.match(await m.send(`!ctusocial presentar ${c.unit.id}`,{actor:a}),/Destacados/);assert.match(await m.send('!ctusocial bio Amo el bambú',{actor:a}),/Amo el bambú/);
+ assert.match(await m.send('!ctushowcase',{actor:a}),/Más rara/);assert.match(await m.send('!ctuperfil @Miguel',{actor:b,mentions:[a]}),/PERFIL PÚBLICO/);assert.match(await m.send('!ctupersonajes @Miguel 1',{actor:b,mentions:[a]}),/COLECCIÓN PÚBLICA/);assert.match(await m.send(`!ctusocial comparar ${c.unit.id} ${c.opponentUnit.id}`,{actor:a}),/Panda Guerrero.*Lobo Sombrío/s);
+});
+test('crafting, evolution and direct acquisition each deliver one concise recoverable reply',async t=>{const c=await craftingFixture(t,{level:10}),m=messenger(c),actor='521999999999@s.whatsapp.net';await earnSealMaterials(c);
+ assert.match(await m.send('!ctucrafting',{actor}),/!ctucrafting crear sello_evolucion/);await m.send('!ctucrafting crear sello_evolucion',{actor});assert.match(await m.send(`!ctuevolucion ${c.unit.id}`,{actor}),/confirmar/);assert.match(await m.send(`!ctuevolucion ${c.unit.id} confirmar`,{actor,id:'evo'}),/evolucionó/);assert.match(await m.send(`!ctuevolucion ${c.unit.id} confirmar`,{actor,id:'evo'}),/ya confirmada/);
+ assert.match(await m.send('!cturecompensas',{actor}),/codigo CHENGDU/);assert.match(await m.send('!cturecompensas codigo CHENGDU',{actor,id:'promo'}),/Obtuviste/);assert.match(await m.send('!cturecompensas codigo CHENGDU',{actor,id:'promo'}),/ya fue procesado/);assert.match(await m.send('!ctuinventario',{actor}),/fragmentos/);
+});

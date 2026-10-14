@@ -1,4 +1,4 @@
-# Chengdú Cards — Beta 0.8
+# Chengdú Cards — Comunidad 0.10
 
 Módulo de juego para un bot de WhatsApp: registro, perfil, catálogo de diez
 personajes, starter único, colección, equipos de hasta tres unidades y combates
@@ -11,6 +11,13 @@ El mercado permite comprar y vender unidades entre jugadores, con comisión,
 anuncios que vencen y un historial de propiedad que conserva cada emisión.
 La Beta 0.8 añade misiones diarias, logros con títulos e insignias, tickets de
 captura, bosses mundiales, apariciones en grupos y el Festival de los Faroles.
+La Beta 0.9 añade desafíos competitivos, Elo, rangos, temporadas de 30 días,
+clasificación global y premios de cierre con títulos permanentes.
+La versión 0.10 incorpora clanes completos, guerras, tesorería y moderación;
+intercambios bilaterales, materiales, crafting, evoluciones, perfiles públicos
+y personajes obtenidos directamente de premios y promociones.
+Guía: [fases 13–32](docs/fases-13-32.md), [auditoría integral](docs/auditoria-fases-0-32.md)
+y [plan de entrega](docs/plan-fases-13-32.md).
 El balance 0.4.1 distingue la fuerza de las rarezas y limita la emisión global
 de cada personaje, conservando las unidades y partidas anteriores.
 Toda la interfaz usa mensajes compactos, emojis, negritas y un siguiente paso
@@ -30,7 +37,7 @@ npm run db:validate
 
 El segundo comando inicializa la base vacía y el catálogo si se trata de una
 instalación nueva; en instalaciones existentes valida o migra el formato original
-de usuarios. Desde los esquemas 1 a 8, migra al esquema 9 con backup y recuperación,
+de usuarios. Desde los esquemas 1 a 10, migra al esquema 11 con backup y recuperación,
 conservando unidades, identidades, saldos, XP, recibos y combates anteriores. La ruta por defecto es `ChengdúData/` junto al módulo, independiente
 del directorio desde el que se ejecute el bot.
 
@@ -47,6 +54,14 @@ no se conectan a WhatsApp ni escriben jugadores de prueba en la base del juego.
 
 | Comando | Uso |
 | --- | --- |
+| `.ctuclan` / `.ctuclan ayuda` | Crear clan, invitar, administrar tesorería, roles y guerras. |
+| `.ctuintercambio ayuda` | Ofertas de unidades/monedas con doble confirmación y códigos I1. |
+| `.ctucrafting` | Recoger materiales y crear sellos o insignias. |
+| `.ctuevolucion ID` | Revisar requisitos y confirmar la evolución de una unidad propia. |
+| `.ctusocial ayuda` | Favorito, destacados, títulos, bio y comparar unidades. |
+| `.ctushowcase @Miguel` | Vitrina pública de favoritos y unidades destacadas. |
+| `.ctuperfil @Miguel` / `.ctupersonajes @Miguel 2` | Perfil/colección pública, sin identidad externa ni wallet. |
+| `.cturecompensas` | Intentos de personaje de premios legítimos y código limitado. |
 | `.cturegistro Miguel` | Crear jugador; nombre de 1–40 caracteres. |
 | `.ctuperfil` | Ver nivel, XP hacia el siguiente nivel, monedas y estadísticas. |
 | `.ctubalance` | Ver ChengCoins, ingresos, gastos y disponibilidad del diario. |
@@ -73,6 +88,12 @@ no se conectan a WhatsApp ni escriben jugadores de prueba en la base del juego.
 | `.ctucapturar S1` | Capturar por un ticket, con propietario y serial únicos. |
 | `.ctueventos` / `.ctuevento faroles` | Calendario, personajes exclusivos y supply del festival. |
 | `.ctuevento faroles reclamar` | Bienvenida única: 25 monedas, 10 XP y un ticket. |
+| `.cturanked @jugador` / `.cturanked @jugador 3v3` | Desafío competitivo avanzado; aceptar y jugar con los comandos habituales. |
+| `.cturank` / `.cturank T1` | Elo propio, rango, colocación y posición de esa temporada. |
+| `.ctutop` / `.ctutop 2` / `.ctutop T1 2` | Clasificación global y archivo, con páginas numéricas. |
+| `.ctutemporada` / `.ctutemporada T1` | Calendario, requisitos y premio de la temporada. |
+| `.ctutemporada T1 reclamar` | Reclamar una vez las monedas y el título después del cierre. |
+| `.ctutemporadas` / `.ctutemporadas 2` | Temporadas y archivo por códigos cortos. |
 | `.ctuhistorial` | Ver tus partidas terminadas, cinco por página y desde cualquier chat. |
 | `.ctuhistorial BTL-…` | Consultar turnos, resultado y recompensa original de una partida propia. |
 | `.ctucatalogo` | Ver las plantillas del catálogo. |
@@ -277,6 +298,30 @@ siguiente partida. Las reglas completas están en [MVP 0.3](docs/mvp-0.3.md).
 Los desafíos vencen en 5 minutos y los combates tras 30 minutos sin una acción.
 La expiración se procesa al consultar perfil, unidades, equipos, saldo o batallas; el
 anfitrión también puede llamar a `game.battle.sweepExpired()` periódicamente.
+
+## Competitivo Beta 0.9
+
+`.cturanked` utiliza el combate avanzado 1v1/2v2/3v3 y sus comandos existentes.
+`.ctupelea` sigue siendo casual. Sólo los nuevos desafíos competitivos modifican
+Elo; las partidas históricas no se convierten ni generan puntos retroactivos.
+
+Cada temporada dura 30 días y empieza con 1000 Elo. El cálculo usa K=32 y tiene
+rangos Bronce, Plata, Oro, Platino, Diamante y Maestro. Para entrar en la
+clasificación definitiva y cobrar un premio se necesitan cinco partidas puntuadas
+y tres rivales distintos. Los provisionales pueden consultar su progreso.
+Sólo puntúan tres partidas por pareja en 24 horas, entre todos los grupos.
+Rendición temprana e inactividad penalizan al jugador responsable sin regalar
+puntos al rival. El límite de temporada termina partidas pendientes sin penalizar.
+
+T1 empieza el 13 de octubre de 2026 a las 00:00 CDMX y termina el 12 de noviembre
+a las 00:00. El siguiente calendario comienza en ese instante. Al cerrar se
+congela la clasificación y el premio depende del rango final, con bonos de podio.
+El reclamo publica monedas, ledger y título permanente juntos. La siguiente
+temporada reinicia el rating y conserva personajes, niveles, mercado e historiales.
+
+Reglas y premios en [Beta 0.9](docs/beta-0.9.md), planificación en
+[sus ocho hitos](docs/plan-beta-0.9.md). El servicio puede actualizar temporadas
+desde `game.competitive.sweepSeasons()`; las consultas también procesan el cierre.
 
 ## Contenido Beta 0.8
 
@@ -486,8 +531,9 @@ independientes; rechaza modificaciones directas de colecciones administradas.
 `usuarios.json`, `personajes.json`, `unidades.json`, `estado.json`, `eventos.json`,
 `ataques.json`, `combates.json`, `recompensas.json`, `sobres.json`, `aperturas.json`,
 `economia.json`, `diarios.json`, `mercado.json`, `ventas.json`, `campanas.json`,
-`premioscontenido.json`, `logros.json`, `encuentros.json`, `accionescontenido.json`
-y `actividad.json` incluyen versión de esquema 9 y revisión. Son veinte colecciones
+`premioscontenido.json`, `logros.json`, `encuentros.json`, `accionescontenido.json`,
+`actividad.json`, `temporadas.json`, `clasificacion.json`, `resultadoscompetitivos.json`
+y `premiostemporada.json` incluyen versión de esquema 10 y revisión. Son veinticuatro colecciones
 y el manifest por snapshot. `_database.json` identifica la instalación.
 `_journal.json` existe mientras hay un commit pendiente. Cada operación que cambia
 datos guarda previamente una copia coherente en `backups/<id-operación>/`.
@@ -543,16 +589,25 @@ activos, revisar la migración a SQLite prevista en el diseño.
 
 ## Alcance validado
 
-Beta 0.8 pasa **439 pruebas**, genera **130 mensajes de ejemplo** y tiene **41
-comandos**. La simulación de contenido verifica **9.000 duelos**. La base local
-se migró al esquema 9 con respaldo y conservación de sus registros anteriores.
+La entrega Beta 0.8 verificó 439 pruebas y 9.000 duelos de contenido.
+La entrega Beta 0.9 verificó **543 pruebas**, **46 comandos** y **153 mensajes de ejemplo**, incluyendo
+Elo, colocación, archivo, abandono y premio de temporada sin créditos inventados.
+La base local se migró del esquema 9 al 10 con respaldo, conservando exactamente
+los registros de sus veinte colecciones previas y sin datos de prueba.
+
+Comunidad 0.10 pasa **683 pruebas**, integra **53 comandos** y genera **188
+mensajes de ejemplo**. La migración local 10→11 conserva los **44 registros** de
+las **24 colecciones** anteriores y agrega once vacías. El respaldo está en
+`ChengdúData/backups/703971b6-9c35-4215-bd51-f5837f664655/`, sin journal pendiente
+ni cuentas de prueba. Los ajustes finales pasaron 37 pruebas de
+clanes, evoluciones, contenido e interfaz y 11 de confirmaciones y comandos.
 
 Las pruebas con `node --test --test-isolation=none` verifican persistencia al
 reabrir, registro/starter concurrentes, supply, identidades, cursores, migraciones
-desde esquemas 1 a 8, journals antiguos, integridad y recuperación de commits. También
+desde esquemas 1 a 10, journals antiguos, integridad y recuperación de commits. También
 cubren equipos, snapshots, turnos, precisión, duplicados, victoria, rendición,
 expiración y estadísticas. Se interrumpe realmente un proceso con `SIGKILL`.
-También se comprueban las trazas de error y los 41 plugins mediante sus
+También se comprueban las trazas de error y los 53 plugins mediante sus
 exportaciones `run`, con una base compartida y sin inyectar el juego del router.
 El debug se verifica activado y desactivado, con causas anidadas, loggers que
 sólo aceptan un argumento y límites de longitud del mensaje de WhatsApp.
@@ -589,6 +644,13 @@ entradas automáticas, reservas congeladas y reparto exacto de XP. Se reproducen
 acciones para detectar estados o resultados alterados y se conserva compatibilidad
 con partidas clásicas activas e históricas.
 
+El competitivo verifica Elo, empate, colocación, límites por pareja, abandono,
+inactividad, calendarios exactos, premios concurrentes, ledger, títulos y
+reinicios. El ranking se reproduce desde recibos para rechazar puntos o
+posiciones alterados. Se interrumpen commits de resultados y premios, incluida
+la llegada del límite de temporada, y se comprueba que recuperación y migración
+conserven resultados completos sin mezclar publicaciones parciales.
+
 Nuevos gastos, regalos e intercambios directos pertenecen
 a las siguientes versiones. El modelo conserva progreso, procedencia,
 revisiones de contenido, seriales, stats individuales, traits y variante.
@@ -601,5 +663,6 @@ Diseño: [fundación 0.1](docs/mvp-0.1.md), [combate 0.2](docs/mvp-0.2.md),
 [mercado 0.6](docs/alpha-0.6.md),
 [combate avanzado 0.7](docs/alpha-0.7.md),
 [contenido 0.8](docs/beta-0.8.md),
+[competitivo 0.9](docs/beta-0.9.md),
 [modelo de datos](docs/database.md) y
 [visión completa](project.md).

@@ -153,7 +153,11 @@ Fallar y cambiar consumen el turno. Los efectos avanzan sólo mientras la unidad
 ⚔️ 0 combates
 🏆 0 victorias · 💔 0 derrotas · ⚖️ 0 sin ganador
 
+🌟 Tu vitrina: .ctushowcase
+✍️ Personalizar: .ctusocial ayuda
+
 👉 Tu colección: *.ctupersonajes*
+🏅 Tu clasificación: .cturank
 ```
 
 ## Colección
@@ -331,6 +335,26 @@ Fallar y cambiar consumen el turno. Los efectos avanzan sólo mientras la unidad
 .ctubalance · Saldo y recompensas
 .ctuhistorial · Tus partidas
 .ctuhistorial ID · Turnos y recompensa
+
+🏅 *Clasificatorias*
+.cturanked @jugador · Equipos 1v1, 2v2 o 3v3; cambia Elo
+.cturank · Tu Elo, rango y colocación
+.ctutop / .ctutop 2 · Ranking mundial
+.ctutemporada · Fechas y premios
+.ctutemporada T1 reclamar · Cobrar tras el cierre
+.ctutemporadas · Archivo de temporadas
+Clasificación oficial: 5 partidas válidas y 3 rivales distintos.
+.ctupelea @jugador continúa siendo amistoso.
+
+🏯 *Comunidad y evolución*
+.ctuclan · Clanes, tesorería y guerras
+.ctuclan ayuda · Gestión y permisos
+.ctuintercambio ayuda · Intercambiar unidades y monedas
+.ctucrafting · Materiales y recetas
+.ctuevolucion ID · Evolucionar sin cambiar la identidad
+.ctusocial ayuda · Favorito, títulos y perfil público
+.ctushowcase · Tu vitrina
+.cturecompensas · Personajes de premios y promociones
 
 📄 *Páginas*
 .ctucatalogo 2 · Ir a la página 2
@@ -614,7 +638,11 @@ Lukas: +15 XP
 🏅 1 logro desbloqueado · 🎟️ 0 tickets
 ↳ .ctuinventario
 
+🌟 Tu vitrina: .ctushowcase
+✍️ Personalizar: .ctusocial ayuda
+
 👉 Tu colección: *.ctupersonajes*
+🏅 Tu clasificación: .cturank
 ```
 
 ## Saldo y reglas de recompensa
@@ -649,17 +677,17 @@ Lukas: +15 XP
 🏆 Victoria vs *Lukas*
 📅 11 de octubre de 2026 · 1v1 clásico · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-15c576f2-708d-4616-8774-b0e1bdda35c8
+🔎 .ctuhistorial BTL-353ecddf-3ba8-4a8a-8b4f-a08e8c545538
 
 🏆 Victoria vs *Lukas*
 📅 11 de octubre de 2026 · 1v1 clásico · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-4c6a1936-b3dd-4618-ab1f-aca98576e065
+🔎 .ctuhistorial BTL-b00c33ee-7729-4148-9499-f6f8da7944c9
 
 🏆 Victoria vs *Lukas*
 📅 11 de octubre de 2026 · 1v1 clásico · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-6fb28d44-9a92-45ef-8779-1202f30342eb
+🔎 .ctuhistorial BTL-eb9d5dde-0cd0-4545-9fd2-7acda37d5648
 
 📄 *Página 1 de 1*
 👉 Tu saldo: *.ctubalance*
@@ -1008,7 +1036,7 @@ Saldo tras ese reclamo: *100 ChengCoins*
 ```text
 🃏 *CHENGDÚ CARDS | ERROR*
 ━━━━━━━━━━━━━━
-💰 No tienes suficientes ChengCoins para esa compra.
+💰 No tienes suficientes ChengCoins para esta operación.
 👉 Consulta .ctubalance
 ```
 
@@ -1155,8 +1183,8 @@ Saldo tras ese reclamo: *100 ChengCoins*
 ```text
 🃏 *CHENGDÚ CARDS | ERROR*
 ━━━━━━━━━━━━━━
-🔒 Esa unidad está en combate o en venta.
-👉 Consulta .ctumercado mios o .ctucombate.
+🔒 Esa unidad está en combate, en venta o reservada en un intercambio.
+👉 Consulta .ctumercado mios, .ctucombate o .ctuintercambio mios.
 ```
 
 ## Error: el comprador necesita saldo
@@ -1164,7 +1192,7 @@ Saldo tras ese reclamo: *100 ChengCoins*
 ```text
 🃏 *CHENGDÚ CARDS | ERROR*
 ━━━━━━━━━━━━━━
-💰 No tienes suficientes ChengCoins para esa compra.
+💰 No tienes suficientes ChengCoins para esta operación.
 👉 Consulta .ctubalance
 ```
 
@@ -1697,8 +1725,8 @@ Fallar y cambiar consumen el turno. Los efectos avanzan sólo mientras la unidad
 ```text
 🃏 *CHENGDÚ CARDS | ERROR*
 ━━━━━━━━━━━━━━
-🔒 Esa unidad está en combate o en venta.
-👉 Consulta .ctumercado mios o .ctucombate.
+🔒 Esa unidad está en combate, en venta o reservada en un intercambio.
+👉 Consulta .ctumercado mios, .ctucombate o .ctuintercambio mios.
 ```
 
 ## Cambio voluntario: consume turno y activa la pasiva
@@ -2590,6 +2618,9 @@ Primer filo
 🏵️ *Insignias*
 ⚔️
 
+🪵 0 fragmentos · ✨ 0 esencias · 🔮 0 sellos
+🔨 .ctucrafting
+
 🎟️ Cada captura usa un ticket. Consíguelos completando misiones, logros y eventos.
 
 📋 Misiones: .ctumisiones
@@ -2919,6 +2950,9 @@ Primer filo
 🏵️ *Insignias*
 ⚔️
 
+🪵 0 fragmentos · ✨ 0 esencias · 🔮 0 sellos
+🔨 .ctucrafting
+
 🎟️ Cada captura usa un ticket. Consíguelos completando misiones, logros y eventos.
 
 📋 Misiones: .ctumisiones
@@ -2941,7 +2975,11 @@ Primer filo
 🏅 1 logro desbloqueado · 🎟️ 2 tickets
 ↳ .ctuinventario
 
+🌟 Tu vitrina: .ctushowcase
+✍️ Personalizar: .ctusocial ayuda
+
 👉 Tu colección: *.ctupersonajes*
+🏅 Tu clasificación: .cturank
 ```
 
 ## Mercado: un personaje exclusivo también se puede vender
@@ -3031,4 +3069,1205 @@ Saldo restante: *436 ChengCoins*
 
 🔎 Stats y ataques: *.ctuficha ESPE-000001*
 📜 Propietarios: .ctupropiedad ESPE-000001
+```
+
+## Competitivo: Elo inicial y requisitos de colocación
+
+```text
+🃏 *CHENGDÚ CARDS | RANKED | TU CLASIFICACIÓN*
+━━━━━━━━━━━━━━
+📅 *Temporada 1* · T1
+
+👤 *Miguel*
+🧭 Sin clasificación · *1000 Elo*
+
+⚔️ 0 clasificatorias válidas
+🏆 0 victorias · 💔 0 derrotas · ⚖️ 0 empates
+
+📋 0/5 clasificatorias válidas
+👥 0/3 rivales distintos
+Completa ambos requisitos para entrar al ranking oficial.
+
+⌛ Cierra: 12 nov 2026, 00:00 (CDMX)
+
+🏅 Jugar: *.cturanked @jugador*
+🌍 Ranking: .ctutop T1
+🎁 Temporada: .ctutemporada T1
+```
+
+## Competitivo: clasificación todavía sin partidas
+
+```text
+🃏 *CHENGDÚ CARDS | RANKED | TOP MUNDIAL*
+━━━━━━━━━━━━━━
+📅 *Temporada 1* · T1
+
+🌱 Aún no hay participantes.
+La primera clasificatoria abre el camino.
+
+🏅 Clasificación oficial: 5 partidas válidas y 3 rivales distintos.
+
+👤 Tu clasificación: .cturank T1
+📅 Temporada: .ctutemporada T1
+```
+
+## Temporada T1: calendario, rangos y premios
+
+```text
+🃏 *CHENGDÚ CARDS | RANKED | TEMPORADA*
+━━━━━━━━━━━━━━
+📅 *Temporada 1* · T1
+🏮 En curso
+
+🌅 Inicio: 13 oct 2026, 00:00 (CDMX)
+⌛ Cierra: 12 nov 2026, 00:00 (CDMX)
+
+🌍 0 participantes · 🏅 0 con clasificación oficial
+
+👤 *Miguel*
+🧭 Sin clasificación · *1000 Elo*
+📋 0/5 clasificatorias válidas
+👥 0/3 rivales distintos
+Completa ambos requisitos para entrar al ranking oficial.
+
+📊 Bronce → Plata → Oro → Platino → Diamante → Maestro
+Los premios se reclaman al cerrar la temporada.
+El podio recibe un extra; no se emiten personajes.
+
+🌍 Ranking: .ctutop T1
+📚 Temporadas: .ctutemporadas
+⚔️ Jugar: .cturanked @jugador
+```
+
+## Temporadas: códigos cortos y archivo
+
+```text
+🃏 *CHENGDÚ CARDS | RANKED | TEMPORADAS*
+━━━━━━━━━━━━━━
+📅 *Temporada 1* · T1
+🏮 En curso · 🌍 0 participantes
+⌛ Cierra: 12 nov 2026, 00:00 (CDMX)
+👉 *.ctutemporada T1*
+
+📄 *Página 1 de 1*
+🏅 Tu clasificación: .cturank
+```
+
+## Desafío competitivo: temporada y reglas visibles
+
+```text
+🃏 *CHENGDÚ CARDS | DESAFÍO RANKED*
+━━━━━━━━━━━━━━
+⚔️ *Miguel* desafió a *Lukas* · *1v1*
+
+🏅 *Clasificatoria · T1*
+📊 Elo y progreso de temporada.
+
+🛡️ 1 unidad por jugador · Elementos, pasivas y efectos
+
+📣 *Lukas, ¿aceptas?*
+👉 *.ctuaceptar* o *.cturechazar*
+
+⏳ Vence a las 00:05 (CDMX).
+↩️ Retirar: .ctucancelar
+```
+
+## Inicio competitivo: un solo mensaje con turno y equipo
+
+```text
+🃏 *CHENGDÚ CARDS | INICIO | T1*
+━━━━━━━━━━━━━━
+⚔️ *Miguel* vs *Lukas* · *1v1*
+🐺 *Lobo Sombrío* toma la iniciativa.
+
+🏅 *Clasificatoria · T1*
+📊 Elo y progreso de temporada.
+
+✨ 🐼 Panda Guerrero: *Piel de Bambú*
+🛡️ Escudo → 🐼 Panda Guerrero · 2 turnos
+✨ 🐺 Lobo Sombrío: *Mirada Nocturna*
+🛡️ Defensa reducida → 🐼 Panda Guerrero · 2 turnos
+🛡️ Escudo → 🐺 Lobo Sombrío · 2 turnos
+
+❤️ *ESTADO*
+🐼 *Miguel* · Panda Guerrero
+▓▓▓▓▓▓▓▓▓▓ 122/122 HP
+🛡️ Escudo 12 · 🛡️ Defensa reducida 2T
+
+🐺 *Lukas* · Lobo Sombrío
+▓▓▓▓▓▓▓▓▓▓ 97/97 HP
+🛡️ Escudo 10
+
+🎯 *Turno de Lukas*
+1️⃣ Garra Sombría · 25 POT
+2️⃣ Colmillo Nocturno · 35 POT
+
+👉 *.ctuatacar 1* o *.ctuatacar 2*
+🔎 Detalles: .ctuficha
+```
+
+## Turno competitivo: mantiene el formato compacto
+
+```text
+🃏 *CHENGDÚ CARDS | T2*
+━━━━━━━━━━━━━━
+🐺 *Lobo Sombrío* usó _Garra Sombría_
+💥 *20 de daño* a Panda Guerrero
+🛡️ 🐼 Panda Guerrero bloqueó 12 de daño
+🛡️ Escudo terminó en 🐼 Panda Guerrero
+
+❤️ *ESTADO*
+🐼 *Miguel* · Panda Guerrero
+▓▓▓▓▓▓▓▓▓▒ 102/122 HP
+🛡️ Defensa reducida 2T
+
+🐺 *Lukas* · Lobo Sombrío
+▓▓▓▓▓▓▓▓▓▓ 97/97 HP
+🛡️ Escudo 10
+
+🎯 *Turno de Miguel*
+1️⃣ Golpe de Bambú · 25 POT
+2️⃣ Impacto del Panda · 36 POT
+
+👉 *.ctuatacar 1* o *.ctuatacar 2*
+🔎 Detalles: .ctuficha
+```
+
+## Resultado competitivo: Elo y premio habitual en la misma respuesta
+
+```text
+🃏 *CHENGDÚ CARDS | VICTORIA*
+━━━━━━━━━━━━━━
+🐼 *Panda Guerrero* usó _Golpe de Bambú_
+💥 *8 de daño* a Lobo Sombrío
+💤 🐺 Lobo Sombrío quedó fuera de combate
+
+🐼 *¡Miguel derrotó a Lukas!*
+
+⚔️ 1v1 · 8 turnos · ❤️ 12 HP restantes
+
+❤️ *ESTADO*
+🐼 *Miguel* · Panda Guerrero
+▓▒▒▒▒▒▒▒▒▒ 12/122 HP
+
+🐺 *Lukas* · Lobo Sombrío
+▒▒▒▒▒▒▒▒▒▒ 0/97 HP
+
+🎁 *RECOMPENSAS*
+Miguel: +120 ChengCoins · +35 XP
+🐼 Panda Guerrero: +35 XP
+🌱 Miguel subió al nivel 3
+Lukas: +15 XP
+🐺 Lobo Sombrío: +15 XP
+
+🏅 *RANKED · T1*
+👤 Miguel: *1016 Elo* (+16) · 🥈 Plata
+👤 Lukas: *984 Elo* (-16) · 🥉 Bronce
+
+⚔️ Otra partida: .cturanked @jugador
+📊 Tu clasificación: .cturank
+```
+
+## Repetir el último turno: conserva el Elo original
+
+```text
+🃏 *CHENGDÚ CARDS | VICTORIA*
+━━━━━━━━━━━━━━
+♻️ Esta acción ya se había registrado. Estado actual:
+
+🐼 *¡Miguel derrotó a Lukas!*
+
+⚔️ 1v1 · 8 turnos · ❤️ 12 HP restantes
+
+❤️ *ESTADO*
+🐼 *Miguel* · Panda Guerrero
+▓▒▒▒▒▒▒▒▒▒ 12/122 HP
+
+🐺 *Lukas* · Lobo Sombrío
+▒▒▒▒▒▒▒▒▒▒ 0/97 HP
+
+🎁 *RECOMPENSAS*
+Miguel: +120 ChengCoins · +35 XP
+🐼 Panda Guerrero: +35 XP
+🌱 Miguel subió al nivel 3
+Lukas: +15 XP
+🐺 Lobo Sombrío: +15 XP
+
+🏅 *RANKED · T1*
+👤 Miguel: *1016 Elo* (+16) · 🥈 Plata
+👤 Lukas: *984 Elo* (-16) · 🥉 Bronce
+
+⚔️ Otra partida: .cturanked @jugador
+📊 Tu clasificación: .cturank
+```
+
+## Historial: distingue el competitivo del casual
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIAL*
+━━━━━━━━━━━━━━
+🏆 Victoria vs *Lukas*
+📅 25 de octubre de 2026 · 1v1 · 8 turnos
+🎁 +120 ChengCoins · +35 XP
+🏅 Ranked T1 · 1016 Elo (+16)
+🔎 .ctuhistorial BTL-b826c3cd-a4a8-454e-a944-f0aaea95763c
+
+💔 Derrota vs *Lukas*
+📅 22 de octubre de 2026 · 1v1 clásico · 5 turnos
+🎁 +0 ChengCoins · +15 XP
+🔎 .ctuhistorial BTL-59a86db6-4360-4369-bd86-b39dae30bc0f
+
+🏆 Victoria vs *Lukas*
+📅 22 de octubre de 2026 · 1v1 clásico · 4 turnos
+🎁 +120 ChengCoins · +35 XP
+🔎 .ctuhistorial BTL-bbe4d59e-5422-45ec-8fa8-9d2beb2dc4a5
+
+💔 Derrota vs *Lukas*
+📅 20 de octubre de 2026 · 1v1 · 0 turnos
+🔎 .ctuhistorial BTL-2c84c613-b16a-414a-9893-77be41f9609f
+
+💔 Derrota vs *Lukas*
+📅 20 de octubre de 2026 · 3v3 · 31 turnos
+🎁 +0 ChengCoins · +15 XP
+🔎 .ctuhistorial BTL-4683a236-5b9c-46ee-b626-b8c1de67365e
+
+📄 *Página 1 de 3*
+➡️ Siguiente: *.ctuhistorial 2*
+👉 Tu saldo: *.ctubalance*
+```
+
+## Colocación: una partida y un rival
+
+```text
+🃏 *CHENGDÚ CARDS | RANKED | TU CLASIFICACIÓN*
+━━━━━━━━━━━━━━
+📅 *Temporada 1* · T1
+
+👤 *Miguel*
+🧭 En colocación · *1016 Elo*
+
+⚔️ 1 clasificatorias válidas
+🏆 1 victorias · 💔 0 derrotas · ⚖️ 0 empates
+
+📋 1/5 clasificatorias válidas
+👥 1/3 rivales distintos
+Completa ambos requisitos para entrar al ranking oficial.
+
+⌛ Cierra: 12 nov 2026, 00:00 (CDMX)
+
+🏅 Jugar: *.cturanked @jugador*
+🌍 Ranking: .ctutop T1
+🎁 Temporada: .ctutemporada T1
+```
+
+## Competitivo: rendirse temprano penaliza sin regalar puntos
+
+```text
+🃏 *CHENGDÚ CARDS | VICTORIA*
+━━━━━━━━━━━━━━
+🏳️ Miguel se rindió.
+
+🐺 *¡Lukas derrotó a Miguel!*
+
+⚔️ 1v1 · 0 turnos · ❤️ 97 HP restantes
+
+❤️ *ESTADO*
+🐼 *Miguel* · Panda Guerrero
+▓▓▓▓▓▓▓▓▓▓ 122/122 HP
+🛡️ Escudo 12 · 🛡️ Defensa reducida 2T
+
+🐺 *Lukas* · Lobo Sombrío
+▓▓▓▓▓▓▓▓▓▓ 97/97 HP
+🛡️ Escudo 10
+
+🎁 Sin recompensa: rendición antes de 4 ataques entre ambos jugadores.
+
+🏅 *RANKED · T1*
+👤 Miguel: *1000 Elo* (-16) · 🥈 Plata
+👤 Lukas: *984 Elo* (0) · 🥉 Bronce
+🏳️ Penalización por rendición temprana; no cuenta para la colocación.
+
+⚔️ Otra partida: .cturanked @jugador
+📊 Tu clasificación: .cturank
+```
+
+## Competitivo: colocado tras cinco partidas y tres rivales
+
+```text
+🃏 *CHENGDÚ CARDS | RANKED | TU CLASIFICACIÓN*
+━━━━━━━━━━━━━━
+📅 *Temporada 1* · T1
+
+👤 *Miguel*
+🥈 Plata · *1059 Elo* · Puesto 1
+
+⚔️ 5 clasificatorias válidas
+🏆 5 victorias · 💔 0 derrotas · ⚖️ 0 empates
+⌛ 1 penalización por abandono
+
+⌛ Cierra: 12 nov 2026, 00:00 (CDMX)
+
+🏅 Jugar: *.cturanked @jugador*
+🌍 Ranking: .ctutop T1
+🎁 Temporada: .ctutemporada T1
+```
+
+## Clasificación: oficiales y provisionales, sin UUID
+
+```text
+🃏 *CHENGDÚ CARDS | RANKED | TOP MUNDIAL*
+━━━━━━━━━━━━━━
+📅 *Temporada 1* · T1
+
+🥇 *1. Miguel*
+🥈 Plata · *1059 Elo*
+⚔️ 5 partidas válidas · 🏆 5 victorias
+
+🧭 *Lukas* · En colocación
+📊 984 Elo · 📋 1/5 partidas · 👥 1/3 rivales
+
+🧭 *Camila* · En colocación
+📊 972 Elo · 📋 2/5 partidas · 👥 1/3 rivales
+
+🧭 *Ana* · En colocación
+📊 969 Elo · 📋 2/5 partidas · 👥 1/3 rivales
+
+🏅 Clasificación oficial: 5 partidas válidas y 3 rivales distintos.
+
+📄 *Página 1 de 1*
+👤 Tu clasificación: .cturank T1
+📅 Temporada: .ctutemporada T1
+```
+
+## Premio de temporada: todavía hay que esperar al cierre
+
+```text
+🃏 *CHENGDÚ CARDS | ERROR*
+━━━━━━━━━━━━━━
+⏳ Los premios de temporada se reclaman después del cierre.
+Consulta la fecha con .ctutemporada
+```
+
+## Temporada terminada: posición y premio congelados
+
+```text
+🃏 *CHENGDÚ CARDS | RANKED | TEMPORADA*
+━━━━━━━━━━━━━━
+📅 *Temporada 1* · T1
+🏁 Cerrada · Clasificación final
+
+🌅 Inicio: 13 oct 2026, 00:00 (CDMX)
+⌛ Cerró: 12 nov 2026, 00:00 (CDMX)
+
+🌍 4 participantes · 🏅 1 con clasificación oficial
+
+👤 *Miguel*
+🥈 Plata · *1059 Elo* · Puesto 1
+
+🎁 *Tu premio final*
+💰 +1450 ChengCoins
+🎖️ Plata de Chengdú · T1
+
+👉 *.ctutemporada T1 reclamar*
+🌍 Ranking: .ctutop T1
+📚 Temporadas: .ctutemporadas
+```
+
+## Premio de cierre: monedas y título permanente
+
+```text
+🃏 *CHENGDÚ CARDS | RANKED | PREMIO DE TEMPORADA*
+━━━━━━━━━━━━━━
+🎁 *¡Premio de temporada reclamado!*
+
+📅 T1 · 🥈 Plata · Puesto 1
+📊 1059 Elo finales
+
+💰 +1450 ChengCoins
+🎖️ Plata de Chengdú · T1
+
+💳 Saldo actual: *2693 ChengCoins*
+
+🎒 Tus títulos: .ctuinventario
+🌍 Clasificación final: .ctutop T1
+```
+
+## Premio repetido: no paga otra vez
+
+```text
+🃏 *CHENGDÚ CARDS | RANKED | PREMIO DE TEMPORADA*
+━━━━━━━━━━━━━━
+✅ Este premio ya se reclamó. Se conserva su recibo original.
+
+📅 T1 · 🥈 Plata · Puesto 1
+📊 1059 Elo finales
+
+💰 +1450 ChengCoins
+🎖️ Plata de Chengdú · T1
+
+💳 Saldo tras ese reclamo: *2693 ChengCoins*
+
+🎒 Tus títulos: .ctuinventario
+🌍 Clasificación final: .ctutop T1
+```
+
+## Inventario: conserva el título de temporada
+
+```text
+🃏 *CHENGDÚ CARDS | INVENTARIO*
+━━━━━━━━━━━━━━
+👤 *Miguel*
+🎟️ *2 tickets de captura*
+
+🎖️ *Títulos*
+Primer filo · Plata de Chengdú · T1
+
+🏵️ *Insignias*
+⚔️
+
+🪵 0 fragmentos · ✨ 0 esencias · 🔮 0 sellos
+🔨 .ctucrafting
+
+🎟️ Cada captura usa un ticket. Consíguelos completando misiones, logros y eventos.
+
+📋 Misiones: .ctumisiones
+🏅 Logros: .ctulogros
+🎴 Aparición del grupo: .ctuspawn
+```
+
+## Movimientos: premio competitivo junto a las otras fuentes
+
+```text
+🃏 *CHENGDÚ CARDS | MOVIMIENTOS*
+━━━━━━━━━━━━━━
+📥 *+1450 ChengCoins* · 🏅 Premio de temporada
+📅 12 nov 2026, 00:00
+
+📥 *+120 ChengCoins* · 🏆 Combate
+📅 25 oct 2026, 00:00
+
+📥 *+120 ChengCoins* · 🏆 Combate
+📅 25 oct 2026, 00:00
+
+📥 *+120 ChengCoins* · 🏆 Combate
+📅 25 oct 2026, 00:00
+
+📥 *+120 ChengCoins* · 🏆 Combate
+📅 25 oct 2026, 00:00
+
+📄 *Página 1 de 6*
+➡️ Siguiente: *.ctumovimientos 2*
+👉 Tu saldo: *.ctubalance*
+```
+
+## Temporada T2: Elo inicial nuevo, colección conservada
+
+```text
+🃏 *CHENGDÚ CARDS | RANKED | TU CLASIFICACIÓN*
+━━━━━━━━━━━━━━
+📅 *Temporada 2* · T2
+
+👤 *Miguel*
+🧭 Sin clasificación · *1000 Elo*
+
+⚔️ 0 clasificatorias válidas
+🏆 0 victorias · 💔 0 derrotas · ⚖️ 0 empates
+
+📋 0/5 clasificatorias válidas
+👥 0/3 rivales distintos
+Completa ambos requisitos para entrar al ranking oficial.
+
+⌛ Cierra: 12 dic 2026, 00:00 (CDMX)
+
+🏅 Jugar: *.cturanked @jugador*
+🌍 Ranking: .ctutop T2
+🎁 Temporada: .ctutemporada T2
+```
+
+## Archivo: clasificación final de T1
+
+```text
+🃏 *CHENGDÚ CARDS | RANKED | TOP MUNDIAL*
+━━━━━━━━━━━━━━
+📅 *Temporada 1* · T1
+
+🥇 *1. Miguel*
+🥈 Plata · *1059 Elo*
+⚔️ 5 partidas válidas · 🏆 5 victorias
+
+🧭 *Lukas* · En colocación
+📊 984 Elo · 📋 1/5 partidas · 👥 1/3 rivales
+
+🧭 *Camila* · En colocación
+📊 972 Elo · 📋 2/5 partidas · 👥 1/3 rivales
+
+🧭 *Ana* · En colocación
+📊 969 Elo · 📋 2/5 partidas · 👥 1/3 rivales
+
+🏅 Clasificación oficial: 5 partidas válidas y 3 rivales distintos.
+
+📄 *Página 1 de 1*
+👤 Tu clasificación: .cturank T1
+📅 Temporada: .ctutemporada T1
+```
+
+## Archivo de temporadas después del cambio de calendario
+
+```text
+🃏 *CHENGDÚ CARDS | RANKED | TEMPORADAS*
+━━━━━━━━━━━━━━
+📅 *Temporada 2* · T2
+🏮 En curso · 🌍 0 participantes
+⌛ Cierra: 12 dic 2026, 00:00 (CDMX)
+👉 *.ctutemporada T2*
+
+📅 *Temporada 1* · T1
+🏁 Cerrada · 🌍 4 participantes
+⌛ Cerró: 12 nov 2026, 00:00 (CDMX)
+👉 *.ctutemporada T1*
+
+📄 *Página 1 de 1*
+🏅 Tu clasificación: .cturank
+```
+
+## Social: favorito y perfil personalizado
+
+```text
+🃏 *CHENGDÚ CARDS | PERFIL PÚBLICO*
+━━━━━━━━━━━━━━
+👤 *Miguel* · Nv. 3
+🎴 3 unidades · 🏆 12 victorias
+
+❤️ Favorito: *Panda Guerrero* · Nv. 3
+
+🌟 .ctushowcase
+✍️ .ctusocial ayuda
+```
+
+## Social: sólo permite destacar unidades propias
+
+```text
+🃏 *CHENGDÚ CARDS | ERROR*
+━━━━━━━━━━━━━━
+🔒 Esa unidad no te pertenece. Elige una de tu colección con .ctupersonajes.
+```
+
+## Social: presentación pública
+
+```text
+🃏 *CHENGDÚ CARDS | PERFIL PÚBLICO*
+━━━━━━━━━━━━━━
+👤 *Miguel* · Nv. 3
+🎴 3 unidades · 🏆 12 victorias
+
+💬 Coleccionista de bambú
+
+❤️ Favorito: *Panda Guerrero* · Nv. 3
+
+🌟 .ctushowcase
+✍️ .ctusocial ayuda
+```
+
+## Social: elegir entre títulos realmente ganados
+
+```text
+🃏 *CHENGDÚ CARDS | TÍTULOS*
+━━━━━━━━━━━━━━
+⚔️ *Primer filo*
+👉 .ctusocial titulo L1
+
+🏅 *Plata de Chengdú · T1*
+👉 .ctusocial titulo T1
+
+🏅 .ctulogros
+```
+
+## Social: mostrar el título de temporada
+
+```text
+🃏 *CHENGDÚ CARDS | PERFIL PÚBLICO*
+━━━━━━━━━━━━━━
+👤 *Miguel* · Nv. 3
+🏅 Plata de Chengdú · T1
+🎴 3 unidades · 🏆 12 victorias
+
+💬 Coleccionista de bambú
+
+❤️ Favorito: *Panda Guerrero* · Nv. 3
+
+🌟 .ctushowcase
+✍️ .ctusocial ayuda
+```
+
+## Perfil público: sin saldo ni identidad externa
+
+```text
+🃏 *CHENGDÚ CARDS | PERFIL PÚBLICO*
+━━━━━━━━━━━━━━
+👤 *Miguel* · Nv. 3
+🏅 Plata de Chengdú · T1
+🎴 3 unidades · 🏆 12 victorias
+
+💬 Coleccionista de bambú
+
+❤️ Favorito: *Panda Guerrero* · Nv. 3
+
+🌟 .ctushowcase @jugador
+
+```
+
+## Colección pública: página numérica por mención
+
+```text
+🃏 *CHENGDÚ CARDS | COLECCIÓN PÚBLICA*
+━━━━━━━━━━━━━━
+🎴 *Miguel*
+
+⚪ *Panda Guerrero* · Nv. 3
+🔎 .ctuficha PAND-000001
+
+⚪ *Mago Carmesí* · Nv. 1
+🔎 .ctuficha MAGC-000001
+
+🔵 *Monje Celestial* · Nv. 1
+🔎 .ctuficha MONJ-000001
+
+📄 *Página 1 de 1*
+```
+
+## Showcase: favorito, rareza, antigüedad y victorias
+
+```text
+🃏 *CHENGDÚ CARDS | SHOWCASE*
+━━━━━━━━━━━━━━
+🌟 *Miguel*
+
+❤️ Favorito: *Panda Guerrero* · Nv. 3
+
+💎 Más rara
+🔵 *Monje Celestial* · Nv. 1
+🏆 0 victorias
+
+🌱 Primera unidad
+⚪ *Panda Guerrero* · Nv. 3
+🏆 12 victorias
+
+🏆 Más victorias
+⚪ *Panda Guerrero* · Nv. 3
+🏆 12 victorias
+
+✍️ .ctusocial ayuda
+```
+
+## Comparar unidades sin entrar en combate
+
+```text
+🃏 *CHENGDÚ CARDS | COMPARAR*
+━━━━━━━━━━━━━━
+⚪ *Panda Guerrero* · Nv. 3
+Común · PAND-000001
+❤️ Vida: 124
+⚔️ Ataque: 25
+🛡️ Defensa: 23
+💨 Velocidad: 8
+
+⚪ *Lobo Sombrío* · Nv. 2
+Común · LOBO-000001
+❤️ Vida: 97
+⚔️ Ataque: 27
+🛡️ Defensa: 17
+💨 Velocidad: 16
+
+🔎 Ataques: .ctuficha ID
+```
+
+## Crafting: materiales disponibles y recetas copiables
+
+```text
+🃏 *CHENGDÚ CARDS | CRAFTING*
+━━━━━━━━━━━━━━
+🪵 0 fragmentos · ✨ 0 esencias · 🔮 0 sellos
+
+🎁 17 recompensas con materiales pendientes
+👉 .ctucrafting reclamar
+
+🔨 *Sello de evolución*
+💰 100 ChengCoins
+🧩 5 fragmentos · 2 esencias
+👉 .ctucrafting crear sello_evolucion
+
+🔨 *Insignia de bambú*
+💰 50 ChengCoins
+🧩 3 fragmentos
+👉 .ctucrafting crear insignia_bambu
+
+🎒 .ctuinventario
+🔮 Evolución: .ctuevolucion ID
+```
+
+## Crafting: recoger materiales de premios auténticos
+
+```text
+🃏 *CHENGDÚ CARDS | MATERIALES*
+━━━━━━━━━━━━━━
+🎒 ¡Materiales recogidos!
+
+🪵 36 fragmentos · ✨ 3 esencias · 🔮 0 sellos
+
+🔨 .ctucrafting
+```
+
+## Crafting: insignia cosmética permanente
+
+```text
+🃏 *CHENGDÚ CARDS | CRAFTING*
+━━━━━━━━━━━━━━
+🔨 ¡Creación completada!
+insignia＿bambu
+
+🪵 33 fragmentos · ✨ 3 esencias · 🔮 0 sellos
+
+💰 Coste: 50 ChengCoins
+
+🔮 .ctuevolucion ID
+🎒 .ctuinventario
+```
+
+## Crafting: preparar un sello de evolución
+
+```text
+🃏 *CHENGDÚ CARDS | CRAFTING*
+━━━━━━━━━━━━━━
+🔨 ¡Creación completada!
+sello＿evolucion
+
+🪵 28 fragmentos · ✨ 1 esencias · 🔮 1 sellos
+
+💰 Coste: 100 ChengCoins
+
+🔮 .ctuevolucion ID
+🎒 .ctuinventario
+```
+
+## Evolución: requisitos, coste e identidad conservada
+
+```text
+🃏 *CHENGDÚ CARDS | EVOLUCIÓN*
+━━━━━━━━━━━━━━
+🔮 *Panda Maestro*
+🎴 PAND-000001 · Nv. 3
+
+📋 Requisitos: nivel 10 · 300 ChengCoins · 1 sello
+💰 Tienes 2543 · 🔮 1 sellos
+
+🌱 Completa los requisitos y libera la unidad si está reservada.
+
+🔨 Sello: .ctucrafting
+🔎 .ctuficha PAND-000001
+```
+
+## Obtención: premios pendientes y código de bienvenida limitado
+
+```text
+🃏 *CHENGDÚ CARDS | RECOMPENSAS*
+━━━━━━━━━━━━━━
+⚔️ Victorias PvP · 11 pendientes
+🎲 10% de personaje
+👉 .cturecompensas pvp
+
+📋 Misiones · 0 pendientes
+🎲 10% de personaje
+
+🏅 Logros · 1 pendientes
+🎲 20% de personaje
+👉 .cturecompensas logro
+
+👹 Jefes · 1 pendientes
+🎲 10% de personaje
+👉 .cturecompensas boss
+
+🏮 Eventos · 1 pendientes
+🎲 10% de personaje
+👉 .cturecompensas evento
+
+🏆 Podio de temporada · 1 pendientes
+🎲 100% de personaje
+👉 .cturecompensas ranking
+
+🎁 Bienvenida: .cturecompensas codigo CHENGDU
+📦 20 canjes disponibles
+
+🎲 Cada premio ganado permite un intento. Los reintentos del mismo mensaje no generan otra tirada.
+🏮 Los personajes exclusivos requieren su evento activo.
+
+🎴 .ctupersonajes
+```
+
+## Promoción: un personaje común con supply real
+
+```text
+🃏 *CHENGDÚ CARDS | RECOMPENSA*
+━━━━━━━━━━━━━━
+🎴 ¡Obtuviste *Panda Guerrero*!
+🔎 PAND-000002
+
+👉 .ctuficha PAND-000002
+```
+
+## Promoción: reintentar conserva la misma unidad
+
+```text
+🃏 *CHENGDÚ CARDS | RECOMPENSA*
+━━━━━━━━━━━━━━
+🎴 ¡Obtuviste *Panda Guerrero*!
+🔎 PAND-000002
+
+📨 Este intento ya fue procesado.
+
+👉 .ctuficha PAND-000002
+```
+
+## Premio del podio: personaje directo además de monedas y título
+
+```text
+🃏 *CHENGDÚ CARDS | RECOMPENSA*
+━━━━━━━━━━━━━━
+🎴 ¡Obtuviste *Panda Guerrero*!
+🔎 PAND-000003
+
+👉 .ctuficha PAND-000003
+```
+
+## Intercambio: dos ofertas y siguientes pasos cortos
+
+```text
+🃏 *CHENGDÚ CARDS | INTERCAMBIO*
+━━━━━━━━━━━━━━
+🤝 *Miguel ↔ Lukas* · I1
+📝 Propuesta editable
+
+👤 *Miguel*
+💰 0 ChengCoins
+🎴 Sin unidades
+⏳ Sin confirmar
+
+👤 *Lukas*
+💰 0 ChengCoins
+🎴 Sin unidades
+⏳ Sin confirmar
+
+📝 .ctuintercambio oferta I1 100 ID1
+✅ .ctuintercambio confirmar I1
+↩️ .ctuintercambio cancelar I1
+⏳ Vence en 15 min. Revisen ambas ofertas antes de confirmar.
+```
+
+## Intercambio: ofrecer monedas
+
+```text
+🃏 *CHENGDÚ CARDS | INTERCAMBIO*
+━━━━━━━━━━━━━━
+🤝 *Miguel ↔ Lukas* · I1
+📝 Propuesta editable
+
+👤 *Miguel*
+💰 10 ChengCoins
+🎴 Sin unidades
+⏳ Sin confirmar
+
+👤 *Lukas*
+💰 0 ChengCoins
+🎴 Sin unidades
+⏳ Sin confirmar
+
+📝 .ctuintercambio oferta I1 100 ID1
+✅ .ctuintercambio confirmar I1
+↩️ .ctuintercambio cancelar I1
+⏳ Vence en 15 min. Revisen ambas ofertas antes de confirmar.
+```
+
+## Intercambio: revisar ambas ofertas
+
+```text
+🃏 *CHENGDÚ CARDS | INTERCAMBIO*
+━━━━━━━━━━━━━━
+🤝 *Miguel ↔ Lukas* · I1
+📝 Propuesta editable
+
+👤 *Miguel*
+💰 10 ChengCoins
+🎴 Sin unidades
+⏳ Sin confirmar
+
+👤 *Lukas*
+💰 20 ChengCoins
+🎴 Sin unidades
+⏳ Sin confirmar
+
+📝 .ctuintercambio oferta I1 100 ID1
+✅ .ctuintercambio confirmar I1
+↩️ .ctuintercambio cancelar I1
+⏳ Vence en 15 min. Revisen ambas ofertas antes de confirmar.
+```
+
+## Intercambio: primera confirmación reserva ambos saldos
+
+```text
+🃏 *CHENGDÚ CARDS | INTERCAMBIO*
+━━━━━━━━━━━━━━
+🤝 *Miguel ↔ Lukas* · I1
+🔒 Ofertas congeladas; bienes reservados
+
+👤 *Miguel*
+💰 10 ChengCoins
+🎴 Sin unidades
+✅ Confirmó
+
+👤 *Lukas*
+💰 20 ChengCoins
+🎴 Sin unidades
+⏳ Sin confirmar
+
+📝 .ctuintercambio oferta I1 100 ID1
+✅ .ctuintercambio confirmar I1
+↩️ .ctuintercambio cancelar I1
+⏳ Vence en 15 min. Revisen ambas ofertas antes de confirmar.
+```
+
+## Intercambio: segunda confirmación completa todo
+
+```text
+🃏 *CHENGDÚ CARDS | INTERCAMBIO*
+━━━━━━━━━━━━━━
+🤝 *Miguel ↔ Lukas* · I1
+✅ Intercambio completado
+
+👤 *Miguel*
+💰 10 ChengCoins
+🎴 Sin unidades
+✅ Confirmó
+
+👤 *Lukas*
+💰 20 ChengCoins
+🎴 Sin unidades
+✅ Confirmó
+
+👉 .ctuintercambio mios
+```
+
+## Intercambio: historial con códigos I1
+
+```text
+🃏 *CHENGDÚ CARDS | TUS INTERCAMBIOS*
+━━━━━━━━━━━━━━
+🤝 Miguel ↔ Lukas · completed
+👉 .ctuintercambio ver I1
+
+📄 *Página 1 de 1*
+📨 .ctuintercambio crear @jugador
+```
+
+## Clan: fundación, miembros y tesorería
+
+```text
+🃏 *CHENGDÚ CARDS | CLAN*
+━━━━━━━━━━━━━━
+🏯 *[BAM] Casa del Bambú* · C1
+👥 1/15 miembros · 💰 0 en tesorería
+
+👑 Líder · Miguel
+
+0 victorias · 0 derrotas · 0 empates
+
+💰 Aportar: .ctuclan depositar 100
+📨 Invitar: .ctuclan invitar @jugador
+📖 Opciones: .ctuclan ayuda
+```
+
+## Clan: una segunda casa en Chengdú
+
+```text
+🃏 *CHENGDÚ CARDS | CLAN*
+━━━━━━━━━━━━━━
+🏯 *[LUNA] Casa Lunar* · C2
+👥 1/15 miembros · 💰 0 en tesorería
+
+👑 Líder · Lukas
+
+0 victorias · 0 derrotas · 0 empates
+
+💰 Aportar: .ctuclan depositar 100
+📨 Invitar: .ctuclan invitar @jugador
+📖 Opciones: .ctuclan ayuda
+```
+
+## Clan: aporte con recibo y saldo real
+
+```text
+🃏 *CHENGDÚ CARDS | CLAN*
+━━━━━━━━━━━━━━
+✅ Aportaste 100 ChengCoins.
+
+🏯 *[BAM] Casa del Bambú* · C1
+👥 3/15 miembros · 💰 100 en tesorería
+
+👑 Líder · Miguel
+🎴 Miembro · Compañero 1
+🎴 Miembro · Compañero 2
+
+0 victorias · 0 derrotas · 0 empates
+
+💰 Aportar: .ctuclan depositar 100
+📨 Invitar: .ctuclan invitar @jugador
+📖 Opciones: .ctuclan ayuda
+```
+
+## Clan: nombrar oficial
+
+```text
+🃏 *CHENGDÚ CARDS | CLAN*
+━━━━━━━━━━━━━━
+🛡️ Rol actualizado.
+
+🏯 *[BAM] Casa del Bambú* · C1
+👥 3/15 miembros · 💰 100 en tesorería
+
+👑 Líder · Miguel
+🛡️ Oficial · Compañero 1
+🎴 Miembro · Compañero 2
+
+0 victorias · 0 derrotas · 0 empates
+
+💰 Aportar: .ctuclan depositar 100
+📨 Invitar: .ctuclan invitar @jugador
+📖 Opciones: .ctuclan ayuda
+```
+
+## Clanes: clasificación de temporada y códigos C1
+
+```text
+🃏 *CHENGDÚ CARDS | CLANES | CLASIFICACIÓN*
+━━━━━━━━━━━━━━
+🏅 Puntos de la temporada T2: victoria 3 · empate 1
+
+🏯 *[LUNA] Casa Lunar*
+🏅 0 puntos · 👥 3/15
+👉 .ctuclan ver C2
+
+🏯 *[BAM] Casa del Bambú*
+🏅 0 puntos · 👥 3/15
+👉 .ctuclan ver C1
+
+📄 *Página 1 de 1*
+```
+
+## Guerra: invitación, entrada y plazo de respuesta
+
+```text
+🃏 *CHENGDÚ CARDS | GUERRA DE CLANES*
+━━━━━━━━━━━━━━
+⚔️ *Casa del Bambú vs Casa Lunar* · G1
+📨 Desafío pendiente · marcador *0–0*
+
+👥 Se fijarán 3 jugadores por clan.
+💰 Entrada: 100 de cada tesorería.
+⏳ Aceptar antes de 30 minutos.
+
+✅ .ctuclan aceptar G1
+❌ .ctuclan rechazar G1
+```
+
+## Guerra: plantillas de tres y marcador inicial
+
+```text
+🃏 *CHENGDÚ CARDS | GUERRA DE CLANES*
+━━━━━━━━━━━━━━
+⚔️ *Casa del Bambú vs Casa Lunar* · G1
+⚔️ En curso · marcador *0–0*
+
+🛡️ *[BAM]*
+Miguel · Compañero 2 · Compañero 1
+
+🛡️ *[LUNA]*
+Lukas · Camila · Ana
+
+🎯 Primero en ganar 3 duelos, o mejor marcador al vencer 24 h.
+Cada pareja de jugadores cuenta una vez.
+
+👉 Desafía a un rival de la plantilla: .ctupelea @jugador
+📊 .ctuclan war G1
+```
+
+## Guerras: historial con código G1
+
+```text
+🃏 *CHENGDÚ CARDS | CLAN | GUERRAS*
+━━━━━━━━━━━━━━
+⚔️ Casa del Bambú vs Casa Lunar · 0–0
+👉 .ctuclan war G1
+
+📄 *Página 1 de 1*
+```
+
+## Tesorería: aportes y entradas auditables
+
+```text
+🃏 *CHENGDÚ CARDS | CLAN | TESORERÍA*
+━━━━━━━━━━━━━━
+💰 -100 de tesorería ChengCoins · Entrada de guerra
+🏦 Saldo: 0
+
+💰 100 de tesorería ChengCoins · Aporte
+🏦 Saldo: 100
+
+💰 -300 personales ChengCoins · Fundación
+🏦 Saldo: 0
+
+📄 *Página 1 de 1*
+```
+
+## Guerra: cierre por plazo sin premio personal para inactivos
+
+```text
+🃏 *CHENGDÚ CARDS | GUERRA DE CLANES*
+━━━━━━━━━━━━━━
+⚔️ *Casa del Bambú vs Casa Lunar* · G1
+🏁 Finalizada · marcador *0–0*
+
+🛡️ *[BAM]*
+Miguel · Compañero 2 · Compañero 1
+
+🛡️ *[LUNA]*
+Lukas · Camila · Ana
+
+🎁 Tesorería: victoria +500 · derrota +100 · empate +150.
+👤 Premio personal: victoria +150 · derrota +50 · empate +75, para quienes disputaron duelos válidos.
+
+📜 .ctuclan guerras
+```
+
+## Inventario ampliado: materiales, sellos e insignia artesanal
+
+```text
+🃏 *CHENGDÚ CARDS | INVENTARIO*
+━━━━━━━━━━━━━━
+👤 *Miguel*
+🎟️ *2 tickets de captura*
+
+🎖️ *Títulos*
+Primer filo · Plata de Chengdú · T1
+
+🏵️ *Insignias*
+⚔️
+
+🪵 28 fragmentos · ✨ 1 esencias · 🔮 1 sellos
+🔨 .ctucrafting
+
+🪵 Insignia: Artesano del Bambú
+
+🎟️ Cada captura usa un ticket. Consíguelos completando misiones, logros y eventos.
+
+📋 Misiones: .ctumisiones
+🏅 Logros: .ctulogros
+🎴 Aparición del grupo: .ctuspawn
 ```

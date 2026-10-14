@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
-import { V5_COLLECTIONS, validateDatabase } from '../storage/validation.js';
+import { SCHEMA_VERSION, V5_COLLECTIONS, validateDatabase } from '../storage/validation.js';
 import { readRecords, register, setup, stripBetaContentFixture } from './helpers.js';
 
 async function v5Fixture(t, version = 5) {
@@ -51,7 +51,7 @@ async function v5Fixture(t, version = 5) {
 test('schema 5 economy migration preserves every historical record and creates no retroactive daily awards', async t => {
   const c = await v5Fixture(t);
   const game = c.open().game;
-  assert.equal((await game.validateDatabase()).schemaVersion, 9);
+  assert.equal((await game.validateDatabase()).schemaVersion, SCHEMA_VERSION);
   for (const name of V5_COLLECTIONS) assert.deepEqual(readRecords(c.directory, name).slice(0, c.state[name].records.length), c.state[name].records);
   assert.deepEqual(readRecords(c.directory, 'diarios'), []);
   assert.equal((await game.economy.getBalance(c.a.id)).coins, 20);
@@ -89,7 +89,7 @@ for (const stage of ['prepared', 'committed', 'published:usuarios.json', 'publis
     await assert.rejects(failed.validateDatabase(), { code: 'STORAGE_WRITE_FAILED' });
     await failed.close();
     const game = c.open().game;
-    assert.equal((await game.validateDatabase()).schemaVersion, 9);
+    assert.equal((await game.validateDatabase()).schemaVersion, SCHEMA_VERSION);
     for (const name of V5_COLLECTIONS) assert.deepEqual(readRecords(c.directory, name).slice(0, c.state[name].records.length), c.state[name].records);
     assert.deepEqual(readRecords(c.directory, 'diarios'), []);
     assert.equal(fs.existsSync(path.join(c.directory, '_journal.json')), false);
@@ -109,7 +109,7 @@ for (const version of [4, 5]) for (const phase of ['prepared', 'committed']) {
     fs.writeFileSync(path.join(c.directory, '_journal.json'), JSON.stringify({ version: 1, phase, body, checksum }));
     if (phase === 'committed') fs.writeFileSync(path.join(c.directory, 'sobres.json'), after['sobres.json']);
     const game = c.open().game;
-    assert.equal((await game.validateDatabase()).schemaVersion, 9);
+    assert.equal((await game.validateDatabase()).schemaVersion, SCHEMA_VERSION);
     assert.equal(readRecords(c.directory, 'sobres')[0].name, phase === 'committed' ? 'Sobre Histórico' : c.state.sobres.records[0].name);
     for (const name of ['usuarios', 'recompensas', 'aperturas', 'economia', 'combates']) assert.deepEqual(readRecords(c.directory, name).slice(0, c.state[name].records.length), c.state[name].records);
     assert.deepEqual(readRecords(c.directory, 'diarios'), []);

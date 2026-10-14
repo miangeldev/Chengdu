@@ -14,6 +14,8 @@ import { migrateEconomyV6 } from './migrations/006-economy.js';
 import { migrateMarketV7 } from './migrations/007-market.js';
 import { migrateCombatV8 } from './migrations/008-combat.js';
 import { migrateContentV9 } from './migrations/009-content.js';
+import { migrateCommunityV11 } from './migrations/011-community.js';
+import { migrateCompetitiveV10 } from './migrations/010-competitive.js';
 import { seedCampaigns, seedEventAttacks, seedEventCharacters } from '../game/content/catalog.js';
 import { progressionBaseline } from '../game/progression/rules.js';
 import { seedAttacks } from '../game/battle/attacks.js';
@@ -187,7 +189,7 @@ export class JsonUnitOfWork {
         if (version < SCHEMA_VERSION) {
           let state = decode(raw, version);
           const migrations = [null, null, migrateBattlesV2, migrateProgressionV3, migrateCollectionV4,
-            migrateBalanceV5, migrateEconomyV6, migrateMarketV7, migrateCombatV8, migrateContentV9];
+            migrateBalanceV5, migrateEconomyV6, migrateMarketV7, migrateCombatV8, migrateContentV9, migrateCompetitiveV10, migrateCommunityV11];
           const now = this.clock();
           for (let next = version + 1; next <= SCHEMA_VERSION; next++) state = migrations[next](state, now);
           this.#commit(raw, state);
@@ -228,17 +230,20 @@ export class JsonUnitOfWork {
       const result = await work(createRepositories(draft, true));
       const copiedResult = structuredClone(result);
       validateDatabase(draft);
-      validateTransition(before, draft);
-      let changed = false;
-      for (const name of COLLECTIONS) {
-        if (JSON.stringify(before[name].records) !== JSON.stringify(draft[name].records)) {
-          const revision = before[name]._meta.revision + 1;
-          requireGame(Number.isSafeInteger(revision), 'NUMERIC_OVERFLOW');
-          draft[name]._meta = { schemaVersion: SCHEMA_VERSION, revision, updatedAt: this.clock() };
-          changed = true;
-        }
+      const changedCollections = COLLECTIONS.filter(name =>
+        JSON.stringify(before[name].records) !== JSON.stringify(draft[name].records));
+      // Read the injected storage clock after the operation so natural
+      // millisecond differences do not turn a valid receipt into a future one.
+      // The draft cannot supply or alter this trusted transition timestamp.
+      // Idempotent replays do not need a new clock reading or a new commit.
+      const now = changedCollections.length ? this.clock() : null;
+      validateTransition(before, draft, changedCollections.length ? { now } : {});
+      for (const name of changedCollections) {
+        const revision = before[name]._meta.revision + 1;
+        requireGame(Number.isSafeInteger(revision), 'NUMERIC_OVERFLOW');
+        draft[name]._meta = { schemaVersion: SCHEMA_VERSION, revision, updatedAt: now };
       }
-      if (changed) this.#commit(raw, draft);
+      if (changedCollections.length) this.#commit(raw, draft);
       return copiedResult;
     });
   }

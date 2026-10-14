@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
-import { V1_COLLECTIONS } from '../storage/validation.js';
+import { SCHEMA_VERSION, V1_COLLECTIONS } from '../storage/validation.js';
 import { balancedLegacyStats } from '../game/characters/balance.js';
 import { readRecords, register, setup, stripBetaContentFixture } from './helpers.js';
 
@@ -35,7 +35,7 @@ async function v1Fixture(t) {
 test('schema 1 upgrade preserves users, owned units, serials, claims, balances and teams', async t => {
   const c = await v1Fixture(t);
   const game = c.open().game;
-  assert.equal((await game.validateDatabase()).schemaVersion, 9);
+  assert.equal((await game.validateDatabase()).schemaVersion, SCHEMA_VERSION);
   assert.deepEqual(await game.users.getUser(c.user.id), c.user);
   assert.deepEqual(readRecords(c.directory, 'unidades')[0], c.unit);
   assert.equal((await game.users.getProfile(c.user.id)).starterClaim.unitId, c.unit.id);
@@ -58,7 +58,7 @@ for (const stage of ['prepared', 'committed', 'published:unidades.json', 'publis
     await assert.rejects(failing.validateDatabase(), { code: 'STORAGE_WRITE_FAILED' });
     await failing.close();
     const recovered = c.open().game;
-    assert.equal((await recovered.validateDatabase()).schemaVersion, 9);
+    assert.equal((await recovered.validateDatabase()).schemaVersion, SCHEMA_VERSION);
     assert.deepEqual(await recovered.users.getUser(c.user.id), c.user);
     assert.deepEqual(readRecords(c.directory, 'unidades')[0], c.unit);
     assert.equal((await recovered.starter.claimStarter({ userId: c.user.id, choice: 'mago' })).unit.id, c.unit.id);
@@ -79,7 +79,7 @@ for (const phase of ['prepared', 'committed']) {
     if (phase === 'committed') fs.writeFileSync(path.join(c.directory, 'usuarios.json'), after['usuarios.json']);
     const game = c.open().game;
     const report = await game.validateDatabase();
-    assert.equal(report.schemaVersion, 9);
+    assert.equal(report.schemaVersion, SCHEMA_VERSION);
     assert.equal(report.users, phase === 'committed' ? 2 : 1);
     assert.equal((await game.units.getUnit(c.unit.id)).ownerId, c.user.id);
     assert.equal(fs.existsSync(path.join(c.directory, '_journal.json')), false);

@@ -1,3 +1,6 @@
+import { effectiveUnitStats, evolutionSnapshot, displayUnitCharacterName } from '../evolution/rules.js';
+import { clanWarForBattle, expireClanWars } from '../clans/lifecycle.js';
+import { expireTrades } from '../trades/lifecycle.js';
 import { randomInt, randomUUID } from 'node:crypto';
 import { requireGame } from '../../utils/GameError.js';
 import { BATTLE_IDLE_MS, CHALLENGE_TTL_MS, deadline, firstPlayer, resolveAttack, selectedAttack } from './engine.js';
@@ -9,10 +12,13 @@ import { dailyTimestamp } from '../economy/dailyPolicy.js';
 import { effectiveStats } from '../progression/rules.js';
 import { ADVANCED_REWARD_VERSION, REWARD_VERSION } from '../rewards/battlePolicy.js';
 import { paginate } from '../../utils/pagination.js';
+import { prepareCompetitiveChallenge } from '../competitive/lifecycle.js';
 
 async function expireGameLocks(repos, now) {
+  await expireClanWars(repos, now);
   const battles = await expireBattles(repos, now);
   await expireListings(repos, now);
+    await expireTrades(repos, now);
   return battles;
 }
 
@@ -72,10 +78,10 @@ async function snapshotFor(repos, unit, advanced) {
   const character = await repos.characters.get(unit.characterId);
   const definitions = await Promise.all(character.attackIds.map(id => repos.attacks.get(id)));
   requireGame(definitions.length === 2 && definitions.every(Boolean), 'DATABASE_CORRUPT');
-  const stats = effectiveStats(unit.initialStats, unit.progress.level, unit.statGrowthVersion, unit.traits, unit.traitVersion, unit.combatBaseStats);
+  const stats = effectiveUnitStats(unit);
   return {
     id: unit.id, characterId: unit.characterId, characterRevision: character.revision,
-    characterName: character.name, serial: unit.serial, level: unit.progress.level, ownershipVersion: unit.ownershipVersion,
+    characterName: displayUnitCharacterName(unit, character), evolution: evolutionSnapshot(unit), serial: unit.serial, level: unit.progress.level, ownershipVersion: unit.ownershipVersion,
     statsVersion: unit.statGrowthVersion, traitVersion: unit.traitVersion, traits: [...unit.traits], variant: unit.variant,
     combatBaseStats: structuredClone(unit.combatBaseStats), stats, hp: stats.hp,
     attacks: advanced ? definitions.map(advancedAttack) : definitions,
@@ -106,9 +112,11 @@ async function replayAction(repos, { userId, chatId, battleId, operationKey }, t
 
 export function createBattleService(storage, clock, randomRoll = () => randomInt(100)) {
   return {
-    async challenge({ userId, opponentId, chatId, operationKey = null, mode = 'classic' }) {
+    async challenge({ userId, opponentId, chatId, operationKey = null, ranked = false, mode = ranked ? 'auto' : 'classic' }) {
       checkKey(operationKey);
+      requireGame(typeof ranked === 'boolean', 'INVALID_RANKED_MODE');
       const selectedMode = normalizeMode(mode);
+      requireGame(!ranked || selectedMode !== 'classic', 'RANKED_ADVANCED_ONLY');
       requireGame(typeof chatId === 'string' && chatId.length > 0 && chatId.length <= 200, 'INVALID_ARENA');
       requireGame(userId !== opponentId, 'SELF_CHALLENGE');
       return storage.withTransaction(async repos => {
@@ -116,7 +124,7 @@ export function createBattleService(storage, clock, randomRoll = () => randomInt
           const previous = await repos.battles.find(b => b.challengeKey === operationKey);
           if (previous) {
             requireGame(previous.chatId === chatId && previous.players[0].userId === userId && previous.players[1].userId === opponentId &&
-              (previous.mode ?? 'classic') === selectedMode, 'OPERATION_CONFLICT');
+              (previous.mode ?? 'classic') === selectedMode && Boolean(previous.competitive) === ranked, 'OPERATION_CONFLICT');
             return { battle: previous, duplicate: true };
           }
         }
@@ -138,14 +146,19 @@ export function createBattleService(storage, clock, randomRoll = () => randomInt
         }
         const teamSize = advanced ? selectedMode === 'auto' ? sizes[0] : Number(selectedMode[0]) : 1;
         if (advanced) requireGame(sizes[0] === sizes[1] && sizes[0] === teamSize, 'TEAM_SIZE_MISMATCH', { teamSize, sizes });
+        const competitive = ranked ? await prepareCompetitiveChallenge(repos, now, { userIds: [userId, opponentId] }) : null;
+        const clanWar = await clanWarForBattle(repos, userId, opponentId, advanced, now);
         const battle = {
           id: `BTL-${randomUUID()}`, rulesVersion: advanced ? 2 : 1, status: 'pending', chatId, players,
           turnUserId: null, turnNumber: 0, actions: [],
           createdAt: now, updatedAt: now, expiresAt: deadline(now, CHALLENGE_TTL_MS),
           acceptedAt: null, finishedAt: null, winnerId: null, finishReason: null,
           challengeKey: operationKey, acceptKey: null, rewardVersion: advanced ? ADVANCED_REWARD_VERSION : REWARD_VERSION, settlement: null,
-          ...(advanced ? { mode: selectedMode, format: `${teamSize}v${teamSize}`, teamSize, openingEvents: [] } : {})
+          ...(advanced ? { mode: selectedMode, format: `${teamSize}v${teamSize}`, teamSize, openingEvents: [] } : {}),
+          ...(competitive ? { competitive } : {}),
+          ...(clanWar ? { clanWar } : {})
         };
+        if (competitive && Date.parse(battle.expiresAt) > Date.parse(competitive.endsAt)) battle.expiresAt = competitive.endsAt;
         await repos.battles.insert(battle);
         return { battle, duplicate: false };
       });
@@ -186,6 +199,7 @@ export function createBattleService(storage, clock, randomRoll = () => randomInt
         battle.acceptedAt = now;
         battle.updatedAt = now;
         battle.expiresAt = deadline(now, BATTLE_IDLE_MS);
+        if (battle.competitive && Date.parse(battle.expiresAt) > Date.parse(battle.competitive.endsAt)) battle.expiresAt = battle.competitive.endsAt;
         battle.turnNumber = 1;
         if (battle.rulesVersion === 2) battle = initializeAdvancedBattle(battle);
         else battle.turnUserId = firstPlayer(battle.players);
@@ -213,6 +227,7 @@ export function createBattleService(storage, clock, randomRoll = () => randomInt
         const result = previous.rulesVersion === 2
           ? resolveAdvancedAction(previous, { userId, type: 'attack', choice, operationKey, now, roll: randomRoll() })
           : resolveAttack(previous, { userId, choice, operationKey, now, roll: randomRoll() });
+        if (result.battle.competitive && result.battle.status === 'active' && Date.parse(result.battle.expiresAt) > Date.parse(result.battle.competitive.endsAt)) result.battle.expiresAt = result.battle.competitive.endsAt;
         if (result.battle.status === 'finished') await settleBattle(repos, result.battle, now);
         else await repos.battles.replace(result.battle);
         return { ...result, duplicate: false };
@@ -235,6 +250,7 @@ export function createBattleService(storage, clock, randomRoll = () => randomInt
         requireGame(previous.rulesVersion === 2, 'ADVANCED_BATTLE_REQUIRED');
         advancedClock(previous, now);
         const result = resolveAdvancedAction(previous, { userId, type: 'switch', choice, operationKey, now, roll: null });
+        if (result.battle.competitive && result.battle.status === 'active' && Date.parse(result.battle.expiresAt) > Date.parse(result.battle.competitive.endsAt)) result.battle.expiresAt = result.battle.competitive.endsAt;
         if (result.battle.status === 'finished') await settleBattle(repos, result.battle, now);
         else await repos.battles.replace(result.battle);
         return { ...result, duplicate: false };

@@ -1,3 +1,5 @@
+import { validateEvolutionSnapshot } from './evolutionSnapshot.js';
+import { effectiveUnitStats, evolvedStats, evolutionSnapshot, displayUnitCharacterName } from '../game/evolution/rules.js';
 import { requireGame } from '../utils/GameError.js';
 import { effectiveStats, safeAdd } from '../game/progression/rules.js';
 import { MARKET_POLICY_VERSION, marketPolicy, marketExpiresAt, quoteMarket } from '../game/market/policy.js';
@@ -13,10 +15,10 @@ const date = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{
 
 function snapshot(unit, character) {
   return { id: unit.id, characterId: unit.characterId, characterRevision: unit.characterRevision,
-    characterName: character.name, rarity: character.rarity, role: character.role, serial: unit.serial,
+    characterName: displayUnitCharacterName(unit, character), evolution: evolutionSnapshot(unit), rarity: character.rarity, role: character.role, serial: unit.serial,
     ownershipVersion: unit.ownershipVersion, level: unit.progress.level, progress: structuredClone(unit.progress),
     traits: unit.traits, variant: unit.variant, traitVersion: unit.traitVersion,
-    stats: effectiveStats(unit.initialStats, unit.progress.level, unit.statGrowthVersion, unit.traits, unit.traitVersion, unit.combatBaseStats) };
+    stats: effectiveUnitStats(unit) };
 }
 
 function sameSnapshot(actual, expected) {
@@ -26,11 +28,12 @@ function sameSnapshot(actual, expected) {
 
 function expiredLock(before, after, unit, at) {
   if (unit.lock === null) return true;
-  const market = unit.lock?.type === 'market';
-  const old = (market ? before.mercado.records : before.combates.records).find(r => r.id === unit.lock?.referenceId);
-  const closed = (market ? after.mercado.records : after.combates.records).find(r => r.id === old?.id);
-  return old?.status === 'active' && closed?.status === 'expired' && Date.parse(old.expiresAt) <= Date.parse(at) &&
-    (market ? closed.closedAt : closed.finishedAt) === at;
+  const market = unit.lock?.type === 'market', trade = unit.lock?.type === 'trade';
+  const name = market ? 'mercado' : trade ? 'intercambios' : 'combates';
+  const old = before[name].records.find(r => r.id === unit.lock?.referenceId);
+  const closed = after[name].records.find(r => r.id === old?.id);
+  return old?.status === (trade ? 'locked' : 'active') && closed?.status === 'expired' && Date.parse(old.expiresAt) <= Date.parse(at) &&
+    (market || trade ? closed.closedAt : closed.finishedAt) === at;
 }
 
 function validNextLock(after, unit, closedAt) {
@@ -38,6 +41,10 @@ function validNextLock(after, unit, closedAt) {
   if (unit?.lock?.type === 'market') {
     const next = after.mercado.records.find(l => l.id === unit.lock.referenceId);
     return next?.status === 'active' && next.unitId === unit.id && next.createdAt === closedAt;
+  }
+  if (unit?.lock?.type === 'trade') {
+    const next = after.intercambios.records.find(t => t.id === unit.lock.referenceId);
+    return next?.status === 'locked' && next.updatedAt === closedAt && next.reservations.some(r => r.unitId === unit.id);
   }
   if (unit?.lock?.type === 'battle') {
     const next = after.combates.records.find(b => b.id === unit.lock.referenceId);
@@ -68,12 +75,13 @@ export function validateMarketData(state) {
     check(['active', 'sold', 'cancelled', 'expired'].includes(listing.status), 'listing.status');
     const unit = units.get(listing.unitId);
     const s = listing.unitSnapshot;
+    validateEvolutionSnapshot(state, s, listing.createdAt);
     check(s && s.id === unit.id && s.characterId === unit.characterId && s.characterRevision === unit.characterRevision &&
       s.serial === unit.serial && s.ownershipVersion === listing.ownershipVersion && text(s.characterName) && text(s.role) &&
       ['common', 'rare', 'epic', 'legendary', 'mythic'].includes(s.rarity) && integer(s.level, 1) && s.level === s.progress?.level &&
       integer(s.progress.xp) && s.level <= unit.progress.level && (s.level !== unit.progress.level || s.progress.xp <= unit.progress.xp) &&
       equal(s.traits, unit.traits) && s.variant === unit.variant && s.traitVersion === unit.traitVersion &&
-      equal(s.stats, effectiveStats(unit.initialStats, s.level, unit.statGrowthVersion, unit.traits, unit.traitVersion, unit.combatBaseStats)), 'listing.snapshot');
+      equal(s.stats, evolvedStats(effectiveStats(unit.initialStats, s.level, unit.statGrowthVersion, unit.traits, unit.traitVersion, unit.combatBaseStats), s.evolution, unit.characterId)), 'listing.snapshot');
     check(ownershipAt(state, listing.unitId, listing.ownershipVersion) === listing.sellerId, 'listing.historicalOwner');
     const acquisition = state.eventos.records.find(event => event.unitId === listing.unitId &&
       (listing.ownershipVersion === 0 ? event.type === 'unit_created' :

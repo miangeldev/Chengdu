@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { GameError, requireGame } from '../../utils/GameError.js';
-import { defineCommand } from './command.js';
+import { competitiveOperationKey, defineCommand } from './command.js';
 import { card } from './format.js';
 import { renderBattle } from './battleFormat.js';
 
@@ -15,19 +15,23 @@ export function defineBattleCommand(command, kind) {
     const user = await game.users.getUserByIdentity(identity());
     const request = { userId: user.id, chatId: context.chatId, operationKey: operationKey(kind, context, user.id) };
     let result;
-    if (kind === 'challenge') {
-      requireGame(args.length >= 1 && args.length <= 2, 'INVALID_OPPONENT');
+    if (kind === 'challenge' || kind === 'ranked') {
+      const invalidOpponent = kind === 'ranked' ? 'RANKED_INVALID_OPPONENT' : 'INVALID_OPPONENT';
+      requireGame(args.length >= 1 && args.length <= 2, invalidOpponent);
       let opponent;
       if (Array.isArray(context.mentions) && context.mentions.length === 1) {
         try { opponent = await game.users.getUserByIdentity({ provider: 'whatsapp', subject: context.mentions[0] }); }
         catch (error) { if (error.code === 'USER_NOT_FOUND') throw new GameError('OPPONENT_NOT_REGISTERED'); throw error; }
       } else {
-        requireGame(Array.isArray(context.mentions) && context.mentions.length === 0 && args[0].startsWith('USR-'), 'INVALID_OPPONENT');
+        requireGame(Array.isArray(context.mentions) && context.mentions.length === 0 && args[0].startsWith('USR-'), invalidOpponent);
         opponent = await game.users.getUser(args[0]);
       }
       const mode = args[1]?.toLowerCase() ?? 'auto';
+      if (kind === 'ranked') requireGame(['auto', 'advanced', 'avanzado', '1v1', '2v2', '3v3'].includes(mode), 'RANKED_ADVANCED_REQUIRED');
       requireGame(['auto', 'advanced', 'avanzado', 'classic', 'clasico', 'clásico', '1v1', '2v2', '3v3'].includes(mode), 'INVALID_BATTLE_MODE');
-      result = await game.battle.challenge({ ...request, opponentId: opponent.id, mode: mode === 'clásico' ? 'classic' : mode });
+      if (kind === 'ranked') request.operationKey = competitiveOperationKey('challenge', context, user.id);
+      result = await game.battle.challenge({ ...request, opponentId: opponent.id, mode: mode === 'clásico' ? 'classic' : mode,
+        ...(kind === 'ranked' ? { ranked: true } : {}) });
     } else if (kind === 'attack') {
       requireGame(args.length === 1 && ['1', '2'].includes(args[0]), 'INVALID_ATTACK');
       result = await game.battle.attack({ ...request, choice: args[0] });

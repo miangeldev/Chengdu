@@ -2909,6 +2909,59 @@ Resultado:
 
 > Existe endgame competitivo.
 
+Estado implementado: **Beta 0.9**, versión `0.9.0`, esquema de datos **10**.
+Las fases 0.1–0.8 siguen integradas, incluida la espera mínima de una hora entre
+apariciones. Los desafíos competitivos usan las reglas avanzadas 1v1/2v2/3v3,
+Elo con K=32, seis rangos, colocación de cinco partidas y tres rivales,
+clasificación global y temporadas consecutivas de 30 días. Los combates
+casuales mantienen sus reglas y los resultados históricos no se convierten.
+
+Se conservan posiciones al cerrar la temporada, se reinicia únicamente el rating
+competitivo y se reclaman una vez los ChengCoins y el título conmemorativo.
+Hay límites por pareja, penalizaciones por abandono e inactividad, resultados
+atómicos, deduplicación, replay de Elo y validación del reloj de almacenamiento.
+El cierre de calendario vence los combates abiertos sin penalizar a nadie.
+
+La [planificación con ocho hitos completados](docs/plan-beta-0.9.md) y
+la [guía del competitivo](docs/beta-0.9.md) documentan alcance y reglas.
+Verificación: **543 pruebas**, **153 ejemplos de WhatsApp**, **46 comandos**.
+La migración real 9→10 conserva exactamente los registros de las veinte
+colecciones anteriores, con respaldo y cuatro colecciones nuevas vacías,
+sin jugadores de prueba ni journal pendiente. La sesión de WhatsApp continúa
+integrándose desde el bot anfitrión.
+
+---
+
+## Comunidad 0.10 — Fase 32 y cierre de requisitos anteriores
+
+Estado implementado: versión `0.10.0`, esquema de datos **11**. Se revisó el
+documento completo y se registró el estado inicial en la
+[auditoría de fases 0–32](docs/auditoria-fases-0-32.md).
+
+La fase 32 incluye roles, miembros, invitaciones, permisos, tesorería con aportes
+y retiros, ranking de temporada, guerras con plantillas fijas, premios de
+participación y moderación. Clanes C1, guerras G1 y páginas numéricas mantienen
+la interfaz breve y las acciones copiables.
+
+Se completan también los huecos funcionales detectados: fase 13, personajes
+directos de premios y promoción limitada; fase 15, intercambios bilaterales con
+doble confirmación y escrow; fase 29, materiales y recetas; fase 30, evoluciones
+versionadas sin cambiar identidad; fase 31, perfiles/colecciones públicas,
+showcase, favoritos, títulos y comparación. La propiedad histórica distingue
+mercado de intercambio. Se mantienen supply por rareza y una hora mínima entre
+apariciones.
+
+Las [reglas y comandos](docs/fases-13-32.md) y el
+[plan de entrega](docs/plan-fases-13-32.md) describen alcance, datos e invariantes.
+Verificación: **683 pruebas**, **188 ejemplos de WhatsApp**, **53 comandos**.
+La migración local 10→11 conserva exactamente los 44 registros de las 24
+colecciones previas, con backup y once colecciones nuevas vacías, sin jugadores
+de prueba ni journal pendiente.
+
+Las recomendaciones de fases 33–36 y V1.0 permanecen visibles en el roadmap;
+la entrega no pretende sustituir telemetría de producción ni una prueba del
+bot conectado a WhatsApp real.
+
 ---
 
 ## V1.0

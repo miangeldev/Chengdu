@@ -1,3 +1,9 @@
+import { createAcquisitionService } from './acquisition/acquisitionService.js';
+import { createClanService } from './clans/clanService.js';
+import { createSocialService } from './social/socialService.js';
+import { createEvolutionService } from './evolution/evolutionService.js';
+import { createCraftingService } from './crafting/craftingService.js';
+import { createTradeService } from './trades/tradeService.js';
 import { JsonUnitOfWork } from '../storage/unitOfWork.js';
 import { createUserService } from './users/userService.js';
 import { createCharacterService } from './characters/characterService.js';
@@ -10,6 +16,7 @@ import { createPackService } from './packs/packService.js';
 import { createMarketService } from './market/marketService.js';
 import { createContentService } from './content/contentService.js';
 import { createEncounterService } from './content/encounterService.js';
+import { createCompetitiveService } from './competitive/competitiveService.js';
 
 export function createGame(options = {}) {
   const storage = options.storage ?? new JsonUnitOfWork(options);
@@ -26,6 +33,13 @@ export function createGame(options = {}) {
     market: createMarketService(storage, clock),
     content: createContentService(storage, clock),
     encounters: createEncounterService(storage, clock, options.randomDropInt),
+    competitive: createCompetitiveService(storage, clock),
+    trades: createTradeService(storage, clock),
+    crafting: createCraftingService(storage, clock),
+    evolution: createEvolutionService(storage, clock),
+    social: createSocialService(storage, clock),
+    clans: createClanService(storage, clock),
+    acquisition: createAcquisitionService(storage, clock, options.randomDropInt),
     validateDatabase: () => storage.validateDatabase(),
     close: () => storage.close()
   };

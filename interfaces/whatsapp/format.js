@@ -15,7 +15,7 @@ export const characterIcon = id => ({ panda_guerrero: '🐼', mago_carmesi: '�
 export const statsText = stats => `❤️ Vida: ${stats.hp}\n⚔️ Ataque: ${stats.attack}\n🛡️ Defensa: ${stats.defense}\n💨 Velocidad: ${stats.speed}`;
 export const serialText = serial => String(serial).padStart(4, '0');
 export const dateText = date => date ? new Date(date).toLocaleDateString('es-MX', { timeZone: 'America/Mexico_City', day: 'numeric', month: 'long', year: 'numeric' }) : 'Fecha no registrada';
-export const unitTitle = unit => `${characterIcon(unit.characterId)} *${displayName(unit.character.name)}*`;
+export const unitTitle = unit => `${characterIcon(unit.characterId)} *${displayName(unit.characterName ?? unit.character.name)}*`;
 export function progressText(progress, kind) {
   const next = xpToNextLevel(progress, kind);
   return `Nivel ${progress.level} · ✨ ${next === null ? `${progress.xp} XP acumulada · Nivel máximo` : `${progress.xp}/${next} XP`}`;

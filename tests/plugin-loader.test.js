@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { SCHEMA_VERSION } from '../storage/validation.js';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -81,6 +82,13 @@ test('direct plugin run exports share one database and complete the game flow', 
     await run('ctuaceptar', bob);
     await run('ctucambiar', bob, ['2']);
     await run('cturendirse', alice);
+    await run('cturank');
+    await run('ctutop');
+    await run('ctutemporada');
+    await run('ctutemporadas');
+    await run('cturanked', alice, ['@Bob', '2v2'], [bob]);
+    await run('ctuaceptar', bob);
+    await run('cturendirse', alice);
     await run('ctumisiones');
     await run('ctulogros');
     await run('ctuinventario');
@@ -94,10 +102,10 @@ test('direct plugin run exports share one database and complete the game flow', 
     await run('ctueventos');
     await run('ctuevento', alice, ['faroles']);
     assert.deepEqual(await game.validateDatabase(), {
-      valid: true, schemaVersion: 9, users: 2, characters: 10, units: 4, claims: 2
+      valid: true, schemaVersion: SCHEMA_VERSION, users: 2, characters: 10, units: 4, claims: 2
     });
-    assert.equal(replies.length, 56);
-    assert.equal(commands.length, 41);
+    assert.equal(replies.length, 63);
+    assert.equal(commands.length, 53);
   } finally {
     await game.close();
   }

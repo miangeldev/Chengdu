@@ -1,3 +1,5 @@
+import { validateEvolutionSnapshot } from './evolutionSnapshot.js';
+import { evolvedStats, displayUnitCharacterName } from '../game/evolution/rules.js';
 import { requireGame } from '../utils/GameError.js';
 import { effectiveStats } from '../game/progression/rules.js';
 import { ownershipAt } from '../game/units/ownership.js';
@@ -38,8 +40,9 @@ function validateSnapshot(state, player, unit, battle, activeUnits) {
     unit.statsVersion === 2 && equal(unit.combatBaseStats, current.combatBaseStats) &&
     unit.traitVersion === current.traitVersion && equal(unit.traits, current.traits) && unit.variant === current.variant,
   'battle.advancedSnapshotOrigin');
-  check(equal(unit.stats, effectiveStats(current.initialStats, unit.level, unit.statsVersion, unit.traits,
-    unit.traitVersion, unit.combatBaseStats)), 'battle.advancedSnapshotStats');
+  validateEvolutionSnapshot(state, unit, battle.acceptedAt);
+  check(equal(unit.stats, evolvedStats(effectiveStats(current.initialStats, unit.level, unit.statsVersion, unit.traits,
+    unit.traitVersion, unit.combatBaseStats), unit.evolution, unit.characterId)), 'battle.advancedSnapshotStats');
   check(integer(unit.hp) && unit.hp <= unit.stats.hp && validateCombatProfile(profileOf(unit)) &&
     Array.isArray(unit.effects) && unit.cooldowns && typeof unit.cooldowns === 'object' && !Array.isArray(unit.cooldowns) &&
     typeof unit.abilityUsed === 'boolean' && typeof unit.participated === 'boolean', 'battle.advancedRuntime');
@@ -63,6 +66,9 @@ function validateSnapshot(state, player, unit, battle, activeUnits) {
 }
 
 export function validateAdvancedBattle(state, battle, { occupied, activeUnits, uniqueKey }) {
+  const challengeDeadline = battle.competitive
+    ? new Date(Math.min(Date.parse(deadline(battle.createdAt, CHALLENGE_TTL_MS)), Date.parse(battle.competitive.endsAt))).toISOString()
+    : deadline(battle.createdAt, CHALLENGE_TTL_MS);
   check(/^BTL-[a-f0-9-]{36}$/.test(battle.id) && text(battle.chatId) && battle.rulesVersion === 2 && battle.rewardVersion === 2,
     'battle.advancedIdentity');
   check(['pending', 'active', 'finished', 'expired', 'rejected', 'cancelled'].includes(battle.status) &&
@@ -78,7 +84,7 @@ export function validateAdvancedBattle(state, battle, { occupied, activeUnits, u
   uniqueKey(battle.acceptKey);
   const accepted = battle.acceptedAt !== null;
   check(!accepted || (date(battle.acceptedAt) && Date.parse(battle.acceptedAt) >= Date.parse(battle.createdAt) &&
-    Date.parse(battle.acceptedAt) < Date.parse(deadline(battle.createdAt, CHALLENGE_TTL_MS))), 'battle.advancedAcceptedAt');
+    Date.parse(battle.acceptedAt) < Date.parse(challengeDeadline)), 'battle.advancedAcceptedAt');
   const allUnits = new Set();
   for (const player of battle.players) {
     check(state.usuarios.records.some(user => user.id === player.userId) && text(player.name) &&
@@ -104,7 +110,7 @@ export function validateAdvancedBattle(state, battle, { occupied, activeUnits, u
     check(['pending', 'expired', 'rejected', 'cancelled'].includes(battle.status) && battle.turnNumber === 0 &&
       battle.turnUserId === null && battle.actions.length === 0 && battle.openingEvents.length === 0 &&
       battle.winnerId === null && battle.acceptKey === null, 'battle.advancedPendingState');
-    check(battle.expiresAt === deadline(battle.createdAt, CHALLENGE_TTL_MS), 'battle.advancedChallengeDeadline');
+    check(battle.expiresAt === challengeDeadline, 'battle.advancedChallengeDeadline');
     if (battle.status === 'pending') check(battle.updatedAt === battle.createdAt, 'battle.advancedPendingTimestamp');
     else {
       check(date(battle.finishedAt) && battle.finishedAt === battle.updatedAt &&
@@ -154,7 +160,7 @@ export function validateAdvancedBattleTransition(before, after, battle, updated)
         const unit = before.unidades.records.find(record => record.id === snapshot.id);
         const character = before.personajes.records.find(record => record.id === snapshot.characterId);
         check(unit && unit.ownerId === player.userId && snapshot.ownershipVersion === unit.ownershipVersion &&
-          snapshot.characterRevision === character.revision && snapshot.characterName === character.name &&
+          snapshot.characterRevision === character.revision && snapshot.characterName === displayUnitCharacterName(unit, character) && equal(snapshot.evolution ?? null, unit.evolution ?? null) &&
           snapshot.level === unit.progress.level && snapshot.profileVersion === character.combat.version &&
           snapshot.element === character.combat.element && equal(snapshot.ability, character.combat.ability) &&
           equal(snapshot.attacks, character.attackIds.map(id => advancedAttack(before.ataques.records.find(attack => attack.id === id)))),

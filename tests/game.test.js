@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { identity, readRecords, register, setup, updateCharacter } from './helpers.js';
+import { SCHEMA_VERSION } from '../storage/validation.js';
 
 test('register → starter → collection and ownership survive reopening', async t => {
   const context = setup(t);
@@ -26,7 +27,7 @@ test('register → starter → collection and ownership survive reopening', asyn
   assert.equal((await game.users.getUserByIdentity(identity())).id, miguel.id);
   assert.equal((await game.users.getProfile(miguel.id)).starterClaim.unitId, panda.unit.id);
   assert.deepEqual((await game.units.getUserUnits(juan.id)).items.map(u => u.id), [lobo.unit.id]);
-  assert.deepEqual(await game.validateDatabase(), { valid: true, schemaVersion: 9, users: 2, characters: 10, units: 2, claims: 2 });
+  assert.deepEqual(await game.validateDatabase(), { valid: true, schemaVersion: SCHEMA_VERSION, users: 2, characters: 10, units: 2, claims: 2 });
 });
 
 test('simultaneous registrations and normalized device JIDs cannot duplicate a player', async t => {

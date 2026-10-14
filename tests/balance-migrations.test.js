@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
-import { V4_COLLECTIONS, validateDatabase } from '../storage/validation.js';
+import { SCHEMA_VERSION, V4_COLLECTIONS, validateDatabase } from '../storage/validation.js';
 import { BALANCED_STATS, LEGACY_STATS, balancedLegacyStats } from '../game/characters/balance.js';
 import { effectiveStats, progressionBaseline } from '../game/progression/rules.js';
 import { calculateDamage } from '../game/battle/engine.js';
@@ -89,7 +89,7 @@ async function v4Fixture(t, { overcap = false, overcapCount = 51, pandaRarity = 
 test('schema 4 balance migration preserves births, progression, receipts, ledger and old fight snapshots', async t => {
   const c = await v4Fixture(t);
   const game = c.open().game;
-  assert.equal((await game.validateDatabase()).schemaVersion, 9);
+  assert.equal((await game.validateDatabase()).schemaVersion, SCHEMA_VERSION);
   const characters = readRecords(c.directory, 'personajes');
   for (const character of characters.filter(row => c.state.personajes.records.some(old => old.id === row.id))) {
     assert.deepEqual(character.baseStats, BALANCED_STATS[character.id]);
@@ -121,7 +121,7 @@ test('legacy over-cap emissions remain owned and playable while the character is
   const c = await v4Fixture(t, { overcap: true });
   const opened = c.open();
   const game = opened.game;
-  assert.equal((await game.validateDatabase()).schemaVersion, 9);
+  assert.equal((await game.validateDatabase()).schemaVersion, SCHEMA_VERSION);
   const panda = readRecords(c.directory, 'personajes').find(p => p.id === 'panda_guerrero');
   assert.deepEqual(panda.supply, { type: 'limited', max: 50, grandfatheredIssued: 51 });
   assert.equal(readRecords(c.directory, 'unidades').filter(u => u.characterId === panda.id).length, 51);
@@ -141,7 +141,7 @@ test('grandfathered emissions stay frozen after a later rarity change raises the
   const c = await v4Fixture(t, { overcap: true, overcapCount: 36, pandaRarity: 'rare' });
   const opened = c.open();
   const game = opened.game;
-  assert.equal((await game.validateDatabase()).schemaVersion, 9);
+  assert.equal((await game.validateDatabase()).schemaVersion, SCHEMA_VERSION);
   assert.deepEqual(readRecords(c.directory, 'personajes').find(p => p.id === 'panda_guerrero').supply,
     { type: 'limited', max: 35, grandfatheredIssued: 36 });
   await opened.storage.withTransaction(async repos => {
@@ -171,7 +171,7 @@ for (const stage of ['prepared', 'committed', 'published:personajes.json', 'publ
     await assert.rejects(failed.validateDatabase(), { code: 'STORAGE_WRITE_FAILED' });
     await failed.close();
     const game = c.open().game;
-    assert.equal((await game.validateDatabase()).schemaVersion, 9);
+    assert.equal((await game.validateDatabase()).schemaVersion, SCHEMA_VERSION);
     assert.deepEqual(readRecords(c.directory, 'aperturas'), c.state.aperturas.records);
     assert.deepEqual(readRecords(c.directory, 'economia'), c.state.economia.records);
     assert.deepEqual(readRecords(c.directory, 'combates'), c.state.combates.records);
@@ -192,7 +192,7 @@ for (const phase of ['prepared', 'committed']) {
     fs.writeFileSync(path.join(c.directory, '_journal.json'), JSON.stringify({ version: 1, phase, body, checksum }));
     if (phase === 'committed') fs.writeFileSync(path.join(c.directory, 'personajes.json'), after['personajes.json']);
     const game = c.open().game;
-    assert.equal((await game.validateDatabase()).schemaVersion, 9);
+    assert.equal((await game.validateDatabase()).schemaVersion, SCHEMA_VERSION);
     assert.equal(readRecords(c.directory, 'personajes').find(p => p.id === 'mago_carmesi').supply.max, phase === 'committed' ? 1 : 2);
     assert.deepEqual(readRecords(c.directory, 'combates'), c.state.combates.records);
     assert.deepEqual(readRecords(c.directory, 'economia'), c.state.economia.records);

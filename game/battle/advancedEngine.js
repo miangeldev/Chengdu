@@ -71,6 +71,12 @@ function enter(player, opponent, turn, events) {
   for (const definition of unit.ability.effects) applyEffect(definition.target === 'self' ? unit : activeUnit(opponent), unit, definition, turn, events);
 }
 
+function idleDeadline(battle, now) {
+  const expiresAt = deadline(now, BATTLE_IDLE_MS);
+  return battle.competitive && Date.parse(battle.competitive.endsAt) < Date.parse(expiresAt)
+    ? battle.competitive.endsAt : expiresAt;
+}
+
 export function initializeAdvancedBattle(previous) {
   const battle = structuredClone(previous);
   requireGame(battle.rulesVersion === 2 && Array.isArray(battle.players) && battle.players.length === 2 && battle.players.every(p => Array.isArray(p.units) && p.units.length >= 1 && p.units.length <= 3), 'INVALID_BATTLE_FORMAT');
@@ -91,7 +97,7 @@ export function initializeAdvancedBattle(previous) {
   battle.turnNumber = 1;
   battle.turnUserId = activeUnit(battle.players[1]).stats.speed > activeUnit(battle.players[0]).stats.speed ? battle.players[1].userId : battle.players[0].userId;
   battle.updatedAt = battle.acceptedAt;
-  battle.expiresAt = deadline(battle.acceptedAt, BATTLE_IDLE_MS);
+  battle.expiresAt = idleDeadline(battle, battle.acceptedAt);
   battle.winnerId = null;
   battle.finishReason = null;
   battle.finishedAt = null;
@@ -234,7 +240,7 @@ export function resolveAdvancedAction(previous, { userId, type = 'attack', choic
   if (battle.status === 'active') {
     battle.turnUserId = opponent.userId;
     battle.turnNumber = battle.actions.length + 1;
-    battle.expiresAt = deadline(now, BATTLE_IDLE_MS);
+    battle.expiresAt = idleDeadline(battle, now);
   } else battle.turnNumber = battle.actions.length;
   return { battle, action };
 }

@@ -11,6 +11,8 @@ export function validateOwnershipData(state, schemaVersion = 7) {
   const units = new Map(state.unidades.records.map(unit => [unit.id, unit]));
   const users = new Set(state.usuarios.records.map(user => user.id));
   const sales = new Map(state.ventas.records.map(sale => [sale.id, sale]));
+  const trades = new Map((schemaVersion >= 11 ? state.intercambios?.records ?? [] : []).map(trade => [trade.id, trade]));
+  const tradeActions = new Map((schemaVersion >= 11 ? state.accionesintercambio?.records ?? [] : []).map(action => [action.id, action]));
   const chains = new Map();
   const operationKeys = new Set();
   for (const event of state.eventos.records) {
@@ -29,10 +31,21 @@ export function validateOwnershipData(state, schemaVersion = 7) {
     check(event.type === 'unit_transferred' && /^EVT-[a-f0-9-]{32,36}$/.test(event.id) && previous &&
       integer(event.ownershipVersion) && event.ownershipVersion === previous.version + 1 &&
       event.fromOwnerId === previous.ownerId && users.has(event.toOwnerId) && event.toOwnerId !== previous.ownerId &&
-      event.reason === 'market' && event.operationKey === `transfer:${event.sourceId}`, 'ownership.transferChain');
-    check(sale && sale.transferEventId === event.id && sale.unitId === unit.id && sale.sellerId === event.fromOwnerId &&
-      sale.buyerId === event.toOwnerId && sale.fromOwnershipVersion === previous.version &&
-      sale.toOwnershipVersion === event.ownershipVersion && sale.createdAt === event.createdAt, 'ownership.saleSource');
+      (event.reason === 'market' ? event.operationKey === `transfer:${event.sourceId}` :
+        event.reason === 'trade' && event.operationKey === `transfer:${event.sourceId}:${event.unitId}`), 'ownership.transferChain');
+    if (event.reason === 'market') {
+      check(sale && sale.transferEventId === event.id && sale.unitId === unit.id && sale.sellerId === event.fromOwnerId &&
+        sale.buyerId === event.toOwnerId && sale.fromOwnershipVersion === previous.version &&
+        sale.toOwnershipVersion === event.ownershipVersion && sale.createdAt === event.createdAt, 'ownership.saleSource');
+    } else {
+      const trade = trades.get(event.sourceId);
+      const action = tradeActions.get(trade?.closeActionId);
+      const source = action?.transfers.find(transfer => transfer.eventId === event.id);
+      check(trade?.status === 'completed' && action?.kind === 'confirm' && action.after.status === 'completed' &&
+        source?.unitId === unit.id && source.fromOwnerId === event.fromOwnerId && source.toOwnerId === event.toOwnerId &&
+        source.fromOwnershipVersion === previous.version && source.toOwnershipVersion === event.ownershipVersion &&
+        action.createdAt === event.createdAt, 'ownership.tradeSource');
+    }
     chains.set(unit.id, { ownerId: event.toOwnerId, version: event.ownershipVersion });
   }
   check(chains.size === units.size, 'ownership.complete');
@@ -47,6 +60,7 @@ export function validateOwnershipTransition(before, after) {
   const oldUnits = new Map(before.unidades.records.map(unit => [unit.id, unit]));
   const nextUnits = new Map(after.unidades.records.map(unit => [unit.id, unit]));
   const previousSales = new Set(before.ventas.records.map(sale => sale.id));
+  const previousTradeActions = new Set((before.accionesintercambio?.records ?? []).map(action => action.id));
   const transfers = new Map();
   for (const event of after.eventos.records.slice(before.eventos.records.length)) {
     if (event.type === 'unit_created') {
@@ -55,9 +69,13 @@ export function validateOwnershipTransition(before, after) {
     }
     const previous = oldUnits.get(event.unitId);
     const updated = nextUnits.get(event.unitId);
+    const marketSource = event.reason === 'market' && previous?.lock?.type === 'market' && !previousSales.has(event.sourceId) &&
+      after.ventas.records.some(sale => sale.id === event.sourceId);
+    const trade = (after.intercambios?.records ?? []).find(row => row.id === event.sourceId);
+    const tradeSource = event.reason === 'trade' && previous?.lock?.type === 'trade' && previous.lock.referenceId === event.sourceId &&
+      trade?.status === 'completed' && !previousTradeActions.has(trade.closeActionId);
     check(event.type === 'unit_transferred' && previous && updated && !transfers.has(event.unitId) &&
-      previous.lock?.type === 'market' && updated.lock === null && !previousSales.has(event.sourceId) &&
-      after.ventas.records.some(sale => sale.id === event.sourceId), 'ownership.newTransfer');
+      updated.lock === null && (marketSource || tradeSource), 'ownership.newTransfer');
     check(event.fromOwnerId === previous.ownerId && event.toOwnerId === updated.ownerId &&
       event.ownershipVersion === previous.ownershipVersion + 1 && updated.ownershipVersion === event.ownershipVersion &&
       updated.updatedAt === event.createdAt, 'ownership.transferTransition');

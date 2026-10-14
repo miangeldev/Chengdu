@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createGame } from '../game/createGame.js';
 import { createCommandRouter } from '../interfaces/whatsapp/index.js';
+import { seasonDefinition } from '../game/competitive/policy.js';
 
 const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'chengdu-preview-'));
 let roll = 0;
@@ -276,6 +277,110 @@ try {
   await send(a, '.ctuevento faroles', 'Festival terminado: emisión cerrada y unidades conservadas');
   await send(b, `.ctucomprar ${eventListing.code}`, 'Después del festival: comercio sin nueva emisión');
   await send(b, `.ctuunidad ${eventUnit.id}`, 'Unidad histórica: conserva el festival después de cambiar de dueño');
+  // Competitive examples use the same temporary players and real game actions.
+  await send(a, '.ctuequipo usar PAND-000001');
+  await send(b, '.ctuequipo usar LOBO-000001');
+  await send(a, '.cturank', 'Competitivo: Elo inicial y requisitos de colocación');
+  await send(a, '.ctutop', 'Competitivo: clasificación todavía sin partidas');
+  await send(a, '.ctutemporada', 'Temporada T1: calendario, rangos y premios');
+  await send(a, '.ctutemporadas', 'Temporadas: códigos cortos y archivo');
+  await send(a, '.cturanked @Lukas 1v1', 'Desafío competitivo: temporada y reglas visibles', [b]);
+  await send(b, '.ctuaceptar', 'Inicio competitivo: un solo mensaje con turno y equipo');
+  battle = await game.battle.getMyBattle({ userId: user.id, chatId });
+  let rankedActionId, rankedActor, rankedTurn = 0;
+  while (battle.status === 'active') {
+    rankedActor = battle.turnUserId === user.id ? a : b;
+    rankedActionId = `preview-ranked-${++rankedTurn}`;
+    await send(rankedActor, '.ctuatacar 1', rankedTurn === 1 ? 'Turno competitivo: mantiene el formato compacto' : null, [], rankedActionId);
+    battle = await game.battle.getMyBattle({ userId: user.id, chatId });
+  }
+  samples.push({ title: 'Resultado competitivo: Elo y premio habitual en la misma respuesta', text: latest });
+  await send(rankedActor, '.ctuatacar 1', 'Repetir el último turno: conserva el Elo original', [], rankedActionId);
+  await send(a, '.ctuhistorial', 'Historial: distingue el competitivo del casual');
+  await send(a, '.cturank', 'Colocación: una partida y un rival');
+  await send(a, '.cturanked @Lukas', null, [b]);
+  await send(b, '.ctuaceptar');
+  await send(a, '.cturendirse', 'Competitivo: rendirse temprano penaliza sin regalar puntos');
+  // Two more rivals complete placement without forging Elo or account balances.
+  for (const [name, subject] of [['Ana', '521222222222@s.whatsapp.net'], ['Camila', '521333333333@s.whatsapp.net']]) {
+    await send(subject, `.cturegistro ${name}`);
+    await send(subject, '.ctustarter lobo');
+    const rival = await game.users.getUserByIdentity({ provider: 'whatsapp', subject });
+    const rivalUnit = (await game.units.getUserUnits(rival.id)).items[0];
+    await send(subject, `.ctuequipo usar ${rivalUnit.id}`);
+    for (let index = 0; index < 2; index++) {
+      await send(a, `.cturanked @${name}`, null, [subject]);
+      await send(subject, '.ctuaceptar');
+      battle = await game.battle.getMyBattle({ userId: user.id, chatId });
+      while (battle.status === 'active') {
+        await send(battle.turnUserId === user.id ? a : subject, '.ctuatacar 1');
+        battle = await game.battle.getMyBattle({ userId: user.id, chatId });
+      }
+    }
+  }
+  await send(a, '.cturank', 'Competitivo: colocado tras cinco partidas y tres rivales');
+  await send(a, '.ctutop', 'Clasificación: oficiales y provisionales, sin UUID');
+  await send(a, '.ctutemporada T1 reclamar', 'Premio de temporada: todavía hay que esperar al cierre');
+  currentTime = seasonDefinition(1).endsAt;
+  await send(a, '.ctutemporada T1', 'Temporada terminada: posición y premio congelados');
+  await send(a, '.ctutemporada T1 reclamar', 'Premio de cierre: monedas y título permanente', [], 'preview-season-reward');
+  await send(a, '.ctutemporada T1 reclamar', 'Premio repetido: no paga otra vez', [], 'preview-season-reward');
+  await send(a, '.ctuinventario', 'Inventario: conserva el título de temporada');
+  await send(a, '.ctumovimientos', 'Movimientos: premio competitivo junto a las otras fuentes');
+  await send(a, '.cturank', 'Temporada T2: Elo inicial nuevo, colección conservada');
+  await send(a, '.ctutop T1', 'Archivo: clasificación final de T1');
+  await send(a, '.ctutemporadas', 'Archivo de temporadas después del cambio de calendario');
+  // Community examples continue the same real temporary save after season T1.
+  contentRoll = () => 0;
+  await send(a, '.ctusocial favorito PAND-000001', 'Social: favorito y perfil personalizado');
+  await send(a, '.ctusocial presentar PAND-000001 LOBO-000002', 'Social: sólo permite destacar unidades propias');
+  await send(a, '.ctusocial bio Coleccionista de bambú', 'Social: presentación pública');
+  await send(a, '.ctusocial titulos', 'Social: elegir entre títulos realmente ganados');
+  await send(a, '.ctusocial titulo T1', 'Social: mostrar el título de temporada');
+  await send(b, '.ctuperfil @Miguel', 'Perfil público: sin saldo ni identidad externa', [a]);
+  await send(b, '.ctupersonajes @Miguel 1', 'Colección pública: página numérica por mención', [a]);
+  await send(a, '.ctushowcase', 'Showcase: favorito, rareza, antigüedad y victorias');
+  await send(a, '.ctusocial comparar PAND-000001 LOBO-000001', 'Comparar unidades sin entrar en combate');
+  await send(a, '.ctucrafting', 'Crafting: materiales disponibles y recetas copiables');
+  await send(a, '.ctucrafting reclamar', 'Crafting: recoger materiales de premios auténticos');
+  await send(a, '.ctucrafting crear insignia_bambu', 'Crafting: insignia cosmética permanente');
+  await send(a, '.ctucrafting crear sello_evolucion', 'Crafting: preparar un sello de evolución');
+  await send(a, '.ctuevolucion PAND-000001', 'Evolución: requisitos, coste e identidad conservada');
+  await send(a, '.cturecompensas', 'Obtención: premios pendientes y código de bienvenida limitado');
+  await send(a, '.cturecompensas codigo CHENGDU', 'Promoción: un personaje común con supply real', [], 'preview-promo');
+  await send(a, '.cturecompensas codigo CHENGDU', 'Promoción: reintentar conserva la misma unidad', [], 'preview-promo');
+  await send(a, '.cturecompensas ranking', 'Premio del podio: personaje directo además de monedas y título');
+  await send(a, '.ctuintercambio crear @Lukas', 'Intercambio: dos ofertas y siguientes pasos cortos', [b]);
+  await send(a, '.ctuintercambio oferta I1 10', 'Intercambio: ofrecer monedas');
+  await send(b, '.ctuintercambio oferta I1 20', 'Intercambio: revisar ambas ofertas');
+  await send(a, '.ctuintercambio confirmar I1', 'Intercambio: primera confirmación reserva ambos saldos');
+  await send(b, '.ctuintercambio confirmar I1', 'Intercambio: segunda confirmación completa todo');
+  await send(a, '.ctuintercambio mios', 'Intercambio: historial con códigos I1');
+  await send(a, '.ctuclan crear BAM Casa del Bambú', 'Clan: fundación, miembros y tesorería');
+  await send(b, '.ctuclan crear LUNA Casa Lunar', 'Clan: una segunda casa en Chengdú');
+  const clanRivals = ['521222222222@s.whatsapp.net', '521333333333@s.whatsapp.net'];
+  const clanFriends = ['521444444444@s.whatsapp.net', '521555555555@s.whatsapp.net'];
+  for (const [i,subject] of clanFriends.entries()) {
+    await send(subject, `.cturegistro Compañero ${i+1}`);
+    await send(subject, '.ctustarter panda');
+    const friend = await game.users.getUserByIdentity({provider:'whatsapp',subject});
+    const friendUnit = (await game.units.getUserUnits(friend.id)).items[0];
+    await send(subject, `.ctuequipo usar ${friendUnit.id}`);
+    await send(a, '.ctuclan invitar @Compañero', null, [subject]);
+    await send(subject, '.ctuclan unirse C1');
+  }
+  for (const subject of clanRivals) { await send(b, '.ctuclan invitar @Rival', null, [subject]); await send(subject, '.ctuclan unirse C2'); }
+  await send(a, '.ctuclan depositar 100', 'Clan: aporte con recibo y saldo real');
+  await send(b, '.ctuclan depositar 100');
+  await send(a, '.ctuclan rol @Compañero oficial', 'Clan: nombrar oficial', [clanFriends[0]]);
+  await send(a, '.ctuclan top', 'Clanes: clasificación de temporada y códigos C1');
+  await send(a, '.ctuclan guerra C2', 'Guerra: invitación, entrada y plazo de respuesta');
+  await send(b, '.ctuclan aceptar G1', 'Guerra: plantillas de tres y marcador inicial');
+  await send(a, '.ctuclan guerras', 'Guerras: historial con código G1');
+  await send(a, '.ctuclan historial', 'Tesorería: aportes y entradas auditables');
+  currentTime = '2026-11-13T06:00:00.000Z';
+  await send(a, '.ctuclan war G1', 'Guerra: cierre por plazo sin premio personal para inactivos');
+  await send(a, '.ctuinventario', 'Inventario ampliado: materiales, sellos e insignia artesanal');
   if (!(await game.validateDatabase()).valid) throw new Error('La base temporal de la vista previa no es válida.');
   const output = fileURLToPath(new URL('../docs/whatsapp-preview.md', import.meta.url));
   fs.writeFileSync(output, '# Vista previa de los mensajes de WhatsApp\n\n' +

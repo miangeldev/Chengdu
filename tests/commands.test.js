@@ -4,6 +4,7 @@ import { createCommandRouter, commands } from '../interfaces/whatsapp/index.js';
 import { register, setup } from './helpers.js';
 import { defineCommand } from '../interfaces/whatsapp/command.js';
 import { GameError } from '../utils/GameError.js';
+import { SCHEMA_VERSION } from '../storage/validation.js';
 
 test('unexpected command failures retain the error and command in the server log only', async () => {
   const error = new TypeError('cmd is not a function');
@@ -57,7 +58,7 @@ test('the WhatsApp commands complete the MVP flow with a simulated socket', asyn
   const sock = { sendMessage: async (from, payload) => { replies.push({ from, ...payload }); } };
   const msg = { key: { remoteJid: '120363111@g.us', participant: '521999999999@s.whatsapp.net' } };
   const route = createCommandRouter({ game });
-  assert.equal(commands.length, 41);
+  assert.equal(commands.length, 53);
   for (const body of ['.cturegistro Miguel', '.ctuperfil', '.ctucatalogo', '.ctustarter', '.ctustarter 1', '.ctupersonajes', '.ctuunidad PAND-000001']) {
     assert.equal(await route(sock, msg, body), true);
   }
@@ -101,7 +102,7 @@ test('players can compare catalog stats and live attack definitions before regis
   await route(sock, msg, '.ctuficha desconocido_personaje');
   assert.match(reply, /personaje no existe/);
   assert.deepEqual(await game.validateDatabase(), {
-    valid: true, schemaVersion: 9, users: 0, characters: 10, units: 0, claims: 0
+    valid: true, schemaVersion: SCHEMA_VERSION, users: 0, characters: 10, units: 0, claims: 0
   });
 });
 

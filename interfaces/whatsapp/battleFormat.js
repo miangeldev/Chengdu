@@ -1,4 +1,5 @@
 import { card, characterIcon, displayName, healthBar } from './format.js';
+import { competitiveBattleOpening, competitiveBattleResult, seasonEndedBattle } from './competitiveFormat.js';
 
 const timeText = date => new Date(date).toLocaleTimeString('es-MX', { timeZone: 'America/Mexico_City', hour: '2-digit', minute: '2-digit', hour12: false });
 
@@ -29,6 +30,7 @@ function statusText(battle, bars) {
 export function rewardText(battle) {
   if (!battle.settlement) return battle.rewardVersion === 0 && battle.acceptedAt ? '📜 Combate anterior a las recompensas del MVP 0.3.' : null;
   const reason = battle.settlement.reason;
+  if (reason !== 'rewarded' && seasonEndedBattle(battle)) return '🎁 Sin recompensa: la temporada cerró antes de terminar el combate.';
   if (reason !== 'rewarded') return `🎁 Sin recompensa: ${
     { early_surrender: 'rendición antes de 4 ataques entre ambos jugadores.', pair_limit: 'ya alcanzaron 3 combates con recompensa entre ustedes en 24 h.', inactivity: 'el combate terminó por inactividad.' }[reason]
   }`;
@@ -161,8 +163,9 @@ function renderAdvancedBattle(result, cmd, { healthBars }) {
   const names = battle.players.map(player => displayName(player.name));
   const format = battle.format ?? `${battle.teamSize}v${battle.teamSize}`;
   const duplicate = result.duplicate ? '♻️ Esta acción ya se había registrado. Estado actual:' : null;
-  if (battle.status === 'pending') return message('DESAFÍO', [duplicate,
+  if (battle.status === 'pending') return message(battle.competitive ? 'DESAFÍO RANKED' : 'DESAFÍO', [duplicate,
     `⚔️ *${names[0]}* desafió a *${names[1]}* · *${format}*`,
+    competitiveBattleOpening(battle),
     `🛡️ ${battle.teamSize} ${battle.teamSize === 1 ? 'unidad' : 'unidades'} por jugador · Elementos, pasivas y efectos`,
     `📣 *${names[1]}, ¿aceptas?*\n👉 *${cmd('ctuaceptar')}* o *${cmd('cturechazar')}*`,
     `⏳ Vence a las ${timeText(battle.expiresAt)} (CDMX).\n↩️ Retirar: ${cmd('ctucancelar')}`
@@ -175,6 +178,7 @@ function renderAdvancedBattle(result, cmd, { healthBars }) {
     const opening = battle.actions.length === 0;
     if (opening) {
       body.push(`⚔️ *${names[0]}* vs *${names[1]}* · *${format}*\n${characterIcon(unit.characterId)} *${displayName(unit.characterName)}* toma la iniciativa.`);
+      body.push(competitiveBattleOpening(battle));
       body.push((battle.openingEvents ?? []).map(event => eventText(battle, event)).filter(Boolean).join('\n'));
     }
     body.push(advancedStatusText(battle, healthBars));
@@ -198,10 +202,16 @@ function renderAdvancedBattle(result, cmd, { healthBars }) {
     body.push(advancedStatusText(battle, healthBars));
   } else {
     label = { rejected: 'DESAFÍO RECHAZADO', cancelled: 'DESAFÍO RETIRADO', expired: 'TIEMPO AGOTADO', finished: 'EMPATE' }[battle.status];
-    body.push({ rejected: `❌ ${names[1]} rechazó el desafío.`, cancelled: `↩️ ${names[0]} retiró el desafío.`, challenge_timeout: '⌛ El desafío venció sin ser aceptado.', inactivity: `⌛ Combate terminado por inactividad.\n⚔️ ${turns} turnos · Sin ganador.`, turn_limit: `⚖️ Ambos conservan unidades tras ${turns} turnos.\nEl combate termina en empate.` }[battle.finishReason]);
+    if (seasonEndedBattle(battle)) {
+      label = 'CIERRE DE TEMPORADA';
+      body.push(`🏁 La temporada ${battle.competitive.seasonCode} cerró.${battle.acceptedAt ? `\n⚔️ ${turns} turnos · Sin ganador.` : '\nEl desafío quedó cerrado sin ser aceptado.'}`);
+    } else {
+      body.push({ rejected: `❌ ${names[1]} rechazó el desafío.`, cancelled: `↩️ ${names[0]} retiró el desafío.`, challenge_timeout: '⌛ El desafío venció sin ser aceptado.', inactivity: `⌛ Combate terminado por inactividad.\n⚔️ ${turns} turnos · Sin ganador.`, turn_limit: `⚖️ Ambos conservan unidades tras ${turns} turnos.\nEl combate termina en empate.` }[battle.finishReason]);
+    }
     if (battle.acceptedAt) body.push(advancedStatusText(battle, healthBars));
   }
   body.push(rewardText(battle));
-  body.push(`⚔️ Otra partida: ${cmd('ctupelea', '@jugador')}`);
+  body.push(competitiveBattleResult(battle));
+  body.push(`⚔️ Otra partida: ${cmd(battle.competitive ? 'cturanked' : 'ctupelea', '@jugador')}${battle.competitive ? `\n📊 Tu clasificación: ${cmd('cturank')}` : ''}`);
   return message(label, body);
 }

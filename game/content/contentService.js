@@ -134,7 +134,8 @@ export function createContentService(storage, clock) {
         await userFor(repos, userId);
         const now = await refresh(repos);
         const achievements = (await unlocks(repos, userId, now)).filter(row => row.unlocked);
-        return { tickets: await ticketBalance(repos, userId), titles: achievements.map(row => row.title),
+        const seasonRewards = await repos.seasonRewards.filter(row => row.userId === userId);
+        return { tickets: await ticketBalance(repos, userId), titles: [...achievements.map(row => row.title), ...seasonRewards.map(row => row.title)],
           badges: achievements.map(row => row.badge), achievementsCount: achievements.length };
       });
     },

@@ -1,12 +1,76 @@
-# Modelo de datos — Beta 0.8 y su evolución
+# Modelo de datos — Comunidad 0.10 y su evolución
 
-Estado: contrato implementado hasta 0.8 (esquema 9), basado en `../project.md`.
+Estado: contrato implementado hasta 0.10 (esquema 11), basado en `../project.md`.
 Los mecanismos descritos como futuros aún requieren servicios y migraciones.
 El alcance se divide en [fundación 0.1](mvp-0.1.md), [combate 0.2](mvp-0.2.md),
 [progresión 0.3](mvp-0.3.md), [colección 0.4](alpha-0.4.md),
 [balance 0.4.1](balance-0.4.1.md), [economía 0.5](alpha-0.5.md)
 y [mercado 0.6](alpha-0.6.md), [combate avanzado 0.7](alpha-0.7.md)
-y [contenido 0.8](beta-0.8.md).
+y [contenido 0.8](beta-0.8.md), [competitivo 0.9](beta-0.9.md).
+
+## Comunidad y migración 10→11
+
+La base incorpora once colecciones vacías para intercambios, crafting,
+evoluciones, perfiles, clanes, guerras y obtención directa de premios. Conserva
+sin cambios los registros de las 24 colecciones previas; sólo avanza metadatos.
+El snapshot actual contiene 35 colecciones y el manifest, 36 archivos.
+
+`accionesintercambio`, `artesania`, `evoluciones`, `accionessociales`,
+`accionesclan`, `accionesguerra` y `obtenciones` son recibos inmutables. El estado
+mutable de clan, guerra y perfil se reproduce desde sus acciones. Los cursores
+internos enlazan versiones de autoridad anteriores a la operación; los comandos
+usan códigos C1/G1/I1 y páginas numéricas.
+
+La tesorería y sus cambios se reproducen desde fundación, aportes, retiros,
+entradas y premios. Los movimientos de moneda personal referencian exactamente
+la acción que los autoriza. El escrow de un trade conserva unidades y monedas
+hasta doble confirmación, cancelación o vencimiento; las transferencias siguen
+la cadena central de propiedad.
+
+La evolución añade una forma versionada, manteniendo `characterId`, ID y serial
+de nacimiento. Combate, mercado y bosses congelan la forma junto con los stats,
+para preservar los snapshots previos. Los materiales se reconstruyen desde
+fuentes de premio únicas y recetas versionadas; no son balances editables.
+
+La obtención directa guarda fuente legítima, pool disponible, probabilidad,
+tirada y resultado, incluso en fallo. Toda emisión utiliza el generador único,
+contadores/supply y evento de nacimiento. Las capturas de evento históricas
+conservan su propio recibo y no se reinterpretan como obtenciones nuevas.
+
+Los helpers independientes de JSON también bloquean las once colecciones
+nuevas. Journal y recuperación admiten versiones anteriores antes de migrar;
+ningún clan, forma o premio se concede automáticamente en la migración.
+Reglas e interfaces: [fases 13–32](fases-13-32.md).
+
+## Competitivo y migración 9→10
+
+Las nuevas colecciones `temporadas`, `clasificacion`, `resultadoscompetitivos`
+y `premiostemporada` separan calendario, proyección de rating, recibos de
+partidas y premios monetarios. Se agregan vacías, sin reescribir registros
+anteriores ni convertir combates casuales. El snapshot contiene veinticuatro
+colecciones y el manifest: veinticinco archivos.
+
+Los desafíos nuevos de ranked guardan metadata versionada y la temporada.
+Sus plazos se limitan al cierre; se reproduce el combate avanzado existente
+para comprobar resultado, participantes y responsable de una inactividad.
+Los resultados competitivos guardan Elo anterior/posterior y deltas. La
+clasificación se reproduce en orden de estos recibos desde 1000 puntos,
+incluyendo colocación y controles por pareja. No se acepta una modificación
+directa del rating ni que una partida histórica adquiera la marca competitiva.
+
+Al cerrar, `temporadas` conserva posiciones finales verificadas contra los
+rankings. Las temporadas cerradas y sus proyecciones no admiten cambios.
+Los resultados que vencen por el calendario no alteran los rankings congelados.
+`premiostemporada` tiene una fuente única por jugador/temporada, política,
+posición, rango, importe, título, saldos y clave de operación. El crédito
+`season_reward` del ledger debe corresponder exactamente con ese recibo.
+El título permanente se incorpora a la vista de inventario desde el premio.
+
+La migración, los resultados y los premios usan la misma cola, writer lock,
+backup y journal que los dominios anteriores. Un journal del esquema 9 se
+recupera antes de migrar. Las definiciones de calendario, Elo y rangos de la
+política 1 se conservan para interpretar la historia; versiones nuevas deben
+mantener sus fórmulas de reproducción y sus fuentes únicas.
 
 ## Contenido y calendario 0.8
 
@@ -117,6 +181,10 @@ puede borrar sus referencias ni reutilizar códigos.
 | `encuentros.json` | Bosses mundiales y apariciones de grupo, con snapshots y estados. |
 | `accionescontenido.json` | Ataques, capturas y comprobaciones temporales inmutables. |
 | `actividad.json` | Próxima comprobación y última aparición de cada grupo. |
+| `temporadas.json` | Calendario competitivo y posiciones congeladas al cierre. |
+| `clasificacion.json` | Elo, colocación y estadísticas reproducibles por temporada. |
+| `resultadoscompetitivos.json` | Recibos inmutables de Elo por partida aceptada y terminada. |
+| `premiostemporada.json` | Premios únicos, título, posición y saldos por jugador/temporada. |
 
 Además, `_database.json` marca la instalación, `_journal.json` coordina un commit
 pendiente y `backups/` conserva snapshots coherentes del estado anterior.
@@ -126,6 +194,8 @@ El esquema 8 conserva esas catorce colecciones y añade perfiles avanzados a
 personajes y ataques; no crea archivos adicionales ni reescribe partidas anteriores.
 El esquema 9 añade seis colecciones, dos personajes y cuatro ataques de evento;
 cada snapshot del journal contiene veinte colecciones y el manifest: 21 archivos.
+El esquema 10 añade las cuatro colecciones competitivas vacías, conservando
+los registros anteriores; cada snapshot contiene 25 archivos con el manifest.
 
 Cada colección emplea esta envoltura; el adaptador oculta la envoltura a servicios:
 

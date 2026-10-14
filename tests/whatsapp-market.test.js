@@ -147,7 +147,7 @@ test('WhatsApp market rejects invalid operations and distinguishes a withdrawn l
   assert.match(await send(`!ctucomprar ${listing.id}`, { actor: buyerActor }), /No tienes suficientes ChengCoins/);
   assert.match(await send(`!cturetirar ${listing.id}`, { actor: buyerActor }), /Sólo el vendedor/);
   assert.match(await send(`!cturetirar ${listing.id}`, { id: null }), /No pude identificar este mensaje/);
-  assert.match(await send(`!ctuequipo usar ${unit.id}`), /en combate o en venta/);
+  assert.match(await send(`!ctuequipo usar ${unit.id}`), /en combate, en venta o reservada/);
   const cancelled = await send(`!cturetirar ${listing.id}`, { id: 'withdraw-original' });
   assert.match(cancelled, /Anuncio retirado/);
   assert.match(cancelled, /no cobra comisión/);

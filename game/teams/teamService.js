@@ -1,3 +1,4 @@
+import { expireTrades } from '../trades/lifecycle.js';
 import { requireGame } from '../../utils/GameError.js';
 import { expireBattles } from '../battle/lifecycle.js';
 import { expireListings } from '../market/lifecycle.js';
@@ -15,6 +16,7 @@ export function createTeamService(storage, clock) {
       const now = clock();
       await expireBattles(repos, now);
       await expireListings(repos, now);
+    await expireTrades(repos, now);
       const user = await repos.users.get(userId);
       requireGame(user, 'USER_NOT_FOUND');
       requireGame(!await repos.battles.find(b => b.status === 'active' && b.players.some(p => p.userId === userId)), 'TEAM_LOCKED');
@@ -38,6 +40,7 @@ export function createTeamService(storage, clock) {
         const now = clock();
         await expireBattles(repos, now);
         await expireListings(repos, now);
+        await expireTrades(repos, now);
         const user = await repos.users.get(userId);
         requireGame(user, 'USER_NOT_FOUND');
         return view(repos, user);
