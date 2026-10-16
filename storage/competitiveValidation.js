@@ -1,10 +1,11 @@
+import { equal } from './equality.js';
 import { requireGame } from '../utils/GameError.js';
 import { replayAdvancedBattle } from '../game/battle/advancedEngine.js';
 import { COMPETITIVE_POLICY_VERSION, applyResultToRanking, competitiveDecision,
   finalStandings, initialRanking, resultPlayers, seasonDefinition, seasonNumberAt, seasonPrize } from '../game/competitive/policy.js';
 
 const check = (condition, field) => requireGame(condition, 'DATABASE_CORRUPT', { field });
-const equal = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
 const integer = (value, minimum = 0) => Number.isSafeInteger(value) && value >= minimum;
 const text = value => typeof value === 'string' && value.length > 0 && value.length <= 200;
 const date = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(value) &&

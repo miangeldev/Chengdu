@@ -5,7 +5,7 @@ import path from 'node:path';
 import { COLLECTIONS, validateDatabase } from '../storage/validation.js';
 import { effectiveStats } from '../game/progression/rules.js';
 import { marketExpiresAt } from '../game/market/policy.js';
-import { readRecords, register, setup } from './helpers.js';
+import { pendingRecords, readRecords, register, setup } from './helpers.js';
 
 const rawState = directory => Object.fromEntries(COLLECTIONS.map(name => [name,
   JSON.parse(fs.readFileSync(path.join(directory, `${name}.json`), 'utf8'))]));
@@ -150,7 +150,7 @@ for (const stage of ['prepared', 'committed', ...COLLECTIONS.map(name => `publis
     const failed = c.open({ fault: current => { if (current === stage) throw new Error('interrupted market purchase'); } }).game;
     await assert.rejects(failed.market.buyListing(request), { code: 'STORAGE_WRITE_FAILED' });
     const journal = JSON.parse(fs.readFileSync(path.join(c.directory, '_journal.json'), 'utf8'));
-    const attempted = JSON.parse(journal.body.after['ventas.json']).records[0];
+    const attempted = pendingRecords(c.directory, journal, 'ventas')[0];
     await failed.close();
     const game = c.open().game;
     const committed = stage !== 'prepared';

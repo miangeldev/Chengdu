@@ -5,7 +5,7 @@ import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { COLLECTIONS, validateDatabase, validateTransition } from '../storage/validation.js';
 import { nextDailyAt } from '../game/economy/dailyPolicy.js';
-import { readRecords, register, setup } from './helpers.js';
+import { pendingRecords, readRecords, register, setup } from './helpers.js';
 
 const databaseState = directory => Object.fromEntries(COLLECTIONS.map(name => [name,
   JSON.parse(fs.readFileSync(path.join(directory, `${name}.json`), 'utf8'))]));
@@ -123,7 +123,7 @@ for (const stage of ['prepared', 'committed', 'published:usuarios.json', 'publis
     const failed = c.open({ fault: current => { if (current === stage) throw new Error('interrupted daily award'); } }).game;
     await assert.rejects(failed.economy.claimDaily(request), { code: 'STORAGE_WRITE_FAILED' });
     const journal = JSON.parse(fs.readFileSync(path.join(c.directory, '_journal.json'), 'utf8'));
-    const attempted = JSON.parse(journal.body.after['diarios.json']).records[0];
+    const attempted = pendingRecords(c.directory, journal, 'diarios')[0];
     await failed.close();
     const game = c.open().game;
     const committed = stage !== 'prepared';

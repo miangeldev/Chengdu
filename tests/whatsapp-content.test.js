@@ -104,6 +104,8 @@ test('boss turns show damage, criticals, HP bars, attack choices and short ranki
 
 test('ordinary group activity produces one announcement per opportunity and ignores repeats, bot messages and unregistered senders', async t => {
   const c = await fixture(t);
+  await c.send('!ctuayuda');
+  c.replies.length = 0;
   const msg = { key: { remoteJid: group, participant: alice, id: 'normal-first' } };
   assert.equal(await c.route(c.sock, msg, 'Hola, equipo'), false);
   assert.equal(c.replies.length, 1);

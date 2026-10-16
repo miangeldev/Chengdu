@@ -1,8 +1,9 @@
+import { equal } from './equality.js';
 import { requireGame } from '../utils/GameError.js';
 import { reduceClan, stamp } from '../game/clans/policy.js';
 import { reduceWar } from '../game/clans/warPolicy.js';
 const check=(v,field)=>requireGame(v,'DATABASE_CORRUPT',{field});
-const equal=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+
 function latest(actions,key) {const map=new Map();for(const action of actions)map.set(action[key],action.after);return [...map.values()];}
 function moneyProof(action,type,userId,amount) {
   if(!type){check(action.movements.length===0,'clan.noMoney');return;}

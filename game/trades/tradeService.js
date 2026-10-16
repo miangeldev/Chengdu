@@ -24,9 +24,8 @@ function authorize(trade, userId, chatId) {
 }
 
 async function publicTrade(repos, trade) {
-  const all = await repos.trades.all();
   const participants = await Promise.all(trade.participants.map(id => userFor(repos, id)));
-  return { ...trade, code: tradeCodeAt(all.findIndex(row => row.id === trade.id)),
+  return { ...trade, code: tradeCodeAt(await repos.trades.indexOf(trade.id)),
     participantNames: participants.map(user => ({ userId: user.id, name: user.name })),
     offeredUnits: await Promise.all(trade.offers.flatMap(offer => offer.unitIds.map(async id => {
       const unit = await repos.units.get(id);
@@ -55,8 +54,7 @@ export function createTradeService(storage, clock) {
       requireGame(unit.ownerId === offer.userId, 'UNIT_NOT_OWNED');
       requireGame(unit.lock === null, 'UNIT_LOCKED');
       // A reserved team must remain unchanged while its battle runs.
-      if (user.team.includes(id)) requireGame(!await repos.battles.find(battle => battle.status === 'active' &&
-        battle.players.some(player => player.userId === user.id)), 'TEAM_LOCKED');
+      if (user.team.includes(id)) requireGame(!await repos.battles.findBy('status', 'active', battle => battle.players.some(player => player.userId === user.id)), 'TEAM_LOCKED');
       units.push(unit);
     }
     return { user, units };
@@ -69,7 +67,7 @@ export function createTradeService(storage, clock) {
       await userFor(repos, userId);
       let trade = await resolveTrade(repos, code);
       authorize(trade, userId, chatId);
-      const previous = await repos.tradeActions.find(action => action.operationKey === operationKey);
+      const previous = await repos.tradeActions.findBy('operationKey', operationKey);
       if (previous) {
         requireGame(previous.tradeId === trade.id && previous.userId === userId && previous.kind === kind &&
           (expectedOffer === null || equal(previous.after.offers.find(offer => offer.userId === userId), { userId, ...expectedOffer })), 'OPERATION_CONFLICT');
@@ -95,7 +93,7 @@ export function createTradeService(storage, clock) {
         await userFor(repos, userId);
         await userFor(repos, opponentId);
         requireGame(userId !== opponentId, 'SELF_TRADE');
-        const previous = await repos.tradeActions.find(action => action.operationKey === operationKey);
+        const previous = await repos.tradeActions.findBy('operationKey', operationKey);
         if (previous) {
           requireGame(previous.kind === 'create' && previous.userId === userId && previous.after.chatId === chatId &&
             equal(previous.after.participants, [userId, opponentId]), 'OPERATION_CONFLICT');

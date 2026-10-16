@@ -30,6 +30,17 @@ export function readRecords(directory, collection) {
   return JSON.parse(fs.readFileSync(path.join(directory, `${collection}.json`), 'utf8')).records;
 }
 
+// Record-patch journals keep only changed rows. Recover the proposed collection
+// from the coherent pre-commit backup for assertions at any publication stage.
+export function pendingRecords(directory, journal, collection) {
+  const file = `${collection}.json`;
+  if (journal.version < 3) return JSON.parse(journal.body.after[file]).records;
+  const change = journal.body.changes[file];
+  const records = readRecords(path.join(directory, 'backups', journal.body.id), collection);
+  for (const { index, record } of change.replacements) records[index] = record;
+  return records.concat(change.appended);
+}
+
 export async function updateCharacter(storage, characterId, changes) {
   await storage.withTransaction(async repos => {
     const character = await repos.characters.get(characterId);

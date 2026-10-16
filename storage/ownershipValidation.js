@@ -1,7 +1,8 @@
+import { equal } from './equality.js';
 import { requireGame } from '../utils/GameError.js';
 
 const check = (value, field) => requireGame(value, 'DATABASE_CORRUPT', { field });
-const equal = (first, second) => JSON.stringify(first) === JSON.stringify(second);
+
 const integer = value => Number.isSafeInteger(value) && value >= 0;
 const text = value => typeof value === 'string' && value.length > 0 && value.length <= 200;
 const date = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(value) && Number.isFinite(Date.parse(value));

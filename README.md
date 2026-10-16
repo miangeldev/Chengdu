@@ -435,8 +435,15 @@ export async function onIncomingMessage(sock, msg, body) {
 }
 ```
 
-El router procesa texto normal del grupo para las apariciones automáticas;
-entrégale también esos mensajes. No anuncia nada si no hay una nueva aparición.
+El router procesa texto normal para las apariciones automáticas únicamente en
+grupos donde se ha usado un comando CTU o que ya tienen historial de apariciones.
+Entrégale también esos mensajes. Los comandos activan el grupo sin escribir en la
+base; la primera comprobación guarda su actividad y la conserva al reiniciar.
+Tras cargar ese historial una vez, los grupos sin uso y las ventanas ya comprobadas
+se descartan en memoria, sin buscar al usuario ni abrir una transacción. Una ráfaga
+de mensajes comparte una sola comprobación por grupo. No anuncia nada si no hay
+una nueva aparición y conserva la oportunidad cada 30 minutos y la separación de
+una hora entre apariciones.
 `automaticSpawns: false` desactiva ese comportamiento.
 Si el anfitrión usa el cargador de plugins, puede importar `observeGameActivity`
 del mismo módulo e invocarlo únicamente para mensajes normales autenticados:
@@ -531,15 +538,23 @@ independientes; rechaza modificaciones directas de colecciones administradas.
 
 ## Persistencia y recuperación
 
-`usuarios.json`, `personajes.json`, `unidades.json`, `estado.json`, `eventos.json`,
-`ataques.json`, `combates.json`, `recompensas.json`, `sobres.json`, `aperturas.json`,
-`economia.json`, `diarios.json`, `mercado.json`, `ventas.json`, `campanas.json`,
-`premioscontenido.json`, `logros.json`, `encuentros.json`, `accionescontenido.json`,
-`actividad.json`, `temporadas.json`, `clasificacion.json`, `resultadoscompetitivos.json`
-y `premiostemporada.json` incluyen versión de esquema 10 y revisión. Son veinticuatro colecciones
-y el manifest por snapshot. `_database.json` identifica la instalación.
+Las 35 colecciones del esquema 11 incluyen versión y revisión; su contrato está
+en [docs/database.md](docs/database.md). `_database.json` identifica la instalación.
 `_journal.json` existe mientras hay un commit pendiente. Cada operación que cambia
 datos guarda previamente una copia coherente en `backups/<id-operación>/`.
+
+El proceso mantiene un snapshot validado en memoria y comprueba cambios externos
+mediante los metadatos de los archivos. Las consultas usan índices; una operación
+sin cambios no clona ni vuelve a validar toda la base. Las escrituras copian sólo
+las colecciones modificadas, conservan en el journal v3 los registros reemplazados
+y añadidos y publican únicamente sus archivos. Se siguen recuperando journals
+anteriores; la instalación y las migraciones conservan el journal completo v1.
+No hace falta convertir los JSON existentes. El benchmark y sus límites están
+en [docs/performance.md](docs/performance.md):
+
+```sh
+npm run perf:benchmark -- --users=1000 --history=10 --iterations=3
+```
 
 Una cola serializa lecturas y escrituras. El lock `.writer.lock` permite un proceso
 por carpeta. Las publicaciones de archivos usan temporales, sincronización y
@@ -584,8 +599,11 @@ Conservar los archivos y backups al diagnosticar. No editar JSON mientras el bot
 esté activo. Para restaurar, detenerlo y recuperar el conjunto completo de una
 copia coherente; mezclar archivos de snapshots distintos rompe referencias.
 
-Los backups se conservan sin poda automática: controlar su tamaño y definir
-retención antes de aumentar el volumen. Los historiales de auditoría están fuera
+Se conservan los últimos 20 respaldos rutinarios del formato nuevo. `backupRetention`
+en `createGame()` o `JsonUnitOfWork` permite cambiar ese límite; `Infinity` desactiva
+la poda. Los respaldos de migración y los formatos históricos permanecen intactos.
+Los archivos idénticos comparten espacio entre respaldos, mediante enlaces entre
+copias; nunca comparten inode con los archivos activos. Los historiales de auditoría están fuera
 de las unidades. Las consultas son paginadas, aunque JSON aún carga y valida el
 estado completo. Antes de usar múltiples escritores o un mercado de varios
 activos, revisar la migración a SQLite prevista en el diseño.

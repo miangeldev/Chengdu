@@ -8,6 +8,54 @@ El alcance se divide en [fundación 0.1](mvp-0.1.md), [combate 0.2](mvp-0.2.md),
 y [mercado 0.6](alpha-0.6.md), [combate avanzado 0.7](alpha-0.7.md)
 y [contenido 0.8](beta-0.8.md), [competitivo 0.9](beta-0.9.md).
 
+## Acceso y commits optimizados sin cambiar el esquema
+
+El esquema sigue siendo 11 y los JSON existentes se abren directamente. Después
+de recuperarlos y validarlos, el proceso conserva su estado profundamente
+inmutable y sus textos en memoria. Antes de cada operación comprueba inode,
+tamaño y fechas de modificación/cambio de cada archivo; si cambiaron, recarga y
+valida el estado completo. Una edición externa durante una escritura produce
+`STORAGE_CONFLICT`. El writer lock y la cola siguen teniendo un único dueño.
+
+Los repositorios mantienen índices de IDs, identidades, propietarios y campos
+consultados. Una transacción copia el array de una colección en su primera
+escritura y conserva las referencias de los registros intactos. Sólo las
+colecciones que realmente cambiaron aumentan revisión. Las transacciones sin
+cambios no vuelven a reproducir historiales ni generan respaldos. Los predicados
+reciben registros congelados y los resultados son copias independientes; los
+repositorios de escritura dejan de admitir mutaciones al terminar el callback.
+Al insertar o reemplazar, el registro se normaliza a JSON plano para que la
+caché y el archivo tengan la misma representación, incluso en campos adicionales.
+
+La validación completa se ejecuta al abrir, recargar o pedir una auditoría. En
+una escritura se conserva la validación de estado y transición, reutilizando las
+pruebas de un dominio únicamente si todas sus dependencias son exactamente las
+mismas colecciones profundamente congeladas. Las fechas y revisiones nuevas se
+comprueban antes de publicar. No se desactivan los controles de saldos, propiedad,
+idempotencia ni reproducción histórica.
+
+El journal v3 rutinario guarda, para cada colección afectada, el hash anterior y
+posterior, longitud anterior, metadata nueva, reemplazos por posición y apéndices.
+Las colecciones intactas quedan vinculadas por sus hashes. Al recuperar, cada
+archivo debe coincidir con su hash anterior o, sólo para un commit confirmado,
+posterior. Se reconstruye y valida la imagen completa propuesta antes de publicar
+cualquier archivo. Un estado preparado se descarta; uno confirmado se termina.
+El orden de los registros y todos los códigos públicos permanecen iguales.
+La inicialización y las migraciones conservan el journal completo v1; también
+se admiten journals v2 de colecciones completas.
+
+Cada respaldo sigue conteniendo todos los JSON anteriores. `snapshot.json` v2
+guarda los hashes en lugar de duplicar sus textos; el formato v1 histórico
+conserva los textos. Los contenidos nuevos se copian a un inode independiente
+(reflink si está disponible) y se sincronizan; los contenidos idénticos pueden
+enlazarse entre respaldos. Nunca se enlaza un respaldo con un archivo activo.
+Tras un commit durable se conservan 20 respaldos rutinarios nuevos por defecto,
+configurables con `backupRetention` (entero positivo o `Infinity`). Los respaldos
+de formato anterior y de migración se preservan. No se poda durante recuperación.
+
+El arranque, la memoria y la reescritura de una colección afectada siguen
+dependiendo de su tamaño. Mediciones y límites: [rendimiento](performance.md).
+
 ## Comunidad y migración 10→11
 
 La base incorpora once colecciones vacías para intercambios, crafting,

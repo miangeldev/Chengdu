@@ -66,8 +66,7 @@ async function teamFor(repos, user) {
 
 async function assertKeyAvailable(repos, key) {
   if (key === null) return;
-  requireGame(!await repos.battles.find(battle => battle.challengeKey === key || battle.acceptKey === key ||
-    battle.actions.some(action => action.operationKey === key)), 'OPERATION_CONFLICT');
+  requireGame(!await repos.battles.findBy('anyOperationKey', key), 'OPERATION_CONFLICT');
 }
 
 function advancedClock(battle, now) {
@@ -92,7 +91,8 @@ async function snapshotFor(repos, unit, advanced) {
 
 async function findBattle(repos, { userId, chatId, battleId = null }, statuses = ['pending', 'active'], missingOkay = false) {
   requireGame(typeof chatId === 'string' && chatId.length > 0 && chatId.length <= 200, 'INVALID_ARENA');
-  const rows = battleId ? [await repos.battles.get(battleId)] : await repos.battles.filter(b => b.chatId === chatId && b.players.some(p => p.userId === userId));
+  const rows = battleId ? [await repos.battles.get(battleId)] : await repos.battles.filterIn('status', statuses,
+    b => b.chatId === chatId && b.players.some(p => p.userId === userId));
   const battle = rows.filter(Boolean).filter(b => statuses.includes(b.status)).sort((a, b) => b.createdAt.localeCompare(a.createdAt) || b.id.localeCompare(a.id))[0];
   if (!battle && missingOkay) return null;
   requireGame(battle, 'BATTLE_NOT_FOUND');
@@ -103,7 +103,7 @@ async function findBattle(repos, { userId, chatId, battleId = null }, statuses =
 
 async function replayAction(repos, { userId, chatId, battleId, operationKey }, type) {
   if (operationKey === null) return null;
-  const battle = await repos.battles.find(b => b.actions.some(a => a.operationKey === operationKey));
+  const battle = await repos.battles.findBy('actionOperationKey', operationKey);
   if (!battle) return null;
   const action = battle.actions.find(a => a.operationKey === operationKey);
   requireGame(action.actorId === userId && battle.chatId === chatId && (action.commandType ?? action.type) === type && (!battleId || battle.id === battleId), 'OPERATION_CONFLICT');
@@ -121,7 +121,7 @@ export function createBattleService(storage, clock, randomRoll = () => randomInt
       requireGame(userId !== opponentId, 'SELF_CHALLENGE');
       return storage.withTransaction(async repos => {
         if (operationKey !== null) {
-          const previous = await repos.battles.find(b => b.challengeKey === operationKey);
+          const previous = await repos.battles.findBy('challengeKey', operationKey);
           if (previous) {
             requireGame(previous.chatId === chatId && previous.players[0].userId === userId && previous.players[1].userId === opponentId &&
               (previous.mode ?? 'classic') === selectedMode && Boolean(previous.competitive) === ranked, 'OPERATION_CONFLICT');
@@ -141,7 +141,7 @@ export function createBattleService(storage, clock, randomRoll = () => randomInt
             sizes.push(units.length);
             for (const unit of units) requireGame(dailyTimestamp(now) >= dailyTimestamp(unit.updatedAt), 'INVALID_CLOCK');
           } else await equipped(repos, user);
-          requireGame(!await repos.battles.find(b => isOpenBattle(b) && b.players.some(p => p.userId === id)), 'PLAYER_BUSY');
+          requireGame(!await repos.battles.findBy('participantId', id, isOpenBattle), 'PLAYER_BUSY');
           players.push({ userId: id, name: user.name, ...(advanced ? { units: [], activeIndex: 0 } : { unit: null }) });
         }
         const teamSize = advanced ? selectedMode === 'auto' ? sizes[0] : Number(selectedMode[0]) : 1;
@@ -168,7 +168,7 @@ export function createBattleService(storage, clock, randomRoll = () => randomInt
       return committedResult(storage, async repos => {
         await participant(repos, userId);
         if (operationKey !== null) {
-          const previous = await repos.battles.find(b => b.acceptKey === operationKey);
+          const previous = await repos.battles.findBy('acceptKey', operationKey);
           if (previous) {
             requireGame(previous.players[1].userId === userId && previous.chatId === chatId && (!battleId || previous.id === battleId), 'OPERATION_CONFLICT');
             return { battle: previous, duplicate: true };
@@ -312,7 +312,7 @@ export function createBattleService(storage, clock, randomRoll = () => randomInt
         await expireGameLocks(repos, clock());
         await participant(repos, userId);
         if (battleId) return findBattle(repos, { userId, chatId, battleId }, ['pending', 'active', 'finished', 'expired', 'rejected', 'cancelled']);
-        const rows = await repos.battles.filter(b => b.chatId === chatId && b.players.some(p => p.userId === userId));
+        const rows = await repos.battles.filterBy('participantId', userId, b => b.chatId === chatId);
         return rows.reverse().sort((a, b) => Number(isOpenBattle(b)) - Number(isOpenBattle(a)) || b.updatedAt.localeCompare(a.updatedAt))[0] ?? null;
       });
     },
@@ -320,7 +320,7 @@ export function createBattleService(storage, clock, randomRoll = () => randomInt
       return storage.withTransaction(async repos => {
         await expireGameLocks(repos, clock());
         await participant(repos, userId);
-        const rows = await repos.battles.filter(b => b.acceptedAt !== null && !isOpenBattle(b) && b.players.some(p => p.userId === userId));
+        const rows = await repos.battles.filterBy('participantId', userId, b => b.acceptedAt !== null && !isOpenBattle(b));
         return paginate(rows, options, `battleHistory:${userId}`, b => [String(8_640_000_000_000_000 - Date.parse(b.finishedAt)).padStart(17, '0'), b.id]);
       });
     },

@@ -1,9 +1,10 @@
+import { equal } from './equality.js';
 import { requireGame } from '../utils/GameError.js';
 import { safeAdd } from '../game/progression/rules.js';
 import { DAILY_POLICY_VERSION, dailyPolicy, nextDailyAt } from '../game/economy/dailyPolicy.js';
 
 const check = (value, field) => requireGame(value, 'DATABASE_CORRUPT', { field });
-const equal = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
 const integer = (value, minimum = 0) => Number.isSafeInteger(value) && value >= minimum;
 const text = value => typeof value === 'string' && value.length > 0 && value.length <= 200;
 const date = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(value) && Number.isFinite(Date.parse(value));

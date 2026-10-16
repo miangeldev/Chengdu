@@ -28,7 +28,7 @@ async function seasonFor(repos, now, code) {
 
 async function standingsFor(repos, season) {
   return season.status === 'closed' ? season.standings
-    : finalStandings(await repos.rankings.filter(rank => rank.seasonId === season.id));
+    : finalStandings(await repos.rankings.filterBy('seasonId', season.id));
 }
 
 async function rankView(repos, season, userId, standings) {
@@ -63,7 +63,7 @@ export function createCompetitiveService(storage, clock) {
         const season = await seasonFor(repos, now, seasonCode);
         const standings = await standingsFor(repos, season);
         return { season, rank: await rankView(repos, season, userId, standings),
-          rewardClaimed: Boolean(await repos.seasonRewards.find(reward => reward.seasonId === season.id && reward.userId === userId)) };
+          rewardClaimed: Boolean(await repos.seasonRewards.findBy('seasonId', season.id, reward => reward.userId === userId)) };
       });
     },
     async getLeaderboard({ seasonCode = null, page = 1, limit = 5 } = {}) {
@@ -88,7 +88,7 @@ export function createCompetitiveService(storage, clock) {
         const standing = standings.find(row => row.userId === userId);
         return { ...season, participants: standings.length, eligibleParticipants: standings.filter(row => row.eligible).length,
           rank, reward: seasonPrize(standing, season), rewardClaimed: userId !== null && Boolean(
-            await repos.seasonRewards.find(reward => reward.seasonId === season.id && reward.userId === userId)) };
+            await repos.seasonRewards.findBy('seasonId', season.id, reward => reward.userId === userId)) };
       });
     },
     async getSeasons({ page = 1, limit = 5 } = {}) {
@@ -109,17 +109,16 @@ export function createCompetitiveService(storage, clock) {
       requireGame(typeof seasonCode === 'string' && /^T(?:10000|[1-9]\d{0,3})$/i.test(seasonCode), 'INVALID_SEASON');
       return storage.withTransaction(async repos => {
         await userFor(repos, userId);
-        const replay = await repos.seasonRewards.find(reward => reward.operationKey === operationKey);
+        const replay = await repos.seasonRewards.findBy('operationKey', operationKey);
         if (replay) {
           requireGame(replay.userId === userId && replay.seasonId === `season:${String(seasonCode).toUpperCase()}`, 'OPERATION_CONFLICT');
           return { reward: replay, alreadyClaimed: true };
         }
-        const claimed = await repos.seasonRewards.find(reward => reward.userId === userId &&
-          reward.seasonId === `season:${seasonCode.toUpperCase()}`);
+        const claimed = await repos.seasonRewards.findBy('userId', userId, reward => reward.seasonId === `season:${seasonCode.toUpperCase()}`);
         if (claimed) return { reward: claimed, alreadyClaimed: true };
         const now = await refresh(repos);
         const season = await seasonFor(repos, now, seasonCode);
-        const previous = await repos.seasonRewards.find(reward => reward.userId === userId && reward.seasonId === season.id);
+        const previous = await repos.seasonRewards.findBy('userId', userId, reward => reward.seasonId === season.id);
         if (previous) return { reward: previous, alreadyClaimed: true };
         requireGame(season.status === 'closed', 'SEASON_NOT_ENDED');
         const standing = season.standings.find(row => row.userId === userId);

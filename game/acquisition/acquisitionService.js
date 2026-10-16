@@ -9,7 +9,7 @@ async function result(repos,receipt,duplicate){const unit=receipt.unitId?await r
 export function createAcquisitionService(storage,clock,randomDropInt=randomInt){
   async function claim({userId,kind,code=null,operationKey}) {keyProof(operationKey);requireGame(Object.hasOwn(CHANCES,kind),'INVALID_ACQUISITION_KIND');
     return storage.withTransaction(async repos=>{const user=await repos.users.get(userId);requireGame(user,'USER_NOT_FOUND');
-      const previous=await repos.acquisitions.find(a=>a.operationKey===operationKey);
+      const previous=await repos.acquisitions.findBy('operationKey', operationKey);
       if(previous){requireGame(previous.userId===userId && previous.kind===kind && (kind!=='promo'||previous.sourceId===code),'OPERATION_CONFLICT');return result(repos,previous,true);}
       const now=clock();stamp(now);requireGame(stamp(now)>=stamp(user.updatedAt),'INVALID_CLOCK');const state=await stateView(repos),old=await repos.acquisitions.all();let sourceId;
       if(kind==='promo'){requireGame(code===PROMOTION.code && stamp(now)>=stamp(PROMOTION.startsAt) && stamp(now)<stamp(PROMOTION.endsAt),'PROMO_UNAVAILABLE');

@@ -60,12 +60,12 @@ export const commands = Object.freeze([registro, perfil, catalogo, starter, pers
 
 export async function observeGameActivity(sock, msg, { game = defaultGame, prefix = '.', logger = console.error } = {}) {
   if (!msg?.key?.remoteJid?.endsWith('@g.us') || msg.key.fromMe || !msg.key.id || !msg.key.participant) return false;
-  let user;
-  try { user = await game.users.getUserByIdentity(identityFor(sock, msg)); }
-  catch (error) { if (['USER_NOT_FOUND', 'INVALID_IDENTITY'].includes(error.code)) return false; throw error; }
   let result;
-  try { result = await game.encounters.observeActivity({ userId: user.id, chatId: msg.key.remoteJid, messageId: msg.key.id }); }
-  catch (error) { logger(`Chengdú: aparición | ${error.code ?? 'UNEXPECTED_ERROR'}`, error); return false; }
+  try { result = await game.encounters.observeGroupActivity({ identity: identityFor(sock, msg), chatId: msg.key.remoteJid, messageId: msg.key.id }); }
+  catch (error) {
+    if (!['USER_NOT_FOUND', 'INVALID_IDENTITY'].includes(error.code)) logger(`Chengdú: aparición | ${error.code ?? 'UNEXPECTED_ERROR'}`, error);
+    return false;
+  }
   if (!result.spawned) return false;
   await sock.sendMessage(msg.key.remoteJid, { text: renderSpawn(result.spawn, (command, args = '') => commandText(prefix, command, args)) });
   return true;

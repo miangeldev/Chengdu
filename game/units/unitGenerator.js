@@ -7,7 +7,7 @@ export async function createUnitInTransaction(repos, { characterId, ownerId, ori
   requireGame(typeof operationKey === 'string' && operationKey.trim().length > 0 && operationKey.length <= 200, 'INVALID_OPERATION_KEY');
   requireGame(origin && typeof origin.type === 'string' && typeof origin.sourceId === 'string' &&
     origin.type.length > 0 && origin.type.length <= 200 && origin.sourceId.length > 0 && origin.sourceId.length <= 200, 'INVALID_ORIGIN');
-  const existing = await repos.events.find(e => e.operationKey === operationKey);
+  const existing = await repos.events.findBy('operationKey', operationKey);
   if (existing) {
     const unit = await repos.units.get(existing.unitId);
     requireGame(existing.type === 'unit_created' && existing.toOwnerId === ownerId && unit.characterId === characterId &&

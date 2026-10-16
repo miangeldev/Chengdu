@@ -41,8 +41,9 @@ export async function settleBattle(repos, battle, now, { idleUserId = null } = {
 }
 
 export async function expireBattles(repos, now) {
-  const expired = await repos.battles.filter(b => isOpenBattle(b) &&
-    (Date.parse(b.expiresAt) <= Date.parse(now) || (b.competitive && Date.parse(b.competitive.endsAt) <= Date.parse(now))));
+  const timestamp = Date.parse(now);
+  const expired = await repos.battles.filterIn('status', ['pending', 'active'], b =>
+    Date.parse(b.expiresAt) <= timestamp || (b.competitive && Date.parse(b.competitive.endsAt) <= timestamp));
   for (const battle of expired) {
     const idleUserId = battle.acceptedAt === null ? null : battle.turnUserId;
     battle.status = 'expired';

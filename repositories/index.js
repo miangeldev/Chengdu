@@ -3,42 +3,59 @@ import { personajesRepository } from './personajesRepository.js';
 import { unidadesRepository } from './unidadesRepository.js';
 import { collectionRepository } from './collection.js';
 
-export function createRepositories(state, writable = false) {
+export function createRepositories(state, writable = false, { beforeWrite, onWrite } = {}) {
+  function repository(name, factory = collectionRepository, indexes) {
+    return factory(state[name].records, writable, {
+      beforeWrite: beforeWrite ? () => beforeWrite(name) : undefined,
+      onWrite: onWrite ? () => onWrite(name) : undefined,
+      indexes
+    });
+  }
   return {
-    users: usuariosRepository(state.usuarios.records, writable),
-    characters: personajesRepository(state.personajes.records, writable),
-    units: unidadesRepository(state.unidades.records, writable),
-    state: collectionRepository(state.estado.records, writable),
-    events: collectionRepository(state.eventos.records, writable),
-    attacks: collectionRepository(state.ataques.records, writable),
-    battles: collectionRepository(state.combates.records, writable),
-    rewards: collectionRepository(state.recompensas.records, writable),
-    packs: collectionRepository(state.sobres.records, writable),
-    openings: collectionRepository(state.aperturas.records, writable),
-    economy: collectionRepository(state.economia.records, writable),
-    dailyClaims: collectionRepository(state.diarios.records, writable),
-    listings: collectionRepository(state.mercado.records, writable),
-    sales: collectionRepository(state.ventas.records, writable),
-    campaigns: collectionRepository(state.campanas.records, writable),
-    contentRewards: collectionRepository(state.premioscontenido.records, writable),
-    achievements: collectionRepository(state.logros.records, writable),
-    encounters: collectionRepository(state.encuentros.records, writable),
-    contentActions: collectionRepository(state.accionescontenido.records, writable),
-    groupActivity: collectionRepository(state.actividad.records, writable),
-    seasons: collectionRepository(state.temporadas.records, writable),
-    rankings: collectionRepository(state.clasificacion.records, writable),
-    competitiveResults: collectionRepository(state.resultadoscompetitivos.records, writable),
-    seasonRewards: collectionRepository(state.premiostemporada.records, writable),
-    trades: collectionRepository(state.intercambios.records, writable),
-    tradeActions: collectionRepository(state.accionesintercambio.records, writable),
-    craftingActions: collectionRepository(state.artesania.records, writable),
-    evolutionActions: collectionRepository(state.evoluciones.records, writable),
-    socialProfiles: collectionRepository(state.perfilessociales.records, writable),
-    socialActions: collectionRepository(state.accionessociales.records, writable),
-    clans: collectionRepository(state.clanes.records, writable),
-    clanActions: collectionRepository(state.accionesclan.records, writable),
-    clanWars: collectionRepository(state.guerrasclan.records, writable),
-    clanWarActions: collectionRepository(state.accionesguerra.records, writable),
-    acquisitions: collectionRepository(state.obtenciones.records, writable)
+    users: repository('usuarios', usuariosRepository),
+    characters: repository('personajes', personajesRepository),
+    units: repository('unidades', unidadesRepository),
+    state: repository('estado'),
+    events: repository('eventos'),
+    attacks: repository('ataques'),
+    battles: repository('combates', collectionRepository, {
+      participantId: battle => battle.players.map(player => player.userId),
+      anyOperationKey: battle => [battle.challengeKey, battle.acceptKey, ...battle.actions.map(action => action.operationKey)].filter(key => key != null),
+      actionOperationKey: battle => battle.actions.map(action => action.operationKey).filter(key => key != null)
+    }),
+    rewards: repository('recompensas'),
+    packs: repository('sobres'),
+    openings: repository('aperturas'),
+    economy: repository('economia'),
+    dailyClaims: repository('diarios'),
+    listings: repository('mercado', collectionRepository, {
+      anyOperationKey: listing => [listing.operationKey, listing.closeOperationKey].filter(key => key != null)
+    }),
+    sales: repository('ventas'),
+    campaigns: repository('campanas'),
+    contentRewards: repository('premioscontenido'),
+    achievements: repository('logros'),
+    encounters: repository('encuentros', collectionRepository, {
+      bossId: encounter => encounter.kind === 'boss' ? [encounter.snapshot.id] : []
+    }),
+    contentActions: repository('accionescontenido'),
+    groupActivity: repository('actividad'),
+    seasons: repository('temporadas'),
+    rankings: repository('clasificacion'),
+    competitiveResults: repository('resultadoscompetitivos'),
+    seasonRewards: repository('premiostemporada'),
+    trades: repository('intercambios', collectionRepository, {
+      participantId: trade => trade.participants
+    }),
+    tradeActions: repository('accionesintercambio'),
+    craftingActions: repository('artesania'),
+    evolutionActions: repository('evoluciones'),
+    socialProfiles: repository('perfilessociales'),
+    socialActions: repository('accionessociales'),
+    clans: repository('clanes'),
+    clanActions: repository('accionesclan'),
+    clanWars: repository('guerrasclan'),
+    clanWarActions: repository('accionesguerra'),
+    acquisitions: repository('obtenciones')
   };
 }

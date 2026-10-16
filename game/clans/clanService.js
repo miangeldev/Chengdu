@@ -21,7 +21,7 @@ async function warView(repos,war,viewerId=null) {
 export function createClanService(storage,clock) {
   async function mutate({userId,kind,operationKey,request={},code=null}) {
     keyProof(operationKey);return storage.withTransaction(async repos => {
-      await user(repos,userId);const replay=await repos.clanActions.find(a => a.operationKey === operationKey);
+      await user(repos,userId);const replay=await repos.clanActions.findBy('operationKey', operationKey);
       if (replay) { requireGame(replay.userId === userId && replay.kind === kind && JSON.stringify(replay.request) === JSON.stringify(request) && (!code || replay.clanId === (await codeRow(repos.clans,code,'C')).id),'OPERATION_CONFLICT');return {clan:await clanView(repos,await repos.clans.get(replay.clanId),userId),alreadyProcessed:true}; }
       const now=clock();stamp(now);requireGame(stamp(now)>=stamp((await user(repos,userId)).updatedAt),'INVALID_CLOCK');await expireClanWars(repos,now);
       const clan=kind === 'create' ? null : code ? await codeRow(repos.clans,code,'C') : membership(await repos.clans.all(),userId);
@@ -32,7 +32,7 @@ export function createClanService(storage,clock) {
   }
   async function warMutate({userId,kind,operationKey,request={},code=null}) {
     keyProof(operationKey);return storage.withTransaction(async repos => {
-      await user(repos,userId);const replay=await repos.clanWarActions.find(a => a.operationKey === operationKey);
+      await user(repos,userId);const replay=await repos.clanWarActions.findBy('operationKey', operationKey);
       if (replay) { requireGame(replay.userId === userId && replay.kind === kind && (kind !== 'create' || replay.request.opponentClanId === (await codeRow(repos.clans,request.opponentClanCode,'C')).id) && (kind === 'create' || !code || replay.warId === (await codeRow(repos.clanWars,code,'G')).id),'OPERATION_CONFLICT');return {war:await warView(repos,await repos.clanWars.get(replay.warId),userId),alreadyProcessed:true}; }
       const now=clock();stamp(now);requireGame(stamp(now)>=stamp((await user(repos,userId)).updatedAt),'INVALID_CLOCK');await expireClanWars(repos,now);
       let war=null;
@@ -60,7 +60,7 @@ export function createClanService(storage,clock) {
     unban:({userId,targetUserId,operationKey})=>mutate({userId,kind:'unban',operationKey,request:{targetUserId}}),
     deposit:({userId,amount,operationKey})=>mutate({userId,kind:'deposit',operationKey,request:{amount}}),
     withdraw:({userId,targetUserId=userId,amount,operationKey})=>mutate({userId,kind:'withdraw',operationKey,request:{targetUserId,amount}}),
-    getLedger:({userId,page=1,limit=5})=>refresh(async repos=>{const clan=membership(await repos.clans.all(),userId);requireGame(clan,'CLAN_NOT_MEMBER');const rows=await repos.clanActions.filter(a=>a.clanId===clan.id && a.before?.treasury !== a.after.treasury);return {...paginate(rows,{page,limit},`clanLedger:${clan.id}`,r=>[-rows.indexOf(r)]),clan:await clanView(repos,clan,userId)};}),
+    getLedger:({userId,page=1,limit=5})=>refresh(async repos=>{const clan=membership(await repos.clans.all(),userId);requireGame(clan,'CLAN_NOT_MEMBER');const rows=await repos.clanActions.filterBy('clanId', clan.id, a => a.before?.treasury !== a.after.treasury);return {...paginate(rows,{page,limit},`clanLedger:${clan.id}`,r=>[-rows.indexOf(r)]),clan:await clanView(repos,clan,userId)};}),
     challengeWar:({userId,opponentClanCode,operationKey})=>warMutate({userId,kind:'create',operationKey,request:{opponentClanCode}}),
     acceptWar:args=>warMutate({...args,kind:'accept'}),rejectWar:args=>warMutate({...args,kind:'reject'}),cancelWar:args=>warMutate({...args,kind:'cancel'}),
     getWar:({userId,code=null})=>refresh(async repos=>{await user(repos,userId);let war=code?await codeRow(repos.clanWars,code,'G'):null;

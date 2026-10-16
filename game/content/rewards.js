@@ -10,7 +10,7 @@ export function validContentKey(value) {
 }
 
 export async function ticketBalance(repos, userId) {
-  return (await repos.contentRewards.filter(reward => reward.userId === userId)).at(-1)?.ticketsAfter ?? 0;
+  return (await repos.contentRewards.lastBy('userId', userId))?.ticketsAfter ?? 0;
 }
 
 export async function grantContentReward(repos, { userId, kind, sourceId, operationKey, coins = 0, userXp = 0,
@@ -19,12 +19,12 @@ export async function grantContentReward(repos, { userId, kind, sourceId, operat
   requireGame(['mission', 'achievement', 'boss', 'event', 'spawn'].includes(kind) && typeof sourceId === 'string' && sourceId.length > 0 && sourceId.length <= 200, 'INVALID_CONTENT_REWARD');
   const user = await repos.users.get(userId);
   requireGame(user, 'USER_NOT_FOUND');
-  const previousKey = await repos.contentRewards.find(reward => reward.operationKey === operationKey);
+  const previousKey = await repos.contentRewards.findBy('operationKey', operationKey);
   if (previousKey) {
     requireGame(previousKey.userId === userId && previousKey.kind === kind && previousKey.sourceId === sourceId, 'OPERATION_CONFLICT');
     return { reward: previousKey, alreadyClaimed: true };
   }
-  const previous = await repos.contentRewards.find(reward => reward.userId === userId && reward.kind === kind && reward.sourceId === sourceId);
+  const previous = await repos.contentRewards.findBy('userId', userId, reward => reward.kind === kind && reward.sourceId === sourceId);
   if (previous) return { reward: previous, alreadyClaimed: true };
   for (const amount of [coins, userXp, tickets, ticketCost]) requireGame(Number.isSafeInteger(amount) && amount >= 0, 'INVALID_CONTENT_REWARD');
   requireGame(dailyTimestamp(createdAt) >= dailyTimestamp(user.updatedAt), 'INVALID_CLOCK');

@@ -2,6 +2,7 @@ import { expireTrades } from '../trades/lifecycle.js';
 import { effectiveUnitStats, evolutionSnapshot, displayUnitCharacterName } from '../evolution/rules.js';
 import { createHash, randomInt, randomUUID } from 'node:crypto';
 import { GameError, requireGame } from '../../utils/GameError.js';
+import { normalizeIdentity } from '../../utils/identity.js';
 import { paginate } from '../../utils/pagination.js';
 import { dailyTimestamp } from '../economy/dailyPolicy.js';
 import { expireBattles } from '../battle/lifecycle.js';
@@ -11,11 +12,15 @@ import { advancedAttack } from '../battle/combatContent.js';
 import { createUnitInTransaction } from '../units/unitGenerator.js';
 import { BOSSES, CONTENT_POLICY_VERSION, SPAWN_POLICY } from './catalog.js';
 import { grantContentReward } from './rewards.js';
-import { activeCampaign, bossContributions, bossRewardFor, encounterCodeAt, encounterDeadline, referenceMatches, resolveBossAttack } from './encounterRules.js';
+import { activeCampaign, bossContributions, bossRewardFor, encounterCodeAt, encounterDeadline, resolveBossAttack } from './encounterRules.js';
 
 const checkKey = key => requireGame(typeof key === 'string' && key.length > 0 && key.length <= 200 && key.trim() === key, 'INVALID_OPERATION_KEY');
+const checkMessageId = messageId => requireGame(typeof messageId === 'string' && messageId.length > 0 && messageId.length <= 200, 'INVALID_OPERATION_KEY');
 const group = chatId => requireGame(typeof chatId === 'string' && chatId.length <= 200 && /^[^\s]+@g\.us$/.test(chatId), 'CONTENT_GROUP_ONLY');
 const bossTemplate = id => (Array.isArray(BOSSES) ? BOSSES : Object.values(BOSSES)).find(boss => boss.id === id);
+const activityId = chatId => `group:${createHash('sha256').update(chatId).digest('hex')}`;
+const checkOperationKey = (chatId, messageId) => `spawn-check:${createHash('sha256').update(JSON.stringify([chatId, messageId])).digest('hex')}`;
+const noSpawn = () => ({ spawn: null, spawned: false, alreadyChecked: false });
 
 async function participant(repos, userId) {
   const user = await repos.users.get(userId);
@@ -24,24 +29,24 @@ async function participant(repos, userId) {
 }
 
 async function availableKey(repos, key) {
-  requireGame(!await repos.contentActions.find(action => action.operationKey === key) &&
-    !await repos.contentRewards.find(reward => reward.operationKey === key), 'OPERATION_CONFLICT');
+  requireGame(!await repos.contentActions.findBy('operationKey', key) &&
+    !await repos.contentRewards.findBy('operationKey', key), 'OPERATION_CONFLICT');
 }
 
 export async function expireEncounters(repos, now) {
   dailyTimestamp(now);
-  const expired = await repos.encounters.filter(encounter => encounter.status === 'active' && Date.parse(encounter.expiresAt) <= Date.parse(now));
+  const expired = await repos.encounters.filterBy('status', 'active', encounter => Date.parse(encounter.expiresAt) <= Date.parse(now));
   for (const encounter of expired) await repos.encounters.replace({ ...encounter, status: 'expired', updatedAt: now, endedAt: now });
   return expired.length;
 }
 
 async function view(repos, encounter, userId = null) {
-  const all = await repos.encounters.all();
-  const result = { ...encounter, code: encounterCodeAt(encounter, all.findIndex(row => row.id === encounter.id)) };
+  const result = { ...encounter, code: encounterCodeAt(encounter, await repos.encounters.indexOf(encounter.id)) };
   if (encounter.kind === 'spawn') return result;
-  const actions = await repos.contentActions.filter(action => action.encounterId === encounter.id && action.kind === 'boss_attack');
+  const actions = await repos.contentActions.filterBy('encounterId', encounter.id, action => action.kind === 'boss_attack');
   const contributions = bossContributions(actions);
-  const users = new Map((await repos.users.all()).map(user => [user.id, user.name]));
+  const userIds = new Set([...contributions.map(contribution => contribution.userId), encounter.winnerId].filter(Boolean));
+  const users = new Map(await Promise.all([...userIds].map(async id => [id, (await repos.users.get(id))?.name])));
   result.participants = contributions.map(({ first, ...contribution }) => ({ ...contribution, name: users.get(contribution.userId) }));
   result.totalDamage = encounter.snapshot.hp - encounter.hp;
   result.totalAttacks = actions.length;
@@ -65,10 +70,22 @@ async function view(repos, encounter, userId = null) {
 
 async function findEncounter(repos, code, kind) {
   requireGame(typeof code === 'string' && code.length <= 100, 'ENCOUNTER_NOT_FOUND');
-  const all = await repos.encounters.all();
-  const encounter = all.find(row => row.kind === kind && referenceMatches(all, row.id, code, kind));
-  requireGame(encounter, 'ENCOUNTER_NOT_FOUND');
+  const normalized = code.trim();
+  const match = /^([BS])([1-9]\d*)$/i.exec(normalized);
+  const encounter = match
+    ? await repos.encounters.at(Number(match[2]) - 1)
+    : await repos.encounters.get(normalized.replace(/^enc-(.*)$/i, (_prefix, suffix) => `ENC-${suffix.toLowerCase()}`));
+  requireGame(encounter?.kind === kind && (!match || match[1].toUpperCase() === (kind === 'boss' ? 'B' : 'S')), 'ENCOUNTER_NOT_FOUND');
   return encounter;
+}
+
+async function referenceMatches(repos, encounterId, code, kind) {
+  if (code === null || code === undefined) return true;
+  if (typeof code !== 'string') return false;
+  const match = /^([BS])([1-9]\d*)$/i.exec(code.trim());
+  if (!match) return code.trim().toLowerCase() === encounterId.toLowerCase();
+  const encounter = await repos.encounters.at(Number(match[2]) - 1);
+  return encounter?.id === encounterId && encounter.kind === kind && match[1].toUpperCase() === (kind === 'boss' ? 'B' : 'S');
 }
 
 async function unitSnapshot(repos, user) {
@@ -87,6 +104,29 @@ async function unitSnapshot(repos, user) {
 }
 
 export function createEncounterService(storage, clock, randomDropInt = upper => randomInt(upper)) {
+  // These are hints only. Every actual opportunity is checked again inside the
+  // writer transaction, so concurrent callers and restarts cannot grant a roll.
+  const activeGroups = new Set();
+  const automaticChecks = new Map();
+  const nextChecks = new Map();
+  const unknownIdentities = new Map();
+  let loadedGroups;
+
+  function rememberCheck(chatId, activity) {
+    if (activity) {
+      activeGroups.add(chatId);
+      nextChecks.set(chatId, { updatedAt: Date.parse(activity.updatedAt), nextCheckAt: Date.parse(activity.nextCheckAt) });
+    }
+  }
+
+  async function loadGroups() {
+    loadedGroups ??= storage.withRead(async repos => {
+      for (const activity of await repos.groupActivity.all()) rememberCheck(activity.chatId, activity);
+      for (const chatId of await repos.encounters.distinct('chatId')) if (chatId !== null) activeGroups.add(chatId);
+    }).catch(error => { loadedGroups = undefined; throw error; });
+    return loadedGroups;
+  }
+
   function roll(upper) {
     const value = randomDropInt(upper);
     requireGame(Number.isSafeInteger(value) && value >= 0 && value < upper, 'INVALID_RANDOM_ROLL');
@@ -107,7 +147,7 @@ export function createEncounterService(storage, clock, randomDropInt = upper => 
     const normalized = { guardian: 'niebla', 'guardián': 'niebla', 'dragón': 'dragon' }[bossId] ?? bossId;
     const template = bossTemplate(normalized);
     requireGame(template, 'BOSS_NOT_FOUND');
-    const latest = (await repos.encounters.filter(encounter => encounter.kind === 'boss' && encounter.snapshot.id === template.id)).at(-1);
+    const latest = await repos.encounters.lastBy('bossId', template.id);
     if (latest) {
       requireGame(dailyTimestamp(now) >= dailyTimestamp(latest.updatedAt), 'INVALID_CLOCK');
       if (latest.status === 'active' || Date.parse(now) < Date.parse(latest.createdAt) + latest.snapshot.respawnMs) return latest;
@@ -121,7 +161,7 @@ export function createEncounterService(storage, clock, randomDropInt = upper => 
 
   async function eligibleCharacters(repos, now) {
     const campaigns = new Map((await repos.campaigns.all()).map(campaign => [campaign.id, campaign]));
-    const counters = new Map((await repos.state.filter(row => row.kind === 'mintCounter')).map(counter => [counter.characterId, counter]));
+    const counters = new Map((await repos.state.filterBy('kind', 'mintCounter')).map(counter => [counter.characterId, counter]));
     return (await repos.characters.all()).filter(character => character.obtainable &&
       character.supply.grandfatheredIssued === undefined &&
       (character.supply.type !== 'limited' || counters.get(character.id)?.issuedCount < character.supply.max) &&
@@ -141,6 +181,69 @@ export function createEncounterService(storage, clock, randomDropInt = upper => 
     });
   }
 
+  async function activityResult(repos, userId, chatId, operationKey) {
+    const previous = await repos.contentActions.findBy('operationKey', operationKey);
+    if (previous) {
+      requireGame(previous.kind === 'spawn_check' && previous.userId === userId && previous.details.chatId === chatId, 'OPERATION_CONFLICT');
+      return { spawn: previous.details.spawnId ? await view(repos, await repos.encounters.get(previous.details.spawnId)) : null, spawned: false, alreadyChecked: true };
+    }
+    const now = clock();
+    dailyTimestamp(now);
+    const activity = await repos.groupActivity.get(activityId(chatId));
+    if (activity) {
+      rememberCheck(chatId, activity);
+      requireGame(dailyTimestamp(now) >= dailyTimestamp(activity.updatedAt), 'INVALID_CLOCK');
+      if (Date.parse(now) < Date.parse(activity.nextCheckAt)) return noSpawn();
+    }
+    return null;
+  }
+
+  async function checkActivity(repos, userId, chatId, operationKey) {
+    await participant(repos, userId);
+    const existing = await activityResult(repos, userId, chatId, operationKey);
+    if (existing) return existing;
+    await availableKey(repos, operationKey);
+    const now = clock();
+    dailyTimestamp(now);
+    // A spawn never reads unit locks. Expiring markets, battles and trades here
+    // used to turn ordinary chat traffic into unrelated global maintenance.
+    await expireEncounters(repos, now);
+    const id = activityId(chatId);
+    const activity = await repos.groupActivity.get(id);
+    const gapAvailable = !activity?.lastSpawnAt || Date.parse(now) >= Date.parse(activity.lastSpawnAt) + SPAWN_POLICY.minSpawnGapMs;
+    const active = (await repos.encounters.filterBy('status', 'active', encounter => encounter.kind === 'spawn' && encounter.chatId === chatId))[0];
+    const rolled = gapAvailable && !active ? roll(100) + 1 : null;
+    const pool = rolled !== null && rolled <= SPAWN_POLICY.chancePercent ? await eligibleCharacters(repos, now) : [];
+    const eligibleCharacterWeights = pool.map(character => SPAWN_POLICY.rarityWeights[character.rarity]);
+    const totalWeight = eligibleCharacterWeights.reduce((sum, weight) => sum + weight, 0);
+    const weightRoll = totalWeight ? roll(totalWeight) : null;
+    let selectionRoll = null;
+    if (weightRoll !== null) {
+      let remainder = weightRoll;
+      for (let index = 0; index < pool.length; index++) {
+        if (remainder < eligibleCharacterWeights[index]) { selectionRoll = index; break; }
+        remainder -= eligibleCharacterWeights[index];
+      }
+    }
+    const spawn = pool.length ? await insertSpawn(repos, pool[selectionRoll], chatId, now) : null;
+    await repos.contentActions.insert({
+      id: `ACT-${randomUUID()}`, kind: 'spawn_check', encounterId: null, userId, operationKey, createdAt: now,
+      details: { chatId, roll: rolled, selectionRoll, weightRoll, eligibleCharacterWeights, eligibleCharacterIds: pool.map(character => character.id), spawnId: spawn?.id ?? null }
+    });
+    const nextCheckAt = new Date((Math.floor(Date.parse(now) / SPAWN_POLICY.checkIntervalMs) + 1) * SPAWN_POLICY.checkIntervalMs).toISOString();
+    dailyTimestamp(nextCheckAt);
+    const updated = { id, chatId, nextCheckAt, lastSpawnAt: spawn ? now : activity?.lastSpawnAt ?? null, updatedAt: now };
+    if (activity) await repos.groupActivity.replace(updated);
+    else await repos.groupActivity.insert(updated);
+    return { ...noSpawn(), spawn: spawn ? await view(repos, spawn) : null, spawned: Boolean(spawn), activity: updated };
+  }
+
+  function committedResult(result, chatId) {
+    if (result.activity) rememberCheck(chatId, result.activity);
+    const { activity, ...publicResult } = result;
+    return publicResult;
+  }
+
   const service = {
     async getBoss({ bossId = 'niebla', userId = null } = {}) {
       return storage.withTransaction(async repos => {
@@ -155,13 +258,13 @@ export function createEncounterService(storage, clock, randomDropInt = upper => 
       requireGame(['1', '2'].includes(String(choice)), 'INVALID_ATTACK');
       const result = await storage.withTransaction(async repos => {
         await participant(repos, userId);
-        const previous = await repos.contentActions.find(action => action.operationKey === operationKey);
+        const previous = await repos.contentActions.findBy('operationKey', operationKey);
         if (previous) {
           requireGame(previous.kind === 'boss_attack' && previous.userId === userId && previous.details.chatId === chatId &&
-            previous.details.choice === String(choice) && referenceMatches(await repos.encounters.all(), previous.encounterId, code, 'boss'), 'OPERATION_CONFLICT');
+            previous.details.choice === String(choice) && await referenceMatches(repos, previous.encounterId, code, 'boss'), 'OPERATION_CONFLICT');
           const boss = await repos.encounters.get(previous.encounterId);
           return { boss: await view(repos, boss, userId), action: previous, duplicate: true,
-            rewards: await repos.contentRewards.filter(reward => reward.kind === 'boss' && reward.sourceId === boss.id && reward.userId === userId) };
+            rewards: await repos.contentRewards.filterBy('sourceId', boss.id, reward => reward.kind === 'boss' && reward.userId === userId) };
         }
         await availableKey(repos, operationKey);
         const now = await refresh(repos);
@@ -169,7 +272,7 @@ export function createEncounterService(storage, clock, randomDropInt = upper => 
         if (boss.status === 'expired') return { failure: 'BOSS_EXPIRED' };
         requireGame(boss.status === 'active', 'BOSS_NOT_ACTIVE');
         requireGame(dailyTimestamp(now) >= dailyTimestamp(boss.updatedAt), 'INVALID_CLOCK');
-        const actions = await repos.contentActions.filter(action => action.kind === 'boss_attack' && action.encounterId === boss.id);
+        const actions = await repos.contentActions.filterBy('encounterId', boss.id, action => action.kind === 'boss_attack');
         const own = actions.filter(action => action.userId === userId);
         requireGame(own.length < boss.snapshot.maxAttacks, 'BOSS_ATTACK_LIMIT');
         const last = own.at(-1);
@@ -217,59 +320,82 @@ export function createEncounterService(storage, clock, randomDropInt = upper => 
         return { ...page, boss: result };
       });
     },
+    activateGroup({ chatId }) {
+      group(chatId);
+      activeGroups.add(chatId);
+    },
+    async observeGroupActivity({ identity, chatId, messageId }) {
+      group(chatId);
+      checkMessageId(messageId);
+      const canonical = normalizeIdentity(identity);
+      await loadGroups();
+      if (!activeGroups.has(chatId)) return noSpawn();
+      const now = dailyTimestamp(clock());
+      const next = nextChecks.get(chatId);
+      if (next && now >= next.updatedAt && now < next.nextCheckAt) return noSpawn();
+      // A burst must not enqueue one writer transaction per message while the
+      // first opportunity is still committing.
+      if (automaticChecks.has(chatId)) return noSpawn();
+      const unknownUntil = unknownIdentities.get(canonical.subject);
+      if (unknownUntil && now < unknownUntil) return noSpawn();
+      const operationKey = checkOperationKey(chatId, messageId);
+      const check = (async () => {
+        const eligibility = await storage.withRead(async repos => {
+          const user = await repos.users.getByIdentity(canonical);
+          if (!user) return { result: { ...noSpawn(), unknownIdentity: true } };
+          return { userId: user.id, result: await activityResult(repos, user.id, chatId, operationKey) };
+        });
+        if (eligibility.result) return eligibility.result;
+        return storage.withTransaction(repos => checkActivity(repos, eligibility.userId, chatId, operationKey));
+      })();
+      automaticChecks.set(chatId, check);
+      try {
+        const result = await check;
+        if (result.unknownIdentity) {
+          // Bound memory even when a public group contains many visitors.
+          if (unknownIdentities.size >= 10_000) unknownIdentities.delete(unknownIdentities.keys().next().value);
+          unknownIdentities.set(canonical.subject, now + 60_000);
+          return noSpawn();
+        }
+        unknownIdentities.delete(canonical.subject);
+        return committedResult(result, chatId);
+      } finally {
+        automaticChecks.delete(chatId);
+      }
+    },
     async observeActivity({ userId, chatId, messageId }) {
       group(chatId);
-      requireGame(typeof messageId === 'string' && messageId.length > 0 && messageId.length <= 200, 'INVALID_OPERATION_KEY');
-      const operationKey = `spawn-check:${createHash('sha256').update(JSON.stringify([chatId, messageId])).digest('hex')}`;
-      return storage.withTransaction(async repos => {
+      checkMessageId(messageId);
+      const operationKey = checkOperationKey(chatId, messageId);
+      // Explicit exploration preserves receipt replay and user validation while
+      // avoiding the expensive writer/transition path for closed windows.
+      const existing = await storage.withRead(async repos => {
         await participant(repos, userId);
-        const previous = await repos.contentActions.find(action => action.operationKey === operationKey);
-        if (previous) {
-          requireGame(previous.kind === 'spawn_check' && previous.userId === userId && previous.details.chatId === chatId, 'OPERATION_CONFLICT');
-          return { spawn: previous.details.spawnId ? await view(repos, await repos.encounters.get(previous.details.spawnId)) : null, spawned: false, alreadyChecked: true };
-        }
-        await availableKey(repos, operationKey);
-        const now = await refresh(repos);
-        const id = `group:${createHash('sha256').update(chatId).digest('hex')}`;
-        const activity = await repos.groupActivity.get(id);
-        if (activity) {
-          requireGame(dailyTimestamp(now) >= dailyTimestamp(activity.updatedAt), 'INVALID_CLOCK');
-          if (Date.parse(now) < Date.parse(activity.nextCheckAt)) return { spawn: null, spawned: false, alreadyChecked: false };
-        }
-        const gapAvailable = !activity?.lastSpawnAt || Date.parse(now) >= Date.parse(activity.lastSpawnAt) + SPAWN_POLICY.minSpawnGapMs;
-        const active = await repos.encounters.find(encounter => encounter.kind === 'spawn' && encounter.chatId === chatId && encounter.status === 'active');
-        const rolled = gapAvailable && !active ? roll(100) + 1 : null;
-        const pool = rolled !== null && rolled <= SPAWN_POLICY.chancePercent ? await eligibleCharacters(repos, now) : [];
-        const eligibleCharacterWeights = pool.map(character => SPAWN_POLICY.rarityWeights[character.rarity]);
-        const totalWeight = eligibleCharacterWeights.reduce((sum, weight) => sum + weight, 0);
-        const weightRoll = totalWeight ? roll(totalWeight) : null;
-        let selectionRoll = null;
-        if (weightRoll !== null) {
-          let remainder = weightRoll;
-          for (let index = 0; index < pool.length; index++) {
-            if (remainder < eligibleCharacterWeights[index]) { selectionRoll = index; break; }
-            remainder -= eligibleCharacterWeights[index];
-          }
-        }
-        const spawn = pool.length ? await insertSpawn(repos, pool[selectionRoll], chatId, now) : null;
-        await repos.contentActions.insert({
-          id: `ACT-${randomUUID()}`, kind: 'spawn_check', encounterId: null, userId, operationKey, createdAt: now,
-          details: { chatId, roll: rolled, selectionRoll, weightRoll, eligibleCharacterWeights, eligibleCharacterIds: pool.map(character => character.id), spawnId: spawn?.id ?? null }
-        });
-        const nextCheckAt = new Date((Math.floor(Date.parse(now) / SPAWN_POLICY.checkIntervalMs) + 1) * SPAWN_POLICY.checkIntervalMs).toISOString();
-        dailyTimestamp(nextCheckAt);
-        const updated = { id, chatId, nextCheckAt, lastSpawnAt: spawn ? now : activity?.lastSpawnAt ?? null, updatedAt: now };
-        if (activity) await repos.groupActivity.replace(updated);
-        else await repos.groupActivity.insert(updated);
-        return { spawn: spawn ? await view(repos, spawn) : null, spawned: Boolean(spawn), alreadyChecked: false };
+        return activityResult(repos, userId, chatId, operationKey);
       });
+      if (existing) return existing;
+      const result = await storage.withTransaction(repos => checkActivity(repos, userId, chatId, operationKey));
+      return committedResult(result, chatId);
     },
     async getSpawn({ chatId }) {
       group(chatId);
+      const current = await storage.withRead(async repos => {
+        const now = clock();
+        dailyTimestamp(now);
+        const spawn = (await repos.encounters.filterBy('status', 'active', encounter => encounter.kind === 'spawn' && encounter.chatId === chatId))[0];
+        if (!spawn) return { spawn: null, expired: false };
+        if (Date.parse(spawn.expiresAt) <= Date.parse(now)) return { spawn: null, expired: true };
+        return { spawn: await view(repos, spawn), expired: false };
+      });
+      if (!current.expired) return current.spawn;
       return storage.withTransaction(async repos => {
-        await refresh(repos);
-        const spawn = (await repos.encounters.filter(encounter => encounter.kind === 'spawn' && encounter.chatId === chatId && encounter.status === 'active')).at(-1);
-        return spawn ? view(repos, spawn) : null;
+        const now = clock();
+        dailyTimestamp(now);
+        const spawn = (await repos.encounters.filterBy('status', 'active', encounter => encounter.kind === 'spawn' && encounter.chatId === chatId))[0];
+        if (!spawn) return null;
+        if (Date.parse(spawn.expiresAt) > Date.parse(now)) return view(repos, spawn);
+        await repos.encounters.replace({ ...spawn, status: 'expired', updatedAt: now, endedAt: now });
+        return null;
       });
     },
     async capture({ userId, chatId, code = null, operationKey }) {
@@ -277,16 +403,16 @@ export function createEncounterService(storage, clock, randomDropInt = upper => 
       checkKey(operationKey);
       const result = await storage.withTransaction(async repos => {
         await participant(repos, userId);
-        const previous = await repos.contentActions.find(action => action.operationKey === operationKey);
+        const previous = await repos.contentActions.findBy('operationKey', operationKey);
         if (previous) {
           requireGame(previous.kind === 'spawn_capture' && previous.userId === userId && previous.details.chatId === chatId &&
-            referenceMatches(await repos.encounters.all(), previous.encounterId, code, 'spawn'), 'OPERATION_CONFLICT');
+            await referenceMatches(repos, previous.encounterId, code, 'spawn'), 'OPERATION_CONFLICT');
           return { spawn: await view(repos, await repos.encounters.get(previous.encounterId)), unit: await repos.units.get(previous.details.unitId),
             reward: await repos.contentRewards.get(previous.details.rewardId), alreadyCaptured: true };
         }
         await availableKey(repos, operationKey);
         const now = await refresh(repos);
-        const spawn = code === null ? (await repos.encounters.filter(encounter => encounter.kind === 'spawn' && encounter.chatId === chatId)).at(-1)
+        const spawn = code === null ? await repos.encounters.lastBy('chatId', chatId)
           : await findEncounter(repos, code, 'spawn');
         requireGame(spawn, 'SPAWN_NOT_FOUND');
         requireGame(spawn.chatId === chatId, 'SPAWN_WRONG_CHAT');
@@ -319,13 +445,15 @@ export function createEncounterService(storage, clock, randomDropInt = upper => 
     // ticket price, owner, supply, deadline or arbitrary encounter policy.
     async createSpawn({ characterId, chatId }) {
       group(chatId);
-      return storage.withTransaction(async repos => {
+      const spawn = await storage.withTransaction(async repos => {
         const now = await refresh(repos);
-        requireGame(!await repos.encounters.find(encounter => encounter.kind === 'spawn' && encounter.chatId === chatId && encounter.status === 'active'), 'SPAWN_ALREADY_ACTIVE');
+        requireGame(!(await repos.encounters.filterBy('status', 'active', encounter => encounter.kind === 'spawn' && encounter.chatId === chatId)).length, 'SPAWN_ALREADY_ACTIVE');
         const character = (await eligibleCharacters(repos, now)).find(candidate => candidate.id === characterId);
         requireGame(character, 'CHARACTER_UNAVAILABLE');
         return view(repos, await insertSpawn(repos, character, chatId, now));
       });
+      activeGroups.add(chatId);
+      return spawn;
     },
     async sweepExpired() {
       return storage.withTransaction(repos => expireEncounters(repos, clock()));

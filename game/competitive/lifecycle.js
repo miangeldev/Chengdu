@@ -11,7 +11,7 @@ export async function refreshSeasons(repos, now) {
     !(season.status === 'closed' && Date.parse(now) < Date.parse(season.endsAt))), 'INVALID_CLOCK');
   for (const season of existing) {
     if (season.status === 'active' && Date.parse(now) >= Date.parse(season.endsAt)) {
-      const rankings = await repos.rankings.filter(rank => rank.seasonId === season.id);
+      const rankings = await repos.rankings.filterBy('seasonId', season.id);
       await repos.seasons.replace({ ...season, status: 'closed', closedAt: season.endsAt,
         standings: finalStandings(rankings), updatedAt: season.endsAt });
     }

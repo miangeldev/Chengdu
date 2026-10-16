@@ -1,3 +1,4 @@
+import { equal } from './equality.js';
 import { expiredStoredLock } from './lockProof.js';
 import { displayUnitCharacterName } from '../game/evolution/rules.js';
 import { validateEvolutionSnapshot } from './evolutionSnapshot.js';
@@ -11,7 +12,7 @@ import { effectiveStats } from '../game/progression/rules.js';
 import { advancedAttack } from '../game/battle/combatContent.js';
 
 const check = (condition, field) => requireGame(condition, 'DATABASE_CORRUPT', { field });
-const equal = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
 const integer = (value, min = 0) => Number.isSafeInteger(value) && value >= min;
 const date = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(value) && Number.isFinite(Date.parse(value));
 const group = value => typeof value === 'string' && value.length <= 200 && /^[^\s]+@g\.us$/.test(value);

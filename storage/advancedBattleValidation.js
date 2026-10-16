@@ -1,3 +1,4 @@
+import { equal } from './equality.js';
 import { validateEvolutionSnapshot } from './evolutionSnapshot.js';
 import { evolvedStats, displayUnitCharacterName } from '../game/evolution/rules.js';
 import { requireGame } from '../utils/GameError.js';
@@ -8,7 +9,7 @@ import { replayAdvancedBattle, MAX_ADVANCED_TURNS } from '../game/battle/advance
 import { CHALLENGE_TTL_MS, deadline } from '../game/battle/engine.js';
 
 const check = (condition, field) => requireGame(condition, 'DATABASE_CORRUPT', { field });
-const equal = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
 const integer = (value, minimum = 0) => Number.isSafeInteger(value) && value >= minimum;
 const text = value => typeof value === 'string' && value.length > 0 && value.length <= 200;
 const date = value => {

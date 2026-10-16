@@ -15,7 +15,7 @@ export function createPackService(storage, clock, randomDropInt = upper => rando
     async listPacks() {
       return storage.withRead(async repos => {
         const characters = await availableCharacters(repos, clock());
-        const counters = await repos.state.filter(r => r.kind === 'mintCounter');
+        const counters = await repos.state.filterBy('kind', 'mintCounter');
         const items = (await repos.packs.all()).map(pack => {
           const pool = availablePool(pack, characters, counters);
           return { ...pack, available: pool.totalWeight > 0, odds: pool.entries.map(entry => ({
@@ -31,7 +31,7 @@ export function createPackService(storage, clock, randomDropInt = upper => rando
       return storage.withTransaction(async repos => {
         const user = await repos.users.get(userId);
         requireGame(user, 'USER_NOT_FOUND');
-        const existing = await repos.openings.find(o => o.operationKey === operationKey);
+        const existing = await repos.openings.findBy('operationKey', operationKey);
         if (existing) {
           requireGame(existing.userId === userId && existing.packId === packId, 'OPERATION_CONFLICT');
           const unit = await repos.units.get(existing.unitId);
@@ -40,7 +40,7 @@ export function createPackService(storage, clock, randomDropInt = upper => rando
         const pack = await repos.packs.get(packId);
         requireGame(pack, 'PACK_NOT_FOUND');
         const now = clock();
-        const pool = availablePool(pack, await availableCharacters(repos, now), await repos.state.filter(r => r.kind === 'mintCounter'));
+        const pool = availablePool(pack, await availableCharacters(repos, now), await repos.state.filterBy('kind', 'mintCounter'));
         requireGame(pool.totalWeight > 0, 'PACK_UNAVAILABLE');
         requireGame(user.economy.coins >= pack.price, 'INSUFFICIENT_COINS', { required: pack.price, coins: user.economy.coins });
         const openingId = `OPEN-${randomUUID()}`;

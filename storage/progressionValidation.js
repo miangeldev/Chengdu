@@ -1,9 +1,10 @@
+import { equal } from './equality.js';
 import { requireGame } from '../utils/GameError.js';
 import { effectiveStats, grantXp, safeAdd } from '../game/progression/rules.js';
 import { advancedUnitRewards, rewardAmounts, rewardDecision, rewardSummary } from '../game/rewards/battlePolicy.js';
 
 const check = (value, field) => requireGame(value, 'DATABASE_CORRUPT', { field });
-const equal = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
 const integer = value => Number.isSafeInteger(value) && value >= 0;
 
 export function validateProgressionData(state, schemaVersion = 5) {

@@ -19,7 +19,7 @@ export async function transferUnitInTransaction(repos, { unitId, fromOwnerId, to
   requireGame(typeof sourceId === 'string' && (reason === 'market' ? /^SALE-[a-f0-9-]{32,36}$/.test(sourceId) :
     reason === 'trade' && /^TRD-[a-f0-9-]{32,36}$/.test(sourceId)), 'INVALID_TRANSFER_SOURCE');
   const operationKey = reason === 'trade' ? `transfer:${sourceId}:${unitId}` : `transfer:${sourceId}`;
-  const previous = await repos.events.find(event => event.operationKey === operationKey);
+  const previous = await repos.events.findBy('operationKey', operationKey);
   if (previous) {
     requireGame(previous.type === 'unit_transferred' && previous.unitId === unitId && previous.fromOwnerId === fromOwnerId &&
       previous.toOwnerId === toOwnerId && previous.sourceId === sourceId && previous.reason === reason, 'OPERATION_CONFLICT');

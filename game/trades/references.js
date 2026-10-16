@@ -8,7 +8,7 @@ export async function resolveTrade(repos, value) {
   if (/^I[1-9]\d*$/i.test(text)) {
     const number = Number(text.slice(1));
     requireGame(Number.isSafeInteger(number), 'TRADE_NOT_FOUND');
-    const row = (await repos.trades.all())[number - 1];
+    const row = await repos.trades.at(number - 1);
     requireGame(row, 'TRADE_NOT_FOUND');
     return row;
   }

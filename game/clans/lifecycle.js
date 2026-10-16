@@ -8,7 +8,7 @@ export async function clanContext(repos) {
 }
 export async function appendClanAction(repos, {clanId,userId,kind,request={},operationKey,now}) {
   const before = await repos.clans.get(clanId), context = await clanContext(repos);
-  const action = {id:`CLA-${randomUUID()}`,clanId,userId,kind,request,operationKey,createdAt:now,before:before ?? null,after:null,movements:[],warCursor:(await repos.clanWarActions.all()).length};
+  const action = {id:`CLA-${randomUUID()}`,clanId,userId,kind,request,operationKey,createdAt:now,before:before ?? null,after:null,movements:[],warCursor:await repos.clanWarActions.count()};
   action.after=reduceClan(before,action,context);
   const amount = kind === 'create' ? 300 : ['deposit','withdraw'].includes(kind) ? request.amount : 0;
   if (amount) { const uid = kind === 'withdraw' ? request.targetUserId : userId, user=await repos.users.get(uid), sourceType={create:'clan_creation',deposit:'clan_deposit',withdraw:'clan_withdraw'}[kind],sourceId=`${action.id}:${uid}`;
@@ -40,7 +40,7 @@ export async function expireClanWars(repos,now) {
 }
 export async function clanWarForBattle(repos,userId,opponentId,advanced,now) {
   if (!advanced || !repos.clanWars) return null;await expireClanWars(repos,now);
-  const war=await repos.clanWars.find(w => w.status === 'active' && [userId,opponentId].every(uid => w.rosters.some(r => r.userIds.includes(uid))) && w.rosters.find(r => r.userIds.includes(userId))?.clanId !== w.rosters.find(r => r.userIds.includes(opponentId))?.clanId);
+  const war=await repos.clanWars.findBy('status', 'active', w => [userId,opponentId].every(uid => w.rosters.some(r => r.userIds.includes(uid))) && w.rosters.find(r => r.userIds.includes(userId))?.clanId !== w.rosters.find(r => r.userIds.includes(opponentId))?.clanId);
   return war ? {version:1,warId:war.id,clanIds:[userId,opponentId].map(uid => war.rosters.find(r => r.userIds.includes(uid)).clanId)} : null;
 }
 export async function settleClanWarBattle(repos,battle,now) {

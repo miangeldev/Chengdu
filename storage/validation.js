@@ -1,3 +1,4 @@
+import { equal } from './equality.js';
 import { validateAcquisitionData, validateAcquisitionTransition } from './acquisitionValidation.js';
 import { validateClanData, validateClanTransition } from './clanValidation.js';
 import { validateSocialData, validateSocialTransition } from './socialValidation.js';
@@ -17,6 +18,7 @@ import { advancedAttack, validateCombatProfile } from '../game/battle/combatCont
 import { validateContentData, validateContentTransition } from './contentValidation.js';
 import { validateEncounterData, validateEncounterTransition } from './encounterValidation.js';
 import { validateCompetitiveData, validateCompetitiveTransition } from './competitiveValidation.js';
+import { runValidation } from './validationCache.js';
 
 export const V1_COLLECTIONS = Object.freeze(['usuarios', 'personajes', 'unidades', 'estado', 'eventos']);
 export const V2_COLLECTIONS = Object.freeze([...V1_COLLECTIONS, 'ataques', 'combates']);
@@ -43,7 +45,7 @@ const integer = (v, minimum = 0) => Number.isSafeInteger(v) && v >= minimum;
 const text = v => typeof v === 'string' && v.length > 0 && v.length <= 200;
 const date = v => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(v) && Number.isFinite(Date.parse(v));
 const check = (condition, field) => requireGame(condition, 'DATABASE_CORRUPT', { field });
-const equal = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
 
 function unique(records, key, field) {
   const seen = new Set();
@@ -84,6 +86,7 @@ export function validateDatabase(state, schemaVersion = SCHEMA_VERSION) {
     const userById = new Map(users.map(r => [r.id, r]));
     const characterById = new Map(characters.map(r => [r.id, r]));
     const unitById = new Map(units.map(r => [r.id, r]));
+    const attackById = new Map((state.ataques?.records ?? []).map(r => [r.id, r]));
     const identities = [];
 
     for (const u of users) {
@@ -121,7 +124,7 @@ export function validateDatabase(state, schemaVersion = SCHEMA_VERSION) {
       if (schemaVersion >= 5) check(c.supply.type === 'limited' && c.supply.max <= SUPPLY_BY_RARITY[c.rarity], 'character.supplyTier');
       if (schemaVersion >= 8) {
         check(validateCombatProfile(c.combat), 'character.combat');
-        const basic = state.ataques.records.find(attack => attack.id === c.attackIds[0]);
+        const basic = attackById.get(c.attackIds[0]);
         check(basic && advancedAttack(basic).cooldown === 0, 'character.basicAttackAvailable');
       }
     }
@@ -143,14 +146,21 @@ export function validateDatabase(state, schemaVersion = SCHEMA_VERSION) {
 
     const counters = entries.filter(r => r.kind === 'mintCounter');
     const claims = entries.filter(r => r.kind === 'claim');
+    const counterByCharacter = new Map(counters.map(counter => [counter.characterId, counter]));
+    const emissionsByCharacter = new Map();
+    for (const unit of units) {
+      const emissions = emissionsByCharacter.get(unit.characterId) ?? { maximum: 0, count: 0 };
+      emissions.maximum = Math.max(emissions.maximum, unit.serial);
+      emissions.count++;
+      emissionsByCharacter.set(unit.characterId, emissions);
+    }
     check(entries.every(r => ['mintCounter', 'claim', 'migrationMap', ...(schemaVersion >= 3 ? ['progressionBaseline'] : [])].includes(r.kind)), 'state.kind');
     unique(counters, r => r.characterId, 'counter.character');
     for (const character of characters) {
-      const counter = counters.find(r => r.characterId === character.id);
-      const minted = units.filter(r => r.characterId === character.id);
-      const maximum = minted.reduce((value, r) => Math.max(value, r.serial), 0);
+      const counter = counterByCharacter.get(character.id);
+      const { maximum = 0, count = 0 } = emissionsByCharacter.get(character.id) ?? {};
       check(counter && counter.id === `mint:${character.id}` && integer(counter.lastSerial) && integer(counter.issuedCount), 'counter');
-      check(counter.lastSerial === maximum && counter.issuedCount === minted.length, 'counter.emissions');
+      check(counter.lastSerial === maximum && counter.issuedCount === count, 'counter.emissions');
       if (character.supply.type === 'limited') {
         const grandfathered = character.supply.grandfatheredIssued;
         if (schemaVersion >= 5 && grandfathered !== undefined) check(integer(grandfathered, 1) && grandfathered === counter.issuedCount, 'counter.grandfathered');
@@ -161,6 +171,8 @@ export function validateDatabase(state, schemaVersion = SCHEMA_VERSION) {
     check(counters.every(r => characterById.has(r.characterId)), 'counter.references');
     unique(events, r => r.operationKey, 'event.operationKey');
     const mintEvents = events.filter(e => e.type === 'unit_created');
+    const mintEventByUnit = new Map(mintEvents.map(event => [event.unitId, event]));
+    const claimedUnits = new Set(claims.map(claim => claim.unitId));
     unique(mintEvents, r => r.unitId, 'event.unit');
     check(mintEvents.length === units.length, 'event.emissions');
     if (schemaVersion < 7) check(events.length === units.length, 'event.emissions');
@@ -173,13 +185,13 @@ export function validateDatabase(state, schemaVersion = SCHEMA_VERSION) {
     unique(claims, r => r.userId, 'claim.user');
     for (const claim of claims) {
       const unit = unitById.get(claim.unitId);
-      const event = mintEvents.find(r => r.unitId === claim.unitId);
+      const event = mintEventByUnit.get(claim.unitId);
       check(claim.id === `starter:${claim.userId}` && userById.has(claim.userId) && unit, 'claim.references');
       check(claim.rewardType === 'starter' && text(claim.sourceId) && date(claim.createdAt), 'claim.metadata');
       check(unit.origin.type === 'starter' && unit.origin.sourceId === claim.sourceId && event.toOwnerId === claim.userId && event.operationKey === claim.id, 'claim.origin');
     }
     for (const unit of units.filter(r => r.origin.type === 'starter')) {
-      check(claims.some(r => r.unitId === unit.id), 'starter.claim');
+      check(claimedUnits.has(unit.id), 'starter.claim');
     }
     for (const migration of entries.filter(r => r.kind === 'migrationMap')) {
       check(migration.id === 'migration:users-v0' && Array.isArray(migration.entries), 'migration.map');
@@ -188,24 +200,28 @@ export function validateDatabase(state, schemaVersion = SCHEMA_VERSION) {
         check(userById.get(item.userId)?.identities.some(r => r.subject === item.subject), 'migration.references');
       }
     }
-    if (schemaVersion >= 2) validateBattleData(state, schemaVersion);
-    if (schemaVersion >= 3) validateProgressionData(state, schemaVersion);
+    if (schemaVersion >= 2) runValidation(validateBattleData, state, schemaVersion);
+    if (schemaVersion >= 3) runValidation(validateProgressionData, state, schemaVersion);
     if (schemaVersion >= 4) {
-      validatePackData(state);
-      validateEconomyData(state, schemaVersion);
+      runValidation(validatePackData, state);
+      runValidation(validateEconomyData, state, schemaVersion);
     }
     if (schemaVersion >= 7) {
-      validateOwnershipData(state, schemaVersion);
-      validateMarketData(state);
+      runValidation(validateOwnershipData, state, schemaVersion);
+      runValidation(validateMarketData, state);
     }
     if (schemaVersion >= 9) {
-      validateContentData(state);
-      validateEncounterData(state);
+      runValidation(validateContentData, state);
+      runValidation(validateEncounterData, state);
     }
-    if (schemaVersion >= 10) validateCompetitiveData(state);
+    if (schemaVersion >= 10) runValidation(validateCompetitiveData, state);
     else check(state.combates?.records.every(battle => battle.competitive === undefined) ?? true, 'competitive.unsupportedSchema');
     if (schemaVersion < 11) check(state.combates?.records.every(battle => battle.clanWar === undefined) ?? true, 'clan.unsupportedSchema');
-    if (schemaVersion >= 11) { validateTradeData(state); validateCraftingData(state); validateEvolutionData(state); validateSocialData(state); validateClanData(state); validateAcquisitionData(state); }
+    if (schemaVersion >= 11) {
+      for (const validator of [validateTradeData, validateCraftingData, validateEvolutionData, validateSocialData, validateClanData, validateAcquisitionData]) {
+        runValidation(validator, state);
+      }
+    }
     return { valid: true, schemaVersion, users: users.length, characters: characters.length, units: units.length, claims: claims.length };
   } catch (error) {
     if (error instanceof GameError && ['DATABASE_CORRUPT', 'UNSUPPORTED_SCHEMA_VERSION'].includes(error.code)) throw error;
@@ -215,10 +231,13 @@ export function validateDatabase(state, schemaVersion = SCHEMA_VERSION) {
 
 export function validateTransition(before, after, context = {}) {
   for (const name of COLLECTIONS) {
+    // Copy-on-write transactions preserve references for untouched collections.
+    if (before[name].records === after[name].records) continue;
     const nextById = new Map(after[name].records.map(r => [r.id, r]));
     for (const previous of before[name].records) {
       const next = nextById.get(previous.id);
       check(next, `${name}.deletion`);
+      if (previous === next) continue;
       if (['eventos', 'recompensas', 'aperturas', 'economia', 'diarios', 'ventas', 'premioscontenido', 'logros', 'accionescontenido', 'resultadoscompetitivos', 'premiostemporada', 'accionesintercambio', 'artesania', 'evoluciones', 'accionessociales', 'accionesclan', 'accionesguerra', 'obtenciones'].includes(name) || (name === 'estado' && previous.kind !== 'mintCounter')) {
         check(equal(previous, next), `${name}.immutable`);
       }

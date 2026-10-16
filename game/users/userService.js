@@ -55,7 +55,7 @@ export function createUserService(storage, clock) {
         await expireBattles(repos, clock());
         const user = await repos.users.get(userId);
         requireGame(user, 'USER_NOT_FOUND');
-        return { user, starterClaim: await repos.state.get(`starter:${userId}`), unitCount: (await repos.units.getByOwner(userId)).length };
+        return { user, starterClaim: await repos.state.get(`starter:${userId}`), unitCount: await repos.units.countBy('ownerId', userId) };
       });
     }
   };

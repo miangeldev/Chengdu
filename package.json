@@ -6,6 +6,7 @@
   "engines": { "node": ">=22" },
   "scripts": {
     "test": "node --test",
+    "perf:benchmark": "node scripts/benchmark-performance.js",
     "preview:whatsapp": "node scripts/preview-whatsapp.js",
     "balance:simulate": "node scripts/simulate-balance.js",
     "balance:advanced": "node scripts/simulate-advanced-balance.js",

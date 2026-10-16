@@ -43,7 +43,7 @@ export function createEvolutionService(storage, clock) {
       requireGame(typeof unitId === 'string', 'UNIT_NOT_FOUND');
       return storage.withTransaction(async repos => {
         requireGame(await repos.users.get(userId), 'USER_NOT_FOUND');
-        const existing = await repos.evolutionActions.find(action => action.operationKey === operationKey);
+        const existing = await repos.evolutionActions.findBy('operationKey', operationKey);
         if (existing) {
           requireGame(existing.userId === userId && existing.unitId === unitId.trim().toUpperCase(), 'OPERATION_CONFLICT');
           return { evolution: existing, alreadyEvolved: true };
@@ -53,7 +53,7 @@ export function createEvolutionService(storage, clock) {
         await expireListings(repos, now);
         await expireTrades(repos, now);
         const user = await repos.users.get(userId);
-        requireGame(!(await repos.craftingActions.find(action => action.operationKey === operationKey)), 'OPERATION_CONFLICT');
+        requireGame(!(await repos.craftingActions.findBy('operationKey', operationKey)), 'OPERATION_CONFLICT');
         const { unit } = await ownUnit(repos, userId, unitId);
         const form = formForCharacter(unit.characterId);
         requireGame(form, 'EVOLUTION_UNAVAILABLE');

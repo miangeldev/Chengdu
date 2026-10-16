@@ -7,7 +7,7 @@ import { CRAFTING_POLICY_VERSION, RECIPES, addMaterials, emptyMaterials, materia
   materialsAfter, recipeFor, sourceKey } from './policy.js';
 
 export async function craftingInventory(repos, userId) {
-  const actions = await repos.craftingActions.filter(action => action.userId === userId);
+  const actions = await repos.craftingActions.filterBy('userId', userId);
   const materials = actions.at(-1)?.materialsAfter ?? emptyMaterials();
   return { materials: structuredClone(materials), badges: [...new Set(actions.filter(action => action.kind === 'craft' && action.badge).map(action => action.badge))] };
 }
@@ -15,7 +15,7 @@ export async function craftingInventory(repos, userId) {
 async function pendingSources(repos, userId, now) {
   const state = { recompensas: { records: await repos.rewards.all() }, premioscontenido: { records: await repos.contentRewards.all() },
     premiostemporada: { records: await repos.seasonRewards.all() } };
-  const claimed = new Set((await repos.craftingActions.filter(action => action.userId === userId && action.kind === 'material_claim'))
+  const claimed = new Set((await repos.craftingActions.filterBy('userId', userId, action => action.kind === 'material_claim'))
     .flatMap(action => action.sources.map(sourceKey)));
   return materialSources(state, userId, now).filter(source => !claimed.has(sourceKey(source)));
 }
@@ -29,7 +29,7 @@ async function userFor(repos, userId) {
 async function baseReceipt(repos, user, operationKey, now) {
   requireGame(dailyTimestamp(now) >= dailyTimestamp(user.updatedAt), 'INVALID_CLOCK');
   return { id: `CRAFT-${randomUUID()}`, userId: user.id, operationKey, policyVersion: CRAFTING_POLICY_VERSION,
-    createdAt: now, economyCursor: (await repos.economy.all()).length,
+    createdAt: now, economyCursor: await repos.economy.count(),
     materialsBefore: (await craftingInventory(repos, user.id)).materials,
     balanceBefore: user.economy.coins, balanceAfter: user.economy.coins };
 }
@@ -67,7 +67,7 @@ export function createCraftingService(storage, clock) {
       validContentKey(operationKey);
       return storage.withTransaction(async repos => {
         const user = await userFor(repos, userId);
-        const existing = await repos.craftingActions.find(action => action.operationKey === operationKey);
+        const existing = await repos.craftingActions.findBy('operationKey', operationKey);
         if (existing) {
           requireGame(existing.userId === userId && existing.kind === 'material_claim', 'OPERATION_CONFLICT');
           return { action: existing, alreadyClaimed: true };
@@ -89,7 +89,7 @@ export function createCraftingService(storage, clock) {
       requireGame(typeof recipeId === 'string' && recipeFor(recipeId), 'RECIPE_NOT_FOUND');
       return storage.withTransaction(async repos => {
         const user = await userFor(repos, userId);
-        const existing = await repos.craftingActions.find(action => action.operationKey === operationKey);
+        const existing = await repos.craftingActions.findBy('operationKey', operationKey);
         if (existing) {
           requireGame(existing.userId === userId && existing.kind === 'craft' && existing.recipeId === recipeId, 'OPERATION_CONFLICT');
           return { action: existing, alreadyCrafted: true };

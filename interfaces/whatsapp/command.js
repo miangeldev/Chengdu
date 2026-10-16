@@ -207,6 +207,9 @@ export function defineCommand(command, handler) {
       let text;
       try {
         requireGame(Array.isArray(args) && args.every(a => typeof a === 'string'), 'INVALID_ARGUMENTS');
+        // Shared by the router and standalone plugins; activating a group is an
+        // in-memory hint and adds no database write to the command response.
+        if (from.endsWith('@g.us')) game.encounters?.activateGroup?.({ chatId: from });
         const contextInfo = msg.message?.extendedTextMessage?.contextInfo ?? msg.message?.imageMessage?.contextInfo ?? msg.message?.videoMessage?.contextInfo;
         text = await handler({ game, args, identity: () => identityFor(sock, msg), prefix,
           cmd: (name, value) => commandText(prefix, name, value),

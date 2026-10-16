@@ -5,7 +5,7 @@ import { requireGame } from '../../utils/GameError.js';
 export const listingCodeAt = index => `M${index + 1}`;
 
 export async function getListingCode(repos, id) {
-  const index = (await repos.listings.all()).findIndex(listing => listing.id === id);
+  const index = await repos.listings.indexOf(id);
   requireGame(index >= 0, 'DATABASE_CORRUPT');
   return listingCodeAt(index);
 }
@@ -16,7 +16,7 @@ export async function resolveListingId(repos, reference) {
   if (/^M\d+$/i.test(value)) {
     const ordinal = Number(value.slice(1));
     const listing = Number.isSafeInteger(ordinal) && ordinal > 0
-      ? (await repos.listings.all())[ordinal - 1] : null;
+      ? await repos.listings.at(ordinal - 1) : null;
     // Keep an unknown reference unresolved: normal lookups reject it, and a
     // retry with a different reference still reports an operation conflict.
     return listing?.id ?? value.toUpperCase();

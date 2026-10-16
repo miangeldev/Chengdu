@@ -1,6 +1,7 @@
+import { equal as eq } from './equality.js';
 import { requireGame } from '../utils/GameError.js';
 import { ACQUISITION_VERSION,CHANCES,PROMOTION,rewardSources,acquisitionPool,selectReward,weightPool } from '../game/acquisition/policy.js';
-const check=(v,field)=>requireGame(v,'DATABASE_CORRUPT',{field});const eq=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+const check=(v,field)=>requireGame(v,'DATABASE_CORRUPT',{field});
 export function validateAcquisitionData(state){const seen=new Set(),keys=new Set(),minted=new Set();
   for(const a of state.obtenciones.records){check(/^ACQ-[a-f0-9-]{36}$/.test(a.id) && state.usuarios.records.some(u=>u.id===a.userId) && a.policyVersion===ACQUISITION_VERSION && Object.hasOwn(CHANCES,a.kind) && a.chance===CHANCES[a.kind] && Number.isFinite(Date.parse(a.createdAt)) && typeof a.operationKey==='string' && a.operationKey.length>0 && a.operationKey.length<=200 && !keys.has(a.operationKey),'acquisition.metadata');keys.add(a.operationKey);
     const source=`${a.userId}:${a.kind}:${a.sourceId}`;check(!seen.has(source),'acquisition.sourceUnique');seen.add(source);

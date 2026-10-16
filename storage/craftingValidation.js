@@ -1,9 +1,10 @@
+import { equal } from './equality.js';
 import { requireGame } from '../utils/GameError.js';
 import { CRAFTING_POLICY_VERSION, MATERIAL_KEYS, addMaterials, emptyMaterials, materialSources,
   materialsAfter, recipeFor, sourceKey } from '../game/crafting/policy.js';
 
 const check = (condition, field) => requireGame(condition, 'DATABASE_CORRUPT', { field });
-const equal = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
 const integer = value => Number.isSafeInteger(value) && value >= 0;
 const date = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(value) && Number.isFinite(Date.parse(value));
 const materials = value => value && Object.keys(value).length === MATERIAL_KEYS.length && MATERIAL_KEYS.every(key => integer(value[key]));

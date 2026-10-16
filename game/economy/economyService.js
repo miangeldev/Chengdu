@@ -1,7 +1,6 @@
 import { requireGame } from '../../utils/GameError.js';
 import { expireBattles } from '../battle/lifecycle.js';
 import { randomUUID } from 'node:crypto';
-import { paginate } from '../../utils/pagination.js';
 import { creditCoinsInTransaction } from './coinOperations.js';
 import { DAILY_POLICY_VERSION, dailyPolicy, dailyTimestamp, nextDailyAt } from './dailyPolicy.js';
 
@@ -12,7 +11,7 @@ async function registeredUser(repos, userId) {
 }
 
 async function latestDaily(repos, userId) {
-  return (await repos.dailyClaims.filter(claim => claim.userId === userId)).at(-1) ?? null;
+  return repos.dailyClaims.lastBy('userId', userId);
 }
 
 export function createEconomyService(storage, clock) {
@@ -21,7 +20,7 @@ export function createEconomyService(storage, clock) {
       return storage.withTransaction(async repos => {
         await expireBattles(repos, clock());
         const user = await registeredUser(repos, userId);
-        const movements = await repos.economy.filter(movement => movement.userId === userId);
+        const movements = await repos.economy.filterBy('userId', userId);
         let income = 0n, expenses = 0n;
         for (const movement of movements) {
           if (movement.type === 'credit') income += BigInt(movement.amount);
@@ -45,7 +44,7 @@ export function createEconomyService(storage, clock) {
         operationKey.trim() === operationKey, 'INVALID_OPERATION_KEY');
       return storage.withTransaction(async repos => {
         const user = await registeredUser(repos, userId);
-        const existing = await repos.dailyClaims.find(claim => claim.operationKey === operationKey);
+        const existing = await repos.dailyClaims.findBy('operationKey', operationKey);
         if (existing) {
           requireGame(existing.userId === userId, 'OPERATION_CONFLICT');
           return { claim: existing, alreadyClaimed: true };
@@ -69,12 +68,9 @@ export function createEconomyService(storage, clock) {
       return storage.withTransaction(async repos => {
         await expireBattles(repos, clock());
         await registeredUser(repos, userId);
-        const movements = await repos.economy.filter(movement => movement.userId === userId);
         // Append order represents committed transactions and stays stable across new arrivals.
-        const keys = new Map(movements.map((movement, index) => [movement.id,
-          [String(Number.MAX_SAFE_INTEGER - index).padStart(16, '0'), movement.id]
-        ]));
-        return paginate(movements, options, `coinLedger:${userId}`, movement => keys.get(movement.id));
+        return repos.economy.pageBy('userId', userId, options, `coinLedger:${userId}`,
+          (movement, position) => [String(Number.MAX_SAFE_INTEGER - position).padStart(16, '0'), movement.id]);
       });
     }
   };

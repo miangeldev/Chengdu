@@ -1,0 +1,105 @@
+{
+  "node": "v26.8.2",
+  "users": 1000,
+  "historyPerUser": 10,
+  "records": {
+    "usuarios": 1000,
+    "personajes": 10,
+    "estado": 1010,
+    "ataques": 22,
+    "sobres": 1,
+    "economia": 10000,
+    "diarios": 10000,
+    "campanas": 1,
+    "perfilessociales": 1000,
+    "accionessociales": 10000
+  },
+  "fixtureBytes": 15666890,
+  "fixtureValidated": true,
+  "metrics": [
+    {
+      "name": "cold_user_read",
+      "iterations": 1,
+      "minMs": 603.394,
+      "medianMs": 603.394,
+      "p95Ms": 603.394,
+      "readFiles": 108,
+      "readBytes": 47000841,
+      "writeFiles": 1,
+      "writeBytes": 95,
+      "fsyncCalls": 2
+    },
+    {
+      "name": "full_database_validation",
+      "iterations": 3,
+      "minMs": 186.537,
+      "medianMs": 253.362,
+      "p95Ms": 308.951,
+      "readFiles": 0,
+      "readBytes": 0,
+      "writeFiles": 0,
+      "writeBytes": 0,
+      "fsyncCalls": 0
+    },
+    {
+      "name": "warm_user_read",
+      "iterations": 3,
+      "minMs": 278.299,
+      "medianMs": 281.629,
+      "p95Ms": 303.955,
+      "readFiles": 36,
+      "readBytes": 15666947,
+      "writeFiles": 0,
+      "writeBytes": 0,
+      "fsyncCalls": 0
+    },
+    {
+      "name": "noop_transaction",
+      "iterations": 3,
+      "minMs": 694.336,
+      "medianMs": 744.223,
+      "p95Ms": 756.105,
+      "readFiles": 36,
+      "readBytes": 15666947,
+      "writeFiles": 0,
+      "writeBytes": 0,
+      "fsyncCalls": 0
+    },
+    {
+      "name": "profile_command",
+      "iterations": 3,
+      "minMs": 692.898,
+      "medianMs": 718.113,
+      "p95Ms": 746.243,
+      "readFiles": 36,
+      "readBytes": 15666947,
+      "writeFiles": 0,
+      "writeBytes": 0,
+      "fsyncCalls": 0
+    },
+    {
+      "name": "social_write",
+      "iterations": 3,
+      "minMs": 1734.691,
+      "medianMs": 1756.407,
+      "p95Ms": 1781.764,
+      "readFiles": 72,
+      "readBytes": 31335104.667,
+      "writeFiles": 75,
+      "writeBytes": 118131220.333,
+      "fsyncCalls": 153
+    },
+    {
+      "name": "queued_20_reads",
+      "iterations": 1,
+      "minMs": 5234.722,
+      "medianMs": 5234.722,
+      "p95Ms": 5234.722,
+      "readFiles": 720,
+      "readBytes": 313374380,
+      "writeFiles": 0,
+      "writeBytes": 0,
+      "fsyncCalls": 0
+    }
+  ]
+}

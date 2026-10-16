@@ -19,7 +19,7 @@ export function createTeamService(storage, clock) {
     await expireTrades(repos, now);
       const user = await repos.users.get(userId);
       requireGame(user, 'USER_NOT_FOUND');
-      requireGame(!await repos.battles.find(b => b.status === 'active' && b.players.some(p => p.userId === userId)), 'TEAM_LOCKED');
+      requireGame(!await repos.battles.findBy('status', 'active', b => b.players.some(p => p.userId === userId)), 'TEAM_LOCKED');
       const ids = chooseIds(user.team);
       requireGame(ids.length <= 3, 'TEAM_FULL');
       requireGame(new Set(ids).size === ids.length, 'DUPLICATE_TEAM_UNIT');

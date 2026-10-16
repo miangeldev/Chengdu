@@ -1,9 +1,10 @@
+import { equal } from './equality.js';
 import { requireGame } from '../utils/GameError.js';
 import { ownershipAt } from '../game/units/ownership.js';
 import { isOpenTrade, TRADE_MAX_OPEN, TRADE_MAX_UNITS, tradeExpiresAt } from '../game/trades/policy.js';
 
 const check = (condition, field) => requireGame(condition, 'DATABASE_CORRUPT', { field });
-const equal = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
 const integer = (number, minimum = 0) => Number.isSafeInteger(number) && number >= minimum;
 const text = value => typeof value === 'string' && value.length > 0 && value.length <= 200;
 const key = value => text(value) && value.trim() === value;

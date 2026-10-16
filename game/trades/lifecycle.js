@@ -2,7 +2,6 @@ import { randomUUID } from 'node:crypto';
 import { requireGame } from '../../utils/GameError.js';
 import { creditCoinsInTransaction } from '../economy/coinOperations.js';
 import { dailyTimestamp } from '../economy/dailyPolicy.js';
-import { isOpenTrade } from './policy.js';
 
 export function createTradeAction(trade, kind, userId, operationKey, now) {
   return { id: `TA-${randomUUID()}`, tradeId: trade.id, userId, kind, operationKey, createdAt: now,
@@ -39,7 +38,7 @@ export async function closeTradeInTransaction(repos, trade, { status, userId, op
 export async function expireTrades(repos, now) {
   if (!repos.trades) return 0;
   const timestamp = dailyTimestamp(now);
-  const expired = await repos.trades.filter(trade => isOpenTrade(trade) && dailyTimestamp(trade.expiresAt) <= timestamp);
+  const expired = await repos.trades.filterIn('status', ['draft', 'locked'], trade => dailyTimestamp(trade.expiresAt) <= timestamp);
   for (const trade of expired) await closeTradeInTransaction(repos, trade, {
     status: 'expired', userId: null, operationKey: `trade-expire:${trade.id}`, now
   });

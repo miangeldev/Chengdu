@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
+import { isDeepStrictEqual } from 'node:util';
 import { DATA_DIR } from '../CTU-database.js';
 import { GameError, requireGame } from '../utils/GameError.js';
 import { seedCharacters } from '../game/characters/catalog.js';
@@ -20,6 +21,7 @@ import { seedCampaigns, seedEventAttacks, seedEventCharacters } from '../game/co
 import { progressionBaseline } from '../game/progression/rules.js';
 import { seedAttacks } from '../game/battle/attacks.js';
 import { seedPacks } from '../game/packs/catalog.js';
+import { dailyTimestamp } from '../game/economy/dailyPolicy.js';
 import { COLLECTIONS, collectionsForVersion, SCHEMA_VERSION, validateDatabase, validateTransition } from './validation.js';
 import { acquireWriterLock } from './writerLock.js';
 import { atomicWrite, parseJSON, readText, syncDirectory } from './files.js';
@@ -30,6 +32,17 @@ const FILES = [...COLLECTIONS.map(name => `${name}.json`), MANIFEST];
 const filesForVersion = version => [...collectionsForVersion(version).map(name => `${name}.json`), MANIFEST];
 const serialize = value => JSON.stringify(value, null, 2) + '\n';
 const digest = body => createHash('sha256').update(JSON.stringify(body)).digest('hex');
+const fileDigest = text => createHash('sha256').update(text).digest('hex');
+
+// Validated snapshots are shared between requests. Repositories copy on write;
+// freezing also prevents a retained repository/predicate from changing authority.
+function freeze(value) {
+  if (value && typeof value === 'object' && !Object.isFrozen(value)) {
+    for (const child of Object.values(value)) freeze(child);
+    Object.freeze(value);
+  }
+  return value;
+}
 
 function envelope(records = []) {
   return { _meta: { schemaVersion: SCHEMA_VERSION, revision: 0, updatedAt: null }, records };
@@ -63,14 +76,19 @@ export class JsonUnitOfWork {
   #opened = false;
   #closing = false;
   #failed = false;
+  #cache;
+  #backupSources = new Map();
+  #recentBackups;
   #onExit = () => {
     try { this.#release?.(); } catch { /* Preserve evidence if lock release fails. */ }
   };
 
-  constructor({ directory = DATA_DIR, clock = () => new Date().toISOString(), fault = () => {} } = {}) {
+  constructor({ directory = DATA_DIR, clock = () => new Date().toISOString(), fault = () => {}, backupRetention = 20 } = {}) {
+    requireGame(backupRetention === Infinity || Number.isSafeInteger(backupRetention) && backupRetention >= 1, 'INVALID_BACKUP_RETENTION');
     this.directory = path.resolve(directory);
     this.clock = clock;
     this.fault = fault;
+    this.backupRetention = backupRetention;
   }
 
   #raw(files = FILES) {
@@ -78,13 +96,36 @@ export class JsonUnitOfWork {
   }
 
   #load() {
+    const stamps = this.#stamps();
+    if (this.#cache && FILES.every(file => stamps[file] === this.#cache.stamps[file])) return this.#cache;
     const raw = this.#raw();
     requireGame(FILES.every(file => raw[file] !== null), 'DATABASE_INCOMPLETE');
-    return { raw, state: decode(raw, SCHEMA_VERSION) };
+    const state = freeze(decode(raw, SCHEMA_VERSION));
+    requireGame(this.#sameStamps(stamps), 'STORAGE_CONFLICT');
+    this.#cache = { raw, state, stamps, hashes: Object.fromEntries(FILES.map(file => [file, fileDigest(raw[file])])) };
+    return this.#cache;
   }
 
-  #writeJournal(body, phase) {
-    atomicWrite(path.join(this.directory, JOURNAL), serialize({ version: 1, phase, body, checksum: digest(body) }));
+  #stamps() {
+    return Object.fromEntries(FILES.map(file => {
+      try {
+        const stat = fs.statSync(path.join(this.directory, file), { bigint: true });
+        requireGame(stat.isFile(), 'STORAGE_READ_FAILED', { file });
+        return [file, `${stat.dev}:${stat.ino}:${stat.size}:${stat.mtimeNs}:${stat.ctimeNs}`];
+      } catch (cause) {
+        if (cause.code === 'ENOENT') return [file, null];
+        throw cause instanceof GameError ? cause : new GameError('STORAGE_READ_FAILED', { file }, { cause });
+      }
+    }));
+  }
+
+  #sameStamps(stamps) {
+    const current = this.#stamps();
+    return FILES.every(file => current[file] === stamps[file]);
+  }
+
+  #writeJournal(body, phase, version = 1) {
+    atomicWrite(path.join(this.directory, JOURNAL), serialize({ version, phase, body, checksum: digest(body) }));
   }
 
   #removeJournal() {
@@ -97,8 +138,16 @@ export class JsonUnitOfWork {
     if (journalText === null) return;
     const journal = parseJSON(journalText, JOURNAL);
     const { body } = journal;
-    requireGame(journal.version === 1 && ['prepared', 'committed'].includes(journal.phase) && body &&
+    requireGame([1, 2, 3].includes(journal.version) && ['prepared', 'committed'].includes(journal.phase) && body &&
       typeof body.id === 'string' && journal.checksum === digest(body), 'DATABASE_CORRUPT', { file: JOURNAL });
+    if (journal.version === 3) {
+      this.#recoverPatches(journal);
+      return;
+    }
+    if (journal.version === 2) {
+      this.#recoverDelta(journal);
+      return;
+    }
     requireGame(body.after && typeof body.after[MANIFEST] === 'string', 'DATABASE_CORRUPT');
     const version = parseJSON(body.after[MANIFEST], MANIFEST).schemaVersion;
     const files = filesForVersion(version);
@@ -123,38 +172,187 @@ export class JsonUnitOfWork {
     this.#removeJournal();
   }
 
-  #backup(body) {
+  #recoverDelta({ body, phase }) {
+    const files = Object.keys(body.after ?? {});
+    requireGame(body.schemaVersion === SCHEMA_VERSION && files.length > 0 &&
+      files.every(file => FILES.includes(file) && file !== MANIFEST) &&
+      body.before && Object.keys(body.before).length === files.length &&
+      files.every(file => typeof body.before[file] === 'string' && typeof body.after[file] === 'string') &&
+      body.unchanged && Object.keys(body.unchanged).length === FILES.length - files.length &&
+      FILES.filter(file => !files.includes(file)).every(file => /^[a-f0-9]{64}$/.test(body.unchanged[file])),
+    'DATABASE_CORRUPT', { file: JOURNAL });
+    const current = this.#raw();
+    for (const file of FILES) {
+      if (files.includes(file)) {
+        const expected = phase === 'prepared' ? [body.before[file]] : [body.before[file], body.after[file]];
+        requireGame(expected.includes(current[file]), 'RECOVERY_CONFLICT', { file });
+      } else {
+        requireGame(current[file] !== null && fileDigest(current[file]) === body.unchanged[file], 'RECOVERY_CONFLICT', { file });
+      }
+    }
+    // Rebuild and validate the complete proposed snapshot before publishing any
+    // delta, just as for historical full-snapshot journals.
+    decode({ ...current, ...body.after }, SCHEMA_VERSION);
+    if (phase === 'committed') {
+      for (const file of files) atomicWrite(path.join(this.directory, file), body.after[file]);
+    }
+    this.#removeJournal();
+  }
+
+  #recoverPatches({ body, phase }) {
+    const files = Object.keys(body.changes ?? {});
+    requireGame(body.schemaVersion === SCHEMA_VERSION && files.length > 0 &&
+      files.every(file => FILES.includes(file) && file !== MANIFEST) && body.unchanged &&
+      Object.keys(body.unchanged).length === FILES.length - files.length &&
+      FILES.filter(file => !files.includes(file)).every(file => /^[a-f0-9]{64}$/.test(body.unchanged[file])),
+    'DATABASE_CORRUPT', { file: JOURNAL });
+    const current = this.#raw();
+    const after = {};
+    for (const file of FILES) {
+      requireGame(current[file] !== null, 'RECOVERY_CONFLICT', { file });
+      const hash = fileDigest(current[file]);
+      if (!files.includes(file)) {
+        requireGame(hash === body.unchanged[file], 'RECOVERY_CONFLICT', { file });
+        continue;
+      }
+      const change = body.changes[file];
+      requireGame(change && /^[a-f0-9]{64}$/.test(change.beforeHash) && /^[a-f0-9]{64}$/.test(change.afterHash) &&
+        Number.isSafeInteger(change.beforeLength) && change.beforeLength >= 0 && change.afterMeta &&
+        Array.isArray(change.replacements) && Array.isArray(change.appended) &&
+        new Set(change.replacements.map(row => row?.index)).size === change.replacements.length &&
+        change.replacements.every(row => Number.isSafeInteger(row?.index) && row.index >= 0 && row.index < change.beforeLength && row.record),
+      'DATABASE_CORRUPT', { file: JOURNAL });
+      requireGame(hash === change.beforeHash || phase === 'committed' && hash === change.afterHash, 'RECOVERY_CONFLICT', { file });
+      if (hash === change.afterHash) after[file] = current[file];
+      else {
+        const collection = parseJSON(current[file], file);
+        requireGame(Array.isArray(collection.records) && collection.records.length === change.beforeLength, 'DATABASE_CORRUPT', { file: JOURNAL });
+        for (const { index, record } of change.replacements) collection.records[index] = record;
+        for (const record of change.appended) collection.records.push(record);
+        collection._meta = change.afterMeta;
+        after[file] = serialize(collection);
+        requireGame(fileDigest(after[file]) === change.afterHash, 'DATABASE_CORRUPT', { file: JOURNAL });
+      }
+    }
+    decode({ ...current, ...after }, SCHEMA_VERSION);
+    if (phase === 'committed') for (const file of files) atomicWrite(path.join(this.directory, file), after[file]);
+    this.#removeJournal();
+  }
+
+  #backup(body, before = body.before, compact = false) {
     const root = path.join(this.directory, 'backups');
     fs.mkdirSync(root, { recursive: true, mode: 0o700 });
     const backup = path.join(root, body.id);
     fs.mkdirSync(backup, { mode: 0o700 });
     for (const file of FILES) {
-      if (body.before[file] !== null) atomicWrite(path.join(backup, file), body.before[file]);
+      if (before[file] !== null) {
+        const hash = compact ? this.#cache.hashes[file] : fileDigest(before[file]);
+        const previous = this.#backupSources.get(file);
+        const target = path.join(backup, file);
+        if (!compact) {
+          // Historical migrations back up the captured bytes, even if another
+          // program edits a legacy file while the migration is preparing.
+          atomicWrite(target, before[file]);
+        } else if (previous?.hash === hash && fs.existsSync(previous.file)) {
+          try { fs.linkSync(previous.file, target); }
+          catch (cause) {
+            if (!['EXDEV', 'EPERM', 'ENOTSUP', 'EOPNOTSUPP', 'EMLINK'].includes(cause.code)) throw cause;
+            atomicWrite(target, before[file]);
+          }
+        } else {
+          // Never link backups to live files: an external in-place edit must
+          // not corrupt the recovery copy as well. Reflink where supported.
+          fs.copyFileSync(path.join(this.directory, file), target, fs.constants.COPYFILE_FICLONE);
+          const fd = fs.openSync(target, 'r');
+          try { fs.fsyncSync(fd); } finally { fs.closeSync(fd); }
+        }
+        this.#backupSources.set(file, { hash, file: target });
+      }
     }
-    atomicWrite(path.join(backup, 'snapshot.json'), serialize({ id: body.id, createdAt: this.clock(), files: body.before }));
+    const files = compact ? this.#cache.hashes : before;
+    atomicWrite(path.join(backup, 'snapshot.json'), serialize({ version: compact ? 2 : 1, id: body.id, createdAt: this.clock(), files }));
     syncDirectory(root);
     syncDirectory(this.directory);
   }
 
-  #commit(before, state) {
-    validateDatabase(state);
-    const after = Object.fromEntries(COLLECTIONS.map(name => [`${name}.json`, serialize(state[name])]));
-    after[MANIFEST] = serialize({ database: 'chengdu-cards', schemaVersion: SCHEMA_VERSION });
-    const body = { id: randomUUID(), before, after };
+  #pruneBackups() {
+    if (this.backupRetention === Infinity) return;
+    const root = path.join(this.directory, 'backups');
+    try {
+      if (!this.#recentBackups) {
+        this.#recentBackups = fs.readdirSync(root, { withFileTypes: true }).filter(entry => entry.isDirectory()).flatMap(entry => {
+          const directory = path.join(root, entry.name);
+          const text = readText(path.join(directory, 'snapshot.json'));
+          if (text === null) return [];
+          // Historical migration backups remain pinned. Only the new compact
+          // format participates in bounded routine-backup retention.
+          const snapshot = parseJSON(text, 'snapshot.json');
+          return snapshot.version === 2 ? [{ directory, created: fs.statSync(directory).mtimeMs }] : [];
+        }).sort((a, b) => a.created - b.created).map(entry => entry.directory);
+      }
+      while (this.#recentBackups.length > this.backupRetention) {
+        fs.rmSync(this.#recentBackups[0], { recursive: true });
+        this.#recentBackups.shift();
+      }
+    } catch {
+      // Retention is maintenance after a durable commit, never its authority.
+      // A failed prune can be retried on the next commit without failing a send.
+      this.#recentBackups = undefined;
+    }
+  }
+
+  #commit(before, state, changedCollections = null) {
+    // Initialization and migrations use the historical complete journal.
+    // Ordinary transactions have already passed both validation stages.
+    if (changedCollections === null) validateDatabase(state);
+    const changedFiles = changedCollections === null ? FILES : changedCollections.map(name => `${name}.json`);
+    const after = Object.fromEntries(changedFiles.map(file => [file, file === MANIFEST
+      ? serialize({ database: 'chengdu-cards', schemaVersion: SCHEMA_VERSION })
+      : serialize(state[file.slice(0, -5)])]));
+    const compact = changedCollections !== null;
+    const body = compact ? {
+      id: randomUUID(), schemaVersion: SCHEMA_VERSION,
+      changes: Object.fromEntries(changedCollections.map(name => {
+        const file = `${name}.json`;
+        const previous = this.#cache.state[name].records;
+        const records = state[name].records;
+        const replacements = [];
+        for (let index = 0; index < previous.length; index++) {
+          if (previous[index] !== records[index]) replacements.push({ index, record: records[index] });
+        }
+        return [file, { beforeHash: this.#cache.hashes[file], afterHash: fileDigest(after[file]),
+          beforeLength: previous.length, afterMeta: state[name]._meta, replacements, appended: records.slice(previous.length) }];
+      })),
+      unchanged: Object.fromEntries(FILES.filter(file => !changedFiles.includes(file)).map(file => [file, this.#cache.hashes[file]]))
+    } : { id: randomUUID(), before, after };
     try {
       // Refuse to overwrite edits made outside the owning process.
-      const current = this.#raw();
-      requireGame(FILES.every(file => current[file] === before[file]), 'STORAGE_CONFLICT');
-      this.#backup(body);
-      this.#writeJournal(body, 'prepared');
+      if (compact) requireGame(this.#sameStamps(this.#cache.stamps), 'STORAGE_CONFLICT');
+      else {
+        const current = this.#raw();
+        requireGame(FILES.every(file => current[file] === before[file]), 'STORAGE_CONFLICT');
+      }
+      this.#backup(body, before, compact);
+      if (compact) requireGame(this.#sameStamps(this.#cache.stamps), 'STORAGE_CONFLICT');
+      else {
+        const current = this.#raw();
+        requireGame(FILES.every(file => current[file] === before[file]), 'STORAGE_CONFLICT');
+      }
+      this.#writeJournal(body, 'prepared', compact ? 3 : 1);
       this.fault('prepared');
-      this.#writeJournal(body, 'committed');
+      this.#writeJournal(body, 'committed', compact ? 3 : 1);
       this.fault('committed');
       for (const file of FILES) {
-        atomicWrite(path.join(this.directory, file), after[file]);
+        if (Object.hasOwn(after, file)) atomicWrite(path.join(this.directory, file), after[file]);
         this.fault(`published:${file}`);
       }
       this.#removeJournal();
+      this.#cache = { raw: { ...before, ...after }, state: freeze(state), stamps: this.#stamps(),
+        hashes: { ...this.#cache?.hashes, ...Object.fromEntries(Object.entries(after).map(([file, value]) => [file, fileDigest(value)])) } };
+      if (compact) {
+        this.#recentBackups?.push(path.join(this.directory, 'backups', body.id));
+        this.#pruneBackups();
+      }
     } catch (cause) {
       this.#failed = true;
       throw cause instanceof GameError ? cause : new GameError('STORAGE_WRITE_FAILED', {}, { cause });
@@ -168,6 +366,7 @@ export class JsonUnitOfWork {
     process.on('exit', this.#onExit);
     try {
       this.#recover();
+      const stamps = this.#stamps();
       const raw = this.#raw();
       if (FILES.every(file => raw[file] === null)) {
         // Backup evidence means this directory used to contain an existing database.
@@ -193,6 +392,10 @@ export class JsonUnitOfWork {
           const now = this.clock();
           for (let next = version + 1; next <= SCHEMA_VERSION; next++) state = migrations[next](state, now);
           this.#commit(raw, state);
+        } else {
+          const state = freeze(decode(raw, SCHEMA_VERSION));
+          requireGame(this.#sameStamps(stamps), 'STORAGE_CONFLICT');
+          this.#cache = { raw, state, stamps, hashes: Object.fromEntries(FILES.map(file => [file, fileDigest(raw[file])])) };
         }
       }
       this.#load();
@@ -212,7 +415,9 @@ export class JsonUnitOfWork {
       this.#open();
       return work();
     });
-    this.#tail = result.catch(() => {});
+    // The queue needs completion only; do not retain the last response payload
+    // (which can itself be a large collection) while the bot is idle.
+    this.#tail = result.then(() => {}, () => {});
     return result;
   }
 
@@ -226,24 +431,38 @@ export class JsonUnitOfWork {
   withTransaction(work) {
     return this.#enqueue(async () => {
       const { raw, state: before } = this.#load();
-      const draft = structuredClone(before);
-      const result = await work(createRepositories(draft, true));
+      const draft = { ...before };
+      const changed = new Set();
+      let active = true;
+      const repos = createRepositories(draft, true, {
+        beforeWrite(name) {
+          requireGame(active, 'TRANSACTION_CLOSED');
+          if (draft[name] === before[name]) draft[name] = { ...before[name], records: before[name].records.slice() };
+          return draft[name].records;
+        },
+        onWrite: name => changed.add(name)
+      });
+      let result;
+      try { result = await work(repos); }
+      finally { active = false; }
       const copiedResult = structuredClone(result);
-      validateDatabase(draft);
-      const changedCollections = COLLECTIONS.filter(name =>
-        JSON.stringify(before[name].records) !== JSON.stringify(draft[name].records));
+      const changedCollections = [...changed].filter(name => !isDeepStrictEqual(before[name].records, draft[name].records));
+      if (!changedCollections.length) return copiedResult;
       // Read the injected storage clock after the operation so natural
       // millisecond differences do not turn a valid receipt into a future one.
       // The draft cannot supply or alter this trusted transition timestamp.
       // Idempotent replays do not need a new clock reading or a new commit.
-      const now = changedCollections.length ? this.clock() : null;
-      validateTransition(before, draft, changedCollections.length ? { now } : {});
+      const now = this.clock();
+      dailyTimestamp(now);
       for (const name of changedCollections) {
         const revision = before[name]._meta.revision + 1;
         requireGame(Number.isSafeInteger(revision), 'NUMERIC_OVERFLOW');
         draft[name]._meta = { schemaVersion: SCHEMA_VERSION, revision, updatedAt: now };
       }
-      if (changedCollections.length) this.#commit(raw, draft);
+      freeze(draft);
+      validateDatabase(draft);
+      validateTransition(before, draft, { now });
+      this.#commit(raw, draft, changedCollections);
       return copiedResult;
     });
   }
@@ -259,5 +478,6 @@ export class JsonUnitOfWork {
     process.removeListener('exit', this.#onExit);
     this.#release = undefined;
     this.#opened = false;
+    this.#cache = undefined;
   }
 }

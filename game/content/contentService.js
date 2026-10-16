@@ -14,9 +14,9 @@ async function userFor(repos, userId) {
 }
 
 async function rewardReplay(repos, userId, operationKey, kind, matches) {
-  const previous = await repos.contentRewards.find(reward => reward.operationKey === operationKey);
+  const previous = await repos.contentRewards.findBy('operationKey', operationKey);
   if (!previous) {
-    requireGame(!await repos.contentActions.find(action => action.operationKey === operationKey), 'OPERATION_CONFLICT');
+    requireGame(!await repos.contentActions.findBy('operationKey', operationKey), 'OPERATION_CONFLICT');
     return null;
   }
   requireGame(previous.userId === userId && previous.kind === kind && matches(previous), 'OPERATION_CONFLICT');
@@ -40,7 +40,7 @@ async function eventView(repos, campaign, now, userId = null) {
     return { id, name: character.name, rarity: character.rarity, issued: counter.issuedCount,
       max: character.supply.max, available: active && character.obtainable && character.supply.grandfatheredIssued === undefined && counter.issuedCount < character.supply.max };
   }));
-  const welcomeClaimed = userId !== null && Boolean(await repos.contentRewards.find(reward => reward.kind === 'event' && reward.sourceId === campaign.id && reward.userId === userId));
+  const welcomeClaimed = userId !== null && Boolean(await repos.contentRewards.findBy('kind', 'event', reward => reward.sourceId === campaign.id && reward.userId === userId));
   return { ...campaign, status, characters, welcomeClaimed };
 }
 
@@ -62,7 +62,7 @@ export function createContentService(storage, clock) {
       if (!unlock && progress.current >= definition.target) unlock = await repos.achievements.insert({ id,
         userId, achievementId: definition.id, policyVersion: CONTENT_POLICY_VERSION, unlockedAt: now,
         snapshot: structuredClone(definition), evidence: progress.evidence });
-      const claimed = Boolean(await repos.contentRewards.find(reward => reward.kind === 'achievement' && reward.sourceId === definition.id && reward.userId === userId));
+      const claimed = Boolean(await repos.contentRewards.findBy('kind', 'achievement', reward => reward.sourceId === definition.id && reward.userId === userId));
       result.push({ ...(unlock?.snapshot ?? definition), current: Math.max(progress.current, unlock ? definition.target : 0),
         unlocked: Boolean(unlock), unlockedAt: unlock?.unlockedAt ?? null, claimed });
     }
@@ -78,7 +78,7 @@ export function createContentService(storage, clock) {
         const progress = missionProgress(await objectiveState(repos), userId, period, now);
         const missions = await Promise.all(MISSIONS.map(async definition => {
           const current = definition.metric === 'characters' ? progress.characters.length : progress[definition.metric];
-          const claimed = Boolean(await repos.contentRewards.find(reward => reward.userId === userId && reward.kind === 'mission' && reward.sourceId === `${period}:${definition.id}`));
+          const claimed = Boolean(await repos.contentRewards.findBy('userId', userId, reward => reward.kind === 'mission' && reward.sourceId === `${period}:${definition.id}`));
           return { ...definition, current, complete: current >= definition.target, claimed };
         }));
         return { period, resetsAt: nextMissionReset(now), missions };
@@ -95,7 +95,7 @@ export function createContentService(storage, clock) {
         const now = await refresh(repos);
         const period = contentPeriod(now);
         const sourceId = `${period}:${definition.id}`;
-        const previous = await repos.contentRewards.find(reward => reward.userId === userId && reward.kind === 'mission' && reward.sourceId === sourceId);
+        const previous = await repos.contentRewards.findBy('userId', userId, reward => reward.kind === 'mission' && reward.sourceId === sourceId);
         if (previous) return { reward: previous, alreadyClaimed: true };
         const evidence = missionProgress(await objectiveState(repos), userId, period, now);
         const current = definition.metric === 'characters' ? evidence.characters.length : evidence[definition.metric];
@@ -119,7 +119,7 @@ export function createContentService(storage, clock) {
         await userFor(repos, userId);
         const replay = await rewardReplay(repos, userId, operationKey, 'achievement', reward => reward.sourceId === definition.id);
         if (replay) return replay;
-        const previous = await repos.contentRewards.find(reward => reward.kind === 'achievement' && reward.sourceId === definition.id && reward.userId === userId);
+        const previous = await repos.contentRewards.findBy('kind', 'achievement', reward => reward.sourceId === definition.id && reward.userId === userId);
         if (previous) return { reward: previous, alreadyClaimed: true };
         const now = await refresh(repos);
         const achievements = await unlocks(repos, userId, now);
@@ -134,7 +134,7 @@ export function createContentService(storage, clock) {
         await userFor(repos, userId);
         const now = await refresh(repos);
         const achievements = (await unlocks(repos, userId, now)).filter(row => row.unlocked);
-        const seasonRewards = await repos.seasonRewards.filter(row => row.userId === userId);
+        const seasonRewards = await repos.seasonRewards.filterBy('userId', userId);
         return { tickets: await ticketBalance(repos, userId), titles: [...achievements.map(row => row.title), ...seasonRewards.map(row => row.title)],
           badges: achievements.map(row => row.badge), achievementsCount: achievements.length };
       });
@@ -163,7 +163,7 @@ export function createContentService(storage, clock) {
         const campaign = await campaignFor(repos, eventId);
         const replay = await rewardReplay(repos, userId, operationKey, 'event', reward => reward.sourceId === campaign.id);
         if (replay) return replay;
-        const previous = await repos.contentRewards.find(reward => reward.userId === userId && reward.kind === 'event' && reward.sourceId === campaign.id);
+        const previous = await repos.contentRewards.findBy('userId', userId, reward => reward.kind === 'event' && reward.sourceId === campaign.id);
         if (previous) return { reward: previous, alreadyClaimed: true };
         const now = await refresh(repos);
         requireGame(activeCampaign(campaign, now), 'EVENT_NOT_ACTIVE');

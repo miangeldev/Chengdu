@@ -157,7 +157,10 @@ Las estadísticas de los personajes y unidades anteriores no se modifican.
 
 ## Integración y persistencia
 
-El router admite `automaticSpawns: true` y procesa texto normal de grupos.
+El router admite `automaticSpawns: true` y procesa texto normal de grupos con uso
+de comandos CTU o historial de apariciones. Los grupos ajenos al juego y las
+ventanas ya comprobadas se descartan en memoria, sin consultar usuarios ni abrir
+transacciones; una ráfaga simultánea comparte una sola comprobación por grupo.
 El anfitrión debe pasarle los mensajes autenticados, no sólo comandos.
 Si ya tiene un cargador de plugins, usa `observeGameActivity(sock, msg)` sólo
 para texto normal de grupos; no ejecutes también el router de comandos.

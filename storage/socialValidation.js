@@ -1,9 +1,10 @@
+import { equal } from './equality.js';
 import { requireGame } from '../utils/GameError.js';
 import { ownershipAt } from '../game/units/ownership.js';
 import { defaultPreferences, earnedTitles, SOCIAL_POLICY_VERSION } from '../game/social/policy.js';
 
 const check = (condition, field) => requireGame(condition, 'DATABASE_CORRUPT', { field });
-const equal = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
 const date = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(value) && Number.isFinite(Date.parse(value));
 
 function preferenceProof(state, preferences, userId, at) {
@@ -43,6 +44,7 @@ function expectedAfter(before, request, actualAfter) {
 export function validateSocialData(state) {
   const users = new Set(state.usuarios.records.map(user => user.id));
   const latest = new Map();
+  const firstByUser = new Map();
   const keys = new Set();
   const profiles = state.perfilessociales.records;
   for (const action of state.accionessociales.records) {
@@ -50,6 +52,7 @@ export function validateSocialData(state) {
       date(action.createdAt) && typeof action.operationKey === 'string' && action.operationKey.length > 0 &&
       action.operationKey.length <= 200 && action.operationKey.trim() === action.operationKey && !keys.has(action.operationKey), 'social.actionMetadata');
     keys.add(action.operationKey);
+    if (!firstByUser.has(action.userId)) firstByUser.set(action.userId, action);
     const previous = latest.get(action.userId);
     check(equal(action.before, previous?.after ?? defaultPreferences()) &&
       (!previous || Date.parse(action.createdAt) >= Date.parse(previous.createdAt)), 'social.actionChain');
@@ -60,7 +63,7 @@ export function validateSocialData(state) {
   check(profiles.length === latest.size && new Set(profiles.map(row => row.userId)).size === profiles.length, 'social.profileCount');
   for (const profile of profiles) {
     const action = latest.get(profile.userId);
-    const first = state.accionessociales.records.find(row => row.userId === profile.userId);
+    const first = firstByUser.get(profile.userId);
     check(users.has(profile.userId) && profile.id === `social:${profile.userId}` && profile.policyVersion === SOCIAL_POLICY_VERSION &&
       equal(profile.preferences, action?.after) && profile.createdAt === first?.createdAt && profile.updatedAt === action?.createdAt, 'social.profileReplay');
   }
@@ -69,6 +72,8 @@ export function validateSocialData(state) {
 export function validateSocialTransition(before, after, context = {}) {
   check(equal(before.accionessociales.records, after.accionessociales.records.slice(0, before.accionessociales.records.length)), 'social.actionsAppendOnly');
   const added = after.accionessociales.records.slice(before.accionessociales.records.length);
+  const updatedUsers = new Set(added.map(action => action.userId));
+  const profilesById = new Map(after.perfilessociales.records.map(profile => [profile.id, profile]));
   for (const action of added) {
     check(context.now && Date.parse(action.createdAt) <= Date.parse(context.now), 'social.trustedClock');
     const selections = [];
@@ -83,8 +88,8 @@ export function validateSocialTransition(before, after, context = {}) {
     }
   }
   for (const profile of before.perfilessociales.records) {
-    const updated = after.perfilessociales.records.find(row => row.id === profile.id);
+    const updated = profilesById.get(profile.id);
     check(updated && profile.createdAt === updated.createdAt && profile.userId === updated.userId &&
-      profile.policyVersion === updated.policyVersion && (added.some(action => action.userId === profile.userId) || equal(profile, updated)), 'social.profileTransition');
+      profile.policyVersion === updated.policyVersion && (updatedUsers.has(profile.userId) || equal(profile, updated)), 'social.profileTransition');
   }
 }

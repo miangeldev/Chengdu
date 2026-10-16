@@ -40,7 +40,7 @@ async function profileView(repos, user, viewerId = null) {
   const stored = await repos.socialProfiles.get(`social:${user.id}`);
   const preferences = stored?.preferences ?? defaultPreferences();
   const titles = earnedTitles(await titleState(repos), user.id);
-  const rankings = await repos.rankings.filter(row => row.userId === user.id);
+  const rankings = await repos.rankings.filterBy('userId', user.id);
   const rank = rankings.at(-1);
   const season = rank ? await repos.seasons.get(rank.seasonId) : null;
   const favorite = await ownedSelection(repos, user.id, preferences.favorite);
@@ -137,7 +137,7 @@ export function createSocialService(storage, clock) {
       }
       return storage.withTransaction(async repos => {
         const user = await requireUser(repos, userId);
-        const replay = await repos.socialActions.find(row => row.operationKey === operationKey);
+        const replay = await repos.socialActions.findBy('operationKey', operationKey);
         if (replay) {
           requireGame(replay.userId === userId && JSON.stringify(replay.request) === JSON.stringify(request), 'OPERATION_CONFLICT');
           return { profile: await profileView(repos, user, userId), action: replay, alreadyUpdated: true };

@@ -1,6 +1,6 @@
 import { collectionRepository } from './collection.js';
 
-export function unidadesRepository(records, writable) {
-  const repository = collectionRepository(records, writable);
-  return { ...repository, async getByOwner(ownerId) { return repository.filter(u => u.ownerId === ownerId); } };
+export function unidadesRepository(records, writable, options) {
+  const repository = collectionRepository(records, writable, options);
+  return { ...repository, async getByOwner(ownerId) { return repository.filterBy('ownerId', ownerId); } };
 }

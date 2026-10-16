@@ -29,8 +29,8 @@ async function userFor(repos, id) {
 }
 
 async function keyUsed(repos, key) {
-  return await repos.listings.find(listing => listing.operationKey === key || listing.closeOperationKey === key) ||
-    await repos.sales.find(sale => sale.operationKey === key);
+  return await repos.listings.findBy('anyOperationKey', key) ||
+    await repos.sales.findBy('operationKey', key);
 }
 
 async function publicListing(repos, listing, code = null) {
@@ -109,7 +109,7 @@ export function createMarketService(storage, clock) {
       const id = normalizedId(unitId, 'UNIT_NOT_FOUND');
       return storage.withTransaction(async repos => {
         await userFor(repos, sellerId);
-        const previous = await repos.listings.find(listing => listing.operationKey === key);
+        const previous = await repos.listings.findBy('operationKey', key);
         if (previous) {
           requireGame(previous.sellerId === sellerId && previous.unitId === id && previous.price === price, 'OPERATION_CONFLICT');
           return { listing: await publicListing(repos, previous), alreadyListed: true };
@@ -124,7 +124,7 @@ export function createMarketService(storage, clock) {
         requireGame(unit.lock?.type !== 'market', 'UNIT_ALREADY_LISTED');
         requireGame(unit.lock === null, 'UNIT_LOCKED');
         if (user.team.includes(id)) {
-          requireGame(!await repos.battles.find(battle => battle.status === 'active' && battle.players.some(player => player.userId === sellerId)), 'TEAM_LOCKED');
+          requireGame(!await repos.battles.findBy('status', 'active', battle => battle.players.some(player => player.userId === sellerId)), 'TEAM_LOCKED');
         }
         requireGame(dailyTimestamp(now) >= dailyTimestamp(unit.updatedAt), 'INVALID_CLOCK');
         const character = await repos.characters.get(unit.characterId);
@@ -144,7 +144,7 @@ export function createMarketService(storage, clock) {
       const result = await storage.withTransaction(async repos => {
         await userFor(repos, buyerId);
         const id = await resolveListingId(repos, listingId);
-        const previous = await repos.sales.find(sale => sale.operationKey === key);
+        const previous = await repos.sales.findBy('operationKey', key);
         if (previous) {
           requireGame(previous.buyerId === buyerId && previous.listingId === id, 'OPERATION_CONFLICT');
           return { sale: await publicSale(repos, previous, buyerId), unit: await repos.units.get(previous.unitId),
@@ -187,7 +187,7 @@ export function createMarketService(storage, clock) {
       return storage.withTransaction(async repos => {
         await userFor(repos, sellerId);
         const id = await resolveListingId(repos, listingId);
-        const previous = await repos.listings.find(listing => listing.status === 'cancelled' && listing.closeOperationKey === key);
+        const previous = await repos.listings.findBy('status', 'cancelled', listing => listing.closeOperationKey === key);
         if (previous) {
           requireGame(previous.sellerId === sellerId && previous.id === id, 'OPERATION_CONFLICT');
           return { listing: await publicListing(repos, previous), alreadyCancelled: true };

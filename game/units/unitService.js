@@ -1,7 +1,6 @@
 import { expireTrades } from '../trades/lifecycle.js';
 import { createUnitInTransaction } from './unitGenerator.js';
 import { requireGame } from '../../utils/GameError.js';
-import { paginate } from '../../utils/pagination.js';
 import { expireBattles } from '../battle/lifecycle.js';
 import { effectiveUnitStats, displayUnitCharacterName, evolutionSnapshot } from '../evolution/rules.js';
 import { expireListings } from '../market/lifecycle.js';
@@ -76,8 +75,7 @@ export function createUnitService(storage, clock) {
         if (unitId !== null) return { units: [await combatDetail(repos, unitId.trim().toUpperCase())] };
         const user = await repos.users.get(userId);
         requireGame(user, 'USER_NOT_FOUND');
-        const battle = await repos.battles.find(b => b.status === 'active' &&
-          (chatId === null || b.chatId === chatId) && b.players.some(p => p.userId === userId));
+        const battle = await repos.battles.findBy('status', 'active', b => (chatId === null || b.chatId === chatId) && b.players.some(p => p.userId === userId));
         if (battle) return { units: battle.players.map(player => snapshotDetail(player)),
           reserves: battle.rulesVersion === 2 ? battle.players.flatMap(player => player.units.filter((_, index) => index !== player.activeIndex).map(unit => snapshotDetail(player, unit))) : [],
           rulesVersion: battle.rulesVersion, format: battle.format ?? '1v1' };
@@ -91,7 +89,7 @@ export function createUnitService(storage, clock) {
         await expireListings(repos, now);
     await expireTrades(repos, now);
         requireGame(await repos.users.get(ownerId), 'USER_NOT_FOUND');
-        const page = paginate(await repos.units.getByOwner(ownerId), options, `collection:${ownerId}`);
+        const page = await repos.units.pageBy('ownerId', ownerId, options, `collection:${ownerId}`);
         page.items = await Promise.all(page.items.map(unit => detail(repos, unit)));
         return page;
       });
@@ -105,10 +103,13 @@ export function createUnitService(storage, clock) {
     await expireTrades(repos, now);
         const unit = await repos.units.get(unitId.trim().toUpperCase());
         requireGame(unit, 'UNIT_NOT_FOUND');
-        const events = await repos.events.filter(event => event.unitId === unit.id);
-        const page = paginate(events, options, `ownershipHistory:${unit.id}`,
+        const page = await repos.events.pageBy('unitId', unit.id, options, `ownershipHistory:${unit.id}`,
           event => [String(event.ownershipVersion ?? 0).padStart(16, '0'), event.id]);
-        const users = new Map((await repos.users.all()).map(user => [user.id, { id: user.id, name: user.name }]));
+        const ownerIds = new Set([unit.ownerId, ...page.items.flatMap(event => [event.fromOwnerId, event.toOwnerId]).filter(Boolean)]);
+        const users = new Map(await Promise.all([...ownerIds].map(async id => {
+          const user = await repos.users.get(id);
+          return [id, { id: user.id, name: user.name }];
+        })));
         page.items = page.items.map(event => ({ id: event.id, type: event.type, unitId: event.unitId,
           reason: event.reason, createdAt: event.createdAt, ownershipVersion: event.ownershipVersion ?? 0,
           fromOwner: event.fromOwnerId === null ? null : users.get(event.fromOwnerId), toOwner: users.get(event.toOwnerId) }));
