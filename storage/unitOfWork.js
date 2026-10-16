@@ -33,6 +33,9 @@ const filesForVersion = version => [...collectionsForVersion(version).map(name =
 const serialize = value => JSON.stringify(value, null, 2) + '\n';
 const digest = body => createHash('sha256').update(JSON.stringify(body)).digest('hex');
 const fileDigest = text => createHash('sha256').update(text).digest('hex');
+// Some Android/shared filesystems expose these syscalls but reject them. The
+// captured JSON can still be backed up with the durable ordinary-write path.
+const BACKUP_FALLBACK_CODES = new Set(['ENOSYS', 'ENOTSUP', 'EOPNOTSUPP', 'EINVAL', 'EXDEV', 'EPERM', 'EACCES', 'EMLINK']);
 
 // Validated snapshots are shared between requests. Repositories copy on write;
 // freezing also prevents a retained repository/predicate from changing authority.
@@ -256,13 +259,18 @@ export class JsonUnitOfWork {
         } else if (previous?.hash === hash && fs.existsSync(previous.file)) {
           try { fs.linkSync(previous.file, target); }
           catch (cause) {
-            if (!['EXDEV', 'EPERM', 'ENOTSUP', 'EOPNOTSUPP', 'EMLINK'].includes(cause.code)) throw cause;
+            if (!BACKUP_FALLBACK_CODES.has(cause.code)) throw cause;
             atomicWrite(target, before[file]);
           }
         } else {
           // Never link backups to live files: an external in-place edit must
           // not corrupt the recovery copy as well. Reflink where supported.
-          fs.copyFileSync(path.join(this.directory, file), target, fs.constants.COPYFILE_FICLONE);
+          try {
+            fs.copyFileSync(path.join(this.directory, file), target, fs.constants.COPYFILE_FICLONE);
+          } catch (cause) {
+            if (!BACKUP_FALLBACK_CODES.has(cause.code)) throw cause;
+            atomicWrite(target, before[file]);
+          }
           const fd = fs.openSync(target, 'r');
           try { fs.fsyncSync(fd); } finally { fs.closeSync(fd); }
         }
@@ -325,6 +333,8 @@ export class JsonUnitOfWork {
       })),
       unchanged: Object.fromEntries(FILES.filter(file => !changedFiles.includes(file)).map(file => [file, this.#cache.hashes[file]]))
     } : { id: randomUUID(), before, after };
+    let stage = 'verify_before_backup';
+    let journalStarted = false;
     try {
       // Refuse to overwrite edits made outside the owning process.
       if (compact) requireGame(this.#sameStamps(this.#cache.stamps), 'STORAGE_CONFLICT');
@@ -332,21 +342,34 @@ export class JsonUnitOfWork {
         const current = this.#raw();
         requireGame(FILES.every(file => current[file] === before[file]), 'STORAGE_CONFLICT');
       }
+      stage = 'backup';
       this.#backup(body, before, compact);
+      stage = 'verify_after_backup';
       if (compact) requireGame(this.#sameStamps(this.#cache.stamps), 'STORAGE_CONFLICT');
       else {
         const current = this.#raw();
         requireGame(FILES.every(file => current[file] === before[file]), 'STORAGE_CONFLICT');
       }
+      // From this point even a failed directory fsync may have left a journal.
+      // Subsequent operations must wait for startup recovery. A backup failure
+      // before this boundary cannot have changed any authoritative game file.
+      stage = 'prepare_journal';
+      journalStarted = true;
       this.#writeJournal(body, 'prepared', compact ? 3 : 1);
+      stage = 'prepared';
       this.fault('prepared');
+      stage = 'commit_journal';
       this.#writeJournal(body, 'committed', compact ? 3 : 1);
+      stage = 'committed';
       this.fault('committed');
       for (const file of FILES) {
+        stage = `published:${file}`;
         if (Object.hasOwn(after, file)) atomicWrite(path.join(this.directory, file), after[file]);
         this.fault(`published:${file}`);
       }
+      stage = 'remove_journal';
       this.#removeJournal();
+      stage = 'cache_snapshot';
       this.#cache = { raw: { ...before, ...after }, state: freeze(state), stamps: this.#stamps(),
         hashes: { ...this.#cache?.hashes, ...Object.fromEntries(Object.entries(after).map(([file, value]) => [file, fileDigest(value)])) } };
       if (compact) {
@@ -354,8 +377,19 @@ export class JsonUnitOfWork {
         this.#pruneBackups();
       }
     } catch (cause) {
-      this.#failed = true;
-      throw cause instanceof GameError ? cause : new GameError('STORAGE_WRITE_FAILED', {}, { cause });
+      let causeCode = cause?.code ?? cause?.name ?? 'UNEXPECTED_ERROR';
+      const seen = new Set();
+      for (let current = cause; current && typeof current === 'object' && !seen.has(current); current = current.cause) {
+        seen.add(current);
+        if (typeof current.code === 'string') causeCode = current.code;
+      }
+      const error = new GameError(cause instanceof GameError ? cause.code : 'STORAGE_WRITE_FAILED',
+        { ...(cause instanceof GameError ? cause.details : {}), stage, operationId: body.id, causeCode }, { cause });
+      // Some host loggers print only .stack, omitting Error.cause and details.
+      // Keep the storage stage and OS error visible in that first log as well.
+      error.message = `${error.code} | etapa=${stage} | causa=${causeCode}`;
+      if (journalStarted) this.#failed = error;
+      throw error;
     }
   }
 
@@ -402,7 +436,8 @@ export class JsonUnitOfWork {
       this.#opened = true;
     } catch (error) {
       process.removeListener('exit', this.#onExit);
-      this.#release();
+      try { this.#release(); }
+      catch (cleanupError) { if (error instanceof Error) error.cleanupError = cleanupError; }
       this.#release = undefined;
       throw error;
     }
@@ -411,7 +446,12 @@ export class JsonUnitOfWork {
   #enqueue(work) {
     if (this.#closing) return Promise.reject(new GameError('DATABASE_CLOSED'));
     const result = this.#tail.then(async () => {
-      requireGame(!this.#failed, 'STORAGE_RECOVERY_REQUIRED');
+      if (this.#failed) throw new GameError('STORAGE_RECOVERY_REQUIRED', {
+        originalCode: this.#failed.code,
+        causeCode: this.#failed.details.causeCode,
+        stage: this.#failed.details.stage,
+        operationId: this.#failed.details.operationId
+      }, { cause: this.#failed });
       this.#open();
       return work();
     });

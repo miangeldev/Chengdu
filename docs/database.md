@@ -56,6 +56,23 @@ de formato anterior y de migración se preservan. No se poda durante recuperaci�
 El arranque, la memoria y la reescritura de una colección afectada siguen
 dependiendo de su tamaño. Mediciones y límites: [rendimiento](performance.md).
 
+Si el sistema de archivos no admite enlaces o copias optimizadas, los respaldos
+usan escritura atómica del JSON capturado. Los errores de espacio o de entrada/
+salida siguen propagándose. Un respaldo fallido antes de intentar crear el journal
+no bloquea las lecturas ni cambia el estado del juego; las escrituras posteriores
+pueden reintentarse cuando se resuelva el problema. Desde el intento de publicar
+el journal se mantiene el bloqueo hasta recuperar al reiniciar, incluso si una
+sincronización falló y no se puede asegurar qué marcador llegó al disco.
+
+`STORAGE_RECOVERY_REQUIRED` conserva el error inicial en `cause` e informa
+`originalCode`, `causeCode`, `stage` y `operationId`. El primer error de escritura
+incluye la etapa y el código de causa también en su mensaje, para los bots que
+imprimen únicamente `error.stack`. Para recuperar una instalación bloqueada:
+detener todas las instancias, ejecutar `npm run db:unlock` y luego
+`npm run db:validate` desde su directorio, y arrancar sólo si la validación tiene
+éxito. No borrar `_journal.json`: identifica la operación que debe completarse o
+descartarse y evita mezclar saldos y recibos de estados distintos.
+
 ## Comunidad y migración 10→11
 
 La base incorpora once colecciones vacías para intercambios, crafting,
