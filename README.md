@@ -1,4 +1,4 @@
-# Chengdú Cards — Comunidad 0.10
+# Chengdú Cards — Historia 0.11
 
 Módulo de juego para un bot de WhatsApp: registro, perfil, catálogo de diez
 personajes, starter único, colección, equipos de hasta tres unidades y combates
@@ -19,6 +19,10 @@ y personajes obtenidos directamente de premios y promociones.
 El ajuste 0.10.1 permite evolucionar desde el nivel 5 con +4% y llegar a +5%
 al nivel 10 automáticamente. [Reglas y balance](docs/evolution-balance-0.10.1.md).
 Verificado con 690 pruebas y 18.000 duelos de comparación.
+La versión **0.11.0** abre el modo Historia hasta su fase 1: prólogo, primeras
+tres misiones del bosque, decisiones persistentes, diario y minijefe con ataques
+anunciados. Sus premios únicos aceleran la XP de los compañeros hacia la
+evolución desde nivel 5. [Alcance, dificultad y presupuesto](docs/story-phase-1.md).
 Guía: [fases 13–32](docs/fases-13-32.md), [auditoría integral](docs/auditoria-fases-0-32.md)
 y [plan de entrega](docs/plan-fases-13-32.md).
 El balance 0.4.1 distingue la fuerza de las rarezas y limita la emisión global
@@ -40,7 +44,7 @@ npm run db:validate
 
 El segundo comando inicializa la base vacía y el catálogo si se trata de una
 instalación nueva; en instalaciones existentes valida o migra el formato original
-de usuarios. Desde los esquemas 1 a 10, migra al esquema 11 con backup y recuperación,
+de usuarios. Desde los esquemas 1 a 11, migra al esquema 12 con backup y recuperación,
 conservando unidades, identidades, saldos, XP, recibos y combates anteriores. La ruta por defecto es `ChengdúData/` junto al módulo, independiente
 del directorio desde el que se ejecute el bot.
 
@@ -57,6 +61,13 @@ no se conectan a WhatsApp ni escriben jugadores de prueba en la base del juego.
 
 | Comando | Uso |
 | --- | --- |
+| `.ctuhistoria` / `.ctuhistoria ayuda` | Retomar la campaña o consultar sus controles. |
+| `.ctuhistoria iniciar` / `.ctucontinuar` | Empezar y avanzar las escenas. |
+| `.ctuhistoria elegir 1` | Confirmar una decisión entre las opciones de la escena. |
+| `.ctuhistoria atacar 1` / `.ctuhistoria defender` | Resolver el turno leyendo la señal del enemigo. |
+| `.ctuhistoria habilidad` / `.ctuhistoria cambiar 2` | Usar una técnica o entrar con reserva. |
+| `.ctuhistoria pista` / `.ctuhistoria reintentar` | Consultar la mecánica gratis o volver tras una derrota. |
+| `.ctudiario historia` / `.ctucapitulos` / `.cturecuerdos` | Crónica, progreso y recuerdos, sin reclamar el diario económico. |
 | `.ctuclan` / `.ctuclan ayuda` | Crear clan, invitar, administrar tesorería, roles y guerras. |
 | `.ctuintercambio ayuda` | Ofertas de unidades/monedas con doble confirmación y códigos I1. |
 | `.ctucrafting` | Recoger materiales y crear sellos o insignias. |
@@ -538,7 +549,7 @@ independientes; rechaza modificaciones directas de colecciones administradas.
 
 ## Persistencia y recuperación
 
-Las 35 colecciones del esquema 11 incluyen versión y revisión; su contrato está
+Las 39 colecciones del esquema 12 incluyen versión y revisión; su contrato está
 en [docs/database.md](docs/database.md). `_database.json` identifica la instalación.
 `_journal.json` existe mientras hay un commit pendiente. Cada operación que cambia
 datos guarda previamente una copia coherente en `backups/<id-operación>/`.
@@ -610,6 +621,13 @@ activos, revisar la migración a SQLite prevista en el diseño.
 
 ## Alcance validado
 
+Historia 0.11 pasa **871 pruebas**, integra **59 comandos** y genera **213
+mensajes de ejemplo**. Se simularon **18.000 encuentros** del minijefe. La
+migración local 11→12 conserva exactamente los **44 registros** de sus **35
+colecciones** anteriores y añade cuatro vacías, sin cuentas de prueba, journal
+ni lock pendiente. Respaldo:
+`ChengdúData/backups/3d02d40a-aa49-490a-8015-3b4f55e5a627/`.
+
 La entrega Beta 0.8 verificó 439 pruebas y 9.000 duelos de contenido.
 La entrega Beta 0.9 verificó **543 pruebas**, **46 comandos** y **153 mensajes de ejemplo**, incluyendo
 Elo, colocación, archivo, abandono y premio de temporada sin créditos inventados.
@@ -625,10 +643,10 @@ clanes, evoluciones, contenido e interfaz y 11 de confirmaciones y comandos.
 
 Las pruebas con `node --test --test-isolation=none` verifican persistencia al
 reabrir, registro/starter concurrentes, supply, identidades, cursores, migraciones
-desde esquemas 1 a 10, journals antiguos, integridad y recuperación de commits. También
+desde esquemas 1 a 11, journals antiguos, integridad y recuperación de commits. También
 cubren equipos, snapshots, turnos, precisión, duplicados, victoria, rendición,
 expiración y estadísticas. Se interrumpe realmente un proceso con `SIGKILL`.
-También se comprueban las trazas de error y los 53 plugins mediante sus
+También se comprueban las trazas de error y los plugins mediante sus
 exportaciones `run`, con una base compartida y sin inyectar el juego del router.
 El debug se verifica activado y desactivado, con causas anidadas, loggers que
 sólo aceptan un argumento y límites de longitud del mensaje de WhatsApp.
@@ -672,8 +690,9 @@ posiciones alterados. Se interrumpen commits de resultados y premios, incluida
 la llegada del límite de temporada, y se comprueba que recuperación y migración
 conserven resultados completos sin mezclar publicaciones parciales.
 
-Nuevos gastos, regalos e intercambios directos pertenecen
-a las siguientes versiones. El modelo conserva progreso, procedencia,
+La Historia añade progreso narrativo, acciones, encuentros y premios únicos.
+Los detalles y los capítulos posteriores están en [la guía de fase 1](docs/story-phase-1.md).
+El modelo conserva progreso, procedencia,
 revisiones de contenido, seriales, stats individuales, traits y variante.
 
 Diseño: [fundación 0.1](docs/mvp-0.1.md), [combate 0.2](docs/mvp-0.2.md),
@@ -685,5 +704,6 @@ Diseño: [fundación 0.1](docs/mvp-0.1.md), [combate 0.2](docs/mvp-0.2.md),
 [combate avanzado 0.7](docs/alpha-0.7.md),
 [contenido 0.8](docs/beta-0.8.md),
 [competitivo 0.9](docs/beta-0.9.md),
+[historia 0.11](docs/story-phase-1.md),
 [modelo de datos](docs/database.md) y
 [visión completa](project.md).

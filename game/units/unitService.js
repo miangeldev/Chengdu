@@ -33,6 +33,15 @@ async function combatDetail(repos, unitId) {
     const player = battle.players.find(p => (p.units ?? [p.unit]).some(value => value.id === unit.id));
     return snapshotDetail(player, (player.units ?? [player.unit]).find(value => value.id === unit.id));
   }
+  if (unit.lock?.type === 'story') {
+    const battle = await repos.storyBattles.get(unit.lock.referenceId);
+    const owner = await repos.users.get(unit.ownerId);
+    const player = battle?.combat.players.find(value => value.userId === 'custodian');
+    const snapshot = battle?.combat.unitSnapshots.find(value => value.id === unit.id);
+    const current = player?.units.find(value => value.id === unit.id);
+    requireGame(battle?.status === 'active' && snapshot && current && owner, 'DATABASE_CORRUPT');
+    return { ...snapshotDetail({ ...player, userId: owner.id, name: owner.name }, current), inStory: true };
+  }
   const character = await repos.characters.get(unit.characterId);
   const owner = await repos.users.get(unit.ownerId);
   const stats = effectiveUnitStats(unit);

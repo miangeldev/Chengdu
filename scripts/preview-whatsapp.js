@@ -381,6 +381,55 @@ try {
   currentTime = '2026-11-13T06:00:00.000Z';
   await send(a, '.ctuclan war G1', 'Guerra: cierre por plazo sin premio personal para inactivos');
   await send(a, '.ctuinventario', 'Inventario ampliado: materiales, sellos e insignia artesanal');
+  // A fresh Custodian follows the entire phase-one story using real rewards.
+  const custodian = '521666666666@s.whatsapp.net';
+  await send(custodian, '.cturegistro Custodio');
+  const storyUser = await game.users.getUserByIdentity({ provider: 'whatsapp', subject: custodian });
+  const storyState = () => game.story.getState({ userId: storyUser.id });
+  async function finishStoryEncounter(title, { collectSignals = false } = {}) {
+    const captured = new Set();
+    for (let turn = 0; turn < 60; turn++) {
+      const state = await storyState();
+      if (state.battle?.status !== 'active') {
+        if (title) samples.push({ title, text: latest });
+        return;
+      }
+      const active = state.battle.team.find(unit => unit.active);
+      const signal = state.battle.enemy.phase;
+      const action = !state.battle.tutorial.attack ? 'atacar 1'
+        : !state.battle.tutorial.defend || signal === 'unleash' ? 'defender'
+          : active.attacks[1].ready ? 'habilidad' : 'atacar 1';
+      const sample = collectSignals && !captured.has(signal) && ['unleash', 'exposed'].includes(signal)
+        ? signal === 'unleash' ? 'Historia: defender la descarga anunciada' : 'Historia: aprovechar la apertura del minijefe' : null;
+      await send(custodian, `.ctuhistoria ${action}`, sample);
+      if (sample) captured.add(signal);
+    }
+    throw new Error('La vista previa de Historia superó el límite de acciones.');
+  }
+  await send(custodian, '.ctuhistoria', 'Historia: invitación al viaje del Custodio');
+  await send(custodian, '.ctuhistoria iniciar', 'Historia P-01: escena y decisiones numeradas');
+  await send(custodian, '.ctuhistoria elegir 2', 'Historia P-02: la primera pregunta deja una consecuencia');
+  await send(custodian, '.ctustarter panda');
+  await send(custodian, '.ctucontinuar', 'Historia: primer vínculo y XP de compañero');
+  await send(custodian, '.ctucontinuar', 'Historia P-03: tutorial con señal y controles tácticos');
+  await send(custodian, '.ctuhistoria atacar 1', 'Historia: ataque y respuesta del Eco en un solo mensaje');
+  await send(custodian, '.ctuhistoria defender', 'Historia: aprender a cubrirse');
+  await send(custodian, '.ctuhistoria habilidad', 'Historia: técnica y recarga compartida');
+  await finishStoryEncounter('Historia: victoria del tutorial y premio único');
+  await send(custodian, '.ctucontinuar', 'Historia P-04: campanas, carta blanca y recuerdo inaugural');
+  await send(custodian, '.ctuhistoria elegir 1', 'Historia I-01: una pista modifica la escena siguiente');
+  await send(custodian, '.ctuhistoria elegir 1', 'Historia I-02: la gratitud de una criatura importa después');
+  await send(custodian, '.ctuhistoria elegir 1', 'Historia I-03: Eco de Tinta y mecánica de minijefe');
+  await send(custodian, '.ctuhistoria rendirse', 'Historia: retirada voluntaria, pista y reintento sin pérdida de cartas');
+  await send(custodian, '.ctuhistoria reintentar', 'Historia: nueva expedición con vida restaurada');
+  await finishStoryEncounter('Historia: fase 1 completa y compañero preparado para evolucionar', { collectSignals: true });
+  await send(custodian, '.ctudiario historia', 'Diario narrativo: resumen, crónica y decisiones sin cobrar el diario económico');
+  await send(custodian, '.ctucapitulos', 'Historia: avance y siguientes misiones bloqueadas');
+  await send(custodian, '.cturecuerdos', 'Historia: recuerdos personales no comerciables');
+  await send(custodian, '.ctucrafting', 'Historia: materiales auténticos para el primer sello');
+  await send(custodian, '.ctureiniciarhistoria', 'Pruebas de Historia: confirmación del reinicio personal');
+  await send(custodian, '.ctureiniciarhistoria confirmar', 'Pruebas de Historia: nueva partida conservando premios y unidades');
+  await send(custodian, '.ctuhistoria elegir 1', 'Pruebas de Historia: repetir una misión no vuelve a entregar sus monedas');
   if (!(await game.validateDatabase()).valid) throw new Error('La base temporal de la vista previa no es válida.');
   const output = fileURLToPath(new URL('../docs/whatsapp-preview.md', import.meta.url));
   fs.writeFileSync(output, '# Vista previa de los mensajes de WhatsApp\n\n' +

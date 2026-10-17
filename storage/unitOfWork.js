@@ -16,6 +16,7 @@ import { migrateMarketV7 } from './migrations/007-market.js';
 import { migrateCombatV8 } from './migrations/008-combat.js';
 import { migrateContentV9 } from './migrations/009-content.js';
 import { migrateCommunityV11 } from './migrations/011-community.js';
+import { migrateStoryV12 } from './migrations/012-story.js';
 import { migrateCompetitiveV10 } from './migrations/010-competitive.js';
 import { seedCampaigns, seedEventAttacks, seedEventCharacters } from '../game/content/catalog.js';
 import { progressionBaseline } from '../game/progression/rules.js';
@@ -176,16 +177,22 @@ export class JsonUnitOfWork {
   }
 
   #recoverDelta({ body, phase }) {
+    const version = body.schemaVersion;
+    requireGame(Number.isSafeInteger(version) && version >= 1 && version <= SCHEMA_VERSION,
+      'DATABASE_CORRUPT', { file: JOURNAL });
+    const historicalFiles = filesForVersion(version);
     const files = Object.keys(body.after ?? {});
-    requireGame(body.schemaVersion === SCHEMA_VERSION && files.length > 0 &&
-      files.every(file => FILES.includes(file) && file !== MANIFEST) &&
+    requireGame(files.length > 0 &&
+      files.every(file => historicalFiles.includes(file) && file !== MANIFEST) &&
       body.before && Object.keys(body.before).length === files.length &&
       files.every(file => typeof body.before[file] === 'string' && typeof body.after[file] === 'string') &&
-      body.unchanged && Object.keys(body.unchanged).length === FILES.length - files.length &&
-      FILES.filter(file => !files.includes(file)).every(file => /^[a-f0-9]{64}$/.test(body.unchanged[file])),
+      body.unchanged && Object.keys(body.unchanged).length === historicalFiles.length - files.length &&
+      historicalFiles.filter(file => !files.includes(file)).every(file => /^[a-f0-9]{64}$/.test(body.unchanged[file])),
     'DATABASE_CORRUPT', { file: JOURNAL });
     const current = this.#raw();
-    for (const file of FILES) {
+    requireGame(FILES.filter(file => !historicalFiles.includes(file)).every(file => current[file] === null),
+      'RECOVERY_CONFLICT');
+    for (const file of historicalFiles) {
       if (files.includes(file)) {
         const expected = phase === 'prepared' ? [body.before[file]] : [body.before[file], body.after[file]];
         requireGame(expected.includes(current[file]), 'RECOVERY_CONFLICT', { file });
@@ -195,7 +202,7 @@ export class JsonUnitOfWork {
     }
     // Rebuild and validate the complete proposed snapshot before publishing any
     // delta, just as for historical full-snapshot journals.
-    decode({ ...current, ...body.after }, SCHEMA_VERSION);
+    decode({ ...current, ...body.after }, version);
     if (phase === 'committed') {
       for (const file of files) atomicWrite(path.join(this.directory, file), body.after[file]);
     }
@@ -203,15 +210,21 @@ export class JsonUnitOfWork {
   }
 
   #recoverPatches({ body, phase }) {
+    const version = body.schemaVersion;
+    requireGame(Number.isSafeInteger(version) && version >= 1 && version <= SCHEMA_VERSION,
+      'DATABASE_CORRUPT', { file: JOURNAL });
+    const historicalFiles = filesForVersion(version);
     const files = Object.keys(body.changes ?? {});
-    requireGame(body.schemaVersion === SCHEMA_VERSION && files.length > 0 &&
-      files.every(file => FILES.includes(file) && file !== MANIFEST) && body.unchanged &&
-      Object.keys(body.unchanged).length === FILES.length - files.length &&
-      FILES.filter(file => !files.includes(file)).every(file => /^[a-f0-9]{64}$/.test(body.unchanged[file])),
+    requireGame(files.length > 0 &&
+      files.every(file => historicalFiles.includes(file) && file !== MANIFEST) && body.unchanged &&
+      Object.keys(body.unchanged).length === historicalFiles.length - files.length &&
+      historicalFiles.filter(file => !files.includes(file)).every(file => /^[a-f0-9]{64}$/.test(body.unchanged[file])),
     'DATABASE_CORRUPT', { file: JOURNAL });
     const current = this.#raw();
+    requireGame(FILES.filter(file => !historicalFiles.includes(file)).every(file => current[file] === null),
+      'RECOVERY_CONFLICT');
     const after = {};
-    for (const file of FILES) {
+    for (const file of historicalFiles) {
       requireGame(current[file] !== null, 'RECOVERY_CONFLICT', { file });
       const hash = fileDigest(current[file]);
       if (!files.includes(file)) {
@@ -237,7 +250,7 @@ export class JsonUnitOfWork {
         requireGame(fileDigest(after[file]) === change.afterHash, 'DATABASE_CORRUPT', { file: JOURNAL });
       }
     }
-    decode({ ...current, ...after }, SCHEMA_VERSION);
+    decode({ ...current, ...after }, version);
     if (phase === 'committed') for (const file of files) atomicWrite(path.join(this.directory, file), after[file]);
     this.#removeJournal();
   }
@@ -422,7 +435,7 @@ export class JsonUnitOfWork {
         if (version < SCHEMA_VERSION) {
           let state = decode(raw, version);
           const migrations = [null, null, migrateBattlesV2, migrateProgressionV3, migrateCollectionV4,
-            migrateBalanceV5, migrateEconomyV6, migrateMarketV7, migrateCombatV8, migrateContentV9, migrateCompetitiveV10, migrateCommunityV11];
+            migrateBalanceV5, migrateEconomyV6, migrateMarketV7, migrateCombatV8, migrateContentV9, migrateCompetitiveV10, migrateCommunityV11, migrateStoryV12];
           const now = this.clock();
           for (let next = version + 1; next <= SCHEMA_VERSION; next++) state = migrations[next](state, now);
           this.#commit(raw, state);

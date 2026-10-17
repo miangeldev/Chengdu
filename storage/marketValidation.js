@@ -37,8 +37,17 @@ function expiredLock(before, after, unit, at) {
     (market || trade ? closed.closedAt : closed.finishedAt) === at;
 }
 
-function validNextLock(after, unit, closedAt) {
+function validNextLock(before, after, unit, closedAt) {
   if (unit?.lock === null) return true;
+  if (unit?.lock?.type === 'story') {
+    const next = after.combateshistoria?.records.find(battle => battle.id === unit.lock.referenceId);
+    const actions = after.accioneshistoria?.records.slice(before.accioneshistoria?.records.length ?? 0) ?? [];
+    return next?.status === 'active' && next.userId === unit.ownerId && next.createdAt === closedAt &&
+      !before.combateshistoria?.records.some(battle => battle.id === next.id) &&
+      next.combat.unitSnapshots.some(snapshot => snapshot.id === unit.id && snapshot.ownerId === unit.ownerId && snapshot.ownershipVersion === unit.ownershipVersion) &&
+      actions.some(action => action.battleId === next.id && action.battleActionSeq === null && action.userId === unit.ownerId &&
+        action.createdAt === closedAt && ['continue', 'choose', 'retry'].includes(action.kind));
+  }
   if (unit?.lock?.type === 'market') {
     const next = after.mercado.records.find(l => l.id === unit.lock.referenceId);
     return next?.status === 'active' && next.unitId === unit.id && next.createdAt === closedAt;
@@ -150,7 +159,7 @@ export function validateMarketTransition(before, after) {
     const { status: newStatus, updatedAt: newUpdatedAt, closedAt: newClosedAt, closeOperationKey: newCloseKey, saleId: newSaleId, ...newSource } = listing;
     check(equal(source, newSource) && ['sold', 'cancelled', 'expired'].includes(listing.status), 'listing.closeTransition');
     const unit = after.unidades.records.find(u => u.id === listing.unitId);
-    check(unit?.lock === null || (listing.status === 'expired' && validNextLock(after, unit, listing.closedAt)), 'listing.closeUnlock');
+    check(unit?.lock === null || (listing.status === 'expired' && validNextLock(before, after, unit, listing.closedAt)), 'listing.closeUnlock');
   }
   for (const sale of after.ventas.records.slice(before.ventas.records.length)) {
     const listing = previous.get(sale.listingId);

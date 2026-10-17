@@ -19,6 +19,7 @@ import { validateContentData, validateContentTransition } from './contentValidat
 import { validateEncounterData, validateEncounterTransition } from './encounterValidation.js';
 import { validateCompetitiveData, validateCompetitiveTransition } from './competitiveValidation.js';
 import { runValidation } from './validationCache.js';
+import { validateStoryData, validateStoryTransition } from './storyValidation.js';
 
 export const V1_COLLECTIONS = Object.freeze(['usuarios', 'personajes', 'unidades', 'estado', 'eventos']);
 export const V2_COLLECTIONS = Object.freeze([...V1_COLLECTIONS, 'ataques', 'combates']);
@@ -33,13 +34,15 @@ export const V9_COLLECTIONS = Object.freeze([...V8_COLLECTIONS, ...CONTENT_COLLE
 export const COMPETITIVE_COLLECTIONS = Object.freeze(['temporadas', 'clasificacion', 'resultadoscompetitivos', 'premiostemporada']);
 export const V10_COLLECTIONS = Object.freeze([...V9_COLLECTIONS, ...COMPETITIVE_COLLECTIONS]);
 export const COMMUNITY_COLLECTIONS = Object.freeze(['intercambios', 'accionesintercambio', 'artesania', 'evoluciones', 'perfilessociales', 'accionessociales', 'clanes', 'accionesclan', 'guerrasclan', 'accionesguerra', 'obtenciones']);
-export const COLLECTIONS = Object.freeze([...V10_COLLECTIONS, ...COMMUNITY_COLLECTIONS]);
-export const SCHEMA_VERSION = 11;
+export const V11_COLLECTIONS = Object.freeze([...V10_COLLECTIONS, ...COMMUNITY_COLLECTIONS]);
+export const STORY_COLLECTIONS = Object.freeze(['historias', 'accioneshistoria', 'combateshistoria', 'premioshistoria']);
+export const COLLECTIONS = Object.freeze([...V11_COLLECTIONS, ...STORY_COLLECTIONS]);
+export const SCHEMA_VERSION = 12;
 
 export function collectionsForVersion(version) {
   requireGame(Number.isSafeInteger(version) && version >= 1 && version <= SCHEMA_VERSION, 'UNSUPPORTED_SCHEMA_VERSION');
   return version === 1 ? V1_COLLECTIONS : version === 2 ? V2_COLLECTIONS : version === 3 ? V3_COLLECTIONS :
-    version < 6 ? V5_COLLECTIONS : version === 6 ? V6_COLLECTIONS : version < 9 ? V8_COLLECTIONS : version === 9 ? V9_COLLECTIONS : version === 10 ? V10_COLLECTIONS : COLLECTIONS;
+    version < 6 ? V5_COLLECTIONS : version === 6 ? V6_COLLECTIONS : version < 9 ? V8_COLLECTIONS : version === 9 ? V9_COLLECTIONS : version === 10 ? V10_COLLECTIONS : version === 11 ? V11_COLLECTIONS : COLLECTIONS;
 }
 const integer = (v, minimum = 0) => Number.isSafeInteger(v) && v >= minimum;
 const text = v => typeof v === 'string' && v.length > 0 && v.length <= 200;
@@ -222,6 +225,7 @@ export function validateDatabase(state, schemaVersion = SCHEMA_VERSION) {
         runValidation(validator, state);
       }
     }
+    if (schemaVersion >= 12) runValidation(validateStoryData, state);
     return { valid: true, schemaVersion, users: users.length, characters: characters.length, units: units.length, claims: claims.length };
   } catch (error) {
     if (error instanceof GameError && ['DATABASE_CORRUPT', 'UNSUPPORTED_SCHEMA_VERSION'].includes(error.code)) throw error;
@@ -238,7 +242,7 @@ export function validateTransition(before, after, context = {}) {
       const next = nextById.get(previous.id);
       check(next, `${name}.deletion`);
       if (previous === next) continue;
-      if (['eventos', 'recompensas', 'aperturas', 'economia', 'diarios', 'ventas', 'premioscontenido', 'logros', 'accionescontenido', 'resultadoscompetitivos', 'premiostemporada', 'accionesintercambio', 'artesania', 'evoluciones', 'accionessociales', 'accionesclan', 'accionesguerra', 'obtenciones'].includes(name) || (name === 'estado' && previous.kind !== 'mintCounter')) {
+      if (['eventos', 'recompensas', 'aperturas', 'economia', 'diarios', 'ventas', 'premioscontenido', 'logros', 'accionescontenido', 'resultadoscompetitivos', 'premiostemporada', 'accionesintercambio', 'artesania', 'evoluciones', 'accionessociales', 'accionesclan', 'accionesguerra', 'obtenciones', 'accioneshistoria', 'premioshistoria'].includes(name) || (name === 'estado' && previous.kind !== 'mintCounter')) {
         check(equal(previous, next), `${name}.immutable`);
       }
       if (name === 'unidades') {
@@ -274,4 +278,5 @@ export function validateTransition(before, after, context = {}) {
   validateSocialTransition(before, after, context);
   validateClanTransition(before, after, context);
   validateAcquisitionTransition(before, after, context);
+  validateStoryTransition(before, after, context);
 }

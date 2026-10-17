@@ -56,6 +56,10 @@ export function createRepositories(state, writable = false, { beforeWrite, onWri
     clanActions: repository('accionesclan'),
     clanWars: repository('guerrasclan'),
     clanWarActions: repository('accionesguerra'),
-    acquisitions: repository('obtenciones')
+    acquisitions: repository('obtenciones'),
+    storyProgress: repository('historias'),
+    storyActions: repository('accioneshistoria'),
+    storyBattles: repository('combateshistoria'),
+    storyRewards: repository('premioshistoria')
   };
 }

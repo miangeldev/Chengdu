@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
-import { SCHEMA_VERSION, COMMUNITY_COLLECTIONS, COMPETITIVE_COLLECTIONS, V9_COLLECTIONS, validateDatabase } from '../storage/validation.js';
+import { SCHEMA_VERSION, COLLECTIONS, COMPETITIVE_COLLECTIONS, V9_COLLECTIONS, validateDatabase } from '../storage/validation.js';
 import { readRecords, register, setup } from './helpers.js';
 
 const serialize = value => JSON.stringify(value, null, 2) + '\n';
@@ -34,7 +34,11 @@ async function v9Fixture(t) {
   const raw = Object.fromEntries(V9_COLLECTIONS.map(name => [`${name}.json`, serialize(state[name])]));
   raw['_database.json'] = serialize({ database: 'chengdu-cards', schemaVersion: 9 });
   for (const [file, contents] of Object.entries(raw)) fs.writeFileSync(path.join(context.directory, file), contents);
-  for (const name of [...COMPETITIVE_COLLECTIONS, ...COMMUNITY_COLLECTIONS]) fs.unlinkSync(path.join(context.directory, `${name}.json`));
+  for (const name of COLLECTIONS.filter(name => !V9_COLLECTIONS.includes(name))) {
+    const filename = path.join(context.directory, `${name}.json`);
+    assert.deepEqual(JSON.parse(fs.readFileSync(filename, 'utf8')).records, [], name);
+    fs.unlinkSync(filename);
+  }
   return { ...context, state, raw };
 }
 

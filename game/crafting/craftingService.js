@@ -14,7 +14,8 @@ export async function craftingInventory(repos, userId) {
 
 async function pendingSources(repos, userId, now) {
   const state = { recompensas: { records: await repos.rewards.all() }, premioscontenido: { records: await repos.contentRewards.all() },
-    premiostemporada: { records: await repos.seasonRewards.all() } };
+    premiostemporada: { records: await repos.seasonRewards.all() },
+    premioshistoria: { records: repos.storyRewards ? await repos.storyRewards.all() : [] } };
   const claimed = new Set((await repos.craftingActions.filterBy('userId', userId, action => action.kind === 'material_claim'))
     .flatMap(action => action.sources.map(sourceKey)));
   return materialSources(state, userId, now).filter(source => !claimed.has(sourceKey(source)));

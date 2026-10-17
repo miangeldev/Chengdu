@@ -1,7 +1,7 @@
 import { defineCommand, pageArguments, pageNavigation } from '../interfaces/whatsapp/command.js';
 import { card } from '../interfaces/whatsapp/format.js';
 
-const sources = { trade_escrow: 'Reserva de intercambio', trade_settlement: 'Intercambio completado', trade_refund: 'Reserva devuelta', crafting_cost: 'Crafting', evolution_cost: 'Evolución', clan_creation: 'Fundación de clan', clan_deposit: 'Aporte a la tesorería', clan_withdraw: 'Retiro de tesorería', clan_war_reward: 'Premio de guerra', battle_reward: '🏆 Combate', pack_opening: '🎁 Sobre', daily_reward: '📅 Diario', market_purchase: '🛒 Compra de unidad', market_sale: '🤝 Venta de unidad', content_reward: '🌿 Misiones y aventuras', season_reward: '🏅 Premio de temporada' };
+const sources = { story_reward: '📖 Misión de Historia', trade_escrow: 'Reserva de intercambio', trade_settlement: 'Intercambio completado', trade_refund: 'Reserva devuelta', crafting_cost: 'Crafting', evolution_cost: 'Evolución', clan_creation: 'Fundación de clan', clan_deposit: 'Aporte a la tesorería', clan_withdraw: 'Retiro de tesorería', clan_war_reward: 'Premio de guerra', battle_reward: '🏆 Combate', pack_opening: '🎁 Sobre', daily_reward: '📅 Diario', market_purchase: '🛒 Compra de unidad', market_sale: '🤝 Venta de unidad', content_reward: '🌿 Misiones y aventuras', season_reward: '🏅 Premio de temporada' };
 const movementDate = value => new Date(value).toLocaleString('es-MX', {
   timeZone: 'America/Mexico_City', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
 });

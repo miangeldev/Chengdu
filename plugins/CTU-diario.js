@@ -2,13 +2,18 @@ import { createHash } from 'node:crypto';
 import { defineCommand } from '../interfaces/whatsapp/command.js';
 import { card } from '../interfaces/whatsapp/format.js';
 import { requireGame } from '../utils/GameError.js';
+import { renderStoryJournal } from '../interfaces/whatsapp/storyFormat.js';
 
 const availabilityText = value => new Date(value).toLocaleString('es-MX', {
   timeZone: 'America/Mexico_City', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
 });
 
 export const { command, run, createRun } = defineCommand('ctudiario', async ({ game, args, identity, context, cmd }) => {
-  requireGame(args.length === 0, 'INVALID_ARGUMENTS');
+  requireGame(args.length === 0 || args.length === 1 && args[0].toLowerCase() === 'historia', 'INVALID_ARGUMENTS');
+  if (args.length) {
+    const user = await game.users.getUserByIdentity(identity());
+    return renderStoryJournal(await game.story.getJournal({ userId: user.id }), cmd);
+  }
   requireGame(typeof context.messageId === 'string' && context.messageId.trim().length > 0, 'ECONOMY_MESSAGE_ID_REQUIRED');
   const user = await game.users.getUserByIdentity(identity());
   const hash = createHash('sha256').update(JSON.stringify(['daily', context.chatId, user.id, context.messageId])).digest('hex');

@@ -2977,6 +2977,47 @@ regenerados; esquema 11 válido y datos locales sin reescrituras.
 
 ---
 
+### Historia 0.11 — Fundamentos y fase 1
+
+La [biblia de Historia](Chengdu_Cards_Biblia_Modo_Historia.md) se concreta en
+una campaña personal: P-01 a P-04 y primeras tres misiones del bosque. Las
+preguntas a Bao, las pistas de Lian y la decisión de auxiliar a una criatura
+dejan consecuencias y recuerdos consultables. I-03 añade el minijefe Eco de
+Tinta con carga anunciada, defensa y apertura; I-04, I-05 y el Guardián Marchito
+quedan para la fase 2.
+
+El avance se guarda por escena y turno. La expedición reutiliza entre una y
+tres unidades propias, congela sus ataques y estadísticas y las reserva mientras
+dura el encuentro. Hay tutorial protegido, derrota sin pérdida de monedas o
+unidades, pistas y reintentos con el equipo actual. Las unidades mantienen su
+identidad, origen, nivel, evolución y trazabilidad.
+
+Los premios únicos del recorrido completo suman 300 ChengCoins, 300 XP de
+Custodio, 1.100 XP por compañero que recorra las misiones elegibles, cinco
+fragmentos y dos esencias. Permiten llegar desde nivel 1 al nivel 5 de evolución;
+el sello y la evolución conservan sus costes. Repetir mensajes, perder o reiniciar
+la campaña de prueba no vuelve a entregar premios ya cobrados.
+
+`.ctuhistoria` reúne las acciones y `.ctudiario historia` abre la crónica sin
+alterar el diario económico. Hay alias para continuar, consultar misión,
+capítulos y recuerdos. El reinicio personal de pruebas exige confirmación y
+no se anuncia en la ayuda pública. El esquema **12** añade progreso, acciones,
+combates y recibos narrativos conservando los datos anteriores.
+
+La [guía de Historia 0.11](docs/story-phase-1.md) documenta alcance, canon,
+controles, dificultad, presupuesto y conservación de datos.
+
+Verificación local: **871 pruebas aprobadas**, **18.000 simulaciones del
+minijefe**, **213 ejemplos de WhatsApp** y **59 comandos**. Incluye dos derrotas
+y victoria táctica, equipos de tres, reanudación sin expiración, reenvíos,
+reinicios sin premios duplicados, XP intercalada con PvP, crafting/evolución,
+propiedad histórica y reservas vencidas. La migración 11→12 conserva los
+44 registros de las 35 colecciones anteriores y añade cuatro vacías; respaldo
+`ChengdúData/backups/3d02d40a-aa49-490a-8015-3b4f55e5a627/`, sin jugadores de
+prueba ni operaciones pendientes. La sesión real depende del bot anfitrión.
+
+---
+
 ## V1.0
 
 ```text

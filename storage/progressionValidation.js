@@ -1,6 +1,7 @@
 import { equal } from './equality.js';
 import { requireGame } from '../utils/GameError.js';
 import { effectiveStats, grantXp, safeAdd } from '../game/progression/rules.js';
+import { ownershipAt } from '../game/units/ownership.js';
 import { advancedUnitRewards, rewardAmounts, rewardDecision, rewardSummary } from '../game/rewards/battlePolicy.js';
 
 const check = (value, field) => requireGame(value, 'DATABASE_CORRUPT', { field });
@@ -29,15 +30,24 @@ export function validateProgressionData(state, schemaVersion = 5) {
     }
   }
   check(userProgress.size === users.size && unitProgress.size === units.size, 'progression.baselineComplete');
-  // Coin movements provide the shared commit order for PvP and content awards.
-  // Iterating each domain separately would replay interleaved XP incorrectly.
+  function applyUnitProgress(entry) {
+    check(entry && units.has(entry.unitId) && integer(entry.xp) &&
+      equal(entry.progressBefore, unitProgress.get(entry.unitId)) &&
+      equal(entry.progressAfter, grantXp(entry.progressBefore, entry.xp, 'unit')), 'reward.unitProgress');
+    unitProgress.set(entry.unitId, entry.progressAfter);
+  }
+
+  // Coin movements provide a shared commit order even when timestamps match.
+  // Story and PvP can both train the same unit between one another's awards.
   if (schemaVersion >= 9) {
     const battleAwards = new Map(state.recompensas.records.map(reward => [reward.id, reward]));
     const contentAwards = new Map(state.premioscontenido.records.map(reward => [reward.id, reward]));
+    const storyAwards = new Map((schemaVersion >= 12 ? state.premioshistoria.records : []).map(reward => [reward.id, reward]));
     const replayed = new Set();
     for (const movement of state.economia.records) {
       const source = movement.sourceType === 'battle_reward' ? battleAwards :
-        movement.sourceType === 'content_reward' ? contentAwards : null;
+        movement.sourceType === 'content_reward' ? contentAwards :
+          schemaVersion >= 12 && movement.sourceType === 'story_reward' ? storyAwards : null;
       if (!source) continue;
       const reward = source.get(movement.sourceId);
       check(reward && reward.userId === movement.userId && integer(reward.userXp) &&
@@ -45,9 +55,25 @@ export function validateProgressionData(state, schemaVersion = 5) {
       check(equal(reward.userProgressBefore, userProgress.get(reward.userId)) &&
         equal(reward.userProgressAfter, grantXp(reward.userProgressBefore, reward.userXp, 'user')), 'reward.userProgress');
       userProgress.set(reward.userId, reward.userProgressAfter);
+      if (schemaVersion >= 12 && movement.sourceType === 'battle_reward') {
+        if (reward.version === 2) {
+          check(Array.isArray(reward.unitRewards), 'reward.unitShares');
+          for (const entry of reward.unitRewards) applyUnitProgress(entry);
+        } else applyUnitProgress({ unitId: reward.unitId, xp: reward.unitXp,
+          progressBefore: reward.unitProgressBefore, progressAfter: reward.unitProgressAfter });
+      } else if (schemaVersion >= 12 && movement.sourceType === 'story_reward') {
+        check(integer(reward.unitXp) && Array.isArray(reward.unitRewards) && reward.unitRewards.length <= 3 &&
+          (reward.unitXp === 0 ? reward.unitRewards.length === 0 : reward.unitRewards.length >= 1) &&
+          new Set(reward.unitRewards.map(entry => entry.unitId)).size === reward.unitRewards.length, 'storyReward.unitShares');
+        for (const entry of reward.unitRewards) {
+          check(entry.xp === reward.unitXp && integer(entry.ownershipVersion) &&
+            ownershipAt(state, entry.unitId, entry.ownershipVersion) === reward.userId, 'storyReward.unitOwner');
+          applyUnitProgress(entry);
+        }
+      }
       replayed.add(reward.id);
     }
-    check(replayed.size === battleAwards.size + contentAwards.size, 'reward.xpLedgerComplete');
+    check(replayed.size === battleAwards.size + contentAwards.size + storyAwards.size, 'reward.xpLedgerComplete');
   }
   for (const unit of units.values()) {
     check(unit.statGrowthVersion === (schemaVersion >= 5 ? 2 : 1), 'progression.statVersion');
@@ -87,15 +113,12 @@ export function validateProgressionData(state, schemaVersion = 5) {
       check(Array.isArray(reward.unitRewards) && equal(reward.unitRewards.map(entry => ({ unitId: entry.unitId, xp: entry.xp })),
         advancedUnitRewards(player, reward.unitXp)), 'reward.unitShares');
       for (const entry of reward.unitRewards) {
-        check(units.has(entry.unitId) && equal(entry.progressBefore, unitProgress.get(entry.unitId)) &&
-          equal(entry.progressAfter, grantXp(entry.progressBefore, entry.xp, 'unit')), 'reward.unitProgress');
-        unitProgress.set(entry.unitId, entry.progressAfter);
+        if (schemaVersion < 12) applyUnitProgress(entry);
       }
       check(!Object.hasOwn(reward, 'unitId') && !Object.hasOwn(reward, 'unitProgressBefore') && !Object.hasOwn(reward, 'unitProgressAfter'), 'reward.advancedShape');
     } else {
-      check(equal(reward.unitProgressBefore, unitProgress.get(reward.unitId)) &&
-        equal(reward.unitProgressAfter, grantXp(reward.unitProgressBefore, reward.unitXp, 'unit')), 'reward.unitProgress');
-      unitProgress.set(reward.unitId, reward.unitProgressAfter);
+      if (schemaVersion < 12) applyUnitProgress({ unitId: reward.unitId, xp: reward.unitXp,
+        progressBefore: reward.unitProgressBefore, progressAfter: reward.unitProgressAfter });
     }
     balances.set(reward.userId, reward.balanceAfter);
     if (schemaVersion < 9) userProgress.set(reward.userId, reward.userProgressAfter);

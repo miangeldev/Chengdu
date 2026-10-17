@@ -26,6 +26,7 @@ export function materialRewardFor(source, version = CRAFTING_POLICY_VERSION) {
   requireGame(version === CRAFTING_POLICY_VERSION, 'INVALID_CRAFTING_POLICY');
   if (source.type === 'battle' && source.receipt.reason === 'rewarded') return { fragmentos: 2, esencias: 0, sellos: 0 };
   if (source.type === 'season') return { fragmentos: 3, esencias: 1, sellos: 0 };
+  if (source.type === 'story') return structuredClone(source.receipt.materials);
   if (source.type === 'content') {
     const rewards = { mission: [2, 0], achievement: [3, 1], boss: [3, 1], event: [1, 0] };
     const amounts = rewards[source.receipt.kind];
@@ -36,12 +37,12 @@ export function materialRewardFor(source, version = CRAFTING_POLICY_VERSION) {
 
 export function materialSources(state, userId, at) {
   const result = [];
-  for (const [type, name] of [['battle', 'recompensas'], ['content', 'premioscontenido'], ['season', 'premiostemporada']]) {
+  for (const [type, name] of [['battle', 'recompensas'], ['content', 'premioscontenido'], ['season', 'premiostemporada'], ['story', 'premioshistoria']]) {
     for (const receipt of state[name]?.records ?? []) {
       if (receipt.userId !== userId || Date.parse(receipt.createdAt) > Date.parse(at)) continue;
       const source = { type, receipt };
       const materials = materialRewardFor(source);
-      if (materials) result.push({ type, id: receipt.id, materials, createdAt: receipt.createdAt });
+      if (materials && MATERIAL_KEYS.some(key => materials[key] > 0)) result.push({ type, id: receipt.id, materials, createdAt: receipt.createdAt });
     }
   }
   return result;

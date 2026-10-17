@@ -17,6 +17,7 @@ import { createMarketService } from './market/marketService.js';
 import { createContentService } from './content/contentService.js';
 import { createEncounterService } from './content/encounterService.js';
 import { createCompetitiveService } from './competitive/competitiveService.js';
+import { createStoryService } from './story/storyService.js';
 
 export function createGame(options = {}) {
   const storage = options.storage ?? new JsonUnitOfWork(options);
@@ -40,6 +41,7 @@ export function createGame(options = {}) {
     social: createSocialService(storage, clock),
     clans: createClanService(storage, clock),
     acquisition: createAcquisitionService(storage, clock, options.randomDropInt),
+    story: createStoryService(storage, clock, options.randomRoll),
     validateDatabase: () => storage.validateDatabase(),
     close: () => storage.close()
   };

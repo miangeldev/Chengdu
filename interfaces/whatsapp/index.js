@@ -51,12 +51,18 @@ import * as rank from '../../plugins/CTU-rank.js';
 import * as top from '../../plugins/CTU-top.js';
 import * as temporada from '../../plugins/CTU-temporada.js';
 import * as temporadas from '../../plugins/CTU-temporadas.js';
+import * as historia from '../../plugins/CTU-historia.js';
+import * as continuar from '../../plugins/CTU-continuar.js';
+import * as capitulos from '../../plugins/CTU-capitulos.js';
+import * as mision from '../../plugins/CTU-mision.js';
+import * as recuerdos from '../../plugins/CTU-recuerdos.js';
+import * as reiniciarHistoria from '../../plugins/CTU-reiniciarhistoria.js';
 import { identityFor } from './command.js';
 import { commandText } from './format.js';
 import { renderSpawn } from './contentFormat.js';
 import { game as defaultGame } from '../../game/index.js';
 
-export const commands = Object.freeze([registro, perfil, catalogo, starter, personajes, unidad, ayuda, equipo, pelea, aceptar, atacar, rendirse, combate, rechazar, cancelar, ficha, balance, historial, sobres, abrir, diario, tienda, movimientos, mercado, vender, comprar, retirar, ventas, propiedad, cambiar, misiones, logros, inventario, boss, bossatacar, bosstop, spawn, capturar, explorar, eventos, evento, ranked, rank, top, temporada, temporadas, clan, intercambio, crafting, evolucion, recompensas, social, showcase]);
+export const commands = Object.freeze([registro, perfil, catalogo, starter, personajes, unidad, ayuda, equipo, pelea, aceptar, atacar, rendirse, combate, rechazar, cancelar, ficha, balance, historial, sobres, abrir, diario, tienda, movimientos, mercado, vender, comprar, retirar, ventas, propiedad, cambiar, misiones, logros, inventario, boss, bossatacar, bosstop, spawn, capturar, explorar, eventos, evento, ranked, rank, top, temporada, temporadas, clan, intercambio, crafting, evolucion, recompensas, social, showcase, historia, continuar, capitulos, mision, recuerdos, reiniciarHistoria]);
 
 export async function observeGameActivity(sock, msg, { game = defaultGame, prefix = '.', logger = console.error } = {}) {
   if (!msg?.key?.remoteJid?.endsWith('@g.us') || msg.key.fromMe || !msg.key.id || !msg.key.participant) return false;

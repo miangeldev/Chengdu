@@ -211,8 +211,17 @@ function releasedInTransaction(before, after, unit, at) {
     (unit.lock.type === 'battle' ? next.finishedAt : next.closedAt) === at;
 }
 
-function validLaterLock(after, unit, at) {
+function validLaterLock(before, after, unit, at) {
   if (unit?.lock === null) return true;
+  if (unit?.lock?.type === 'story') {
+    const row = after.combateshistoria?.records.find(battle => battle.id === unit.lock.referenceId);
+    const actions = after.accioneshistoria?.records.slice(before.accioneshistoria?.records.length ?? 0) ?? [];
+    return row?.status === 'active' && row.userId === unit.ownerId && row.createdAt === at &&
+      !before.combateshistoria?.records.some(battle => battle.id === row.id) &&
+      row.combat.unitSnapshots.some(snapshot => snapshot.id === unit.id && snapshot.ownerId === unit.ownerId && snapshot.ownershipVersion === unit.ownershipVersion) &&
+      actions.some(action => action.battleId === row.id && action.battleActionSeq === null && action.userId === unit.ownerId &&
+        action.createdAt === at && ['continue', 'choose', 'retry'].includes(action.kind));
+  }
   if (unit?.lock?.type === 'market') {
     const row = after.mercado.records.find(listing => listing.id === unit.lock.referenceId);
     return row?.status === 'active' && row.unitId === unit.id && row.createdAt === at;
@@ -226,6 +235,18 @@ function validLaterLock(after, unit, at) {
     return row?.status === 'locked' && row.updatedAt === at && row.reservations.some(reservation => reservation.unitId === unit.id);
   }
   return false;
+}
+
+// Refreshing a trade can release the unit immediately before a completed story
+// scene trains it. The new receipt must prove that exact progress transition;
+// refunds still cannot alter ownership, battle results or arbitrary statistics.
+function storyTrainingAfterRelease(before, after, unit, updated, at) {
+  const rewards = after.premioshistoria?.records.slice(before.premioshistoria?.records.length ?? 0) ?? [];
+  const actions = after.accioneshistoria?.records.slice(before.accioneshistoria?.records.length ?? 0) ?? [];
+  return rewards.some(reward => reward.userId === unit.ownerId && reward.createdAt === at &&
+    actions.some(action => action.id === reward.actionId && action.rewardId === reward.id && action.userId === unit.ownerId && action.createdAt === at) &&
+    reward.unitRewards.some(grant => grant.unitId === unit.id && grant.ownershipVersion === unit.ownershipVersion &&
+      integer(grant.xp, 1) && equal(grant.progressBefore, unit.progress) && equal(grant.progressAfter, updated.progress)));
 }
 
 export function validateTradeTransition(before, after) {
@@ -274,8 +295,9 @@ export function validateTradeTransition(before, after) {
         const oldUnit = oldUnits.get(reservation.unitId);
         const updated = nextUnits.get(reservation.unitId);
         check(oldUnit?.lock?.type === 'trade' && oldUnit.lock.referenceId === old.id && updated.ownerId === oldUnit.ownerId &&
-          updated.ownershipVersion === oldUnit.ownershipVersion && equal(oldUnit.progress, updated.progress) &&
-          equal(oldUnit.battleStats, updated.battleStats) && (updated.lock === null || action.kind === 'expire' && validLaterLock(after, updated, action.createdAt)), 'trade.refundSource');
+          updated.ownershipVersion === oldUnit.ownershipVersion &&
+          (equal(oldUnit.progress, updated.progress) || action.kind === 'expire' && storyTrainingAfterRelease(before, after, oldUnit, updated, action.createdAt)) &&
+          equal(oldUnit.battleStats, updated.battleStats) && (updated.lock === null || action.kind === 'expire' && validLaterLock(before, after, updated, action.createdAt)), 'trade.refundSource');
       }
     }
     for (const movement of action.movements) {

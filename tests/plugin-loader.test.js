@@ -105,7 +105,8 @@ test('direct plugin run exports share one database and complete the game flow', 
       valid: true, schemaVersion: SCHEMA_VERSION, users: 2, characters: 10, units: 4, claims: 2
     });
     assert.equal(replies.length, 63);
-    assert.equal(commands.length, 53);
+    assert.equal(new Set(commands.map(plugin => plugin.command)).size, commands.length);
+    for (const name of ['ctuhistoria', 'ctucontinuar', 'ctucapitulos', 'ctumision', 'cturecuerdos', 'ctureiniciarhistoria']) assert.ok(plugins.has(name));
   } finally {
     await game.close();
   }

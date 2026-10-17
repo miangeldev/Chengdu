@@ -17,7 +17,7 @@ function validateSources(state, action, used) {
     const key = `${action.userId}:${sourceKey(source)}`;
     const actual = sources.get(sourceKey(source));
     check(actual && Object.keys(source).length === 2 && !used.has(key), 'crafting.earnedSource');
-    const coinSource = { battle: 'battle_reward', content: 'content_reward', season: 'season_reward' }[source.type];
+    const coinSource = { battle: 'battle_reward', content: 'content_reward', season: 'season_reward', story: 'story_reward' }[source.type];
     check(state.economia.records.slice(0, action.economyCursor).some(movement => movement.sourceType === coinSource &&
       movement.sourceId === source.id && movement.userId === action.userId), 'crafting.sourceCommitOrder');
     used.add(key);

@@ -17,6 +17,7 @@ export function validateEconomyData(state, schemaVersion = 7) {
   const sales = new Map((schemaVersion >= 7 ? state.ventas.records : []).map(s => [s.id, s]));
   const contentRewards = new Map((schemaVersion >= 9 ? state.premioscontenido.records : []).map(r => [r.id, r]));
   const seasonRewards = new Map((schemaVersion >= 10 ? state.premiostemporada.records : []).map(r => [r.id, r]));
+  const storyRewards = new Map((schemaVersion >= 12 ? state.premioshistoria.records : []).map(r => [r.id, r]));
   const operationKeys = new Set();
   const latest = new Map();
   for (const claim of claims.values()) {
@@ -36,7 +37,8 @@ export function validateEconomyData(state, schemaVersion = 7) {
   const sources = { battle_reward: rewards, pack_opening: openings, ...(schemaVersion >= 6 ? { daily_reward: claims } : {}),
     ...(schemaVersion >= 7 ? { market_purchase: sales, market_sale: sales } : {}),
     ...(schemaVersion >= 9 ? { content_reward: contentRewards } : {}),
-    ...(schemaVersion >= 10 ? { season_reward: seasonRewards } : {}) };
+    ...(schemaVersion >= 10 ? { season_reward: seasonRewards } : {}),
+    ...(schemaVersion >= 12 ? { story_reward: storyRewards } : {}) };
   if (schemaVersion >= 11) {
     for (const type of ['trade_escrow', 'trade_settlement', 'trade_refund', 'clan_creation', 'clan_deposit', 'clan_withdraw', 'clan_war_reward']) {
       const actions = [...state.accionesintercambio.records, ...state.accionesclan.records, ...state.accionesguerra.records];
@@ -63,7 +65,7 @@ export function validateEconomyData(state, schemaVersion = 7) {
       check(movement.type === 'debit' && movement.amount === (['crafting_cost', 'evolution_cost'].includes(movement.sourceType) ? source.coins : ['trade_escrow', 'clan_creation', 'clan_deposit'].includes(movement.sourceType) ? source.amount : source.price) && integer(movement.amount, 1) &&
         movement.balanceBefore >= movement.amount && movement.balanceAfter === movement.balanceBefore - movement.amount, 'coinMovement.debit');
     } else {
-      check(movement.type === 'credit' && movement.amount === (resale ? source.net : ['battle_reward', 'content_reward', 'season_reward'].includes(movement.sourceType) ? source.coins : source.amount) &&
+      check(movement.type === 'credit' && movement.amount === (resale ? source.net : ['battle_reward', 'content_reward', 'season_reward', 'story_reward'].includes(movement.sourceType) ? source.coins : source.amount) &&
         movement.balanceAfter === safeAdd(movement.balanceBefore, movement.amount), 'coinMovement.credit');
     }
     balances.set(movement.userId, movement.balanceAfter);

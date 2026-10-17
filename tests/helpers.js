@@ -52,7 +52,8 @@ export async function updateCharacter(storage, characterId, changes) {
 // schema actually supported. This never runs against the project's database.
 export function stripBetaContentFixture(directory) {
   for (const name of ['campanas', 'premioscontenido', 'logros', 'encuentros', 'accionescontenido', 'actividad',
-    'temporadas', 'clasificacion', 'resultadoscompetitivos', 'premiostemporada', 'intercambios', 'accionesintercambio', 'artesania', 'evoluciones', 'perfilessociales', 'accionessociales', 'clanes', 'accionesclan', 'guerrasclan', 'accionesguerra', 'obtenciones']) {
+    'temporadas', 'clasificacion', 'resultadoscompetitivos', 'premiostemporada', 'intercambios', 'accionesintercambio', 'artesania', 'evoluciones', 'perfilessociales', 'accionessociales', 'clanes', 'accionesclan', 'guerrasclan', 'accionesguerra', 'obtenciones',
+    'historias', 'accioneshistoria', 'combateshistoria', 'premioshistoria']) {
     fs.rmSync(path.join(directory, `${name}.json`), { force: true });
   }
   const characterFile = path.join(directory, 'personajes.json');

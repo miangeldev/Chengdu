@@ -49,8 +49,14 @@ function preserved(c) {
     const expected = c.state[name].records;
     const actual = readRecords(c.directory, name);
     assert.deepEqual(['personajes', 'estado', 'ataques'].includes(name) ? actual.slice(0, expected.length) : actual, expected, name);
+    const meta = JSON.parse(fs.readFileSync(path.join(c.directory, `${name}.json`), 'utf8'))._meta;
+    assert.equal(meta.schemaVersion, SCHEMA_VERSION);
+    assert.equal(meta.revision, c.state[name]._meta.revision + SCHEMA_VERSION - 8);
   }
   for (const name of CONTENT_COLLECTIONS.filter(name => name !== 'campanas')) assert.deepEqual(readRecords(c.directory, name), []);
+  for (const name of COLLECTIONS.filter(name => !V8_COLLECTIONS.includes(name) && !CONTENT_COLLECTIONS.includes(name))) {
+    assert.deepEqual(readRecords(c.directory, name), [], name);
+  }
   assert.equal(readRecords(c.directory, 'campanas').length, 1);
   assert.equal(readRecords(c.directory, 'personajes').length, c.state.personajes.records.length + 2);
   assert.equal(readRecords(c.directory, 'ataques').length, c.state.ataques.records.length + 4);

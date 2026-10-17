@@ -297,6 +297,11 @@ Fallar y cambiar consumen el turno. Los efectos avanzan sólo mientras la unidad
 .cturegistro Nombre · Registro
 .ctustarter · Primer personaje
 
+📖 *Historia del Custodio*
+.ctuhistoria · Prólogo y primeras misiones del bosque
+.ctuhistoria ayuda · Decisiones, combates y reintentos
+.ctudiario historia · Tu crónica, pistas y recuerdos
+
 🎴 *Colección*
 .ctuperfil · Tu progreso
 .ctupersonajes · Elegir unidad
@@ -677,17 +682,17 @@ Lukas: +15 XP
 🏆 Victoria vs *Lukas*
 📅 11 de octubre de 2026 · 1v1 clásico · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-065e9e74-54c2-4d1d-bdcf-1b73f65adc00
+🔎 .ctuhistorial BTL-079c6928-e02f-4ef2-a6e3-7e8cf53b00a6
 
 🏆 Victoria vs *Lukas*
 📅 11 de octubre de 2026 · 1v1 clásico · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-4132c922-300e-4ec1-817f-fe230f91b4de
+🔎 .ctuhistorial BTL-bf28b2c8-6cbd-4354-8933-1b6885e8c2c2
 
 🏆 Victoria vs *Lukas*
 📅 11 de octubre de 2026 · 1v1 clásico · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-62b62c22-4d68-460a-8e71-8a47eaf71835
+🔎 .ctuhistorial BTL-f96ecff2-f2d2-4a39-9416-261dd8091733
 
 📄 *Página 1 de 1*
 👉 Tu saldo: *.ctubalance*
@@ -1185,6 +1190,7 @@ Saldo tras ese reclamo: *100 ChengCoins*
 ━━━━━━━━━━━━━━
 🔒 Esa unidad está en combate, en venta o reservada en un intercambio.
 👉 Consulta .ctumercado mios, .ctucombate o .ctuintercambio mios.
+📖 Para un encuentro narrativo: .ctuhistoria
 ```
 
 ## Error: el comprador necesita saldo
@@ -1727,6 +1733,7 @@ Fallar y cambiar consumen el turno. Los efectos avanzan sólo mientras la unidad
 ━━━━━━━━━━━━━━
 🔒 Esa unidad está en combate, en venta o reservada en un intercambio.
 👉 Consulta .ctumercado mios, .ctucombate o .ctuintercambio mios.
+📖 Para un encuentro narrativo: .ctuhistoria
 ```
 
 ## Cambio voluntario: consume turno y activa la pasiva
@@ -3310,26 +3317,26 @@ Lukas: +15 XP
 📅 25 de octubre de 2026 · 1v1 · 8 turnos
 🎁 +120 ChengCoins · +35 XP
 🏅 Ranked T1 · 1016 Elo (+16)
-🔎 .ctuhistorial BTL-6d4cc900-7941-468d-b946-25ce30540375
+🔎 .ctuhistorial BTL-8da282ee-f2f9-4de5-aafe-922bf22d6050
 
 💔 Derrota vs *Lukas*
 📅 22 de octubre de 2026 · 1v1 clásico · 5 turnos
 🎁 +0 ChengCoins · +15 XP
-🔎 .ctuhistorial BTL-1acd9f42-c937-4e3e-bb44-e1f60fddb141
+🔎 .ctuhistorial BTL-46dc4881-a037-4739-b8ac-7183df1cb174
 
 🏆 Victoria vs *Lukas*
 📅 22 de octubre de 2026 · 1v1 clásico · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-ef49445b-ef47-4849-9dff-d2c43855bf45
+🔎 .ctuhistorial BTL-8bdabf65-efc2-42cc-973c-6b50a87d655f
 
 💔 Derrota vs *Lukas*
 📅 20 de octubre de 2026 · 1v1 · 0 turnos
-🔎 .ctuhistorial BTL-1e63607f-81d6-4108-92c8-a9803ef639ac
+🔎 .ctuhistorial BTL-17e7aef7-2f49-40d3-8bb6-29beed003032
 
 💔 Derrota vs *Lukas*
 📅 20 de octubre de 2026 · 3v3 · 31 turnos
 🎁 +0 ChengCoins · +15 XP
-🔎 .ctuhistorial BTL-93cb4521-a73b-4613-8ee3-bf36e06d8d3d
+🔎 .ctuhistorial BTL-5f4245cb-8f7d-4828-a537-07585ffb4a3d
 
 📄 *Página 1 de 3*
 ➡️ Siguiente: *.ctuhistorial 2*
@@ -4274,4 +4281,749 @@ Primer filo · Plata de Chengdú · T1
 📋 Misiones: .ctumisiones
 🏅 Logros: .ctulogros
 🎴 Aparición del grupo: .ctuspawn
+```
+
+## Historia: invitación al viaje del Custodio
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA*
+━━━━━━━━━━━━━━
+🎋 *El despertar del Custodio*
+
+En Chengdú, las cartas conservan historias. Una tinta desconocida está borrando sus nombres.
+Bao te espera bajo el bambú: tu primer vínculo puede cambiar lo que viene.
+
+📖 Prólogo y primeras tres misiones del bosque.
+💾 Cada escena y turno quedan guardados; puedes volver cuando quieras.
+
+👉 *.ctuhistoria iniciar*
+📖 Guía: .ctuhistoria ayuda
+```
+
+## Historia P-01: escena y decisiones numeradas
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA*
+━━━━━━━━━━━━━━
+🎋 *Prólogo · El despertar del Custodio*
+📍 *P-01 · Una invitación bajo el bambú*
+
+📖 Avance: 0/7 misiones
+
+Un panda anciano observa una carta a la sombra del bambú. A su espalda se alza el Gran Archivo.
+Bao: «Una carta no es solo poder. Es una historia que acepta continuar contigo».
+Desde la torre suena una campana. Bao levanta la mirada: nadie debería estar tocándola.
+
+1. Preguntar por el Archivo
+👉 .ctuhistoria elegir 1
+
+2. Preguntar por las criaturas
+👉 .ctuhistoria elegir 2
+
+📖 .ctudiario historia
+```
+
+## Historia P-02: la primera pregunta deja una consecuencia
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA*
+━━━━━━━━━━━━━━
+🎋 *Prólogo · El despertar del Custodio*
+📍 *P-02 · El primer vínculo*
+
+📖 Avance: 1/7 misiones
+
+🖋️ Bao: «Cada una tiene su nombre y su historia. Ser Custodio es acompañarla, no decidir todo por ella».
+
+🎁 +20 ChengCoins · +20 XP de Custodio
+
+Bao: «Preguntaste por las criaturas. Ahora podrás conocer a una por su propio nombre».
+Bao despliega los registros de las criaturas que pueden formar su primer vínculo.
+«No busques la más rara. Busca una compañera cuya forma de luchar quieras aprender».
+Tu criatura inicial conserva su identidad, su origen y las aventuras que viváis juntos.
+
+🎴 Elige tu primer compañero: *.ctustarter*
+👉 Después: .ctuhistoria continuar
+```
+
+## Historia: primer vínculo y XP de compañero
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA*
+━━━━━━━━━━━━━━
+🎋 *Prólogo · El despertar del Custodio*
+📍 *P-03 · Una sombra en la plaza*
+
+📖 Avance: 2/7 misiones
+
+🎁 +20 XP de Custodio
+✨ Panda Guerrero: +100 XP · 🌱 Nv. 2
+
+Una mancha de tinta cruza la plaza. Dentro tiembla una criatura que parece no reconocer el camino.
+Bao: «Es un Eco: una identidad dañada. Vamos a detenerlo sin hacerle más daño del necesario».
+«Prueba tus ataques, aprende a cubrirte y observa cuándo conviene usar una habilidad. Estoy aquí si caes».
+
+🛡️ Equipo preparado: 1/3 compañeros
+
+👉 *.ctuhistoria continuar*
+🛡️ .ctuequipo · 📖 .ctudiario historia
+```
+
+## Historia P-03: tutorial con señal y controles tácticos
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA | T1*
+━━━━━━━━━━━━━━
+🎋 *Prólogo · El despertar del Custodio*
+📍 *P-03 · Una sombra en la plaza*
+
+📖 Avance: 2/7 misiones
+
+❤️ *EXPEDICIÓN*
+🐼 *Panda Guerrero*
+▓▓▓▓▓▓▓▓▓▓ 122/122 HP
+🛡️ Escudo 12
+
+👁️ *Eco desorientado*
+▓▓▓▓▓▓▓▓▓▓ 110/110 HP
+
+⚠️ *SEÑAL ENEMIGA*
+El Eco está confundido. Bao te guía: ataca, defiende y prueba tu habilidad.
+
+🎯 *Tu turno*
+1. Golpe de Bambú · 25 POT
+2. Impacto del Panda · 36 POT
+
+👉 .ctuhistoria atacar 1
+👉 .ctuhistoria atacar 2
+👉 .ctuhistoria defender
+👉 .ctuhistoria habilidad
+
+💾 El turno se conserva al salir.
+```
+
+## Historia: ataque y respuesta del Eco en un solo mensaje
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA | T2*
+━━━━━━━━━━━━━━
+🎋 *Prólogo · El despertar del Custodio*
+📍 *P-03 · Una sombra en la plaza*
+
+📖 Avance: 2/7 misiones
+
+Panda Guerrero usó Golpe de Bambú: 38 de daño.
+Eco desorientado usó Roce de tinta: 0 de daño.
+
+❤️ *EXPEDICIÓN*
+🐼 *Panda Guerrero*
+▓▓▓▓▓▓▓▓▓▓ 122/122 HP
+🛡️ Escudo 11
+
+👁️ *Eco desorientado*
+▓▓▓▓▓▓▓▒▒▒ 72/110 HP
+
+⚠️ *SEÑAL ENEMIGA*
+El Eco está confundido. Bao te guía: ataca, defiende y prueba tu habilidad.
+
+🎯 *Tu turno*
+1. Golpe de Bambú · 25 POT
+2. Impacto del Panda · 36 POT
+
+👉 .ctuhistoria atacar 1
+👉 .ctuhistoria atacar 2
+👉 .ctuhistoria defender
+👉 .ctuhistoria habilidad
+
+💾 El turno se conserva al salir.
+```
+
+## Historia: aprender a cubrirse
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA | T3*
+━━━━━━━━━━━━━━
+🎋 *Prólogo · El despertar del Custodio*
+📍 *P-03 · Una sombra en la plaza*
+
+📖 Avance: 2/7 misiones
+
+Panda Guerrero se cubre: reduce el próximo daño de este turno un 70%.
+Eco desorientado usó Roce de tinta: 1 de daño.
+🛡️ Tu defensa amortiguó la ofensiva: recibiste 1 de daño.
+
+❤️ *EXPEDICIÓN*
+🐼 *Panda Guerrero*
+▓▓▓▓▓▓▓▓▓▓ 121/122 HP
+
+👁️ *Eco desorientado*
+▓▓▓▓▓▓▓▒▒▒ 72/110 HP
+
+⚠️ *SEÑAL ENEMIGA*
+El Eco está confundido. Bao te guía: ataca, defiende y prueba tu habilidad.
+
+🎯 *Tu turno*
+1. Golpe de Bambú · 25 POT
+2. Impacto del Panda · 36 POT
+
+👉 .ctuhistoria atacar 1
+👉 .ctuhistoria atacar 2
+👉 .ctuhistoria defender
+👉 .ctuhistoria habilidad
+
+💾 El turno se conserva al salir.
+```
+
+## Historia: técnica y recarga compartida
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA | T4*
+━━━━━━━━━━━━━━
+🎋 *Prólogo · El despertar del Custodio*
+📍 *P-03 · Una sombra en la plaza*
+
+📖 Avance: 2/7 misiones
+
+Panda Guerrero usó Impacto del Panda: 49 de daño.
+Panda Guerrero recibe escudo.
+Eco desorientado usó Roce de tinta: 0 de daño.
+
+❤️ *EXPEDICIÓN*
+🐼 *Panda Guerrero*
+▓▓▓▓▓▓▓▓▓▓ 121/122 HP
+🛡️ Escudo 11
+
+👁️ *Eco desorientado*
+▓▓▓▒▒▒▒▒▒▒ 23/110 HP
+
+⚠️ *SEÑAL ENEMIGA*
+El Eco está confundido. Bao te guía: ataca, defiende y prueba tu habilidad.
+
+🎯 *Tu turno*
+1. Golpe de Bambú · 25 POT
+2. Impacto del Panda · 36 POT · ⏳ 2T
+
+👉 .ctuhistoria atacar 1
+👉 .ctuhistoria defender
+
+💾 El turno se conserva al salir.
+```
+
+## Historia: victoria del tutorial y premio único
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA*
+━━━━━━━━━━━━━━
+🎋 *Prólogo · El despertar del Custodio*
+📍 *P-04 · Las campanas del Archivo*
+
+📖 Avance: 3/7 misiones
+
+Panda Guerrero usó Golpe de Bambú: 23 de daño.
+Eco desorientado quedó fuera de combate.
+El Eco se serena. Tu vínculo resistió la tinta.
+
+🌿 *¡Encuentro superado!*
+Eco desorientado deja de luchar. El vínculo sigue intacto.
+
+🎁 +45 ChengCoins · +50 XP de Custodio
+✨ Panda Guerrero: +220 XP · 🌱 Nv. 3
+🧩 1 fragmento
+
+La tinta abandona al Eco, pero las campanas siguen sonando. Lian encuentra una carta completamente blanca.
+Lian: «Los registros no están rotos. Les faltan los nombres».
+Bao reconoce un sello en el borde y aparta la mirada: «No es la primera vez que veo esa tinta».
+Las últimas huellas salen de la plaza y se pierden en el Bosque de los Susurros.
+
+🛡️ Equipo preparado: 1/3 compañeros
+
+👉 *.ctuhistoria continuar*
+🛡️ .ctuequipo · 📖 .ctudiario historia
+```
+
+## Historia P-04: campanas, carta blanca y recuerdo inaugural
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA*
+━━━━━━━━━━━━━━
+🎋 *Capítulo I · El Bosque que Olvidó su Voz*
+📍 *I-01 · Sendero en silencio*
+
+📖 Avance: 4/7 misiones
+
+🎁 +35 ChengCoins · +30 XP de Custodio
+✨ Panda Guerrero: +80 XP
+🧩 1 fragmento
+📜 Recuerdo: Campanas sin manos
+
+El sendero conserva el olor de la lluvia, pero no se oye un solo pájaro.
+Lian descubre cortes oscuros sobre el bambú. Junto al arroyo, unas huellas arrastran la misma tinta.
+«Podemos seguir cualquiera de las dos pistas. Primero quiero entender qué estamos viendo».
+
+🛡️ Equipo preparado: 1/3 compañeros
+
+1. Examinar las marcas del bambú
+👉 .ctuhistoria elegir 1
+
+2. Seguir las huellas del arroyo
+👉 .ctuhistoria elegir 2
+
+📖 .ctudiario historia
+```
+
+## Historia I-01: una pista modifica la escena siguiente
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA*
+━━━━━━━━━━━━━━
+🎋 *Capítulo I · El Bosque que Olvidó su Voz*
+📍 *I-02 · Una criatura herida*
+
+📖 Avance: 5/7 misiones
+
+🖋️ Los cortes interrumpen viejas inscripciones. Lian copia el patrón: «Alguien está buscando nombres, no madera».
+
+🎁 +40 ChengCoins · +35 XP de Custodio
+✨ Panda Guerrero: +100 XP
+🧩 1 fragmento
+
+El patrón del bambú vuelve a aparecer en una hoja. Al apartarla, Lian descubre a quien se refugia debajo.
+Una pequeña criatura tiembla entre hojas manchadas de tinta. Más adelante, las huellas todavía están frescas.
+Bao deja su bastón junto al arroyo: «Está asustada. Pero la corriente pronto borrará el rastro».
+Lian abre su cuaderno. Espera tu decisión.
+
+🛡️ Equipo preparado: 1/3 compañeros
+
+1. Auxiliar a la criatura
+👉 .ctuhistoria elegir 1
+
+2. Perseguir las huellas
+👉 .ctuhistoria elegir 2
+
+📖 .ctudiario historia
+```
+
+## Historia I-02: la gratitud de una criatura importa después
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA*
+━━━━━━━━━━━━━━
+🎋 *Capítulo I · El Bosque que Olvidó su Voz*
+📍 *I-03 · Huellas en el bambú*
+
+📖 Avance: 6/7 misiones
+
+🖋️ Limpias la tinta de una pata y le dejas espacio. Antes de refugiarse, la criatura señala unos arbustos: te está advirtiendo.
+
+🎁 +60 ChengCoins · +45 XP de Custodio
+✨ Panda Guerrero: +150 XP · 🌱 Nv. 4
+🧩 1 fragmento · 1 esencia
+
+La criatura que ayudaste silba desde su refugio y señala las garras oscuras. Su advertencia llega a tiempo.
+Dos Ecos retroceden hacia el bambú; un tercero avanza, reuniendo tinta alrededor de sus garras.
+Lian: «No todos quieren atacarnos. Mira cuál prepara el golpe».
+Bao: «Cuando la tinta se concentre, cúbrete. Después de descargarla quedará expuesto».
+
+🛡️ Equipo preparado: 1/3 compañeros
+
+1. Observar y enfrentar solo al Eco hostil
+👉 .ctuhistoria elegir 1
+
+2. Proteger a los Ecos asustados
+👉 .ctuhistoria elegir 2
+
+3. Atacar sin distinguirlos
+👉 .ctuhistoria elegir 3
+
+📖 .ctudiario historia
+```
+
+## Historia I-03: Eco de Tinta y mecánica de minijefe
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA | T1*
+━━━━━━━━━━━━━━
+🎋 *Capítulo I · El Bosque que Olvidó su Voz*
+📍 *I-03 · Huellas en el bambú*
+
+📖 Avance: 6/7 misiones
+
+🖋️ Reconoces al Eco de Tinta por sus garras oscuras y dejas una salida a los otros. Lian anota tu cuidado al elegir el objetivo.
+
+❤️ *EXPEDICIÓN*
+🐼 *Panda Guerrero*
+▓▓▓▓▓▓▓▓▓▓ 126/126 HP
+🛡️ Escudo 12
+
+👁️ *Eco de Tinta*
+▓▓▓▓▓▓▓▓▓▓ 240/240 HP
+
+⚠️ *SEÑAL ENEMIGA*
+El Eco prepara un zarpazo corto.
+
+🎯 *Tu turno*
+1. Golpe de Bambú · 25 POT
+2. Impacto del Panda · 36 POT
+
+👉 .ctuhistoria atacar 1
+👉 .ctuhistoria atacar 2
+👉 .ctuhistoria defender
+👉 .ctuhistoria habilidad
+
+💾 El turno se conserva al salir.
+```
+
+## Historia: retirada voluntaria, pista y reintento sin pérdida de cartas
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA | RETIRADA*
+━━━━━━━━━━━━━━
+🎋 *Capítulo I · El Bosque que Olvidó su Voz*
+📍 *I-03 · Huellas en el bambú*
+
+📖 Avance: 6/7 misiones
+
+Te retiras a salvo. Puedes preparar otro equipo y volver a intentarlo.
+
+❤️ *EXPEDICIÓN*
+🐼 *Panda Guerrero*
+▓▓▓▓▓▓▓▓▓▓ 126/126 HP
+🛡️ Escudo 12
+
+👁️ *Eco de Tinta*
+▓▓▓▓▓▓▓▓▓▓ 240/240 HP
+
+🏳️ *Te retiraste del encuentro.*
+Tu historia sigue guardada. No pierdes cartas ni monedas; reintentar no duplica los premios.
+
+💡 Observa la señal enemiga: defender antes de un golpe cargado puede cambiar el combate. Prepara tu equipo y vuelve a intentarlo.
+
+🔁 *.ctuhistoria reintentar*
+🛡️ Preparar: .ctuequipo
+🔎 Pista: .ctuhistoria pista
+```
+
+## Historia: nueva expedición con vida restaurada
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA | T1*
+━━━━━━━━━━━━━━
+🎋 *Capítulo I · El Bosque que Olvidó su Voz*
+📍 *I-03 · Huellas en el bambú*
+
+📖 Avance: 6/7 misiones
+
+❤️ *EXPEDICIÓN*
+🐼 *Panda Guerrero*
+▓▓▓▓▓▓▓▓▓▓ 126/126 HP
+🛡️ Escudo 12
+
+👁️ *Eco de Tinta*
+▓▓▓▓▓▓▓▓▓▓ 240/240 HP
+
+⚠️ *SEÑAL ENEMIGA*
+El Eco prepara un zarpazo corto.
+
+🎯 *Tu turno*
+1. Golpe de Bambú · 25 POT
+2. Impacto del Panda · 36 POT
+
+👉 .ctuhistoria atacar 1
+👉 .ctuhistoria atacar 2
+👉 .ctuhistoria defender
+👉 .ctuhistoria habilidad
+
+💾 El turno se conserva al salir.
+```
+
+## Historia: defender la descarga anunciada
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA | T4*
+━━━━━━━━━━━━━━
+🎋 *Capítulo I · El Bosque que Olvidó su Voz*
+📍 *I-03 · Huellas en el bambú*
+
+📖 Avance: 6/7 misiones
+
+Panda Guerrero se cubre: reduce el próximo daño de este turno un 70%.
+Eco de Tinta usó Descarga de tinta: 26 de daño.
+🛡️ Tu defensa amortiguó la ofensiva: recibiste 26 de daño.
+
+❤️ *EXPEDICIÓN*
+🐼 *Panda Guerrero*
+▓▓▓▓▓▓▓▓▒▒ 95/126 HP
+
+👁️ *Eco de Tinta*
+▓▓▓▓▓▓▓▓▓▒ 210/240 HP
+Defensas abiertas
+
+⚠️ *SEÑAL ENEMIGA*
+✨ El Eco está expuesto tras la descarga: su defensa queda en 0 durante tu próxima acción.
+
+🎯 *Tu turno*
+1. Golpe de Bambú · 25 POT
+2. Impacto del Panda · 36 POT
+
+👉 .ctuhistoria atacar 1
+👉 .ctuhistoria atacar 2
+👉 .ctuhistoria defender
+👉 .ctuhistoria habilidad
+
+💾 El turno se conserva al salir.
+```
+
+## Historia: aprovechar la apertura del minijefe
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA | T5*
+━━━━━━━━━━━━━━
+🎋 *Capítulo I · El Bosque que Olvidó su Voz*
+📍 *I-03 · Huellas en el bambú*
+
+📖 Avance: 6/7 misiones
+
+Aprovechas la apertura: el Eco tiene la defensa reducida a 0.
+Panda Guerrero usó Impacto del Panda: 61 de daño.
+Panda Guerrero recibe escudo.
+El Eco intenta recuperar el equilibrio.
+
+❤️ *EXPEDICIÓN*
+🐼 *Panda Guerrero*
+▓▓▓▓▓▓▓▓▒▒ 95/126 HP
+🛡️ Escudo 12
+
+👁️ *Eco de Tinta*
+▓▓▓▓▓▓▓▒▒▒ 149/240 HP
+
+⚠️ *SEÑAL ENEMIGA*
+El Eco prepara un zarpazo corto.
+
+🎯 *Tu turno*
+1. Golpe de Bambú · 25 POT
+2. Impacto del Panda · 36 POT · ⏳ 2T
+
+👉 .ctuhistoria atacar 1
+👉 .ctuhistoria defender
+
+💾 El turno se conserva al salir.
+```
+
+## Historia: fase 1 completa y compañero preparado para evolucionar
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA | FASE 1 COMPLETA*
+━━━━━━━━━━━━━━
+📖 Avance: 7/7 misiones
+
+Panda Guerrero usó Golpe de Bambú: 28 de daño.
+Eco de Tinta quedó fuera de combate.
+El Eco se serena. Tu vínculo resistió la tinta.
+
+🌿 *¡Encuentro superado!*
+Eco de Tinta deja de luchar. El vínculo sigue intacto.
+
+🎁 +100 ChengCoins · +100 XP de Custodio
+✨ Panda Guerrero: +450 XP · 🌱 Nv. 5
+🧩 1 fragmento · 1 esencia
+
+📜 *Tu primera expedición queda escrita.*
+Has completado el prólogo y las primeras tres misiones del bosque. Tus decisiones y recuerdos quedan guardados.
+
+🔒 El resto del Capítulo I llegará en la siguiente fase.
+
+📖 .ctudiario historia
+🎋 .cturecuerdos
+🔮 Consulta tu evolución: .ctuevolucion PAND-000006
+```
+
+## Diario narrativo: resumen, crónica y decisiones sin cobrar el diario económico
+
+```text
+🃏 *CHENGDÚ CARDS | DIARIO DEL CUSTODIO*
+━━━━━━━━━━━━━━
+📍 *Qué pasó antes*
+Has superado el prólogo y la primera expedición del bosque. La tinta continúa hacia un claro todavía cerrado.
+
+📚 *Crónica*
+*P-01 · Una invitación bajo el bambú*
+Un panda anciano observa una carta a la sombra del bambú. A su espalda se alza el Gran Archivo.
+*P-02 · El primer vínculo*
+Bao despliega los registros de las criaturas que pueden formar su primer vínculo.
+*P-03 · Una sombra en la plaza*
+Una mancha de tinta cruza la plaza. Dentro tiembla una criatura que parece no reconocer el camino.
+*P-04 · Las campanas del Archivo*
+La tinta abandona al Eco, pero las campanas siguen sonando. Lian encuentra una carta completamente blanca.
+*I-01 · Sendero en silencio*
+El sendero conserva el olor de la lluvia, pero no se oye un solo pájaro.
+*I-02 · Una criatura herida*
+Una pequeña criatura tiembla entre hojas manchadas de tinta. Más adelante, las huellas todavía están frescas.
+*I-03 · Huellas en el bambú*
+Dos Ecos retroceden hacia el bambú; un tercero avanza, reuniendo tinta alrededor de sus garras.
+
+👥 *Personajes conocidos*
+*Maestro Bao*
+Mentor y antiguo guardián del Archivo. Te ayuda a comprender a tus compañeros.
+*Lian*
+Investiga los nombres borrados y recuerda cómo tratas a los Ecos.
+
+🖋️ *Trazos y pistas*
+*Trazos de la Primera Carta*
+0 de 5. Aún no has recuperado ninguno.
+
+🧭 *Tus decisiones*
+*Una invitación bajo el bambú*
+Preguntar por las criaturas. Bao: «Cada una tiene su nombre y su historia. Ser Custodio es acompañarla, no decidir todo por ella».
+*Sendero en silencio*
+Examinar las marcas del bambú. Los cortes interrumpen viejas inscripciones. Lian copia el patrón: «Alguien está buscando nombres, no madera».
+*Una criatura herida*
+Auxiliar a la criatura. Limpias la tinta de una pata y le dejas espacio. Antes de refugiarse, la criatura señala unos arbustos: te está advirtiendo.
+*Huellas en el bambú*
+Observar y enfrentar solo al Eco hostil. Reconoces al Eco de Tinta por sus garras oscuras y dejas una salida a los otros. Lian anota tu cuidado al elegir el objetivo.
+
+📜 *Recuerdos*
+*Campanas sin manos*
+La primera llamada del Gran Archivo y una carta que había perdido su nombre.
+*La gratitud del bosque*
+Te detuviste a ayudar a una criatura herida cuando las huellas podían desaparecer.
+*La confianza de Lian*
+Distinguiste al Eco hostil de las criaturas asustadas. Lian dejó una nota de confianza en tu cuaderno.
+
+🗺️ *Atlas*
+*Plaza del Archivo*
+El despertar del Custodio
+*Bosque de los Susurros*
+El Bosque que Olvidó su Voz
+
+👉 .ctuhistoria
+🗺️ .ctucapitulos
+```
+
+## Historia: avance y siguientes misiones bloqueadas
+
+```text
+🃏 *CHENGDÚ CARDS | CAPÍTULOS*
+━━━━━━━━━━━━━━
+🎋 *El despertar del Custodio*
+✅ P-01 · Una invitación bajo el bambú
+✅ P-02 · El primer vínculo
+✅ P-03 · Una sombra en la plaza
+✅ P-04 · Las campanas del Archivo
+
+🎋 *El Bosque que Olvidó su Voz*
+✅ I-01 · Sendero en silencio
+✅ I-02 · Una criatura herida
+✅ I-03 · Huellas en el bambú
+🔒 I-04 · El claro de la tinta · Próxima fase
+🔒 I-05 · Encuentro del capítulo · Próxima fase
+
+👉 .ctuhistoria
+```
+
+## Historia: recuerdos personales no comerciables
+
+```text
+🃏 *CHENGDÚ CARDS | RECUERDOS*
+━━━━━━━━━━━━━━
+📜 *Memorias del Custodio*
+
+*Campanas sin manos*
+La primera llamada del Gran Archivo y una carta que había perdido su nombre.
+
+*La gratitud del bosque*
+Te detuviste a ayudar a una criatura herida cuando las huellas podían desaparecer.
+
+*La confianza de Lian*
+Distinguiste al Eco hostil de las criaturas asustadas. Lian dejó una nota de confianza en tu cuaderno.
+
+👉 .ctuhistoria
+```
+
+## Historia: materiales auténticos para el primer sello
+
+```text
+🃏 *CHENGDÚ CARDS | CRAFTING*
+━━━━━━━━━━━━━━
+🪵 0 fragmentos · ✨ 0 esencias · 🔮 0 sellos
+
+🎁 5 recompensas con materiales pendientes
+👉 .ctucrafting reclamar
+
+🔨 *Sello de evolución*
+💰 100 ChengCoins
+🧩 5 fragmentos · 2 esencias
+👉 .ctucrafting crear sello_evolucion
+
+🔨 *Insignia de bambú*
+💰 50 ChengCoins
+🧩 3 fragmentos
+👉 .ctucrafting crear insignia_bambu
+
+🎒 .ctuinventario
+🔮 Evolución: .ctuevolucion ID
+```
+
+## Pruebas de Historia: confirmación del reinicio personal
+
+```text
+🃏 *CHENGDÚ CARDS | REINICIAR HISTORIA*
+━━━━━━━━━━━━━━
+🧪 *Reinicio de campaña para pruebas*
+
+Vuelve al comienzo del prólogo y termina tu encuentro narrativo actual.
+Tus unidades, XP, monedas y recompensas ya entregadas se conservan. Los premios únicos no se vuelven a cobrar.
+
+👉 Confirmar: *.ctureiniciarhistoria confirmar*
+```
+
+## Pruebas de Historia: nueva partida conservando premios y unidades
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA*
+━━━━━━━━━━━━━━
+🎋 *Prólogo · El despertar del Custodio*
+📍 *P-01 · Una invitación bajo el bambú*
+
+📖 Avance: 0/7 misiones
+
+🖋️ Campaña reiniciada para pruebas. Tus unidades, XP, monedas y premios anteriores se conservan.
+
+Un panda anciano observa una carta a la sombra del bambú. A su espalda se alza el Gran Archivo.
+Bao: «Una carta no es solo poder. Es una historia que acepta continuar contigo».
+Desde la torre suena una campana. Bao levanta la mirada: nadie debería estar tocándola.
+
+🛡️ Equipo preparado: 1/3 compañeros
+
+1. Preguntar por el Archivo
+👉 .ctuhistoria elegir 1
+
+2. Preguntar por las criaturas
+👉 .ctuhistoria elegir 2
+
+📖 .ctudiario historia
+```
+
+## Pruebas de Historia: repetir una misión no vuelve a entregar sus monedas
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA*
+━━━━━━━━━━━━━━
+🎋 *Prólogo · El despertar del Custodio*
+📍 *P-02 · El primer vínculo*
+
+📖 Avance: 1/7 misiones
+
+🖋️ Bao: «Guardamos nombres y vínculos. Cuando las campanas llaman solas, algo ha dejado de estar donde debería».
+
+↩️ Premio único ya entregado; repetir esta misión no vuelve a otorgarlo.
+
+Bao: «Antes de entrar en el Archivo, necesitas conocer a tu primer compañero».
+Bao despliega los registros de las criaturas que pueden formar su primer vínculo.
+«No busques la más rara. Busca una compañera cuya forma de luchar quieras aprender».
+Tu criatura inicial conserva su identidad, su origen y las aventuras que viváis juntos.
+
+🛡️ Equipo preparado: 1/3 compañeros
+
+🎴 Tu compañero ya está preparado.
+👉 *.ctuhistoria continuar*
 ```

@@ -127,7 +127,7 @@ export function validateBattleData(state, schemaVersion = 3) {
     else check(date(battle.finishedAt) && battle.turnUserId === null && (accepted || ({ expired: 'challenge_timeout', rejected: 'rejected', cancelled: 'cancelled' })[battle.status] === battle.finishReason), 'battle.closedFinish');
   }
   for (const unit of units.values()) {
-    if ((schemaVersion >= 7 && unit.lock?.type === 'market' || schemaVersion >= 11 && unit.lock?.type === 'trade')) continue; // Market validation checks the matching active listing.
+    if ((schemaVersion >= 7 && unit.lock?.type === 'market' || schemaVersion >= 11 && unit.lock?.type === 'trade' || schemaVersion >= 12 && unit.lock?.type === 'story')) continue; // Each domain validates its matching reservation.
     if (unit.lock !== null) check(unit.lock?.type === 'battle' && battles.get(unit.lock.referenceId)?.status === 'active' && activeUnits.has(unit.id), 'unit.lockReference');
   }
 }
