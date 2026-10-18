@@ -10,6 +10,7 @@ import { defaultPreferences, earnedTitles, SOCIAL_POLICY_VERSION, validBio } fro
 async function titleState(repos) {
   return { logros: { records: await repos.achievements.all() },
     premiostemporada: { records: await repos.seasonRewards.all() },
+    premioshistoria: { records: repos.storyRewards ? await repos.storyRewards.all() : [] },
     artesania: { records: repos.craftingActions ? await repos.craftingActions.all() : [] } };
 }
 

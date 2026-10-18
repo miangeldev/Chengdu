@@ -317,7 +317,7 @@ test('expanded story errors explain the available boss mechanics without exposin
 });
 
 test('real expanded WhatsApp campaign completes fourteen missions, two ordered clues and two Trazos', async t => {
-  const c = setup(t, { randomRoll: () => 0 });
+  const c = setup(t, { randomRoll: () => 0, storyContentVersion: 2 });
   const user = await register(c.game);
   const replies = [], logs = [];
   const route = createCommandRouter({ game: c.game, prefix: '!', automaticSpawns: false, debug: false, logger: (...args) => logs.push(args) });

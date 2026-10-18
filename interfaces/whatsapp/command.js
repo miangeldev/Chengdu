@@ -10,6 +10,17 @@ export { displayName, rarityName } from './format.js';
 
 const messages = {
   STORY_NOT_STARTED: '🎋 Bao te espera bajo el bambú. Empieza con .ctuhistoria iniciar',
+  STORY_SIDE_LOCKED: '🌿 Esa ruta opcional todavía no se abrió. Consulta .ctuhistoria opcionales y continúa la campaña.',
+  STORY_SEASON_REQUIRED: '🏛️ Las Pruebas del Archivo se abren después de completar el epílogo. Continúa con .ctuhistoria',
+  STORY_ACTIVITY_LOCKED: '🧭 Ya tienes una ruta opcional o prueba en curso. Continúa con .ctuhistoria o pausa con .ctuhistoria volver; si hay combate, ríndete primero.',
+  STORY_SCENE_LOCKED: '📖 Sólo puedes releer escenas de misiones completadas. Consulta tu avance con .ctucapitulos',
+  STORY_CONTRIBUTION_REQUIRED: '🤝 Falta tu aportación a esta escena. Confírmala con .ctuhistoria aportar; puedes avanzar con clan o en solitario.',
+  STORY_MAIN_REQUIRED: '🎋 Ya estás en la campaña principal. Continúa con .ctuhistoria',
+  STORY_INVALID_ACTIVITY: '🔎 Elige una ruta disponible. Consulta .ctuhistoria opcionales, .ctuhistoria pruebas o relee una misión completada con .ctuhistoria escenas III-04 1',
+  STORY_NOT_PROTECTABLE: '🛡️ Proteger se usa cuando hay aliados en peligro o durante la fase Elección. Consulta la señal con .ctuhistoria',
+  STORY_NOT_PURIFIABLE: '✨ Purificar se usa ante la tensión de la Campana o los sellos del Archivista. Consulta las acciones disponibles con .ctuhistoria',
+  STORY_ACTION_COOLDOWN: '⏳ Esa táctica todavía se está recuperando. Usa otra acción disponible y consulta la señal con .ctuhistoria',
+  STORY_SKILL_SEALED: '🔒 Tu técnica está sellada temporalmente. Alterna acciones o purifica cuando esté disponible; consulta .ctuhistoria',
   STORY_INVALID_JOURNAL_SECTION: '📖 Elige cronica, personajes, trazos, decisiones, recuerdos o atlas.\nEjemplo: .ctudiario historia cronica 1',
   STORY_INVALID_JOURNAL_PAGE: '📄 Escribe una página entera desde 1.\nEjemplo: .ctudiario historia cronica 2',
   STORY_COMPLETE: '📜 Completaste la ruta de Historia disponible. Consulta tus recuerdos con .cturecuerdos y los próximos capítulos con .ctucapitulos',

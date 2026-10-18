@@ -3,14 +3,18 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createGame } from '../game/createGame.js';
+import { JsonUnitOfWork } from '../storage/unitOfWork.js';
 import { createCommandRouter } from '../interfaces/whatsapp/index.js';
 import { seasonDefinition } from '../game/competitive/policy.js';
+import { activeStoryMission, currentStoryStep } from '../game/story/catalog.js';
+import { storySeasonTacticalAction, storyTacticalAction } from './simulate-story-balance.js';
 
 const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'chengdu-preview-'));
 let roll = 0;
 let currentTime = '2026-10-11T20:00:00Z';
 let contentRoll = null;
-const game = createGame({ directory, clock: () => currentTime, randomRoll: () => roll, randomDropInt: upper => contentRoll ? contentRoll(upper) : upper - 1 });
+const storage = new JsonUnitOfWork({ directory, clock: () => currentTime });
+const game = createGame({ storage, clock: () => currentTime, randomRoll: () => roll, randomDropInt: upper => contentRoll ? contentRoll(upper) : upper - 1 });
 const route = createCommandRouter({ game });
 const samples = [];
 let latest;
@@ -381,67 +385,66 @@ try {
   currentTime = '2026-11-13T06:00:00.000Z';
   await send(a, '.ctuclan war G1', 'Guerra: cierre por plazo sin premio personal para inactivos');
   await send(a, '.ctuinventario', 'Inventario ampliado: materiales, sellos e insignia artesanal');
-  // A fresh Custodian follows all fourteen missions using real rewards.
+  // Drive the whole saved season through the public WhatsApp adapter.
   const custodian = '521666666666@s.whatsapp.net';
+  roll = 30;
   await send(custodian, '.cturegistro Custodio');
   const storyUser = await game.users.getUserByIdentity({ provider: 'whatsapp', subject: custodian });
   const storyState = () => game.story.getState({ userId: storyUser.id });
-  async function finishStoryEncounter(title, { collectSignals = false } = {}) {
-    const captured = new Set();
-    for (let turn = 0; turn < 60; turn++) {
+  const capturedStory = new Set();
+  const actionNames = { attack: 'atacar', defend: 'defender', skill: 'habilidad', switch: 'cambiar',
+    break: 'romper', observe: 'observar', support: 'apoyar', purify: 'purificar', protect: 'proteger' };
+  async function advanceStory() {
+    const state = await storyState();
+    let action;
+    if (state.progress.stage === 'choice') {
+      const step = currentStoryStep(activeStoryMission(state.progress), state.progress);
+      action = `elegir ${step?.requiredChoice ?? '1'}`;
+    } else if (state.progress.stage === 'community') action = 'aportar';
+    else if (state.progress.stage === 'defeated') action = 'reintentar';
+    else if (state.progress.stage === 'battle') {
+      const record = await storage.withRead(repos => repos.storyBattles.get(state.progress.activeBattleId));
+      const tactic = record.combat.encounterId === 'P03' ? storyTacticalAction(record.combat) : storySeasonTacticalAction(record.combat);
+      action = `${actionNames[tactic.action]}${tactic.choice ? ` ${tactic.choice}` : ''}`;
+    } else action = 'continuar';
+    await send(custodian, `.ctuhistoria ${action}`);
+    return storyState();
+  }
+  async function finishStoryRoute(label) {
+    for (let turn = 0; turn < 1400; turn++) {
       const state = await storyState();
-      if (state.battle?.status !== 'active') {
-        if (title) samples.push({ title, text: latest });
+      const mainComplete = state.progress.status === 'complete' && state.route.kind === 'main';
+      const sideComplete = label && state.route.kind === 'main';
+      if (mainComplete || sideComplete) {
+        samples.push({ title: label ?? 'Historia: temporada completa, cinco Trazos y título ganado', text: latest });
         return;
       }
-      const active = state.battle.team.find(unit => unit.active);
-      const signal = state.battle.enemy.phase;
-      const tutorial = state.battle.encounterId === 'P03';
-      const action = tutorial && !state.battle.tutorial.attack ? 'atacar 1'
-        : signal === 'unleash' || tutorial && !state.battle.tutorial.defend ? 'defender'
-          : state.battle.availableActions.includes('break') ? 'romper'
-            : state.battle.availableActions.includes('observe') ? 'observar'
-              : active.attacks[1].ready ? 'habilidad' : 'atacar 1';
-      const signalText = action === 'romper' ? 'romper la barrera antes de atacar'
-        : action === 'observar' ? 'observar para revelar al Mercader original'
-          : signal === 'unleash' ? 'defender la descarga anunciada'
-            : signal === 'exposed' ? 'aprovechar la apertura del enemigo' : null;
-      const sample = collectSignals && !captured.has(signal) && signalText ? `Historia ${state.mission.code}: ${signalText}` : null;
-      await send(custodian, `.ctuhistoria ${action}`, sample);
-      if (sample) captured.add(signal);
+      let signal;
+      if (state.battle?.status === 'active') signal = `${state.mission.code}:${state.battle.encounterId}:${state.battle.learning?.remaining ?? 0}:${state.battle.enemy.phase}`;
+      else signal = `${state.mission.code}:${state.progress.sceneStep}:${state.progress.stage}`;
+      const sample = !capturedStory.has(signal) && (state.progress.stage !== 'battle' ||
+        ['unleash', 'reflect', 'tension', 'protect', 'choice', 'damage', 'defense', 'support'].includes(state.battle.enemy.phase) || state.battle.learning?.scouting);
+      if (sample) {
+        capturedStory.add(signal);
+        samples.push({ title: `Historia ${state.mission.code}: ${state.battle?.learning?.scouting ? 'reconocimiento obligatorio' : state.progress.stage === 'defeated' ? 'derrota guardada y reintento' : `escena ${state.mission.stepNumber ?? 1}`}`, text: latest });
+      }
+      await advanceStory();
     }
     throw new Error('La vista previa de Historia superó el límite de acciones.');
   }
-  await send(custodian, '.ctuhistoria', 'Historia: invitación al viaje del Custodio');
-  await send(custodian, '.ctuhistoria iniciar', 'Historia P-01: escena y decisiones numeradas');
-  await send(custodian, '.ctuhistoria elegir 2', 'Historia P-02: la primera pregunta deja una consecuencia');
+  await send(custodian, '.ctuhistoria', 'Historia: invitación a la temporada completa');
   await send(custodian, '.ctustarter panda');
-  await send(custodian, '.ctucontinuar', 'Historia: primer vínculo y XP de compañero');
-  await send(custodian, '.ctucontinuar', 'Historia P-03: tutorial con señal y controles tácticos');
-  await send(custodian, '.ctuhistoria atacar 1', 'Historia: ataque y respuesta del Eco en un solo mensaje');
-  await send(custodian, '.ctuhistoria defender', 'Historia: aprender a cubrirse');
-  await send(custodian, '.ctuhistoria habilidad', 'Historia: técnica y recarga compartida');
-  await finishStoryEncounter('Historia: victoria del tutorial y premio único');
-  await send(custodian, '.ctucontinuar', 'Historia P-04: campanas, carta blanca y recuerdo inaugural');
-  await send(custodian, '.ctuhistoria elegir 1', 'Historia I-01: una pista modifica la escena siguiente');
-  await send(custodian, '.ctuhistoria elegir 1', 'Historia I-02: la gratitud de una criatura importa después');
-  await send(custodian, '.ctuhistoria elegir 1', 'Historia I-03: Eco de Tinta y mecánica de minijefe');
-  await send(custodian, '.ctuhistoria rendirse', 'Historia: retirada voluntaria, pista y reintento sin pérdida de cartas');
-  await send(custodian, '.ctuhistoria reintentar', 'Historia: nueva expedición con vida restaurada');
-  await finishStoryEncounter('Historia: primer tramo superado y claro disponible', { collectSignals: true });
-  await send(custodian, '.ctucontinuar', 'Historia I-04: Guardiana Nube y emboscada del claro');
-  await finishStoryEncounter('Historia I-04: la memoria del bosque conduce a las raíces');
-  await send(custodian, '.ctucontinuar', 'Historia I-05: Guardián Marchito y barrera de raíces');
-  await finishStoryEncounter('Historia I-05: restauración del Guardián y Primer Trazo', { collectSignals: true });
-  await send(custodian, '.ctudiario historia', 'Diario tras el bosque: un Trazo recuperado y Mercado disponible');
-  await send(custodian, '.ctuhistoria elegir 1', 'Historia II-01: Mei, Tao y comerciantes legítimos');
-  await send(custodian, '.ctuhistoria elegir 2', 'Historia II-02: una identidad auténtica conserva su historial');
-  await send(custodian, '.ctuhistoria elegir 1', 'Historia II-03: aceptar una oferta simulada sin mover cartas reales');
-  await send(custodian, '.ctuhistoria elegir 1', 'Historia II-04: primera pista elegida, el libro de entregas');
-  await send(custodian, '.ctucontinuar', 'Historia II-04: la segunda pista cambia el orden de la investigación');
-  await send(custodian, '.ctucontinuar', 'Historia II-04: ambas pistas convergen sin duplicar la decisión');
-  await send(custodian, '.ctucontinuar', 'Historia II-05: señuelos del Mercader Sin Rostro');
-  await finishStoryEncounter('Historia: capítulos I y II completos, Segundo Trazo y recompensa moderada', { collectSignals: true });
+  await send(custodian, '.ctuhistoria iniciar', 'Historia P-01: primera escena y decisiones numeradas');
+  await finishStoryRoute();
+  await send(custodian, '.ctuhistoria opcionales', 'Historia: cuatro rutas opcionales disponibles');
+  await send(custodian, '.ctuhistoria opcional III-A', 'Historia opcional: ayudar a Huan conserva el avance principal');
+  await send(custodian, '.ctuhistoria volver', 'Historia opcional: pausa y regreso al epílogo completado');
+  await send(custodian, '.ctuhistoria opcional III-A', 'Historia opcional: retomar la escena guardada');
+  await finishStoryRoute('Historia opcional: recuerdo y premio único, campaña conservada');
+  await send(custodian, '.ctuhistoria escenas III-04 2', 'Archivo: escena completada y páginas numéricas');
+  await send(custodian, '.ctuhistoria pruebas', 'Archivo: tres pruebas sin premios de campaña repetibles');
+  await send(custodian, '.ctuhistoria prueba 1', 'Archivo: desafío opcional después del epílogo');
+  await finishStoryRoute('Archivo: entrenamiento completado sin duplicar XP, monedas ni materiales');
   await send(custodian, '.ctudiario historia', 'Diario narrativo: resumen, crónica y decisiones sin cobrar el diario económico');
   await send(custodian, '.ctudiario historia cronica 1', 'Diario narrativo: primeras cuatro misiones con páginas numéricas');
   await send(custodian, '.ctuhistoria diario cronica 2', 'Diario narrativo: siguiente página mediante el alias de Historia');

@@ -1,8 +1,10 @@
 import { equal } from './equality.js';
 import { requireGame } from '../utils/GameError.js';
-import { STORY_CAMPAIGN_ID, isStoryContentVersion, getStoryMission } from '../game/story/catalog.js';
-import { createStoryBattle, resolveStoryAction } from '../game/story/combat.js';
-import { reduceStoryProgress, storyProgressId, storyRewardId } from '../game/story/progress.js';
+import { STORY_CAMPAIGN_ID, isStoryContentVersion, getStoryMission, activeStoryMission, currentStoryStep,
+  storyEncounterFor, storyTitleReward } from '../game/story/catalog.js';
+import { createStoryBattle, resolveStoryAction, storyCombatPolicy } from '../game/story/combat.js';
+import { reduceStoryProgress, completedStoryMission, storyProgressId, storyRewardId } from '../game/story/progress.js';
+import { storyLearningDefeats, storyBattleContext } from '../game/story/battlePolicy.js';
 import { storyUnitSnapshot } from '../game/story/snapshot.js';
 import { effectiveUnitStats, displayUnitCharacterName } from '../game/evolution/rules.js';
 import { advancedAttack } from '../game/battle/combatContent.js';
@@ -30,7 +32,8 @@ const sameRefs = (refs, snapshots) => equal(refs, snapshots.map(snapshot => ({ u
 function battleHistory(record) {
   const original = record.combat;
   let combat = createStoryBattle({ id: record.id, encounterId: original.encounterId,
-    units: original.unitSnapshots, now: record.createdAt, version: original.version });
+    units: original.unitSnapshots, now: record.createdAt, version: original.version,
+    ...(original.version >= 3 ? { learning: { defeats: original.learning?.defeats, required: original.learning?.required }, context: original.context } : {}) });
   const prefixes = [combat];
   for (const action of original.actions) {
     combat = resolveStoryAction(combat, { action: action.action, choice: action.choice,
@@ -41,6 +44,23 @@ function battleHistory(record) {
   return prefixes;
 }
 
+function checkCommunity(state, action, previous) {
+  if (action.contentVersion < 3) return;
+  if (action.kind !== 'contribute') { check(action.community === null, 'noCommunity'); return; }
+  const community = action.community, mission = activeStoryMission(previous), step = currentStoryStep(mission, previous);
+  check(community && equal(Object.keys(community), ['objective', 'mode', 'clanId', 'clanActionId']) &&
+    previous.stage === 'community' && community.objective === step?.communityObjective &&
+    ['solo','clan'].includes(community.mode), 'communityDefinition');
+  if (community.mode === 'solo') { check(community.clanId === null && community.clanActionId === null, 'soloCommunity'); return; }
+  const receipt = state.accionesclan.records.find(row => row.id === community.clanActionId);
+  check(previous.decisions.community_route === 'clan' && receipt?.clanId === community.clanId &&
+    receipt.after?.status === 'active' && receipt.after.members.some(member => member.userId === action.userId) &&
+    Date.parse(receipt.createdAt) <= Date.parse(action.createdAt), 'communityClanAuthority');
+  const index = state.accionesclan.records.indexOf(receipt);
+  const following = state.accionesclan.records.slice(index + 1).find(row => row.clanId === community.clanId);
+  check(!following || Date.parse(following.createdAt) >= Date.parse(action.createdAt), 'communityClanDate');
+}
+
 export function validateStoryData(state) {
   const users = mapOf(state.usuarios.records), units = mapOf(state.unidades.records);
   const characters = mapOf(state.personajes.records), attacks = mapOf(state.ataques.records);
@@ -48,9 +68,11 @@ export function validateStoryData(state) {
   const histories = new Map(), activeUnits = new Set(), activeUsers = new Set();
   for (const battle of battles.values()) {
     const mission = getStoryMission(battle.missionId, battle.contentVersion);
+    const step = battle.contentVersion >= 3 && mission?.kind === 'sequence' ? mission.steps.find(value => value.id === battle.stepId) : null;
     check(/^STB-[a-f0-9-]{36}$/.test(battle.id) && users.has(battle.userId) && validCampaign(battle) &&
-      integer(battle.run, 1) && mission?.encounterId === battle.combat?.encounterId && battle.combat.version === battle.contentVersion &&
+      integer(battle.run, 1) && (step?.encounterId ?? mission?.encounterId) === battle.combat?.encounterId && battle.combat.version === battle.contentVersion &&
       date(battle.createdAt) && date(battle.updatedAt) && Date.parse(battle.updatedAt) >= Date.parse(battle.createdAt), 'battleMetadata');
+    if (battle.contentVersion >= 3) check(mission.kind === 'sequence' ? Boolean(step) : battle.stepId === null, 'battleStepId');
     const prefixes = battleHistory(battle); histories.set(battle.id, prefixes);
     check(battle.status === battle.combat.status && battle.updatedAt === battle.combat.updatedAt, 'battleStatus');
     check(battle.status === 'active' ? battle.closedAt === null && battle.closeReason === null :
@@ -108,19 +130,31 @@ export function validateStoryData(state) {
       action.kind === 'choose' ? equal(Object.keys(request), ['choice']) && typeof request.choice === 'string' :
       action.kind === 'act' ? equal(Object.keys(request), ['action', 'choice']) && typeof request.action === 'string' &&
         (request.choice === null || typeof request.choice === 'string') :
-      ['start', 'continue', 'retry', 'reset', 'upgrade'].includes(action.kind) && equal(request, {})), 'request');
+      ['optional','trial'].includes(action.kind) && action.contentVersion >= 3 ? equal(Object.keys(request), ['code']) && text(request.code) :
+      ['start', 'continue', 'retry', 'reset', 'upgrade', ...(action.contentVersion >= 3 ? ['return','contribute'] : [])].includes(action.kind) && equal(request, {})), 'request');
     check(!previous || action.kind === 'upgrade' || action.contentVersion === previous.contentVersion, 'actionContentVersion');
-    if (action.kind === 'upgrade') check(previous?.contentVersion === 1 && action.contentVersion === 2 &&
-      action.operationKey === `story-upgrade:${storyProgressId(action.userId)}:1:2`, 'upgradeAuthority');
+    if (action.kind === 'upgrade') check(previous && previous.contentVersion < action.contentVersion &&
+      (action.contentVersion === 2 ? previous.contentVersion === 1 : action.contentVersion === 3 && [1,2].includes(previous.contentVersion)) &&
+      action.operationKey === `story-upgrade:${storyProgressId(action.userId)}:${previous.contentVersion}:${action.contentVersion}`, 'upgradeAuthority');
+    checkCommunity(state, action, previous);
     const battle = action.battleId ? battles.get(action.battleId) : null;
     const prefix = battle && integer(action.battleActionSeq, 1) ? histories.get(battle.id)[action.battleActionSeq] : null;
     if (battle) {
       check(battle.userId === action.userId && battle.run === (previous?.run ?? 1) &&
-        battle.missionId === getStoryMission(previous?.missionIndex, previous?.contentVersion)?.id, 'actionBattleOwner');
+        battle.missionId === activeStoryMission(previous)?.id, 'actionBattleOwner');
       if (action.battleActionSeq === null) {
         check(['choose', 'continue', 'retry'].includes(action.kind) && action.contentVersion === battle.contentVersion &&
           !creations.has(battle.id) && battle.createdAt === action.createdAt &&
           (action.kind === 'retry' ? previous?.stage === 'defeated' : !['battle', 'defeated'].includes(previous?.stage)), 'battleStart');
+        if (battle.contentVersion >= 3) {
+          const mission = activeStoryMission(previous), step = currentStoryStep(mission, previous);
+          const closed = [...battles.values()].filter(row => creations.has(row.id) && row.status !== 'active' &&
+            row.combat.actions.length > 0 && stepCounts.get(row.id) === row.combat.actions.length);
+          const defeats = storyLearningDefeats(closed, { userId: action.userId, run: previous.run, missionId: mission.id, encounterId: battle.combat.encounterId });
+          check(battle.stepId === (step?.id ?? null) && battle.combat.encounterId === storyEncounterFor(mission, previous) &&
+            battle.combat.learning.defeats === defeats && battle.combat.learning.required === storyCombatPolicy(battle.combat.encounterId).requiredDefeats &&
+            equal(battle.combat.context, storyBattleContext(previous, step)), 'battleLearningAuthority');
+        }
         creations.add(battle.id);
       } else {
         const step = battle.combat.actions[action.battleActionSeq - 1], key = `${battle.id}:${action.battleActionSeq}`;
@@ -136,8 +170,8 @@ export function validateStoryData(state) {
       (!previous?.activeBattleId || action.kind === 'upgrade'), 'missingBattle');
     const expected = reduceStoryProgress(previous, action, prefix);
     check(equal(action.after, expected) && action.run === expected.run && Array.isArray(action.unitRefs), 'progressReplay');
-    const mission = previous ? getStoryMission(previous.missionIndex, action.contentVersion) : null;
-    const completed = previous && expected.missionIndex === previous.missionIndex + 1;
+    const mission = completedStoryMission(previous, expected, action);
+    const completed = Boolean(mission);
     if (completed) {
       const id = storyRewardId(action.userId, mission.id), reward = rewards.get(id);
       check(action.rewardId === id && reward, 'completionReward');
@@ -146,7 +180,7 @@ export function validateStoryData(state) {
         check(reward.actionId === action.id && reward.contentVersion === action.contentVersion &&
           reward.createdAt === action.createdAt && reward.run === expected.run &&
           (mission.reward.unitXp === 0 ? action.unitRefs.length === 0 : action.unitRefs.length >= 1 && action.unitRefs.length <= 3) &&
-          (!battle || sameRefs(action.unitRefs, battle.combat.unitSnapshots)), 'firstReward');
+          (mission.reward.unitXp === 0 || !battle || sameRefs(action.unitRefs, battle.combat.unitSnapshots)), 'firstReward');
       } else check(action.unitRefs.length === 0, 'replayedReward');
     } else check(action.rewardId === null && action.unitRefs.length === 0, 'unearnedReward');
     chains.set(action.userId, expected);
@@ -161,6 +195,8 @@ export function validateStoryData(state) {
       ['coins', 'userXp', 'unitXp', 'materials', 'memory'].every(key => equal(reward[key], mission.reward[key])) &&
       Array.isArray(reward.unitRewards) && reward.unitRewards.length === action.unitRefs.length &&
       new Set(action.unitRefs.map(ref => ref.unitId)).size === action.unitRefs.length, 'rewardDefinition');
+    check(reward.contentVersion >= 3 ? equal(reward.titleReward, storyTitleReward(mission, action.after.decisions)) :
+      reward.titleReward === undefined, 'rewardTitle');
     for (let index = 0; index < action.unitRefs.length; index++) {
       const ref = action.unitRefs[index], grant = reward.unitRewards[index];
       check(units.has(ref.unitId) && integer(ref.ownershipVersion) && ownerAt(state, ref.unitId, ref.ownershipVersion) === action.userId &&
@@ -182,8 +218,16 @@ export function validateStoryTransition(before, after, context = {}) {
     const user = before.usuarios.records.find(user => user.id === row.userId);
     check(user && Date.parse(row.createdAt) >= Date.parse(user.updatedAt) &&
       (!context.now || Date.parse(row.createdAt) <= Date.parse(context.now)), 'trustedClock');
-    if (row.kind === 'continue' && getStoryMission(row.before?.missionIndex, row.contentVersion)?.kind === 'starter')
+    if (row.kind === 'continue' && activeStoryMission(row.before)?.kind === 'starter')
       check(before.unidades.records.some(unit => unit.ownerId === row.userId), 'starterAuthority');
+    if (row.kind === 'contribute') {
+      const clan = row.before.decisions.community_route === 'clan' && before.clanes.records.find(value =>
+        value.status === 'active' && value.members.some(member => member.userId === row.userId));
+      const receipt = clan && before.accionesclan.records.filter(value => value.clanId === clan.id).at(-1);
+      check(clan ? row.community?.mode === 'clan' && row.community.clanId === clan.id &&
+        receipt?.id === row.community.clanActionId : row.community?.mode === 'solo' &&
+        row.community.clanId === null && row.community.clanActionId === null, 'communityCurrentClan');
+    }
   }
   for (const progress of after.historias.records) {
     const previous = before.historias.records.find(row => row.id === progress.id);
@@ -197,9 +241,18 @@ export function validateStoryTransition(before, after, context = {}) {
       check(previous.status === 'active' && battle.combat.actions.length === previous.combat.actions.length + 1 &&
         equal(previous.combat.actions, battle.combat.actions.slice(0, previous.combat.actions.length)) &&
         equal(previous.combat.unitSnapshots, battle.combat.unitSnapshots) &&
-        ['userId', 'campaignId', 'contentVersion', 'run', 'missionId', 'createdAt'].every(key => equal(previous[key], battle[key])), 'battleAppendOnly');
+        ['userId', 'campaignId', 'contentVersion', 'run', 'missionId', 'stepId', 'createdAt'].every(key => equal(previous[key], battle[key])) &&
+        equal(previous.combat.learning, battle.combat.learning) && equal(previous.combat.context, battle.combat.context), 'battleAppendOnly');
     } else {
       check(battle.status === 'active' && battle.combat.actions.length === 0, 'newBattle');
+      if (battle.contentVersion >= 3) {
+        const mission = activeStoryMission(action.before), step = currentStoryStep(mission, action.before);
+        const defeats = storyLearningDefeats(before.combateshistoria.records, { userId: battle.userId, run: battle.run,
+          missionId: battle.missionId, encounterId: battle.combat.encounterId });
+        check(battle.stepId === (step?.id ?? null) && battle.combat.learning.defeats === defeats &&
+          battle.combat.learning.required === storyCombatPolicy(battle.combat.encounterId).requiredDefeats &&
+          equal(battle.combat.context, storyBattleContext(action.before, step)), 'currentBattleLearning');
+      }
       const user = before.usuarios.records.find(row => row.id === battle.userId);
       const ids = battle.combat.unitSnapshots.map(unit => unit.id);
       check(user.team.length ? equal(user.team, ids) : ids.length === 1, 'expeditionSelection');
@@ -223,7 +276,9 @@ export function validateStoryTransition(before, after, context = {}) {
       check(unit && unit.ownerId === reward.userId && unit.ownershipVersion === grant.ownershipVersion &&
         Date.parse(reward.createdAt) >= Date.parse(unit.updatedAt) && equal(grant.progressBefore, unit.progress) &&
         (expiredStoredLock(before, after, unit, reward.createdAt) || unit.lock?.type === 'story' && unit.lock.referenceId === action.battleId &&
-          after.combateshistoria.records.find(row => row.id === action.battleId)?.status === 'won'), 'rewardCurrentOwner');
+          (() => { const battle = after.combateshistoria.records.find(row => row.id === action.battleId);
+            const step = currentStoryStep(activeStoryMission(action.before), action.before);
+            return battle?.status === 'won' || battle?.status === 'lost' && step?.acceptDefeat && battle.combat.finishReason !== 'surrender'; })()), 'rewardCurrentOwner');
     }
   }
   for (const unit of before.unidades.records) {

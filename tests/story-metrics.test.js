@@ -5,12 +5,30 @@ import path from 'node:path';
 import { setup, register } from './helpers.js';
 import { COLLECTIONS } from '../storage/validation.js';
 import { analyzeStoryProgress, analyzeStoryMessages, storyPreviewMessages } from '../game/story/metrics.js';
-import { storyMissions } from '../game/story/catalog.js';
+import { storyMissions, STORY_TRIALS } from '../game/story/catalog.js';
 import { runStoryMetrics } from '../scripts/story-metrics.js';
 
 const NOW = '2026-10-20T12:00:00.000Z';
 const OLD = '2026-10-17T12:00:00.000Z';
 const FIRST = storyMissions(1)[0].id, TUTORIAL = storyMissions(1)[2].id;
+
+test('season metrics keep the main ending complete while a trial is active and separate forced reconnaissance', () => {
+  const trial = STORY_TRIALS[0];
+  const progress = [{ userId: 'private-season', contentVersion: 3, status: 'playing', missionIndex: 32,
+    activityId: trial.id, updatedAt: OLD, completedMissionIds: storyMissions(3).map(mission => mission.id), completedActivityIds: [] }];
+  const battles = [
+    { id: 'scout', userId: 'private-season', missionId: storyMissions(3)[28].id, status: 'lost', closeReason: 'lost', combat: { learning: { scouting: true }, finishReason: 'knockout' } },
+    { id: 'retreat', userId: 'private-season', missionId: storyMissions(3)[28].id, status: 'lost', closeReason: 'lost', combat: { learning: { scouting: true }, finishReason: 'surrender' } },
+    { id: 'trial', userId: 'private-season', missionId: trial.id, status: 'active', closeReason: null, combat: { learning: { scouting: false } } }
+  ];
+  const report = analyzeStoryProgress({ progress, battles, now: NOW });
+  assert.equal(report.players.currentSliceComplete, 1); assert.equal(report.players.pending, 0);
+  assert.equal(report.players.inactivePending, 0);
+  assert.equal(report.byContentVersion[2].availableMissions, 32);
+  assert.equal(report.missions.find(mission => mission.code === trial.code).currentPlayers, 1);
+  assert.deepEqual(report.reconnaissance, { attempts: 2, defeats: 1, withdrawals: 1 });
+  assert.doesNotMatch(JSON.stringify(report), /private-season|userId/);
+});
 
 test('story metrics count unique players and mission completions across resets while separating legacy slices', () => {
   const resetUser = { userId: 'private-a', contentVersion: 2, status: 'playing', missionIndex: 2,

@@ -6,9 +6,11 @@ import { expireListings } from '../market/lifecycle.js';
 import { expireTrades } from '../trades/lifecycle.js';
 import { validContentKey } from '../content/rewards.js';
 import { STORY_CAMPAIGN_ID, STORY_CAMPAIGN_TITLE, STORY_CONTENT_VERSION, STORY_TRACES,
-  STORY_MEMORIES, getStoryMission, storyScene, storyMissions, storyChapters, isStoryContentVersion } from './catalog.js';
-import { createStoryBattle, resolveStoryAction, storyBattleView, STORY_COMBAT_VERSION } from './combat.js';
-import { reduceStoryProgress, storyProgressId, storyRewardId } from './progress.js';
+  STORY_MEMORIES, STORY_SIDE_MISSIONS, STORY_TRIALS, STORY_ENDINGS, activeStoryMission, currentStoryStep, storyEncounterFor,
+  getStoryMission, storyScene, storyMissions, storyChapters, isStoryContentVersion } from './catalog.js';
+import { createStoryBattle, resolveStoryAction, storyBattleView, storyCombatPolicy } from './combat.js';
+import { reduceStoryProgress, completedStoryMission, storyProgressId, storyRewardId } from './progress.js';
+import { storyLearningDefeats, storyBattleContext, isLearningDefeat } from './battlePolicy.js';
 import { rewardStoryMission } from './rewards.js';
 import { storyUnitSnapshot } from './snapshot.js';
 import { displayUnitCharacterName } from '../evolution/rules.js';
@@ -38,7 +40,7 @@ async function expedition(repos, userId, now, { lockedBattleId = null } = {}) {
 }
 const references = units => units.map(unit => ({ unitId: unit.id, ownershipVersion: unit.ownershipVersion }));
 
-async function startBattle(repos, userId, mission, run, now, contentVersion) {
+async function startBattle(repos, userId, mission, progress, now, contentVersion) {
   const units = await expedition(repos, userId, now), snapshots = [];
   for (const unit of units) {
     const character = await repos.characters.get(unit.characterId);
@@ -46,12 +48,25 @@ async function startBattle(repos, userId, mission, run, now, contentVersion) {
     snapshots.push(storyUnitSnapshot(unit, character, attacks));
   }
   const id = `STB-${randomUUID()}`;
-  const combat = createStoryBattle({ id, encounterId: mission.encounterId, units: snapshots, now,
-    version: contentVersion === 1 ? 1 : STORY_COMBAT_VERSION });
-  const record = { id, userId, campaignId: STORY_CAMPAIGN_ID, contentVersion, run,
+  const encounterId = storyEncounterFor(mission, progress), step = currentStoryStep(mission, progress);
+  const learning = contentVersion >= 3 ? { defeats: storyLearningDefeats(await repos.storyBattles.filterBy('userId', userId),
+    { userId, run: progress.run, missionId: mission.id, encounterId }), required: storyCombatPolicy(encounterId).requiredDefeats } : undefined;
+  const combat = createStoryBattle({ id, encounterId, units: snapshots, now, version: contentVersion,
+    ...(contentVersion >= 3 ? { learning, context: storyBattleContext(progress, step) } : {}) });
+  const record = { id, userId, campaignId: STORY_CAMPAIGN_ID, contentVersion, run: progress.run,
+    ...(contentVersion >= 3 ? { stepId: step?.id ?? null } : {}),
     missionId: mission.id, status: combat.status, createdAt: now, updatedAt: now, closedAt: null, closeReason: null, combat };
   for (const unit of units) await repos.units.replace({ ...unit, lock: { type: 'story', referenceId: id }, updatedAt: now });
   await repos.storyBattles.insert(record); return record;
+}
+function presentBattle(record) {
+  const result = storyBattleView(record.combat);
+  if (record.combat.version >= 3 && isLearningDefeat(record)) {
+    const defeats = result.learning.defeats + 1;
+    result.learning = { ...result.learning, defeats, remaining: Math.max(0, result.learning.required - defeats),
+      scouting: defeats < result.learning.required, attemptWasScouting: result.learning.scouting };
+  }
+  return result;
 }
 async function unlock(repos, battle, now) {
   for (const snapshot of battle.combat.unitSnapshots) {
@@ -63,9 +78,11 @@ async function unlock(repos, battle, now) {
 async function savedView(repos, userId, extras = {}, availableVersion = STORY_CONTENT_VERSION) {
   const user = await registeredUser(repos, userId), progress = await repos.storyProgress.get(storyProgressId(userId));
   const version = progress?.contentVersion ?? availableVersion;
-  const definition = progress ? getStoryMission(progress.missionIndex, version) : null;
+  const definition = activeStoryMission(progress), step = currentStoryStep(definition, progress ?? {});
   const mission = definition ? { ...definition, chapterTitle: storyChapters(version).find(chapter => chapter.id === definition.chapterId)?.title,
-    choices: progress.stage === 'choice' ? definition.choices : [], scene: storyScene(definition, progress.decisions, progress.sceneStep ?? 0) } : null;
+    choices: progress.stage === 'choice' ? step?.choices ?? definition.choices : [],
+    ...(step ? { stepNumber: progress.sceneStep + 1, stepCount: definition.steps.length, communityObjective: step.communityObjective ?? null } : {}),
+    encounterId: storyEncounterFor(definition, progress), scene: storyScene(definition, progress.decisions, progress.sceneStep ?? 0) } : null;
   const record = progress?.activeBattleId || progress?.stage === 'defeated' ? await repos.storyBattles.get(progress.activeBattleId ?? progress.lastBattleId) : null;
   const team = [];
   for (const unitId of user.team) {
@@ -74,9 +91,14 @@ async function savedView(repos, userId, extras = {}, availableVersion = STORY_CO
       characterName: character.name, level: unit.progress.level, progress: unit.progress, locked: unit.lock !== null });
   }
   return { campaign: { id: STORY_CAMPAIGN_ID, title: STORY_CAMPAIGN_TITLE, contentVersion: version,
-    missionCount: storyMissions(version).length, availableMissionCount: storyMissions(availableVersion).length },
+    missionCount: storyMissions(version).length, availableMissionCount: storyMissions(availableVersion).length,
+    ...(version >= 3 ? { finishStage: 'season' } : {}) },
     nextContentAvailable: Boolean(progress && version < availableVersion), progress, mission, team,
-    battle: record ? storyBattleView(record.combat) : null, reward: null, ...extras };
+    route: { kind: progress?.activityId ? definition?.code.startsWith('PRUEBA-') ? 'trial' : 'optional' : 'main', code: definition?.code ?? null, title: definition?.title ?? null },
+    returnAvailable: Boolean(progress?.activityId && !progress.activeBattleId),
+    seasonComplete: version >= 3 && progress?.missionIndex === storyMissions(version).length,
+    ending: STORY_ENDINGS[progress?.decisions.archive_ending] ?? null,
+    battle: record ? presentBattle(record) : null, reward: null, ...extras };
 }
 
 export function createStoryService(storage, clock, randomRoll = () => randomInt(100), { contentVersion = STORY_CONTENT_VERSION } = {}) {
@@ -85,7 +107,8 @@ export function createStoryService(storage, clock, randomRoll = () => randomInt(
   async function mutate({ userId, operationKey, ...request }, kind) {
     validContentKey(operationKey);
     const normalized = kind === 'choose' ? { choice: String(request.choice ?? '') } : kind === 'act' ?
-      { action: request.action, choice: request.choice == null ? null : String(request.choice) } : {};
+      { action: request.action, choice: request.choice == null ? null : String(request.choice) } :
+      ['optional','trial'].includes(kind) ? { code: String(request.code ?? '').trim().toUpperCase() } : {};
     const outcome = await storage.withTransaction(async repos => {
       const user = await registeredUser(repos, userId);
       const replay = await repos.storyActions.findBy('operationKey', operationKey);
@@ -102,22 +125,25 @@ export function createStoryService(storage, clock, randomRoll = () => randomInt(
         const upgrade = { id: `STA-${randomUUID()}`, userId, campaignId: STORY_CAMPAIGN_ID, contentVersion,
           run: before.run, kind: 'upgrade', request: {}, operationKey: `story-upgrade:${before.id}:${before.contentVersion}:${contentVersion}`,
           createdAt: now, before, after: null, battleId: null, battleActionSeq: null, unitRefs: [], rewardId: null };
+        if (contentVersion >= 3) upgrade.community = null;
         upgrade.after = reduceStoryProgress(before, upgrade);
         await repos.storyProgress.replace(upgrade.after); await repos.storyActions.insert(upgrade);
         return { upgradedStory: true };
       }
       requireGame(!before || before.contentVersion === contentVersion, 'STORY_INVALID_ACTION');
       await refreshLocks(repos, now);
-      const mission = before ? getStoryMission(before.missionIndex, contentVersion) : null;
+      const mission = activeStoryMission(before), step = currentStoryStep(mission, before ?? {});
       let battle = null, units = [];
       if (kind !== 'start' && kind !== 'reset') requireGame(before, 'STORY_NOT_STARTED');
       if (kind === 'continue' && mission?.kind === 'starter') {
         requireGame((await repos.units.getByOwner(userId)).length > 0, 'STORY_STARTER_REQUIRED');
       }
       const begin = (kind === 'retry' && before?.stage === 'defeated') ||
-        (kind === 'continue' && before?.stage === 'ready' && mission?.encounterId) ||
-        (kind === 'choose' && before?.stage === 'choice' && mission?.choices.some(c => c.id === normalized.choice) && mission.encounterId);
-      if (begin) battle = await startBattle(repos, userId, mission, before.run, now, contentVersion);
+        (kind === 'continue' && before?.stage === 'ready' && storyEncounterFor(mission, before)) ||
+        (kind === 'choose' && before?.stage === 'choice' && (step?.choices ?? mission?.choices ?? []).some(c => c.id === normalized.choice) &&
+          storyEncounterFor(mission, { ...before, decisions: { ...before.decisions,
+            [(step?.choices ?? mission.choices).find(c => c.id === normalized.choice).key]: (step?.choices ?? mission.choices).find(c => c.id === normalized.choice).value } }));
+      if (begin) battle = await startBattle(repos, userId, mission, before, now, contentVersion);
       let sequence = null;
       if (kind === 'act' || kind === 'reset' && before?.activeBattleId) {
         const id = before?.activeBattleId; requireGame(id, 'STORY_BATTLE_NOT_ACTIVE');
@@ -145,10 +171,17 @@ export function createStoryService(storage, clock, randomRoll = () => randomInt(
       const action = { id: `STA-${randomUUID()}`, userId, campaignId: STORY_CAMPAIGN_ID, contentVersion,
         run: before?.run ?? 1, kind, request: normalized, operationKey, createdAt: now,
         before, after: null, battleId: battle?.id ?? null, battleActionSeq: sequence, unitRefs: [], rewardId: null };
+      if (contentVersion >= 3) action.community = null;
+      if (kind === 'contribute') {
+        requireGame(before?.stage === 'community' && step?.communityObjective, 'STORY_CONTRIBUTION_REQUIRED');
+        const clan = before.decisions.community_route === 'clan' ? (await repos.clans.all()).find(clan => clan.status === 'active' && clan.members.some(member => member.userId === userId)) : null;
+        const clanAction = clan ? await repos.clanActions.lastBy('clanId', clan.id) : null;
+        action.community = { objective: step.communityObjective, mode: clan ? 'clan' : 'solo', clanId: clan?.id ?? null, clanActionId: clanAction?.id ?? null };
+      }
       action.after = reduceStoryProgress(before, action, battle?.combat ?? null);
       action.run = action.after.run;
       let reward = null;
-      const completed = before && action.after.missionIndex === before.missionIndex + 1;
+      const completed = completedStoryMission(before, action.after, action);
       if (completed) {
         const previousReward = await repos.storyRewards.get(storyRewardId(userId, mission.id));
         if (!previousReward && mission.reward.unitXp > 0) {
@@ -156,13 +189,18 @@ export function createStoryService(storage, clock, randomRoll = () => randomInt(
           else units = await expedition(repos, userId, now);
           action.unitRefs = references(units);
         }
-        reward = await rewardStoryMission(repos, { userId, mission, actionId: action.id, run: action.after.run, unitRefs: action.unitRefs, now, contentVersion });
+        reward = await rewardStoryMission(repos, { userId, mission, actionId: action.id, run: action.after.run, unitRefs: action.unitRefs, now, contentVersion, decisions: action.after.decisions });
         action.rewardId = reward.id;
       }
       if (before) await repos.storyProgress.replace(action.after); else await repos.storyProgress.insert(action.after);
       await repos.storyActions.insert(action);
+      const community = action.community ? { ...action.community, contributors: new Set((await repos.storyActions.filterBy('kind', 'contribute'))
+        .filter(row => row.community?.objective === action.community.objective && row.community.clanId === action.community.clanId &&
+          (action.community.clanId || row.userId === userId)).map(row => row.userId)).size } : null;
       return view(repos, userId, { reward, alreadyProcessed: false, consequence: action.after.lastConsequence,
-        ...(kind === 'act' && battle?.status === 'won' ? { battle: storyBattleView(battle.combat) } : {}) });
+        ...(community ? { community } : {}),
+        ...(kind === 'act' && battle?.status !== 'active' && action.after.stage !== 'defeated'
+          ? { battle: { ...presentBattle(battle), acceptedDefeat: battle.status === 'lost' && Boolean(step?.acceptDefeat) } } : {}) });
     });
     if (outcome.upgradedStory) return mutate({ userId, operationKey, ...request }, kind);
     return outcome;
@@ -171,18 +209,51 @@ export function createStoryService(storage, clock, randomRoll = () => randomInt(
     getState: ({ userId }) => storage.withRead(repos => view(repos, userId)),
     start: args => mutate(args, 'start'), continue: args => mutate(args, 'continue'), choose: args => mutate(args, 'choose'),
     act: args => mutate(args, 'act'), retry: args => mutate(args, 'retry'), reset: args => mutate(args, 'reset'),
+    startOptional: args => mutate(args, 'optional'), returnToMain: args => mutate(args, 'return'),
+    startTrial: ({ number, ...args }) => mutate({ ...args, code: `PRUEBA-${number}` }, 'trial'), contribute: args => mutate(args, 'contribute'),
+    getOptionals: ({ userId }) => storage.withRead(async repos => {
+      const state = await view(repos, userId), progress = state.progress;
+      return { missions: STORY_SIDE_MISSIONS.map(mission => ({ code: mission.code, title: mission.title,
+        status: progress?.completedActivityIds?.includes(mission.id) ? 'complete' : progress?.completedMissionIds.includes(mission.afterMissionId) ? 'available' : 'locked' })) };
+    }),
+    getTrials: ({ userId }) => storage.withRead(async repos => {
+      const state = await view(repos, userId);
+      return { trials: STORY_TRIALS.map(trial => ({ number: trial.number, title: trial.title,
+        available: state.seasonComplete, completed: state.progress?.completedActivityIds?.includes(trial.id) ?? false })) };
+    }),
+    getScenes: ({ userId, code, page = 1 }) => storage.withRead(async repos => {
+      await registeredUser(repos, userId);
+      const reward = (await repos.storyRewards.filterBy('userId', userId)).find(row => row.missionCode === String(code).trim().toUpperCase());
+      requireGame(reward, 'STORY_SCENE_LOCKED');
+      const definition = getStoryMission(reward.missionId, reward.contentVersion), action = await repos.storyActions.get(reward.actionId);
+      const totalPages = definition.steps?.length ?? (definition.kind === 'investigation' ? 3 : 1);
+      requireGame(Number.isSafeInteger(page) && page >= 1 && page <= totalPages, 'PAGE_NOT_FOUND');
+      return { mission: { code: definition.code, title: definition.title }, page, totalPages,
+        scene: storyScene(definition, action.after.decisions, page - 1) };
+    }),
     getJournal: ({ userId }) => storage.withRead(async repos => {
       const state = await view(repos, userId), progress = state.progress;
       if (!progress) return { summary: 'Bao te espera en la Plaza del Archivo. Inicia tu historia para abrir el diario.', chronicle: [], characters: [], traces: [], decisions: [], memories: [], atlas: [] };
       const missions = storyMissions(progress.contentVersion), chapters = storyChapters(progress.contentVersion);
       const seen = missions.slice(0, Math.min(progress.missionIndex + 1, missions.length));
-      const choices = seen.flatMap(m => m.choices.filter(c => progress.decisions[c.key] === c.value).map(c => ({ title: m.title, text: `${c.label}. ${c.consequence}` })));
+      const optionalSeen = STORY_SIDE_MISSIONS.filter(m => progress.completedActivityIds?.includes(m.id) || progress.activityId === m.id);
+      const chosen = new Map();
+      for (const action of await repos.storyActions.filterBy('userId', userId)) {
+        if (action.run !== progress.run || action.kind !== 'choose') continue;
+        const definition = activeStoryMission(action.before), step = currentStoryStep(definition, action.before);
+        const choice = (step?.choices ?? definition?.choices ?? []).find(choice => choice.id === action.request.choice);
+        if (!choice || progress.decisions[choice.key] !== choice.value) continue;
+        chosen.delete(choice.key);
+        chosen.set(choice.key, { title: definition.title, text: `${choice.label}. ${choice.consequence}` });
+      }
+      const choices = [...chosen.values()];
       return { summary: progress.status === 'complete' ? progress.contentVersion === 1
         ? 'Has superado el prólogo y la primera expedición del bosque. El claro te espera cuando continúes la historia.'
-        : 'Has restaurado al Guardián y desenmascarado al Mercader Sin Rostro. Conservas dos Trazos; el viaje hacia el Puente de los Espejos continúa en la próxima fase.'
+        : progress.contentVersion === 2 ? 'Has restaurado al Guardián y desenmascarado al Mercader Sin Rostro. Conservas dos Trazos; el viaje hacia el Puente de los Espejos continúa en la próxima fase.'
+        : `Has reunido los cinco Trazos y terminado la temporada. ${state.ending?.summary ?? ''} El Archivo Abierto conserva tus recuerdos.`
         : `Continúas ${state.mission.code}: ${state.mission.title}. Tu avance y tus decisiones están guardados.`,
-        chronicle: seen.filter(m => progress.completedMissionIds.includes(m.id)).map(m => ({ title: `${m.code} · ${m.title}`,
-          text: progress.contentVersion >= 2 && m.completionScene?.length ? m.completionScene.join(' ') : m.scene[0] })),
+        chronicle: [...seen.filter(m => progress.completedMissionIds.includes(m.id)),...optionalSeen.filter(m => progress.completedActivityIds?.includes(m.id))].map(m => ({ title: `${m.code} · ${m.title}`,
+          text: progress.contentVersion >= 2 && m.completionScene?.length ? m.completionScene.join(' ') : (m.scene ?? m.steps?.[0].scene)[0] })),
         characters: [{ title: 'Maestro Bao', text: 'Mentor y antiguo guardián del Archivo. Te ayuda a comprender a tus compañeros.' },
           ...(progress.missionIndex >= 3 ? [{ title: 'Lian', text: 'Investiga los nombres borrados y recuerda cómo tratas a los Ecos.' }] : []),
           ...(progress.contentVersion >= 2 && progress.missionIndex >= 7 ? [{ title: 'Guardiana Nube', text: 'Reconoce los símbolos que la tinta dejó en el bosque.' }] : []),
@@ -193,7 +264,10 @@ export function createStoryService(storage, clock, randomRoll = () => randomInt(
             ? [{ title: 'Tao', text: 'Aprendiz de mensajero y testigo de las entregas sin firma del mercado.' }] : []),
           ...(progress.contentVersion >= 2 && progress.missionIndex >= 12 ? [{ title: 'Señora Yun', text: 'Restaura tejidos y registros dañados para devolver sus nombres.' }] : []),
           ...(progress.contentVersion >= 2 && progress.missionIndex >= 13 ? [{ title: 'Mercader Sin Rostro', text: progress.completedMissionIds.includes('mercader_sin_rostro')
-            ? 'Vendía identidades incompletas entre señuelos. Sus registros revelaron a un antiguo protector del Archivo.' : 'Oculta el original entre invocaciones que prometen poder sin historia.' }] : [])],
+            ? 'Vendía identidades incompletas entre señuelos. Sus registros revelaron a un antiguo protector del Archivo.' : 'Oculta el original entre invocaciones que prometen poder sin historia.' }] : []),
+          ...(progress.contentVersion >= 3 && progress.missionIndex >= 14 ? [{ title: 'Huan', text: progress.decisions.rival_response === 'forgive' ? 'Tu rival aceptó un vínculo de confianza. Acude al Archivo como aliado.' : 'Rival del Puente de los Espejos. Elige su lugar con libertad.' }] : []),
+          ...(progress.missionIndex >= 19 ? [{ title: 'Ren', text: 'Ayuda a las Casas a escuchar sus diferencias y a proteger a quienes no llevan enseña.' }] : []),
+          ...(progress.missionIndex >= 24 ? [{ title: 'El Archivista', text: 'Antiguo compañero de Bao. Confunde la conservación de la memoria con el control de las decisiones.' }] : [])],
         traces: [{ title: 'Trazos de la Primera Carta', text: `${progress.traces?.length ?? 0} de 5 recuperados.` },
           ...STORY_TRACES.filter(trace => progress.traces?.includes(trace.id)).map(trace => ({ title: trace.title, text: trace.description }))], decisions: choices,
         memories: STORY_MEMORIES.filter(m => progress.memories.includes(m.id)).map(m => ({ title: m.title, text: m.description })),

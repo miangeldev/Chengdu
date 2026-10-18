@@ -1,6 +1,6 @@
 {
   "name": "chengdu-cards",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "private": true,
   "type": "module",
   "engines": { "node": ">=22" },
@@ -14,7 +14,9 @@
     "balance:evolution": "node scripts/simulate-evolution-balance.js",
     "balance:story": "node scripts/simulate-story-balance.js",
     "balance:story:chapters": "node scripts/simulate-story-balance.js --chapters",
+    "balance:story:season": "node scripts/simulate-story-balance.js --season",
     "story:metrics": "node scripts/story-metrics.js",
+    "story:season": "node scripts/story-season-report.js",
     "db:validate": "node scripts/database.js validate",
     "db:unlock": "node scripts/database.js unlock"
   }

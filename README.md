@@ -1,4 +1,4 @@
-# Chengdú Cards — Historia 0.12
+# Chengdú Cards — Historia 0.13
 
 Módulo de juego para un bot de WhatsApp: registro, perfil, catálogo de diez
 personajes, starter único, colección, equipos de hasta tres unidades y combates
@@ -27,6 +27,10 @@ La versión **0.12.0** completa el bosque y el Mercado de los Ecos: **14
 misiones**, Guardián Marchito, Mercader Sin Rostro, investigación con dos pistas
 y los dos primeros Trazos. Reduce un 25% los premios nuevos del tramo inicial,
 conservando los recibos anteriores. [Fases 2 y 3](docs/story-phases-2-3.md).
+La versión **0.13.0** cierra la temporada: 32 misiones principales, cinco Trazos,
+tres resoluciones personales y el título Custodio del Alba. Añade rutas
+opcionales, escenas archivadas, pruebas posteriores y jefes con reconocimientos
+obligatorios anunciados en la interfaz. [Temporada completa](docs/story-season.md).
 Guía: [fases 13–32](docs/fases-13-32.md), [auditoría integral](docs/auditoria-fases-0-32.md)
 y [plan de entrega](docs/plan-fases-13-32.md).
 El balance 0.4.1 distingue la fuerza de las rarezas y limita la emisión global
@@ -71,6 +75,11 @@ no se conectan a WhatsApp ni escriben jugadores de prueba en la base del juego.
 | `.ctuhistoria atacar 1` / `.ctuhistoria defender` | Resolver el turno leyendo la señal del enemigo. |
 | `.ctuhistoria habilidad` / `.ctuhistoria cambiar 2` | Usar una técnica o entrar con reserva. |
 | `.ctuhistoria romper` / `.ctuhistoria observar` | Romper raíces del Guardián o revelar señuelos del Mercader; consumen el turno. |
+| `.ctuhistoria apoyar` / `.ctuhistoria purificar` / `.ctuhistoria proteger` | Curar al equipo, responder a tensión y sellos, o cuidar aliados en peligro. |
+| `.ctuhistoria opcionales` / `.ctuhistoria opcional III-A` | Consultar rutas opcionales y entrar en una disponible. |
+| `.ctuhistoria volver` | Pausar una ruta sin combate y volver a la campaña principal. |
+| `.ctuhistoria escenas III-04 1` | Releer escenas completadas sin cambiar decisiones ni premios. |
+| `.ctuhistoria pruebas` / `.ctuhistoria prueba 1` | Entrenar después del epílogo. |
 | `.ctuhistoria pista` / `.ctuhistoria reintentar` | Consultar la mecánica gratis o volver tras una derrota. |
 | `.ctudiario historia` / `.ctucapitulos` / `.cturecuerdos` | Crónica, progreso y recuerdos, sin reclamar el diario económico. |
 | `.ctudiario historia cronica 2` | Detalle de cuatro entradas por página; también personajes, trazos, decisiones, recuerdos y atlas. |
@@ -723,5 +732,6 @@ Diseño: [fundación 0.1](docs/mvp-0.1.md), [combate 0.2](docs/mvp-0.2.md),
 [competitivo 0.9](docs/beta-0.9.md),
 [historia 0.11](docs/story-phase-1.md),
 [historia 0.12](docs/story-phases-2-3.md),
+[temporada completa 0.13](docs/story-season.md),
 [modelo de datos](docs/database.md) y
 [visión completa](project.md).

@@ -6,11 +6,13 @@ const safe = value => displayName(value ?? '');
 const lines = value => (Array.isArray(value) ? value : [value]).filter(Boolean).map(safe).join('\n');
 const chapterName = mission => {
   const code = mission?.code ?? '';
-  const title = mission?.chapterTitle ?? (code.startsWith('P') ? 'El despertar del Custodio' : code.startsWith('II-') ? 'El Mercado de los Ecos' : 'El Bosque que Olvidó su Voz');
-  return `${code.startsWith('P') ? 'Prólogo' : code.startsWith('II-') ? 'Capítulo II' : 'Capítulo I'} · ${safe(title)}`;
+  const prefix = code.split('-')[0];
+  const titles = { P: 'El despertar del Custodio', I: 'El Bosque que Olvidó su Voz', II: 'El Mercado de los Ecos', III: 'Las Montañas del Espejo', IV: 'Las Casas Divididas', V: 'El Último Nombre', E: 'El Archivo Abierto' };
+  const title = mission?.chapterTitle ?? titles[prefix] ?? 'Diario del Custodio';
+  return `${prefix === 'P' ? 'Prólogo' : prefix === 'E' ? 'Epílogo' : titles[prefix] ? `Capítulo ${prefix}` : 'Archivo'} · ${safe(title)}`;
 };
 const completed = progress => progress?.status === 'complete';
-const phaseLabels = { charge: 'Tinta en concentración', unleash: 'Descarga preparada', exposed: 'Defensas abiertas', roots: 'Barrera de raíces', illusions: 'Señuelos activos', trick_strike: 'Golpe entre sombras' };
+const phaseLabels = { charge: 'Tinta en concentración', unleash: 'Descarga preparada', exposed: 'Defensas abiertas', roots: 'Barrera de raíces', illusions: 'Señuelos activos', trick_strike: 'Golpe entre sombras', reflect: 'Reflejo activo', tension: 'Tensión de la Campana', memory: 'Memoria', control: 'Control', choice: 'Elección', protect: 'Protección' };
 const effectLabels = { poison: '☠️ Veneno', burn: '🔥 Quemadura', stun: '💫 Aturdido', shield: '🛡️ Escudo', regeneration: '💚 Regeneración', attack_up: '⚔️ Ataque aumentado', defense_down: '🛡️ Defensa reducida' };
 const effectsText = unit => (unit.effects ?? []).map(effect => effectLabels[effect.type] ? `${effectLabels[effect.type]}${effect.type === 'shield' ? ` ${effect.potency}` : effect.remaining ? ` ${effect.remaining}T` : ''}` : null).filter(Boolean).join(' · ');
 
@@ -20,8 +22,8 @@ function battleView(battle) {
   const opponent = battle.players.find(value => value.userId === 'echo') ?? battle.players[1];
   const enemy = opponent.units[opponent.activeIndex];
   return {
-    status: battle.status, finishReason: battle.finishReason, round: battle.turnNumber, tutorial: battle.tutorial,
-    encounterId: battle.encounterId, availableActions: battle.availableActions,
+    status: battle.status, finishReason: battle.finishReason, acceptedDefeat: battle.acceptedDefeat, round: battle.turnNumber, tutorial: battle.tutorial,
+    encounterId: battle.encounterId, availableActions: battle.availableActions, learning: battle.learning,
     enemy: { name: enemy.characterName, hp: enemy.hp, maxHp: enemy.stats.hp, intent: battle.enemyIntent?.text, phase: battle.enemyIntent?.type ?? battle.enemyPhase ?? null, mechanics: battle.enemyMechanics ?? null },
     team: player.units.map((unit, index) => ({ slot: index + 1, name: unit.characterName, characterId: unit.characterId,
       hp: unit.hp, maxHp: unit.stats.hp, level: unit.level, active: index === player.activeIndex,
@@ -56,6 +58,7 @@ function rewardText(reward, team = []) {
     if (materialsText) sections.push(`🧩 ${materialsText}`);
   }
   if (reward.memory) sections.push(`📜 Recuerdo: ${safe(reward.memory.title ?? STORY_MEMORIES.find(memory => memory.id === reward.memory)?.title ?? reward.memory)}`);
+  if (reward.titleReward) sections.push(`${reward.titleReward.badge ?? '🏅'} Título: *${safe(reward.titleReward.name)}*`);
   return sections.join('\n') || null;
 }
 
@@ -73,20 +76,32 @@ export function renderStory(result, cmd, { healthBars = true, inspect = false } 
   if (!progress) return card('HISTORIA', [
     '🎋 *El despertar del Custodio*',
     'En Chengdú, las cartas conservan historias. Una tinta desconocida está borrando sus nombres.\nBao te espera bajo el bambú: tu primer vínculo puede cambiar lo que viene.',
-    '📖 Prólogo, Bosque de los Susurros y Mercado de los Ecos.\n💾 Cada escena y turno quedan guardados; puedes volver cuando quieras.'
+    (result.campaign?.missionCount ?? 32) >= 32 ? '📖 Temporada completa: prólogo, cinco capítulos y epílogo.\n💾 Cada escena y turno quedan guardados; puedes volver cuando quieras.' : '📖 Prólogo, Bosque de los Susurros y Mercado de los Ecos.\n💾 Cada escena y turno quedan guardados; puedes volver cuando quieras.'
   ], `👉 *${cmd('ctuhistoria', 'iniciar')}*\n📖 Guía: ${cmd('ctuhistoria', 'ayuda')}`);
 
   const duplicate = result.alreadyProcessed ? '♻️ Este mensaje ya se procesó. Tu progreso sigue guardado.' : null;
   const battle = battleView(result.battle);
-  const missionCount = result.campaign?.missionCount ?? (progress.contentVersion === 2 ? 14 : 7);
-  const body = [duplicate, mission ? `🎋 *${chapterName(mission)}*\n📍 *${safe(mission.code)} · ${safe(mission.title)}*` : null,
+  const missionCount = result.mainMissionCount ?? result.campaign?.missionCount ?? (progress.contentVersion >= 3 ? 32 : progress.contentVersion === 2 ? 14 : 7);
+  const sideRoute = result.route?.kind && result.route.kind !== 'main';
+  const routeFooter = sideRoute && result.returnAvailable ? `↩️ Volver a la campaña: ${cmd('ctuhistoria', 'volver')}` : null;
+  const body = [duplicate, sideRoute ? result.route.kind === 'trial' ? '🏛️ *PRUEBA DEL ARCHIVO*' : '🌿 *MISIÓN OPCIONAL*' : null,
+    mission ? `🎋 *${chapterName(mission)}*\n📍 *${safe(mission.code)} · ${safe(mission.title)}*` : null,
     `📖 Avance: ${completed(progress) ? missionCount : Math.min(missionCount, progress.missionIndex ?? 0)}/${missionCount} misiones`];
+  if (mission?.stepCount) body.push(`📜 *Escena ${mission.stepNumber ?? 1}/${mission.stepCount}*`);
   if (battle?.status !== 'won') body.push(result.consequence ? `🖋️ ${safe(result.consequence)}` : null);
-  if (battle?.status === 'active' || battle?.status === 'lost') {
+  if (result.community) body.push(`🤝 *Aportación guardada*\n${result.community.mode === 'clan' ? 'Tu aportación forma parte de la reconstrucción con tu clan.' : 'La ruta individual conserva la misma progresión principal.'}`);
+  if (battle?.status === 'active' || battle?.status === 'lost' && !battle.acceptedDefeat) {
     if (battle.lastEvents?.length && !result.alreadyProcessed) body.push(lines(battle.lastEvents));
     const active = battle.team.find(unit => unit.active) ?? battle.team[0];
     body.push(`❤️ *EXPEDICIÓN*\n${characterIcon(active.characterId)} *${safe(active.name)}*\n${hpText(active, healthBars)}${effectsText(active) ? `\n${effectsText(active)}` : ''}${battle.team.filter(unit => !unit.active).map(unit => `\n${unit.slot}. ${safe(unit.name)}: ${unit.hp > 0 ? hpText(unit, false) : '💤 KO'}`).join('')}`);
     body.push(`👁️ *${safe(battle.enemy.name)}*\n${hpText(battle.enemy, healthBars)}${phaseLabels[battle.enemy.phase] ? `\n${phaseLabels[battle.enemy.phase]}` : ''}${effectsText(battle.enemy) ? `\n${effectsText(battle.enemy)}` : ''}`);
+    if (battle.learning?.required > 0) {
+      const learning = battle.learning;
+      body.push(`📖 *Aprendizaje del jefe: ${Math.min(learning.defeats, learning.required)}/${learning.required} derrotas*\n${
+        battle.status === 'active' && learning.scouting ? 'Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.'
+          : learning.remaining > 0 ? `Faltan ${learning.remaining} derrotas de aprendizaje antes del intento de victoria.`
+            : 'Aprendizaje completado. Ya puedes disputar la victoria.'}\n🏳️ Rendirse no cuenta como derrota de aprendizaje.`);
+    }
     if (battle.status === 'lost') {
       const surrender = battle.finishReason === 'surrender';
       body.push(`${surrender ? '🏳️ *Te retiraste del encuentro.*' : '🌧️ *Esta vez la expedición cayó.*'}\nTu historia sigue guardada. No pierdes cartas ni monedas; reintentar no duplica los premios.`);
@@ -94,7 +109,7 @@ export function renderStory(result, cmd, { healthBars = true, inspect = false } 
         : battle.encounterId === 'I05' ? 'Rompe la barrera de raíces antes de gastar tus técnicas y defiende cuando anuncie la descarga. La apertura posterior es tu oportunidad.'
           : 'Observa la señal enemiga: defender antes de un golpe cargado puede cambiar el combate. Prepara tu equipo y vuelve a intentarlo.';
       body.push(`💡 ${safe(result.hint ?? mission?.hint ?? encounterHint)}`);
-      return card(`HISTORIA | ${surrender ? 'RETIRADA' : 'DERROTA'}`, body, `🔁 *${cmd('ctuhistoria', 'reintentar')}*\n🛡️ Preparar: ${cmd('ctuequipo')}\n🔎 Pista: ${cmd('ctuhistoria', 'pista')}`);
+      return card(`HISTORIA | ${surrender ? 'RETIRADA' : 'DERROTA'}`, body, `🔁 *${cmd('ctuhistoria', 'reintentar')}*\n🛡️ Preparar: ${cmd('ctuequipo')}\n🔎 Pista: ${cmd('ctuhistoria', 'pista')}${routeFooter ? `\n${routeFooter}` : ''}`);
     }
     const intent = typeof battle.enemy.intent === 'object' ? battle.enemy.intent.text : battle.enemy.intent;
     body.push(intent ? `⚠️ *SEÑAL ENEMIGA*\n${safe(intent)}` : null);
@@ -109,10 +124,14 @@ export function renderStory(result, cmd, { healthBars = true, inspect = false } 
     if (allowed('skill') && ready.some(attack => String(attack.choice) === '2')) actions.push(cmd('ctuhistoria', 'habilidad'));
     if (battle.availableActions?.includes('break')) actions.push(`${cmd('ctuhistoria', 'romper')} · Rompe raíces y consume el turno`);
     if (battle.availableActions?.includes('observe')) actions.push(`${cmd('ctuhistoria', 'observar')} · Revela señuelos y consume el turno`);
+    if (battle.availableActions?.includes('support')) actions.push(`${cmd('ctuhistoria', 'apoyar')} · Recupera vida del equipo`);
+    if (battle.availableActions?.includes('purify')) actions.push(`${cmd('ctuhistoria', 'purificar')} · Reduce tensión o sellos`);
+    if (battle.availableActions?.includes('protect')) actions.push(`${cmd('ctuhistoria', 'proteger')} · Protege a tus aliados`);
     const reserve = battle.team.find(unit => !unit.active && unit.hp > 0);
     if (reserve && allowed('switch')) actions.push(cmd('ctuhistoria', `cambiar ${reserve.slot}`));
     body.push(actions.map(action => `👉 ${action}`).join('\n'));
     body.push('💾 El turno se conserva al salir.');
+    if (sideRoute) body.push(`↩️ Para pausar esta ruta: ${cmd('ctuhistoria', 'rendirse')} y después ${cmd('ctuhistoria', 'volver')}`);
     return card(`HISTORIA | T${battle.round ?? 1}`, body);
   }
 
@@ -121,30 +140,62 @@ export function renderStory(result, cmd, { healthBars = true, inspect = false } 
     body.push('🌿 *¡Encuentro superado!*');
     body.push(result.consequence ? `🖋️ ${safe(result.consequence)}` : null);
   }
+  if (battle?.acceptedDefeat) {
+    if (battle.lastEvents?.length && !result.alreadyProcessed) body.push(lines(battle.lastEvents));
+    body.push('🤝 *Duelo amistoso concluido.*\nLa historia continúa tras el duelo. Lo aprendido con Huan queda guardado.');
+  }
   body.push(rewardText(reward, result.team));
   const evolutionCandidate = result.team?.find(unit => (unit.level ?? unit.progress?.level ?? 0) >= 5);
-  if (completed(progress)) {
+  if (completed(progress) && !sideRoute) {
+    const season = result.campaign?.finishStage === 'season' || missionCount >= 32;
     const extended = missionCount > 7;
     const continuation = result.nextContentAvailable === true;
-    return card(extended ? 'HISTORIA | CAPÍTULO II COMPLETO' : 'HISTORIA | FASE 1 COMPLETA', [...body,
-      extended ? '📜 *Dos Trazos, nuevas preguntas.*\nHas completado el prólogo, el Bosque de los Susurros y el Mercado de los Ecos. Tus decisiones y recuerdos quedan guardados.'
+    return card(season ? 'HISTORIA | TEMPORADA COMPLETA' : extended ? 'HISTORIA | CAPÍTULO II COMPLETO' : 'HISTORIA | FASE 1 COMPLETA', [...body,
+      season ? '🌅 *Custodio del Alba*\nHas completado los cinco capítulos y el epílogo. Los cinco Trazos, tus decisiones y los vínculos del viaje quedan guardados.'
+        : extended ? '📜 *Dos Trazos, nuevas preguntas.*\nHas completado el prólogo, el Bosque de los Susurros y el Mercado de los Ecos. Tus decisiones y recuerdos quedan guardados.'
         : '📜 *Tu primera expedición queda escrita.*\nHas completado el prólogo y las primeras tres misiones del bosque. Tus decisiones y recuerdos quedan guardados.',
-      continuation ? '🎋 El bosque vuelve a llamarte. Ya puedes continuar hacia el claro de la tinta.'
-        : extended ? '🔒 La siguiente etapa de tu viaje llegará con los próximos capítulos.' : '🔒 El resto del Capítulo I llegará en la siguiente fase.'
-    ], `${continuation ? `👉 *${cmd('ctuhistoria', 'continuar')}*\n` : ''}📖 ${cmd('ctudiario', 'historia')}\n🎋 ${cmd('cturecuerdos')}\n${evolutionCandidate ? `🔮 Consulta tu evolución: ${cmd('ctuevolucion', evolutionCandidate.id)}` : `🔎 Consulta tus compañeros: ${cmd('ctuficha')}`}`);
+      result.ending ? `🖋️ *${safe(result.ending.title)}*\n${safe(result.ending.summary)}` : null,
+      continuation ? extended ? '🏔️ Hay capítulos nuevos. Continúa desde tu avance guardado.' : '🎋 El bosque vuelve a llamarte. Ya puedes continuar hacia el claro de la tinta.'
+        : season ? '📖 El Archivo queda abierto: puedes volver a sus escenas, explorar rutas opcionales y entrenar en sus pruebas.' : extended ? '🔒 La siguiente etapa de tu viaje llegará con los próximos capítulos.' : '🔒 El resto del Capítulo I llegará en la siguiente fase.'
+    ], `${continuation ? `👉 *${cmd('ctuhistoria', 'continuar')}*\n` : ''}📖 ${cmd('ctudiario', 'historia')}\n🎋 ${cmd('cturecuerdos')}\n${season ? `🏛️ ${cmd('ctuhistoria', 'pruebas')}\n🌿 ${cmd('ctuhistoria', 'opcionales')}\n🏅 ${cmd('ctusocial', 'titulos')}` : evolutionCandidate ? `🔮 Consulta tu evolución: ${cmd('ctuevolucion', evolutionCandidate.id)}` : `🔎 Consulta tus compañeros: ${cmd('ctuficha')}`}`);
   }
   body.push(lines(mission?.scene));
   if (result.team?.length) body.push(`🛡️ Equipo preparado: ${result.team.length}/3 compañeros`);
   body.push(mission?.objective ? `🧭 *Objetivo:* ${safe(mission.objective)}` : null);
-  if (inspect) body.push(`💡 ${safe(result.hint ?? mission?.hint ?? 'Lee las opciones y elige la que represente a tu Custodio. Las decisiones se guardan sin bloquear tu avance.')}`);
-  const showChoices = progress.stage === 'choice' && mission?.choices?.length;
+  if (inspect) body.push(`💡 ${safe(result.hint ?? mission?.hint ?? 'Lee las opciones y elige la que represente a tu Custodio. Las pistas necesarias están en la escena y el diario.')}`);
+  const showChoices = mission?.choices?.length && (sideRoute || progress.stage !== 'investigation');
   if (progress.stage === 'investigation') body.push(`🔎 *Investigación ${progress.sceneStep ?? 1}/2*\nLee esta pista; la siguiente completa la otra parte del hallazgo.`);
   body.push(showChoices ? decisionText(mission, cmd) : null);
-  const footer = progress.stage === 'starter' ? result.team?.length
+  if (mission?.communityObjective) body.push(`🤝 ${safe(typeof mission.communityObjective === 'object' ? mission.communityObjective.text ?? 'Participa en la reconstrucción del pabellón.' : 'Participa en la reconstrucción del pabellón.')}`);
+  const footer = mission?.communityObjective ? `👉 *${cmd('ctuhistoria', 'aportar')}*\n📖 ${cmd('ctudiario', 'historia')}` : progress.stage === 'starter' ? result.team?.length
     ? `🎴 Tu compañero ya está preparado.\n👉 *${cmd('ctuhistoria', 'continuar')}*`
     : `🎴 Elige tu primer compañero: *${cmd('ctustarter')}*\n👉 Después: ${cmd('ctuhistoria', 'continuar')}` : showChoices ? `📖 ${cmd('ctudiario', 'historia')}`
     : `👉 *${cmd('ctuhistoria', 'continuar')}*\n🛡️ ${cmd('ctuequipo')} · 📖 ${cmd('ctudiario', 'historia')}`;
-  return card('HISTORIA', body, footer);
+  return card('HISTORIA', body, [footer, routeFooter].filter(Boolean).join('\n'));
+}
+
+export function renderStoryOptionals(result, cmd) {
+  return card('HISTORIA | OPCIONALES', (result.missions ?? []).map(mission =>
+    mission.status === 'locked' ? `🔒 ${safe(mission.code)} · Sigue la campaña para descubrir esta ruta.` :
+      `${mission.status === 'complete' ? '✅' : '🌿'} *${safe(mission.code)} · ${safe(mission.title)}*\n${mission.status === 'complete' ? `Completada. Sus premios únicos ya quedaron registrados.\n📖 ${cmd('ctuhistoria', `escenas ${mission.code} 1`)}` : `👉 ${cmd('ctuhistoria', `opcional ${mission.code}`)}`}`),
+  `Las rutas opcionales conservan tu avance principal.\n👉 ${cmd('ctuhistoria')}`);
+}
+
+export function renderStoryTrials(result, cmd) {
+  return card('PRUEBAS DEL ARCHIVO', ['🏛️ Encuentros de entrenamiento tras completar la temporada. Sus premios de campaña no se vuelven a entregar.',
+    ...(result.trials ?? []).map(trial => trial.available
+      ? `${trial.completed ? '✅' : '⚔️'} *${trial.number}. ${safe(trial.title)}*\n👉 ${cmd('ctuhistoria', `prueba ${trial.number}`)}${trial.completed ? `\n📖 ${cmd('ctuhistoria', `escenas PRUEBA-${trial.number} 1`)}` : ''}`
+      : `🔒 Prueba ${trial.number} · Completa el epílogo para abrirla.`)
+  ], `👉 ${cmd('ctuhistoria')}`);
+}
+
+export function renderStoryScenes(result, cmd) {
+  return card('ARCHIVO DE ESCENAS', [`📖 *${safe(result.mission.code)} · ${safe(result.mission.title)}*`, lines(result.scene),
+    '🔎 Lectura del recuerdo guardado. No cambia tus decisiones ni vuelve a entregar premios.'
+  ], [`📄 *Página ${result.page} de ${result.totalPages}*`,
+    result.page > 1 ? `⬅️ ${cmd('ctuhistoria', `escenas ${result.mission.code} ${result.page - 1}`)}` : null,
+    result.page < result.totalPages ? `➡️ ${cmd('ctuhistoria', `escenas ${result.mission.code} ${result.page + 1}`)}` : null,
+    `👉 ${cmd('ctuhistoria')}`].filter(Boolean).join('\n'));
 }
 
 function entryText(entry) {
@@ -226,6 +277,8 @@ export const renderStoryHelp = cmd => card('HISTORIA | GUÍA', [
   `📖 ${cmd('ctuhistoria')} · Volver a tu misión\n👉 ${cmd('ctuhistoria', 'continuar')} · Avanzar\n🧭 ${cmd('ctuhistoria', 'elegir 1')} · Elegir una opción`,
   `⚔️ ${cmd('ctuhistoria', 'atacar 1')} · Ataque 1 o 2\n🛡️ ${cmd('ctuhistoria', 'defender')} · Reducir daño\n✨ ${cmd('ctuhistoria', 'habilidad')} · Habilidad con recarga\n🔀 ${cmd('ctuhistoria', 'cambiar 2')} · Entrar con reserva; consume turno\n🔎 ${cmd('ctuhistoria', 'pista')} · Inspección gratuita\n🏳️ ${cmd('ctuhistoria', 'rendirse')} · Terminar el intento`,
   `🌱 ${cmd('ctuhistoria', 'romper')} · Romper barreras de raíces\n👁️ ${cmd('ctuhistoria', 'observar')} · Revelar señuelos\nEstas tácticas aparecen cuando el jefe las necesita y consumen un turno.`,
+  `💚 ${cmd('ctuhistoria', 'apoyar')} · Recuperar vida del equipo\n✨ ${cmd('ctuhistoria', 'purificar')} · Reducir tensión o sellos\n🛡️ ${cmd('ctuhistoria', 'proteger')} · Cuidar aliados en peligro\n📖 Los jefes indican sus derrotas de aprendizaje obligatorias; rendirse no las completa.`,
   `🔁 ${cmd('ctuhistoria', 'reintentar')} · Tras una derrota\n🛡️ ${cmd('ctuequipo')} · Preparar 1 a 3 compañeros\n📖 ${cmd('ctudiario', 'historia')} · Diario narrativo\n🗺️ ${cmd('ctucapitulos')} · Misiones y bloqueos\n📜 ${cmd('cturecuerdos')} · Recuerdos`,
+  `🌿 ${cmd('ctuhistoria', 'opcionales')} · Rutas adicionales\n↩️ ${cmd('ctuhistoria', 'volver')} · Pausar una ruta sin combate\n📚 ${cmd('ctuhistoria', 'escenas III-04 1')} · Releer una misión completada\n🏛️ ${cmd('ctuhistoria', 'pruebas')} · Entrenar tras el epílogo`,
   '🎁 Los premios de primera finalización aceleran la XP de tus compañeros. Repetir escenas o reintentar no duplica premios.\n🔮 La evolución se abre desde nivel 5; no es obligatoria para avanzar.'
 ], `👉 ${cmd('ctuhistoria', 'iniciar')}`);

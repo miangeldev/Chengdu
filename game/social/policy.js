@@ -24,5 +24,9 @@ export function earnedTitles(state, userId, at = null) {
     row.badge === 'bambu_artesano' && Date.parse(row.createdAt) <= cutoff)) {
     result.push({ code: 'A1', name: 'Artesano del Bambú', badge: '🪵', source: 'craft' });
   }
+  for (const reward of state.premioshistoria?.records ?? []) {
+    if (reward.userId === userId && reward.titleReward && Date.parse(reward.createdAt) <= cutoff)
+      result.push({ ...reward.titleReward, source: 'story' });
+  }
   return result;
 }

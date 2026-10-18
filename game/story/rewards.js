@@ -1,10 +1,10 @@
 import { requireGame } from '../../utils/GameError.js';
 import { creditCoinsInTransaction } from '../economy/coinOperations.js';
 import { grantXp } from '../progression/rules.js';
-import { STORY_CAMPAIGN_ID, STORY_CONTENT_VERSION } from './catalog.js';
+import { STORY_CAMPAIGN_ID, STORY_CONTENT_VERSION, storyTitleReward } from './catalog.js';
 import { storyRewardId } from './progress.js';
 
-export async function rewardStoryMission(repos, { userId, mission, actionId, run, unitRefs, now, contentVersion = STORY_CONTENT_VERSION }) {
+export async function rewardStoryMission(repos, { userId, mission, actionId, run, unitRefs, now, contentVersion = STORY_CONTENT_VERSION, decisions = {} }) {
   const id = storyRewardId(userId, mission.id), existing = await repos.storyRewards.get(id);
   if (existing) return { ...existing, alreadyClaimed: true };
   const user = await repos.users.get(userId), definition = mission.reward;
@@ -23,7 +23,7 @@ export async function rewardStoryMission(repos, { userId, mission, actionId, run
   const userProgressAfter = grantXp(user.progress, definition.userXp, 'user');
   const reward = { id, userId, campaignId: STORY_CAMPAIGN_ID, contentVersion,
     missionId: mission.id, missionCode: mission.code, actionId, run, createdAt: now,
-    ...structuredClone(definition), unitRewards,
+    ...structuredClone(definition), ...(contentVersion >= 3 ? { titleReward: storyTitleReward(mission, decisions) } : {}), unitRewards,
     balanceBefore: user.economy.coins, balanceAfter: credited.economy.coins,
     userProgressBefore: user.progress, userProgressAfter };
   await repos.users.replace({ ...credited, progress: userProgressAfter });

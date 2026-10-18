@@ -1,5 +1,8 @@
 # Historia 0.12 — fases 2 y 3
 
+> Guía de la entrega 0.12. La continuación hasta el epílogo, las rutas opcionales
+> y las Pruebas del Archivo se documentan en [Historia 0.13](story-season.md).
+
 La campaña **Las Cartas Sin Nombre** completa el Bosque de los Susurros y abre
 el Mercado de los Ecos: **14 misiones**, tres encuentros nuevos, dos Trazos y
 decisiones con consecuencias visibles. La referencia de diseño sigue siendo

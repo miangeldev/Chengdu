@@ -3059,6 +3059,40 @@ publicar identidades. La base local sigue válida en esquema 12: 40 archivos y
 
 ---
 
+### Historia 0.13 — Fases 4 a 7 y cierre de temporada
+
+La temporada alcanza 32 misiones principales con capítulos III, IV y V y el
+epílogo. Las escenas recuerdan decisiones anteriores, desarrollan la relación
+con Huan y Bao, muestran voces a favor del Sello y culminan en tres resoluciones
+personales que conservan los vínculos libres. E-02 otorga Custodio del Alba.
+
+Los jefes introducen reconocimientos obligatorios y transparentes: una o dos
+derrotas de aprendizaje y cuatro ante el Archivista. La interfaz muestra el
+avance, explica cuándo todavía no puede haber victoria y no cuenta las
+rendiciones como aprendizaje. Apoyar, purificar y proteger amplían las
+respuestas tácticas; las derrotas no generan premios ni pérdidas de propiedad.
+
+Las rutas opcionales se pausan y conservan el avance principal. La reconstrucción
+de IV-03 reconoce al clan real y mantiene una vía individual equivalente.
+El archivo permite releer escenas completadas con sus decisiones guardadas;
+las pruebas posteriores no duplican recursos de campaña.
+
+El contenido versión 3 conserva acciones, encuentros y premios anteriores bajo
+sus reglas originales. La XP online y el ajuste de premios iniciales de 0.12
+se mantienen. La [guía de temporada](docs/story-season.md) describe recorrido,
+controles, aprendizaje, opcionales, conservación y verificación. Las 18 misiones
+restantes incluyen 95 escenas y 11.021 palabras base: una estimación reproducible
+de 54,8 minutos a 220 palabras/minuto y tres segundos por acción, sin contar
+combates, reintentos, variantes ni opcionales. La medición humana sigue pendiente.
+
+Verificación de 0.13: 961 casos comprobados entre la suite general y la
+repetición dirigida del recorrido completo, 3.600 duelos de
+jefes, 1.200 encuentros de accesibilidad y 60 casos de tiradas fijas. La vista
+previa reúne 405 ejemplos; sus 210 mensajes narrativos/diario tienen un máximo
+de 2.957 unidades UTF-16. Los 40 JSON locales siguen intactos y válidos en esquema 12.
+
+---
+
 ## V1.0
 
 ```text

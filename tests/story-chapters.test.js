@@ -5,7 +5,7 @@ import { storyMissions, STORY_MEMORIES } from '../game/story/catalog.js';
 
 const NOW = '2026-10-17T20:00:00.000Z';
 async function campaign(t, { starter = 'panda', choices = {}, clock = () => NOW } = {}) {
-  const c = setup(t, { clock, randomRoll: () => 30 });
+  const c = setup(t, { storyContentVersion: 2, clock, randomRoll: () => 30 });
   const user = await register(c.game);
   const { unit } = await c.game.starter.claimStarter({ userId: user.id, choice: starter });
   let sequence = 0;
