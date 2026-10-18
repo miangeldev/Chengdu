@@ -120,8 +120,10 @@ en esa misma colección conserva un coste proporcional a su tamaño. El caché
 reduce el coste recurrente, pero no elimina esos límites del almacenamiento JSON.
 Las comprobaciones de integridad y recuperación permanecen activas.
 
-Los cambios mantienen el esquema 11 y recuperan journals de las versiones
-anteriores. Los respaldos rutinarios nuevos se conservan hasta el límite
+La optimización conservó el esquema 11; Historia lo amplió posteriormente al
+12. Se recuperan journals de las versiones anteriores antes de migrar, usando
+los archivos de su propio esquema. Historia 0.12 conserva el esquema 12 y
+versiona el contenido y el motor narrativo por separado. Los respaldos rutinarios nuevos se conservan hasta el límite
 configurado; los respaldos históricos de migración se preservan. La retención
 reduce acumulación futura, no limpia automáticamente todo el contenido histórico
 de una instalación.

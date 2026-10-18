@@ -1,6 +1,6 @@
-# Modelo de datos — Comunidad 0.10 y su evolución
+# Modelo de datos — Historia 0.12
 
-Estado: contrato implementado hasta 0.10 (esquema 11), basado en `../project.md`.
+Estado: contrato implementado hasta 0.12 (esquema 12), basado en `../project.md`.
 Los mecanismos descritos como futuros aún requieren servicios y migraciones.
 El alcance se divide en [fundación 0.1](mvp-0.1.md), [combate 0.2](mvp-0.2.md),
 [progresión 0.3](mvp-0.3.md), [colección 0.4](alpha-0.4.md),
@@ -10,7 +10,8 @@ y [contenido 0.8](beta-0.8.md), [competitivo 0.9](beta-0.9.md).
 
 ## Acceso y commits optimizados sin cambiar el esquema
 
-El esquema sigue siendo 11 y los JSON existentes se abren directamente. Después
+La optimización conservó el esquema 11; Historia 0.11 lo amplió al 12. Los JSON
+del esquema actual se abren directamente, sin una migración adicional en 0.12. Después
 de recuperarlos y validarlos, el proceso conserva su estado profundamente
 inmutable y sus textos en memoria. Antes de cada operación comprueba inode,
 tamaño y fechas de modificación/cambio de cada archivo; si cambiaron, recarga y
@@ -73,12 +74,45 @@ detener todas las instancias, ejecutar `npm run db:unlock` y luego
 éxito. No borrar `_journal.json`: identifica la operación que debe completarse o
 descartarse y evita mezclar saldos y recibos de estados distintos.
 
+## Historia y compatibilidad 0.11→0.12
+
+El esquema 12 contiene 39 colecciones y el manifest. La migración 11→12 conserva
+los registros anteriores y añade `historias`, `accioneshistoria`,
+`combateshistoria` y `premioshistoria`. Los helpers independientes impiden
+escribir esos archivos administrados fuera del escritor único.
+
+La versión de contenido 1 conserva las siete misiones, recibos y cifras
+originales. La versión 2 añade siete misiones y reduce los premios futuros de
+las siete primeras: 225 monedas, 225 XP de Custodio y 825 XP por compañero.
+La primera acción nueva de una campaña antigua publica una acción `upgrade`
+reproducible, sin monedas ni XP. Mantiene decisiones, premios y unidades;
+una campaña terminada continúa en I-04. Las consultas no fuerzan escrituras.
+
+Un combate antiguo conserva motor y snapshots de versión 1 al reanudarse. Los
+combates nuevos usan la versión 2. Los premios ya cobrados conservan su versión
+y nunca se recalculan ni vuelven a entregarse. La recuperación cubre tanto la
+actualización narrativa como el premio siguiente si hay una interrupción.
+
+Las emisiones históricas pueden omitir `ownershipVersion` en su evento de
+creación: equivalen a la propiedad inicial de versión 0. La evolución utiliza
+la misma función `ownershipAt` que el resto del juego. No se rellenan ni
+reescriben eventos antiguos para poder evolucionar; las transferencias
+posteriores siguen exigiendo su versión explícita y su recibo legítimo.
+
+La revisión de accesos de 0.12 cubre el singleton `gameDatabase`, repositorios,
+servicios, adaptadores de comandos y scripts. Los comandos usan repositorios;
+los helpers de JSON bloquean las 39 colecciones administradas. Los resultados
+de lectura son copias y las escrituras se concentran en el Unit of Work. Las
+mutaciones directas de arrays quedan dentro de migraciones, recuperación y
+fixtures temporales. Se comprobó la interpretación de la propiedad inicial
+en combate, mercado, intercambios, perfiles e Historia, además de evolución.
+
 ## Comunidad y migración 10→11
 
 La base incorpora once colecciones vacías para intercambios, crafting,
 evoluciones, perfiles, clanes, guerras y obtención directa de premios. Conserva
 sin cambios los registros de las 24 colecciones previas; sólo avanza metadatos.
-El snapshot actual contiene 35 colecciones y el manifest, 36 archivos.
+El snapshot de Comunidad contiene 35 colecciones y el manifest, 36 archivos.
 
 `accionesintercambio`, `artesania`, `evoluciones`, `accionessociales`,
 `accionesclan`, `accionesguerra` y `obtenciones` son recibos inmutables. El estado

@@ -1,5 +1,9 @@
 # Historia 0.11 — fundamentos y fase 1
 
+> Guía histórica de la entrega 0.11 y sus premios originales. La versión 0.12
+> completa las fases 2 y 3 y reduce los premios nuevos; las reglas actuales y la
+> continuación de guardados están en [Historia 0.12](story-phases-2-3.md).
+
 La campaña **Las Cartas Sin Nombre**, temporada **Los Nombres Perdidos**, abre
 el prólogo y las primeras tres misiones del Bosque de los Susurros. Se basa en
 [la biblia del modo historia](../Chengdu_Cards_Biblia_Modo_Historia.md), con

@@ -11,7 +11,7 @@ const stateOf = directory => Object.fromEntries(COLLECTIONS.map(name => [name,
   JSON.parse(fs.readFileSync(path.join(directory, `${name}.json`), 'utf8'))]));
 
 async function fixture(t, { combat = true, clock = () => NOW } = {}) {
-  const context = setup(t, { clock, randomRoll: () => 30 });
+  const context = setup(t, { storyContentVersion: 1, clock, randomRoll: () => 30 });
   const user = await register(context.game);
   let sequence = 0;
   const invoke = (kind, args = {}) => context.game.story[kind]({ userId: user.id, operationKey: `audit:${++sequence}`, ...args });
@@ -28,7 +28,7 @@ function rebuildEmptyCombat(state, change) {
   const snapshots = structuredClone(battle.combat.unitSnapshots);
   change(snapshots[0]);
   battle.combat = createStoryBattle({ id: battle.id, encounterId: battle.combat.encounterId,
-    units: snapshots, now: battle.createdAt });
+    units: snapshots, now: battle.createdAt, version: battle.combat.version });
 }
 
 for (const [name, corrupt] of [
@@ -68,7 +68,7 @@ test('offline action coverage also preserves the order of combat steps with iden
 
 test('offline noncombat rewards cannot predate the rewarded unit emission', async t => {
   let now = NOW;
-  const context = setup(t, { clock: () => now });
+  const context = setup(t, { storyContentVersion: 1, clock: () => now });
   const user = await register(context.game);
   await context.game.story.start({ userId: user.id, operationKey: 'birth:start' });
   await context.game.story.choose({ userId: user.id, choice: '1', operationKey: 'birth:choice' });
@@ -87,7 +87,7 @@ test('offline noncombat rewards cannot predate the rewarded unit emission', asyn
 });
 
 test('offline story start cannot predate the registered account', async t => {
-  const context = setup(t, { clock: () => NOW });
+  const context = setup(t, { storyContentVersion: 1, clock: () => NOW });
   const user = await register(context.game);
   await context.game.story.start({ userId: user.id, operationKey: 'before-account' });
   const state = stateOf(context.directory), earlier = '2026-10-16T12:00:00.000Z';
@@ -101,7 +101,7 @@ test('offline story start cannot predate the registered account', async t => {
 
 test('historical story ownership must exist at the snapshot time rather than at a later transfer', async t => {
   let now = NOW;
-  const context = setup(t, { clock: () => now, randomRoll: () => 30 });
+  const context = setup(t, { storyContentVersion: 1, clock: () => now, randomRoll: () => 30 });
   const seller = await register(context.game), buyer = await register(context.game, 'Lukas', '521111111111');
   const unit = (await context.game.starter.claimStarter({ userId: seller.id, choice: 'panda' })).unit;
   await context.game.economy.claimDaily({ userId: buyer.id, operationKey: 'ownership:daily' });
@@ -135,7 +135,7 @@ test('historical story ownership must exist at the snapshot time rather than at 
   battle.createdAt = earlier;
   battle.updatedAt = earlier;
   battle.combat = createStoryBattle({ id: battle.id, encounterId: battle.combat.encounterId,
-    units: battle.combat.unitSnapshots, now: earlier });
+    units: battle.combat.unitSnapshots, now: earlier, version: battle.combat.version });
   assert.throws(() => validateDatabase(state), { code: 'DATABASE_CORRUPT' });
 });
 
@@ -158,7 +158,7 @@ test('story receipts cannot direct XP to a different account even when the XP to
 
 test('a future timestamp cannot be supplied through a coherent new story action', async t => {
   let now = NOW;
-  const context = setup(t, { clock: () => now });
+  const context = setup(t, { storyContentVersion: 1, clock: () => now });
   const user = await register(context.game);
   const before = stateOf(context.directory);
   now = '2026-10-17T13:00:00.000Z';

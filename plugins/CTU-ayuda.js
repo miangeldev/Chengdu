@@ -3,7 +3,7 @@ import { card, section } from '../interfaces/whatsapp/format.js';
 
 export const { command, run, createRun } = defineCommand('ctuayuda', async ({ cmd }) => card('AYUDA', [
   section('🌱 *Empezar*', `${cmd('cturegistro', 'Nombre')} · Registro\n${cmd('ctustarter')} · Primer personaje`),
-  section('📖 *Historia del Custodio*', `${cmd('ctuhistoria')} · Prólogo y primeras misiones del bosque\n${cmd('ctuhistoria', 'ayuda')} · Decisiones, combates y reintentos\n${cmd('ctudiario', 'historia')} · Tu crónica, pistas y recuerdos`),
+  section('📖 *Historia del Custodio*', `${cmd('ctuhistoria')} · Prólogo, Bosque y Mercado de los Ecos\n${cmd('ctuhistoria', 'ayuda')} · Decisiones, combates y reintentos\n${cmd('ctudiario', 'historia')} · Tu crónica, pistas y recuerdos`),
   section('🎴 *Colección*', `${cmd('ctuperfil')} · Tu progreso\n${cmd('ctupersonajes')} · Elegir unidad\n${cmd('ctucatalogo')} · Ver personajes\n${cmd('ctuficha', '[ID o personaje]')} · Stats, precisión, elemento y pasiva\n${cmd('ctuunidad', 'ID')} · Propietario y procedencia`),
   section('🎁 *Sobres*', `${cmd('ctusobres')} · Precios y probabilidades\n${cmd('ctuabrir', 'basico')} · Obtener un personaje`),
   section('💰 *Economía*', `${cmd('ctudiario')} · +100 ChengCoins cada 24 h\n${cmd('ctutienda')} · Comprar sobres\n${cmd('ctumovimientos')} · Tus ingresos y gastos`),

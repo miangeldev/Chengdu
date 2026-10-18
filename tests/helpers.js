@@ -12,7 +12,9 @@ export function setup(t, options = {}) {
   function open(overrides = {}) {
     const storage = new JsonUnitOfWork({ directory, ...options, ...overrides });
     stores.push(storage);
-    return { storage, game: createGame({ storage, randomRoll: overrides.randomRoll ?? options.randomRoll, randomDropInt: overrides.randomDropInt ?? options.randomDropInt }) };
+    return { storage, game: createGame({ storage, randomRoll: overrides.randomRoll ?? options.randomRoll,
+      randomDropInt: overrides.randomDropInt ?? options.randomDropInt,
+      storyContentVersion: overrides.storyContentVersion ?? options.storyContentVersion }) };
   }
   const context = { directory, open, ...open() };
   t.after(async () => {

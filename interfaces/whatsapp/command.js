@@ -10,7 +10,12 @@ export { displayName, rarityName } from './format.js';
 
 const messages = {
   STORY_NOT_STARTED: '🎋 Bao te espera bajo el bambú. Empieza con .ctuhistoria iniciar',
-  STORY_COMPLETE: '📜 Completaste la fase 1 de Historia. Consulta tus recuerdos con .cturecuerdos; el resto del bosque llegará en la siguiente fase.',
+  STORY_INVALID_JOURNAL_SECTION: '📖 Elige cronica, personajes, trazos, decisiones, recuerdos o atlas.\nEjemplo: .ctudiario historia cronica 1',
+  STORY_INVALID_JOURNAL_PAGE: '📄 Escribe una página entera desde 1.\nEjemplo: .ctudiario historia cronica 2',
+  STORY_COMPLETE: '📜 Completaste la ruta de Historia disponible. Consulta tus recuerdos con .cturecuerdos y los próximos capítulos con .ctucapitulos',
+  STORY_NOT_BREAKABLE: '🌱 No hay una barrera de raíces que romper ahora. Revisa la señal enemiga con .ctuhistoria y elige otra acción.',
+  STORY_NOT_OBSERVABLE: '👁️ Observar se usa ante señuelos activos. Consulta la situación con .ctuhistoria; las pistas se revisan gratis con .ctuhistoria inspeccionar',
+  INVALID_STORY_COMBAT_VERSION: '📖 Las reglas de este encuentro no están disponibles en esta versión. Consulta .ctuhistoria y pide al administrador que revise la versión del bot.',
   STORY_INVALID_CHOICE: '🧭 Esa opción no está disponible. Elige uno de los números de tu escena con .ctuhistoria elegir 1. Tu progreso sigue guardado.',
   STORY_CHOICE_REQUIRED: '🧭 Primero elige una opción de la escena con .ctuhistoria elegir 1. Revisa las opciones con .ctuhistoria',
   STORY_STARTER_REQUIRED: '🎴 Necesitas tu primer compañero para crear el vínculo. Usa .ctustarter y vuelve con .ctuhistoria continuar',

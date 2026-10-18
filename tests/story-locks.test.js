@@ -6,7 +6,7 @@ const NOW = '2026-10-17T20:00:00.000Z';
 
 async function contextFor(t, { teamSize = 1 } = {}) {
   let currentTime = NOW, sequence = 0;
-  const context = setup(t, { clock: () => currentTime, randomRoll: () => 0 });
+  const context = setup(t, { storyContentVersion: 1, clock: () => currentTime, randomRoll: () => 0 });
   context.user = await register(context.game);
   context.rival = await register(context.game, 'Lukas', '521111111111');
   context.unit = (await context.game.starter.claimStarter({ userId: context.user.id, choice: 'panda' })).unit;

@@ -1,11 +1,16 @@
 import { card, characterIcon, displayName, healthBar } from './format.js';
 import { STORY_MEMORIES } from '../../game/story/catalog.js';
+import { requireGame } from '../../utils/GameError.js';
 
 const safe = value => displayName(value ?? '');
 const lines = value => (Array.isArray(value) ? value : [value]).filter(Boolean).map(safe).join('\n');
-const chapterName = mission => mission?.code?.startsWith('P') ? 'Prólogo · El despertar del Custodio' : 'Capítulo I · El Bosque que Olvidó su Voz';
+const chapterName = mission => {
+  const code = mission?.code ?? '';
+  const title = mission?.chapterTitle ?? (code.startsWith('P') ? 'El despertar del Custodio' : code.startsWith('II-') ? 'El Mercado de los Ecos' : 'El Bosque que Olvidó su Voz');
+  return `${code.startsWith('P') ? 'Prólogo' : code.startsWith('II-') ? 'Capítulo II' : 'Capítulo I'} · ${safe(title)}`;
+};
 const completed = progress => progress?.status === 'complete';
-const phaseLabels = { charge: 'Tinta en concentración', unleash: 'Descarga preparada', exposed: 'Defensas abiertas' };
+const phaseLabels = { charge: 'Tinta en concentración', unleash: 'Descarga preparada', exposed: 'Defensas abiertas', roots: 'Barrera de raíces', illusions: 'Señuelos activos', trick_strike: 'Golpe entre sombras' };
 const effectLabels = { poison: '☠️ Veneno', burn: '🔥 Quemadura', stun: '💫 Aturdido', shield: '🛡️ Escudo', regeneration: '💚 Regeneración', attack_up: '⚔️ Ataque aumentado', defense_down: '🛡️ Defensa reducida' };
 const effectsText = unit => (unit.effects ?? []).map(effect => effectLabels[effect.type] ? `${effectLabels[effect.type]}${effect.type === 'shield' ? ` ${effect.potency}` : effect.remaining ? ` ${effect.remaining}T` : ''}` : null).filter(Boolean).join(' · ');
 
@@ -16,7 +21,8 @@ function battleView(battle) {
   const enemy = opponent.units[opponent.activeIndex];
   return {
     status: battle.status, finishReason: battle.finishReason, round: battle.turnNumber, tutorial: battle.tutorial,
-    enemy: { name: enemy.characterName, hp: enemy.hp, maxHp: enemy.stats.hp, intent: battle.enemyIntent?.text, phase: battle.enemyPhase ?? null },
+    encounterId: battle.encounterId, availableActions: battle.availableActions,
+    enemy: { name: enemy.characterName, hp: enemy.hp, maxHp: enemy.stats.hp, intent: battle.enemyIntent?.text, phase: battle.enemyIntent?.type ?? battle.enemyPhase ?? null, mechanics: battle.enemyMechanics ?? null },
     team: player.units.map((unit, index) => ({ slot: index + 1, name: unit.characterName, characterId: unit.characterId,
       hp: unit.hp, maxHp: unit.stats.hp, level: unit.level, active: index === player.activeIndex,
       effects: unit.effects, attacks: unit.attacks.map((attack, attackIndex) => ({ choice: attackIndex + 1, name: attack.name,
@@ -67,14 +73,15 @@ export function renderStory(result, cmd, { healthBars = true, inspect = false } 
   if (!progress) return card('HISTORIA', [
     '🎋 *El despertar del Custodio*',
     'En Chengdú, las cartas conservan historias. Una tinta desconocida está borrando sus nombres.\nBao te espera bajo el bambú: tu primer vínculo puede cambiar lo que viene.',
-    '📖 Prólogo y primeras tres misiones del bosque.\n💾 Cada escena y turno quedan guardados; puedes volver cuando quieras.'
+    '📖 Prólogo, Bosque de los Susurros y Mercado de los Ecos.\n💾 Cada escena y turno quedan guardados; puedes volver cuando quieras.'
   ], `👉 *${cmd('ctuhistoria', 'iniciar')}*\n📖 Guía: ${cmd('ctuhistoria', 'ayuda')}`);
 
   const duplicate = result.alreadyProcessed ? '♻️ Este mensaje ya se procesó. Tu progreso sigue guardado.' : null;
   const battle = battleView(result.battle);
+  const missionCount = result.campaign?.missionCount ?? (progress.contentVersion === 2 ? 14 : 7);
   const body = [duplicate, mission ? `🎋 *${chapterName(mission)}*\n📍 *${safe(mission.code)} · ${safe(mission.title)}*` : null,
-    `📖 Avance: ${completed(progress) ? 7 : Math.min(7, progress.missionIndex ?? 0)}/7 misiones`];
-  body.push(result.consequence ? `🖋️ ${safe(result.consequence)}` : null);
+    `📖 Avance: ${completed(progress) ? missionCount : Math.min(missionCount, progress.missionIndex ?? 0)}/${missionCount} misiones`];
+  if (battle?.status !== 'won') body.push(result.consequence ? `🖋️ ${safe(result.consequence)}` : null);
   if (battle?.status === 'active' || battle?.status === 'lost') {
     if (battle.lastEvents?.length && !result.alreadyProcessed) body.push(lines(battle.lastEvents));
     const active = battle.team.find(unit => unit.active) ?? battle.team[0];
@@ -83,20 +90,27 @@ export function renderStory(result, cmd, { healthBars = true, inspect = false } 
     if (battle.status === 'lost') {
       const surrender = battle.finishReason === 'surrender';
       body.push(`${surrender ? '🏳️ *Te retiraste del encuentro.*' : '🌧️ *Esta vez la expedición cayó.*'}\nTu historia sigue guardada. No pierdes cartas ni monedas; reintentar no duplica los premios.`);
-      body.push(`💡 ${safe(result.hint ?? mission?.hint ?? 'Observa la señal enemiga: defender antes de un golpe cargado puede cambiar el combate. Prepara tu equipo y vuelve a intentarlo.')}`);
+      const encounterHint = battle.encounterId === 'II05' ? 'Observa los señuelos para revelar al original antes de atacar. Cuando anuncie una descarga, defiende; las técnicas también se gastan si alcanzan una ilusión.'
+        : battle.encounterId === 'I05' ? 'Rompe la barrera de raíces antes de gastar tus técnicas y defiende cuando anuncie la descarga. La apertura posterior es tu oportunidad.'
+          : 'Observa la señal enemiga: defender antes de un golpe cargado puede cambiar el combate. Prepara tu equipo y vuelve a intentarlo.';
+      body.push(`💡 ${safe(result.hint ?? mission?.hint ?? encounterHint)}`);
       return card(`HISTORIA | ${surrender ? 'RETIRADA' : 'DERROTA'}`, body, `🔁 *${cmd('ctuhistoria', 'reintentar')}*\n🛡️ Preparar: ${cmd('ctuequipo')}\n🔎 Pista: ${cmd('ctuhistoria', 'pista')}`);
     }
     const intent = typeof battle.enemy.intent === 'object' ? battle.enemy.intent.text : battle.enemy.intent;
     body.push(intent ? `⚠️ *SEÑAL ENEMIGA*\n${safe(intent)}` : null);
+    if (typeof battle.enemy.mechanics === 'string' && battle.enemy.mechanics) body.push(`🧩 ${safe(battle.enemy.mechanics)}`);
     if (inspect) body.push(`🔎 ${safe(result.hint ?? mission?.hint ?? 'Defender reduce el daño recibido. La habilidad y los cambios consumen un turno; revisa la señal antes de actuar.')}`);
     const attacks = (active.attacks ?? []).map(attack => `${attack.choice}. ${safe(attack.name)} · ${attack.power} POT${attack.cooldown ? ` · ⏳ ${attack.cooldown}T` : ''}`).join('\n');
     body.push(`🎯 *Tu turno*${attacks ? `\n${attacks}` : ''}`);
     const ready = (active.attacks ?? []).filter(attack => attack.ready !== false && !attack.cooldown);
-    const actions = ready.map(attack => cmd('ctuhistoria', `atacar ${attack.choice}`));
-    actions.push(cmd('ctuhistoria', 'defender'));
-    if (ready.some(attack => String(attack.choice) === '2')) actions.push(cmd('ctuhistoria', 'habilidad'));
+    const allowed = action => !Array.isArray(battle.availableActions) || battle.availableActions.includes(action);
+    const actions = allowed('attack') ? ready.map(attack => cmd('ctuhistoria', `atacar ${attack.choice}`)) : [];
+    if (allowed('defend')) actions.push(cmd('ctuhistoria', 'defender'));
+    if (allowed('skill') && ready.some(attack => String(attack.choice) === '2')) actions.push(cmd('ctuhistoria', 'habilidad'));
+    if (battle.availableActions?.includes('break')) actions.push(`${cmd('ctuhistoria', 'romper')} · Rompe raíces y consume el turno`);
+    if (battle.availableActions?.includes('observe')) actions.push(`${cmd('ctuhistoria', 'observar')} · Revela señuelos y consume el turno`);
     const reserve = battle.team.find(unit => !unit.active && unit.hp > 0);
-    if (reserve) actions.push(cmd('ctuhistoria', `cambiar ${reserve.slot}`));
+    if (reserve && allowed('switch')) actions.push(cmd('ctuhistoria', `cambiar ${reserve.slot}`));
     body.push(actions.map(action => `👉 ${action}`).join('\n'));
     body.push('💾 El turno se conserva al salir.');
     return card(`HISTORIA | T${battle.round ?? 1}`, body);
@@ -104,22 +118,31 @@ export function renderStory(result, cmd, { healthBars = true, inspect = false } 
 
   if (battle?.status === 'won') {
     if (battle.lastEvents?.length && !result.alreadyProcessed) body.push(lines(battle.lastEvents));
-    body.push(`🌿 *¡Encuentro superado!*\n${safe(battle.enemy?.name ?? 'El Eco')} deja de luchar. El vínculo sigue intacto.`);
+    body.push('🌿 *¡Encuentro superado!*');
+    body.push(result.consequence ? `🖋️ ${safe(result.consequence)}` : null);
   }
   body.push(rewardText(reward, result.team));
   const evolutionCandidate = result.team?.find(unit => (unit.level ?? unit.progress?.level ?? 0) >= 5);
-  if (completed(progress)) return card('HISTORIA | FASE 1 COMPLETA', [...body,
-    '📜 *Tu primera expedición queda escrita.*\nHas completado el prólogo y las primeras tres misiones del bosque. Tus decisiones y recuerdos quedan guardados.',
-    '🔒 El resto del Capítulo I llegará en la siguiente fase.'
-  ], `📖 ${cmd('ctudiario', 'historia')}\n🎋 ${cmd('cturecuerdos')}\n${evolutionCandidate ? `🔮 Consulta tu evolución: ${cmd('ctuevolucion', evolutionCandidate.id)}` : `🔎 Consulta tus compañeros: ${cmd('ctuficha')}`}`);
+  if (completed(progress)) {
+    const extended = missionCount > 7;
+    const continuation = result.nextContentAvailable === true;
+    return card(extended ? 'HISTORIA | CAPÍTULO II COMPLETO' : 'HISTORIA | FASE 1 COMPLETA', [...body,
+      extended ? '📜 *Dos Trazos, nuevas preguntas.*\nHas completado el prólogo, el Bosque de los Susurros y el Mercado de los Ecos. Tus decisiones y recuerdos quedan guardados.'
+        : '📜 *Tu primera expedición queda escrita.*\nHas completado el prólogo y las primeras tres misiones del bosque. Tus decisiones y recuerdos quedan guardados.',
+      continuation ? '🎋 El bosque vuelve a llamarte. Ya puedes continuar hacia el claro de la tinta.'
+        : extended ? '🔒 La siguiente etapa de tu viaje llegará con los próximos capítulos.' : '🔒 El resto del Capítulo I llegará en la siguiente fase.'
+    ], `${continuation ? `👉 *${cmd('ctuhistoria', 'continuar')}*\n` : ''}📖 ${cmd('ctudiario', 'historia')}\n🎋 ${cmd('cturecuerdos')}\n${evolutionCandidate ? `🔮 Consulta tu evolución: ${cmd('ctuevolucion', evolutionCandidate.id)}` : `🔎 Consulta tus compañeros: ${cmd('ctuficha')}`}`);
+  }
   body.push(lines(mission?.scene));
   if (result.team?.length) body.push(`🛡️ Equipo preparado: ${result.team.length}/3 compañeros`);
   body.push(mission?.objective ? `🧭 *Objetivo:* ${safe(mission.objective)}` : null);
   if (inspect) body.push(`💡 ${safe(result.hint ?? mission?.hint ?? 'Lee las opciones y elige la que represente a tu Custodio. Las decisiones se guardan sin bloquear tu avance.')}`);
-  body.push(decisionText(mission, cmd));
+  const showChoices = progress.stage === 'choice' && mission?.choices?.length;
+  if (progress.stage === 'investigation') body.push(`🔎 *Investigación ${progress.sceneStep ?? 1}/2*\nLee esta pista; la siguiente completa la otra parte del hallazgo.`);
+  body.push(showChoices ? decisionText(mission, cmd) : null);
   const footer = progress.stage === 'starter' ? result.team?.length
     ? `🎴 Tu compañero ya está preparado.\n👉 *${cmd('ctuhistoria', 'continuar')}*`
-    : `🎴 Elige tu primer compañero: *${cmd('ctustarter')}*\n👉 Después: ${cmd('ctuhistoria', 'continuar')}` : mission?.choices?.length ? `📖 ${cmd('ctudiario', 'historia')}`
+    : `🎴 Elige tu primer compañero: *${cmd('ctustarter')}*\n👉 Después: ${cmd('ctuhistoria', 'continuar')}` : showChoices ? `📖 ${cmd('ctudiario', 'historia')}`
     : `👉 *${cmd('ctuhistoria', 'continuar')}*\n🛡️ ${cmd('ctuequipo')} · 📖 ${cmd('ctudiario', 'historia')}`;
   return card('HISTORIA', body, footer);
 }
@@ -131,18 +154,60 @@ function entryText(entry) {
   return [title ? `*${safe(title)}*` : null, text ? lines(text) : null].filter(Boolean).join('\n');
 }
 
-export function renderStoryJournal(journal, cmd, { memoriesOnly = false } = {}) {
-  if (memoriesOnly) return card('RECUERDOS', [
-    '📜 *Memorias del Custodio*',
-    journal.memories?.length ? journal.memories.map(entryText).join('\n\n') : 'Aún no tienes recuerdos narrativos. Cada vínculo deja una huella; empieza tu historia.'
-  ], `👉 ${cmd('ctuhistoria')}`);
-  const sections = [['📍 *Qué pasó antes*', journal.summary], ['📚 *Crónica*', journal.chronicle], ['👥 *Personajes conocidos*', journal.characters],
-    ['🖋️ *Trazos y pistas*', journal.traces], ['🧭 *Tus decisiones*', journal.decisions], ['📜 *Recuerdos*', journal.memories], ['🗺️ *Atlas*', journal.atlas]];
-  const known = sections.filter(([, value]) => value && (!Array.isArray(value) || value.length));
-  return card('DIARIO DEL CUSTODIO', known.length ? known.map(([title, value]) =>
-    `${title}\n${Array.isArray(value) ? value.map(entryText).join('\n') : entryText(value)}`)
+const JOURNAL_SECTIONS = Object.freeze({
+  cronica: { key: 'chronicle', title: 'Crónica' }, personajes: { key: 'characters', title: 'Personajes' },
+  trazos: { key: 'traces', title: 'Trazos y pistas' }, decisiones: { key: 'decisions', title: 'Decisiones' },
+  recuerdos: { key: 'memories', title: 'Recuerdos' }, atlas: { key: 'atlas', title: 'Atlas' }
+});
+const journalEntries = value => (Array.isArray(value) ? value : value ? [value] : []);
+const entryTitle = entry => typeof entry === 'string' ? safe(entry) : safe(entry.title ?? entry.name ?? entry.label ?? entry.code ?? entry.text ?? '');
+
+export function storyJournalArguments(args = []) {
+  requireGame(args.length <= 2, 'STORY_INVALID_JOURNAL_SECTION');
+  if (!args.length) return { section: null, page: 1 };
+  const section = args[0].normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+  if (section === 'resumen') {
+    requireGame(args.length === 1, 'STORY_INVALID_JOURNAL_PAGE');
+    return { section: null, page: 1 };
+  }
+  requireGame(Object.hasOwn(JOURNAL_SECTIONS, section), 'STORY_INVALID_JOURNAL_SECTION');
+  requireGame(args.length === 1 || /^\d+$/.test(args[1]), 'STORY_INVALID_JOURNAL_PAGE');
+  const page = args.length === 1 ? 1 : Number(args[1]);
+  requireGame(Number.isSafeInteger(page) && page >= 1, 'STORY_INVALID_JOURNAL_PAGE');
+  return { section, page };
+}
+
+export function renderStoryJournal(journal, cmd, { memoriesOnly = false, section = null, page = 1 } = {}) {
+  const selected = section ?? (memoriesOnly ? 'recuerdos' : null);
+  if (selected) {
+    requireGame(Object.hasOwn(JOURNAL_SECTIONS, selected), 'STORY_INVALID_JOURNAL_SECTION');
+    requireGame(Number.isSafeInteger(page) && page >= 1, 'STORY_INVALID_JOURNAL_PAGE');
+    const definition = JOURNAL_SECTIONS[selected], entries = journalEntries(journal[definition.key]);
+    const totalPages = Math.max(1, Math.ceil(entries.length / 4));
+    requireGame(page <= totalPages, 'PAGE_NOT_FOUND');
+    const navigation = [
+      `📄 *Página ${page} de ${totalPages}*`,
+      page > 1 ? `⬅️ ${cmd('ctudiario', `historia ${selected} ${page - 1}`)}` : null,
+      page < totalPages ? `➡️ ${cmd('ctudiario', `historia ${selected} ${page + 1}`)}` : null,
+      `📖 Resumen: ${cmd('ctudiario', 'historia')}\n👉 ${cmd('ctuhistoria')}`
+    ].filter(Boolean).join('\n');
+    return card(`DIARIO | ${definition.title.toLocaleUpperCase('es')}`, entries.length
+      ? entries.slice((page - 1) * 4, page * 4).map(entryText)
+      : ['📜 Todavía no tienes entradas en esta sección. Sigue tu historia para descubrirlas.'], navigation);
+  }
+  const sections = [
+    ['📍 *Qué pasó antes*', journalEntries(journal.summary).map(entryText).join('\n')],
+    ['📚 *Últimas escenas*', journalEntries(journal.chronicle).slice(-2).map(entryText).join('\n')],
+    ['👥 *Personajes conocidos*', journalEntries(journal.characters).map(entryTitle).join(' · ')],
+    ['🖋️ *Trazos y pistas*', journalEntries(journal.traces).map(entryText).join('\n')],
+    ['🧭 *Últimas decisiones*', journalEntries(journal.decisions).slice(-2).map(entryText).join('\n')],
+    ['📜 *Recuerdos*', journalEntries(journal.memories).map(entryTitle).join(' · ')],
+    ['🗺️ *Atlas*', journalEntries(journal.atlas).map(entryTitle).join(' · ')]
+  ].filter(([, text]) => text);
+  const details = Object.keys(JOURNAL_SECTIONS).map(name => cmd('ctudiario', `historia ${name}`)).join('\n');
+  return card('DIARIO DEL CUSTODIO', sections.length ? sections.map(([title, text]) => `${title}\n${text}`)
     : ['🎋 Tu diario todavía espera su primera página.\nEmpieza con la invitación de Bao bajo el bambú.'],
-  `👉 ${cmd('ctuhistoria')}\n🗺️ ${cmd('ctucapitulos')}`);
+  `📚 *Consultar el detalle*\n${details}\n\n👉 ${cmd('ctuhistoria')}`);
 }
 
 export function renderStoryMap(map, cmd) {
@@ -160,6 +225,7 @@ export const renderStoryHelp = cmd => card('HISTORIA | GUÍA', [
   '🎋 *Un Custodio, un vínculo, una historia.*\nAvanza a tu ritmo: las escenas, decisiones y turnos quedan guardados.',
   `📖 ${cmd('ctuhistoria')} · Volver a tu misión\n👉 ${cmd('ctuhistoria', 'continuar')} · Avanzar\n🧭 ${cmd('ctuhistoria', 'elegir 1')} · Elegir una opción`,
   `⚔️ ${cmd('ctuhistoria', 'atacar 1')} · Ataque 1 o 2\n🛡️ ${cmd('ctuhistoria', 'defender')} · Reducir daño\n✨ ${cmd('ctuhistoria', 'habilidad')} · Habilidad con recarga\n🔀 ${cmd('ctuhistoria', 'cambiar 2')} · Entrar con reserva; consume turno\n🔎 ${cmd('ctuhistoria', 'pista')} · Inspección gratuita\n🏳️ ${cmd('ctuhistoria', 'rendirse')} · Terminar el intento`,
+  `🌱 ${cmd('ctuhistoria', 'romper')} · Romper barreras de raíces\n👁️ ${cmd('ctuhistoria', 'observar')} · Revelar señuelos\nEstas tácticas aparecen cuando el jefe las necesita y consumen un turno.`,
   `🔁 ${cmd('ctuhistoria', 'reintentar')} · Tras una derrota\n🛡️ ${cmd('ctuequipo')} · Preparar 1 a 3 compañeros\n📖 ${cmd('ctudiario', 'historia')} · Diario narrativo\n🗺️ ${cmd('ctucapitulos')} · Misiones y bloqueos\n📜 ${cmd('cturecuerdos')} · Recuerdos`,
   '🎁 Los premios de primera finalización aceleran la XP de tus compañeros. Repetir escenas o reintentar no duplica premios.\n🔮 La evolución se abre desde nivel 5; no es obligatoria para avanzar.'
 ], `👉 ${cmd('ctuhistoria', 'iniciar')}`);

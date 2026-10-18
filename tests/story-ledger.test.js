@@ -154,7 +154,7 @@ test('historia crafting: reclamar requiere recibo anterior en ledger y no permit
 
 
 async function realContext(t) {
-  const context = setup(t, { clock: () => NOW, randomRoll: () => 0 });
+  const context = setup(t, { storyContentVersion: 1, clock: () => NOW, randomRoll: () => 0 });
   context.user = await register(context.game);
   context.rival = await register(context.game, 'Lukas', '521111111111');
   context.unit = (await context.game.starter.claimStarter({ userId: context.user.id, choice: 'panda' })).unit;

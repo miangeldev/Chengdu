@@ -5,23 +5,23 @@ import { createStoryBattle, replayStoryBattle, resolveStoryAction, storyBattleVi
 import { simulateStory, storyBalanceSnapshot, storyTacticalAction } from '../scripts/simulate-story-balance.js';
 
 const NOW = '2026-10-17T00:00:00.000Z';
-const create = (characterId = 'panda_guerrero', encounterId = 'I03', level = 4) => createStoryBattle({ id: 'STORY-test', encounterId,
+const create = (characterId = 'panda_guerrero', encounterId = 'I03', level = 4) => createStoryBattle({ version: 1, id: 'STORY-test', encounterId,
   units: [storyBalanceSnapshot(characterId, level)], now: NOW });
 const act = (battle, action, choice = null, rolls = [0, 0], now = NOW) => resolveStoryAction(battle, { action, choice, rolls, now }).battle;
 const throwsCode = (work, code) => assert.throws(work, error => error.code === code);
 
 for (const characterId of ['panda_guerrero', 'mago_carmesi', 'lobo_sombrio']) {
   test(`historia: ${characterId} gana por táctica sin evolución y puede perder tres intentos reales`, () => {
-    const tactical = simulateStory({ characterId, level: 4, policy: 'tactical', rolls: [0, 0] });
+    const tactical = simulateStory({ characterId, level: 4, policy: 'tactical', rolls: [0, 0], version: 1 });
     assert.equal(tactical.status, 'won');
     assert.equal(validateStoryBattle(tactical.battle), true);
     for (let attempt = 0; attempt < 3; attempt++) {
-      const failed = simulateStory({ characterId, level: 4, policy: 'attack', rolls: [0, 0], seed: attempt });
+      const failed = simulateStory({ characterId, level: 4, policy: 'attack', rolls: [0, 0], version: 1, seed: attempt });
       assert.equal(failed.status, 'lost');
       assert.equal(failed.battle.finishReason, 'knockout');
       assert.ok(failed.battle.actions.at(-1).events.some(event => event.type === 'lost' && event.text.includes('defiende')));
     }
-    assert.equal(simulateStory({ characterId, level: 4, policy: 'tactical', rolls: [0, 0] }).status, 'won');
+    assert.equal(simulateStory({ characterId, level: 4, policy: 'tactical', rolls: [0, 0], version: 1 }).status, 'won');
   });
 }
 
@@ -74,7 +74,7 @@ test('historia: el tutorial protege al jugador y pide ataque, defensa y habilida
 
 test('historia: aprender las tres acciones permite terminar el tutorial con cada starter', () => {
   for (const characterId of ['panda_guerrero', 'mago_carmesi', 'lobo_sombrio']) {
-    const result = simulateStory({ characterId, level: 2, encounterId: 'P03', rolls: [0, 0] });
+    const result = simulateStory({ characterId, level: 2, encounterId: 'P03', rolls: [0, 0], version: 1 });
     assert.equal(result.status, 'won');
     assert.deepEqual(result.battle.tutorial, { attack: true, defend: true, skill: true });
   }
@@ -92,7 +92,7 @@ test('historia: los turnos guardados reanudan semanas después con snapshots his
 
 test('historia: el cambio y la derrota automática respetan hasta tres compañeros', () => {
   const units = ['mago_carmesi', 'panda_guerrero', 'lobo_sombrio'].map(id => storyBalanceSnapshot(id, 4));
-  let battle = createStoryBattle({ id: 'STORY-party', encounterId: 'I03', units, now: NOW });
+  let battle = createStoryBattle({ version: 1, id: 'STORY-party', encounterId: 'I03', units, now: NOW });
   battle = act(battle, 'switch', '2');
   assert.equal(battle.players[0].activeIndex, 1);
   assert.ok(battle.actions.at(-1).events.some(event => event.type === 'switch'));
@@ -115,7 +115,7 @@ test('historia: rendirse no ejecuta otra ofensiva y permite liberar equipo en se
 
 test('historia: las formas evolucionadas son snapshots y no condicionan el acceso', () => {
   const evolved = storyBalanceSnapshot('mago_carmesi', 5, true);
-  const battle = createStoryBattle({ id: 'STORY-evolution', encounterId: 'I03', units: [evolved], now: NOW });
+  const battle = createStoryBattle({ version: 1, id: 'STORY-evolution', encounterId: 'I03', units: [evolved], now: NOW });
   assert.deepEqual(battle.unitSnapshots[0].evolution, evolved.evolution);
   assert.equal(activeUnit(battle.players[0]).stats.hp, 112);
   assert.equal(validateStoryBattle(battle), true);
@@ -154,10 +154,10 @@ test('historia: inspección es una proyección gratuita con ataques, estados y t
 });
 
 test('historia: entrada inválida no permite crear aliados o acciones fuera de sus perfiles', () => {
-  throwsCode(() => createStoryBattle({ id: 'x', encounterId: 'UNKNOWN', units: [storyBalanceSnapshot('mago_carmesi')], now: NOW }), 'STORY_ENCOUNTER_NOT_FOUND');
-  throwsCode(() => createStoryBattle({ id: 'x', encounterId: 'I03', units: [], now: NOW }), 'INVALID_STORY_TEAM');
+  throwsCode(() => createStoryBattle({ version: 1, id: 'x', encounterId: 'UNKNOWN', units: [storyBalanceSnapshot('mago_carmesi')], now: NOW }), 'STORY_ENCOUNTER_NOT_FOUND');
+  throwsCode(() => createStoryBattle({ version: 1, id: 'x', encounterId: 'I03', units: [], now: NOW }), 'INVALID_STORY_TEAM');
   const unit = storyBalanceSnapshot('panda_guerrero');
-  throwsCode(() => createStoryBattle({ id: 'x', encounterId: 'I03', units: [unit, unit], now: NOW }), 'INVALID_STORY_TEAM');
+  throwsCode(() => createStoryBattle({ version: 1, id: 'x', encounterId: 'I03', units: [unit, unit], now: NOW }), 'INVALID_STORY_TEAM');
   const battle = create();
   throwsCode(() => act(battle, 'dance'), 'INVALID_STORY_ACTION');
   throwsCode(() => act(battle, 'attack', '3'), 'INVALID_ATTACK');

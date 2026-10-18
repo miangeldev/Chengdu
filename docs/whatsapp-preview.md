@@ -298,7 +298,7 @@ Fallar y cambiar consumen el turno. Los efectos avanzan sólo mientras la unidad
 .ctustarter · Primer personaje
 
 📖 *Historia del Custodio*
-.ctuhistoria · Prólogo y primeras misiones del bosque
+.ctuhistoria · Prólogo, Bosque y Mercado de los Ecos
 .ctuhistoria ayuda · Decisiones, combates y reintentos
 .ctudiario historia · Tu crónica, pistas y recuerdos
 
@@ -682,17 +682,17 @@ Lukas: +15 XP
 🏆 Victoria vs *Lukas*
 📅 11 de octubre de 2026 · 1v1 clásico · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-079c6928-e02f-4ef2-a6e3-7e8cf53b00a6
+🔎 .ctuhistorial BTL-1eb6739d-5e84-402b-8ddc-3f0c6c706595
 
 🏆 Victoria vs *Lukas*
 📅 11 de octubre de 2026 · 1v1 clásico · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-bf28b2c8-6cbd-4354-8933-1b6885e8c2c2
+🔎 .ctuhistorial BTL-829c42d6-45e4-4a58-8588-58f5154da0ab
 
 🏆 Victoria vs *Lukas*
 📅 11 de octubre de 2026 · 1v1 clásico · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-f96ecff2-f2d2-4a39-9416-261dd8091733
+🔎 .ctuhistorial BTL-884daeaf-2b2f-46d4-a1c2-4dbc4a1a084d
 
 📄 *Página 1 de 1*
 👉 Tu saldo: *.ctubalance*
@@ -3317,26 +3317,26 @@ Lukas: +15 XP
 📅 25 de octubre de 2026 · 1v1 · 8 turnos
 🎁 +120 ChengCoins · +35 XP
 🏅 Ranked T1 · 1016 Elo (+16)
-🔎 .ctuhistorial BTL-8da282ee-f2f9-4de5-aafe-922bf22d6050
+🔎 .ctuhistorial BTL-8f617591-2a43-454a-a1f5-824139363694
 
 💔 Derrota vs *Lukas*
 📅 22 de octubre de 2026 · 1v1 clásico · 5 turnos
 🎁 +0 ChengCoins · +15 XP
-🔎 .ctuhistorial BTL-46dc4881-a037-4739-b8ac-7183df1cb174
+🔎 .ctuhistorial BTL-1126b6b7-3925-433e-96be-74d28340fe4d
 
 🏆 Victoria vs *Lukas*
 📅 22 de octubre de 2026 · 1v1 clásico · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-8bdabf65-efc2-42cc-973c-6b50a87d655f
+🔎 .ctuhistorial BTL-ac986bbe-0732-464a-8cc8-f030e8991fa7
 
 💔 Derrota vs *Lukas*
 📅 20 de octubre de 2026 · 1v1 · 0 turnos
-🔎 .ctuhistorial BTL-17e7aef7-2f49-40d3-8bb6-29beed003032
+🔎 .ctuhistorial BTL-94e4f895-0880-403e-8854-af36fd9b0261
 
 💔 Derrota vs *Lukas*
 📅 20 de octubre de 2026 · 3v3 · 31 turnos
 🎁 +0 ChengCoins · +15 XP
-🔎 .ctuhistorial BTL-5f4245cb-8f7d-4828-a537-07585ffb4a3d
+🔎 .ctuhistorial BTL-a8df3b5c-e26c-4518-b582-beb469f97cd2
 
 📄 *Página 1 de 3*
 ➡️ Siguiente: *.ctuhistorial 2*
@@ -4161,13 +4161,13 @@ Bono al cumplir los requisitos: +4% · redondeo hacia abajo.
 ━━━━━━━━━━━━━━
 🏅 Puntos de la temporada T2: victoria 3 · empate 1
 
-🏯 *[LUNA] Casa Lunar*
-🏅 0 puntos · 👥 3/15
-👉 .ctuclan ver C2
-
 🏯 *[BAM] Casa del Bambú*
 🏅 0 puntos · 👥 3/15
 👉 .ctuclan ver C1
+
+🏯 *[LUNA] Casa Lunar*
+🏅 0 puntos · 👥 3/15
+👉 .ctuclan ver C2
 
 📄 *Página 1 de 1*
 ```
@@ -4200,7 +4200,7 @@ Bono al cumplir los requisitos: +4% · redondeo hacia abajo.
 Miguel · Compañero 2 · Compañero 1
 
 🛡️ *[LUNA]*
-Lukas · Camila · Ana
+Lukas · Ana · Camila
 
 🎯 Primero en ganar 3 duelos, o mejor marcador al vencer 24 h.
 Cada pareja de jugadores cuenta una vez.
@@ -4249,7 +4249,7 @@ Cada pareja de jugadores cuenta una vez.
 Miguel · Compañero 2 · Compañero 1
 
 🛡️ *[LUNA]*
-Lukas · Camila · Ana
+Lukas · Ana · Camila
 
 🎁 Tesorería: victoria +500 · derrota +100 · empate +150.
 👤 Premio personal: victoria +150 · derrota +50 · empate +75, para quienes disputaron duelos válidos.
@@ -4293,7 +4293,7 @@ Primer filo · Plata de Chengdú · T1
 En Chengdú, las cartas conservan historias. Una tinta desconocida está borrando sus nombres.
 Bao te espera bajo el bambú: tu primer vínculo puede cambiar lo que viene.
 
-📖 Prólogo y primeras tres misiones del bosque.
+📖 Prólogo, Bosque de los Susurros y Mercado de los Ecos.
 💾 Cada escena y turno quedan guardados; puedes volver cuando quieras.
 
 👉 *.ctuhistoria iniciar*
@@ -4308,7 +4308,7 @@ Bao te espera bajo el bambú: tu primer vínculo puede cambiar lo que viene.
 🎋 *Prólogo · El despertar del Custodio*
 📍 *P-01 · Una invitación bajo el bambú*
 
-📖 Avance: 0/7 misiones
+📖 Avance: 0/14 misiones
 
 Un panda anciano observa una carta a la sombra del bambú. A su espalda se alza el Gran Archivo.
 Bao: «Una carta no es solo poder. Es una historia que acepta continuar contigo».
@@ -4331,11 +4331,11 @@ Desde la torre suena una campana. Bao levanta la mirada: nadie debería estar to
 🎋 *Prólogo · El despertar del Custodio*
 📍 *P-02 · El primer vínculo*
 
-📖 Avance: 1/7 misiones
+📖 Avance: 1/14 misiones
 
 🖋️ Bao: «Cada una tiene su nombre y su historia. Ser Custodio es acompañarla, no decidir todo por ella».
 
-🎁 +20 ChengCoins · +20 XP de Custodio
+🎁 +15 ChengCoins · +15 XP de Custodio
 
 Bao: «Preguntaste por las criaturas. Ahora podrás conocer a una por su propio nombre».
 Bao despliega los registros de las criaturas que pueden formar su primer vínculo.
@@ -4354,10 +4354,10 @@ Tu criatura inicial conserva su identidad, su origen y las aventuras que viváis
 🎋 *Prólogo · El despertar del Custodio*
 📍 *P-03 · Una sombra en la plaza*
 
-📖 Avance: 2/7 misiones
+📖 Avance: 2/14 misiones
 
-🎁 +20 XP de Custodio
-✨ Panda Guerrero: +100 XP · 🌱 Nv. 2
+🎁 +15 XP de Custodio
+✨ Panda Guerrero: +75 XP
 
 Una mancha de tinta cruza la plaza. Dentro tiembla una criatura que parece no reconocer el camino.
 Bao: «Es un Eco: una identidad dañada. Vamos a detenerlo sin hacerle más daño del necesario».
@@ -4377,11 +4377,11 @@ Bao: «Es un Eco: una identidad dañada. Vamos a detenerlo sin hacerle más dañ
 🎋 *Prólogo · El despertar del Custodio*
 📍 *P-03 · Una sombra en la plaza*
 
-📖 Avance: 2/7 misiones
+📖 Avance: 2/14 misiones
 
 ❤️ *EXPEDICIÓN*
 🐼 *Panda Guerrero*
-▓▓▓▓▓▓▓▓▓▓ 122/122 HP
+▓▓▓▓▓▓▓▓▓▓ 120/120 HP
 🛡️ Escudo 12
 
 👁️ *Eco desorientado*
@@ -4410,14 +4410,14 @@ El Eco está confundido. Bao te guía: ataca, defiende y prueba tu habilidad.
 🎋 *Prólogo · El despertar del Custodio*
 📍 *P-03 · Una sombra en la plaza*
 
-📖 Avance: 2/7 misiones
+📖 Avance: 2/14 misiones
 
 Panda Guerrero usó Golpe de Bambú: 38 de daño.
 Eco desorientado usó Roce de tinta: 0 de daño.
 
 ❤️ *EXPEDICIÓN*
 🐼 *Panda Guerrero*
-▓▓▓▓▓▓▓▓▓▓ 122/122 HP
+▓▓▓▓▓▓▓▓▓▓ 120/120 HP
 🛡️ Escudo 11
 
 👁️ *Eco desorientado*
@@ -4446,7 +4446,7 @@ El Eco está confundido. Bao te guía: ataca, defiende y prueba tu habilidad.
 🎋 *Prólogo · El despertar del Custodio*
 📍 *P-03 · Una sombra en la plaza*
 
-📖 Avance: 2/7 misiones
+📖 Avance: 2/14 misiones
 
 Panda Guerrero se cubre: reduce el próximo daño de este turno un 70%.
 Eco desorientado usó Roce de tinta: 1 de daño.
@@ -4454,7 +4454,7 @@ Eco desorientado usó Roce de tinta: 1 de daño.
 
 ❤️ *EXPEDICIÓN*
 🐼 *Panda Guerrero*
-▓▓▓▓▓▓▓▓▓▓ 121/122 HP
+▓▓▓▓▓▓▓▓▓▓ 119/120 HP
 
 👁️ *Eco desorientado*
 ▓▓▓▓▓▓▓▒▒▒ 72/110 HP
@@ -4482,7 +4482,7 @@ El Eco está confundido. Bao te guía: ataca, defiende y prueba tu habilidad.
 🎋 *Prólogo · El despertar del Custodio*
 📍 *P-03 · Una sombra en la plaza*
 
-📖 Avance: 2/7 misiones
+📖 Avance: 2/14 misiones
 
 Panda Guerrero usó Impacto del Panda: 49 de daño.
 Panda Guerrero recibe escudo.
@@ -4490,7 +4490,7 @@ Eco desorientado usó Roce de tinta: 0 de daño.
 
 ❤️ *EXPEDICIÓN*
 🐼 *Panda Guerrero*
-▓▓▓▓▓▓▓▓▓▓ 121/122 HP
+▓▓▓▓▓▓▓▓▓▓ 119/120 HP
 🛡️ Escudo 11
 
 👁️ *Eco desorientado*
@@ -4517,17 +4517,16 @@ El Eco está confundido. Bao te guía: ataca, defiende y prueba tu habilidad.
 🎋 *Prólogo · El despertar del Custodio*
 📍 *P-04 · Las campanas del Archivo*
 
-📖 Avance: 3/7 misiones
+📖 Avance: 3/14 misiones
 
 Panda Guerrero usó Golpe de Bambú: 23 de daño.
 Eco desorientado quedó fuera de combate.
 El Eco se serena. Tu vínculo resistió la tinta.
 
 🌿 *¡Encuentro superado!*
-Eco desorientado deja de luchar. El vínculo sigue intacto.
 
-🎁 +45 ChengCoins · +50 XP de Custodio
-✨ Panda Guerrero: +220 XP · 🌱 Nv. 3
+🎁 +34 ChengCoins · +38 XP de Custodio
+✨ Panda Guerrero: +165 XP · 🌱 Nv. 2
 🧩 1 fragmento
 
 La tinta abandona al Eco, pero las campanas siguen sonando. Lian encuentra una carta completamente blanca.
@@ -4549,10 +4548,10 @@ Las últimas huellas salen de la plaza y se pierden en el Bosque de los Susurros
 🎋 *Capítulo I · El Bosque que Olvidó su Voz*
 📍 *I-01 · Sendero en silencio*
 
-📖 Avance: 4/7 misiones
+📖 Avance: 4/14 misiones
 
-🎁 +35 ChengCoins · +30 XP de Custodio
-✨ Panda Guerrero: +80 XP
+🎁 +26 ChengCoins · +22 XP de Custodio
+✨ Panda Guerrero: +60 XP · 🌱 Nv. 3
 🧩 1 fragmento
 📜 Recuerdo: Campanas sin manos
 
@@ -4579,13 +4578,12 @@ Lian descubre cortes oscuros sobre el bambú. Junto al arroyo, unas huellas arra
 🎋 *Capítulo I · El Bosque que Olvidó su Voz*
 📍 *I-02 · Una criatura herida*
 
-📖 Avance: 5/7 misiones
+📖 Avance: 5/14 misiones
 
 🖋️ Los cortes interrumpen viejas inscripciones. Lian copia el patrón: «Alguien está buscando nombres, no madera».
 
-🎁 +40 ChengCoins · +35 XP de Custodio
-✨ Panda Guerrero: +100 XP
-🧩 1 fragmento
+🎁 +30 ChengCoins · +26 XP de Custodio
+✨ Panda Guerrero: +75 XP
 
 El patrón del bambú vuelve a aparecer en una hoja. Al apartarla, Lian descubre a quien se refugia debajo.
 Una pequeña criatura tiembla entre hojas manchadas de tinta. Más adelante, las huellas todavía están frescas.
@@ -4611,13 +4609,13 @@ Lian abre su cuaderno. Espera tu decisión.
 🎋 *Capítulo I · El Bosque que Olvidó su Voz*
 📍 *I-03 · Huellas en el bambú*
 
-📖 Avance: 6/7 misiones
+📖 Avance: 6/14 misiones
 
 🖋️ Limpias la tinta de una pata y le dejas espacio. Antes de refugiarse, la criatura señala unos arbustos: te está advirtiendo.
 
-🎁 +60 ChengCoins · +45 XP de Custodio
-✨ Panda Guerrero: +150 XP · 🌱 Nv. 4
-🧩 1 fragmento · 1 esencia
+🎁 +45 ChengCoins · +34 XP de Custodio
+✨ Panda Guerrero: +112 XP
+🧩 1 fragmento
 
 La criatura que ayudaste silba desde su refugio y señala las garras oscuras. Su advertencia llega a tiempo.
 Dos Ecos retroceden hacia el bambú; un tercero avanza, reuniendo tinta alrededor de sus garras.
@@ -4646,13 +4644,13 @@ Bao: «Cuando la tinta se concentre, cúbrete. Después de descargarla quedará 
 🎋 *Capítulo I · El Bosque que Olvidó su Voz*
 📍 *I-03 · Huellas en el bambú*
 
-📖 Avance: 6/7 misiones
+📖 Avance: 6/14 misiones
 
 🖋️ Reconoces al Eco de Tinta por sus garras oscuras y dejas una salida a los otros. Lian anota tu cuidado al elegir el objetivo.
 
 ❤️ *EXPEDICIÓN*
 🐼 *Panda Guerrero*
-▓▓▓▓▓▓▓▓▓▓ 126/126 HP
+▓▓▓▓▓▓▓▓▓▓ 124/124 HP
 🛡️ Escudo 12
 
 👁️ *Eco de Tinta*
@@ -4681,13 +4679,13 @@ El Eco prepara un zarpazo corto.
 🎋 *Capítulo I · El Bosque que Olvidó su Voz*
 📍 *I-03 · Huellas en el bambú*
 
-📖 Avance: 6/7 misiones
+📖 Avance: 6/14 misiones
 
 Te retiras a salvo. Puedes preparar otro equipo y volver a intentarlo.
 
 ❤️ *EXPEDICIÓN*
 🐼 *Panda Guerrero*
-▓▓▓▓▓▓▓▓▓▓ 126/126 HP
+▓▓▓▓▓▓▓▓▓▓ 124/124 HP
 🛡️ Escudo 12
 
 👁️ *Eco de Tinta*
@@ -4711,11 +4709,11 @@ Tu historia sigue guardada. No pierdes cartas ni monedas; reintentar no duplica 
 🎋 *Capítulo I · El Bosque que Olvidó su Voz*
 📍 *I-03 · Huellas en el bambú*
 
-📖 Avance: 6/7 misiones
+📖 Avance: 6/14 misiones
 
 ❤️ *EXPEDICIÓN*
 🐼 *Panda Guerrero*
-▓▓▓▓▓▓▓▓▓▓ 126/126 HP
+▓▓▓▓▓▓▓▓▓▓ 124/124 HP
 🛡️ Escudo 12
 
 👁️ *Eco de Tinta*
@@ -4736,7 +4734,7 @@ El Eco prepara un zarpazo corto.
 💾 El turno se conserva al salir.
 ```
 
-## Historia: defender la descarga anunciada
+## Historia I-03: defender la descarga anunciada
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T4*
@@ -4744,18 +4742,18 @@ El Eco prepara un zarpazo corto.
 🎋 *Capítulo I · El Bosque que Olvidó su Voz*
 📍 *I-03 · Huellas en el bambú*
 
-📖 Avance: 6/7 misiones
+📖 Avance: 6/14 misiones
 
 Panda Guerrero se cubre: reduce el próximo daño de este turno un 70%.
-Eco de Tinta usó Descarga de tinta: 26 de daño.
-🛡️ Tu defensa amortiguó la ofensiva: recibiste 26 de daño.
+Eco de Tinta usó Descarga de tinta: 25 de daño.
+🛡️ Tu defensa amortiguó la ofensiva: recibiste 25 de daño.
 
 ❤️ *EXPEDICIÓN*
 🐼 *Panda Guerrero*
-▓▓▓▓▓▓▓▓▒▒ 95/126 HP
+▓▓▓▓▓▓▓▓▒▒ 94/124 HP
 
 👁️ *Eco de Tinta*
-▓▓▓▓▓▓▓▓▓▒ 210/240 HP
+▓▓▓▓▓▓▓▓▒▒ 169/240 HP
 Defensas abiertas
 
 ⚠️ *SEÑAL ENEMIGA*
@@ -4773,7 +4771,7 @@ Defensas abiertas
 💾 El turno se conserva al salir.
 ```
 
-## Historia: aprovechar la apertura del minijefe
+## Historia I-03: aprovechar la apertura del enemigo
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T5*
@@ -4781,7 +4779,7 @@ Defensas abiertas
 🎋 *Capítulo I · El Bosque que Olvidó su Voz*
 📍 *I-03 · Huellas en el bambú*
 
-📖 Avance: 6/7 misiones
+📖 Avance: 6/14 misiones
 
 Aprovechas la apertura: el Eco tiene la defensa reducida a 0.
 Panda Guerrero usó Impacto del Panda: 61 de daño.
@@ -4790,11 +4788,11 @@ El Eco intenta recuperar el equilibrio.
 
 ❤️ *EXPEDICIÓN*
 🐼 *Panda Guerrero*
-▓▓▓▓▓▓▓▓▒▒ 95/126 HP
+▓▓▓▓▓▓▓▓▒▒ 94/124 HP
 🛡️ Escudo 12
 
 👁️ *Eco de Tinta*
-▓▓▓▓▓▓▓▒▒▒ 149/240 HP
+▓▓▓▓▓▒▒▒▒▒ 108/240 HP
 
 ⚠️ *SEÑAL ENEMIGA*
 El Eco prepara un zarpazo corto.
@@ -4809,28 +4807,693 @@ El Eco prepara un zarpazo corto.
 💾 El turno se conserva al salir.
 ```
 
-## Historia: fase 1 completa y compañero preparado para evolucionar
+## Historia: primer tramo superado y claro disponible
 
 ```text
-🃏 *CHENGDÚ CARDS | HISTORIA | FASE 1 COMPLETA*
+🃏 *CHENGDÚ CARDS | HISTORIA*
 ━━━━━━━━━━━━━━
-📖 Avance: 7/7 misiones
+🎋 *Capítulo I · El Bosque que Olvidó su Voz*
+📍 *I-04 · El claro de la tinta*
 
-Panda Guerrero usó Golpe de Bambú: 28 de daño.
+📖 Avance: 7/14 misiones
+
+Aprovechas la apertura: el Eco tiene la defensa reducida a 0.
+Panda Guerrero usó Impacto del Panda: 48 de daño.
+Panda Guerrero recibe escudo.
 Eco de Tinta quedó fuera de combate.
 El Eco se serena. Tu vínculo resistió la tinta.
 
 🌿 *¡Encuentro superado!*
-Eco de Tinta deja de luchar. El vínculo sigue intacto.
 
-🎁 +100 ChengCoins · +100 XP de Custodio
-✨ Panda Guerrero: +450 XP · 🌱 Nv. 5
+🎁 +75 ChengCoins · +75 XP de Custodio
+✨ Panda Guerrero: +338 XP · 🌱 Nv. 4
 🧩 1 fragmento · 1 esencia
 
-📜 *Tu primera expedición queda escrita.*
-Has completado el prólogo y las primeras tres misiones del bosque. Tus decisiones y recuerdos quedan guardados.
+Lian vuelve a abrir su cuaderno: «Distinguiste a los asustados. Aquí también tendremos que mirar antes de atacar».
+Una figura de niebla aparta el bambú: la Guardiana Nube escucha una canción que ya no sabe terminar.
+Nube: «Queda una sílaba bajo las raíces. La tinta se lleva los nombres, pero todavía no ha aprendido a escuchar».
+Lian reconoce en una piedra el sello de la carta blanca. A su lado, una sombra se tensa antes de atacar.
+Bao: «Mira sus movimientos. Si anuncia el golpe, puedes prepararte antes de recibirlo».
 
-🔒 El resto del Capítulo I llegará en la siguiente fase.
+🛡️ Equipo preparado: 1/3 compañeros
+
+👉 *.ctuhistoria continuar*
+🛡️ .ctuequipo · 📖 .ctudiario historia
+```
+
+## Historia I-04: Guardiana Nube y emboscada del claro
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA | T1*
+━━━━━━━━━━━━━━
+🎋 *Capítulo I · El Bosque que Olvidó su Voz*
+📍 *I-04 · El claro de la tinta*
+
+📖 Avance: 7/14 misiones
+
+❤️ *EXPEDICIÓN*
+🐼 *Panda Guerrero*
+▓▓▓▓▓▓▓▓▓▓ 126/126 HP
+🛡️ Escudo 12
+
+👁️ *Acechador de Tinta*
+▓▓▓▓▓▓▓▓▓▓ 170/170 HP
+
+⚠️ *SEÑAL ENEMIGA*
+El Acechador prepara una garra rápida.
+
+🎯 *Tu turno*
+1. Golpe de Bambú · 25 POT
+2. Impacto del Panda · 36 POT
+
+👉 .ctuhistoria atacar 1
+👉 .ctuhistoria atacar 2
+👉 .ctuhistoria defender
+👉 .ctuhistoria habilidad
+
+💾 El turno se conserva al salir.
+```
+
+## Historia I-04: la memoria del bosque conduce a las raíces
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA*
+━━━━━━━━━━━━━━
+🎋 *Capítulo I · El Bosque que Olvidó su Voz*
+📍 *I-05 · Guardián Marchito*
+
+📖 Avance: 8/14 misiones
+
+Panda Guerrero usó Golpe de Bambú: 2 de daño.
+Acechador de Tinta quedó fuera de combate.
+La emboscada termina. El claro vuelve a quedar en silencio.
+
+🌿 *¡Encuentro superado!*
+
+🖋️ Nube retiene la última sílaba y señala las raíces del centro del claro. Allí alguien sigue intentando recordar su deber.
+
+🎁 +45 ChengCoins · +30 XP de Custodio
+✨ Panda Guerrero: +90 XP
+🧩 1 fragmento
+
+El Guardián Marchito levanta un muro de raíces. Bajo la corteza, la tinta repite una orden que ya no comprende.
+Nube: «Antes protegía el sendero. Ahora cree que todo el que intenta pasar viene a quitarle algo».
+Bao: «Rompe la barrera cuando cierre el paso y defiende cuando concentre la tinta. Estamos aquí para devolverle su voz».
+
+🛡️ Equipo preparado: 1/3 compañeros
+
+👉 *.ctuhistoria continuar*
+🛡️ .ctuequipo · 📖 .ctudiario historia
+```
+
+## Historia I-05: Guardián Marchito y barrera de raíces
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA | T1*
+━━━━━━━━━━━━━━
+🎋 *Capítulo I · El Bosque que Olvidó su Voz*
+📍 *I-05 · Guardián Marchito*
+
+📖 Avance: 8/14 misiones
+
+❤️ *EXPEDICIÓN*
+🐼 *Panda Guerrero*
+▓▓▓▓▓▓▓▓▓▓ 126/126 HP
+🛡️ Escudo 12
+
+👁️ *Guardián Marchito*
+▓▓▓▓▓▓▓▓▓▓ 240/240 HP
+Barrera de raíces
+
+⚠️ *SEÑAL ENEMIGA*
+🌿 Las raíces protegen al Guardián. Rompe la barrera para abrir paso a tus ataques.
+
+🧩 🌿 Barrera de raíces: 50 puntos.
+
+🎯 *Tu turno*
+1. Golpe de Bambú · 25 POT
+2. Impacto del Panda · 36 POT
+
+👉 .ctuhistoria atacar 1
+👉 .ctuhistoria atacar 2
+👉 .ctuhistoria defender
+👉 .ctuhistoria habilidad
+👉 .ctuhistoria romper · Rompe raíces y consume el turno
+
+💾 El turno se conserva al salir.
+```
+
+## Historia I-05: romper la barrera antes de atacar
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA | T2*
+━━━━━━━━━━━━━━
+🎋 *Capítulo I · El Bosque que Olvidó su Voz*
+📍 *I-05 · Guardián Marchito*
+
+📖 Avance: 8/14 misiones
+
+💥 Rompes la barrera de raíces y abres paso a tu ataque básico.
+Panda Guerrero usó Golpe de Bambú: 28 de daño.
+Guardián Marchito usó Golpe de Raíces: 5 de daño.
+
+❤️ *EXPEDICIÓN*
+🐼 *Panda Guerrero*
+▓▓▓▓▓▓▓▓▓▓ 121/126 HP
+
+👁️ *Guardián Marchito*
+▓▓▓▓▓▓▓▓▓▒ 212/240 HP
+Tinta en concentración
+
+⚠️ *SEÑAL ENEMIGA*
+La tinta se concentra: el próximo golpe será cargado. Prepara tu defensa.
+
+🧩 🌿 Barrera de raíces: 0 puntos.
+
+🎯 *Tu turno*
+1. Golpe de Bambú · 25 POT
+2. Impacto del Panda · 36 POT
+
+👉 .ctuhistoria atacar 1
+👉 .ctuhistoria atacar 2
+👉 .ctuhistoria defender
+👉 .ctuhistoria habilidad
+
+💾 El turno se conserva al salir.
+```
+
+## Historia I-05: defender la descarga anunciada
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA | T4*
+━━━━━━━━━━━━━━
+🎋 *Capítulo I · El Bosque que Olvidó su Voz*
+📍 *I-05 · Guardián Marchito*
+
+📖 Avance: 8/14 misiones
+
+Panda Guerrero se cubre: reduce el próximo daño de este turno un 70%.
+Guardián Marchito usó Estallido de Raíces: 13 de daño.
+🛡️ Tu defensa amortiguó la ofensiva: recibiste 13 de daño.
+
+❤️ *EXPEDICIÓN*
+🐼 *Panda Guerrero*
+▓▓▓▓▓▓▓▓▓▒ 108/126 HP
+
+👁️ *Guardián Marchito*
+▓▓▓▓▓▓▓▓▒▒ 173/240 HP
+Defensas abiertas
+
+⚠️ *SEÑAL ENEMIGA*
+✨ Tras descargar su fuerza, el enemigo queda expuesto: defensa 0 durante tu próxima acción.
+
+🧩 🌿 Barrera de raíces: 0 puntos.
+
+🎯 *Tu turno*
+1. Golpe de Bambú · 25 POT
+2. Impacto del Panda · 36 POT · ⏳ 1T
+
+👉 .ctuhistoria atacar 1
+👉 .ctuhistoria defender
+
+💾 El turno se conserva al salir.
+```
+
+## Historia I-05: aprovechar la apertura del enemigo
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA | T5*
+━━━━━━━━━━━━━━
+🎋 *Capítulo I · El Bosque que Olvidó su Voz*
+📍 *I-05 · Guardián Marchito*
+
+📖 Avance: 8/14 misiones
+
+Aprovechas la apertura: el Eco tiene la defensa reducida a 0.
+Panda Guerrero usó Golpe de Bambú: 50 de daño.
+El Eco intenta recuperar el equilibrio.
+
+❤️ *EXPEDICIÓN*
+🐼 *Panda Guerrero*
+▓▓▓▓▓▓▓▓▓▒ 108/126 HP
+
+👁️ *Guardián Marchito*
+▓▓▓▓▓▓▒▒▒▒ 123/240 HP
+Barrera de raíces
+
+⚠️ *SEÑAL ENEMIGA*
+🌿 Las raíces protegen al Guardián. Rompe la barrera para abrir paso a tus ataques.
+
+🧩 🌿 Barrera de raíces: 50 puntos.
+
+🎯 *Tu turno*
+1. Golpe de Bambú · 25 POT
+2. Impacto del Panda · 36 POT
+
+👉 .ctuhistoria atacar 1
+👉 .ctuhistoria atacar 2
+👉 .ctuhistoria defender
+👉 .ctuhistoria habilidad
+👉 .ctuhistoria romper · Rompe raíces y consume el turno
+
+💾 El turno se conserva al salir.
+```
+
+## Historia I-05: restauración del Guardián y Primer Trazo
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA*
+━━━━━━━━━━━━━━
+🎋 *Capítulo II · El Mercado de los Ecos*
+📍 *II-01 · Rumores entre faroles*
+
+📖 Avance: 9/14 misiones
+
+💥 Rompes la barrera de raíces y abres paso a tu ataque básico.
+Panda Guerrero usó Golpe de Bambú: 6 de daño.
+Guardián Marchito quedó fuera de combate.
+La tinta abandona las raíces. El Guardián recuerda parte de su nombre.
+
+🌿 *¡Encuentro superado!*
+
+🖋️ El Guardián baja las ramas: «Yo... cuidaba el camino. No debía cerrarlo para siempre». Parte de su memoria vuelve con el viento.
+Nube te entrega el Primer Trazo. Entre la tinta que se disuelve oyes: «El nombre también puede convertirse en una cadena».
+
+🎁 +105 ChengCoins · +60 XP de Custodio
+✨ Panda Guerrero: +195 XP · 🌱 Nv. 5
+🧩 1 fragmento · 1 esencia
+📜 Recuerdo: El nombre bajo las raíces
+
+Bao recuerda a la criatura del arroyo: «En un mercado, escuchar también puede ser una forma de cuidar».
+En el Mercado de los Ecos, Tía Mei enfría una taza junto a un asiento vacío. Hay puestos que han cerrado sin despedirse.
+Mei: «Aquí comerciamos con historias que continúan. Esas cartas perfectas, sin nombre de origen, están haciendo callar a la gente».
+Lian guarda el Primer Trazo. Necesitáis un testimonio, no acusar a todo el mercado.
+
+🛡️ Equipo preparado: 1/3 compañeros
+
+1. Escuchar a los comerciantes con cortesía
+👉 .ctuhistoria elegir 1
+
+2. Mostrar el símbolo y pedir pruebas
+👉 .ctuhistoria elegir 2
+
+📖 .ctudiario historia
+```
+
+## Diario tras el bosque: un Trazo recuperado y Mercado disponible
+
+```text
+🃏 *CHENGDÚ CARDS | DIARIO DEL CUSTODIO*
+━━━━━━━━━━━━━━
+📍 *Qué pasó antes*
+Continúas II-01: Rumores entre faroles. Tu avance y tus decisiones están guardados.
+
+📚 *Últimas escenas*
+*I-04 · El claro de la tinta*
+Nube retiene la última sílaba y señala las raíces del centro del claro. Allí alguien sigue intentando recordar su deber.
+*I-05 · Guardián Marchito*
+El Guardián baja las ramas: «Yo... cuidaba el camino. No debía cerrarlo para siempre». Parte de su memoria vuelve con el viento. Nube te entrega el Primer Trazo. Entre la tinta que se disuelve oyes: «El nombre también puede convertirse en una cadena».
+
+👥 *Personajes conocidos*
+Maestro Bao · Lian · Guardiana Nube · Guardián Marchito · Tía Mei
+
+🖋️ *Trazos y pistas*
+*Trazos de la Primera Carta*
+1 de 5 recuperados.
+*Primer Trazo*
+Un nombre conserva una memoria, pero también puede convertirse en una cadena. Nube te confió este fragmento cuando el bosque volvió a responder.
+
+🧭 *Últimas decisiones*
+*Una criatura herida*
+Auxiliar a la criatura. Limpias la tinta de una pata y le dejas espacio. Antes de refugiarse, la criatura señala unos arbustos: te está advirtiendo.
+*Huellas en el bambú*
+Observar y enfrentar solo al Eco hostil. Reconoces al Eco de Tinta por sus garras oscuras y dejas una salida a los otros. Lian anota tu cuidado al elegir el objetivo.
+
+📜 *Recuerdos*
+Campanas sin manos · La gratitud del bosque · La confianza de Lian · El nombre bajo las raíces
+
+🗺️ *Atlas*
+Plaza del Archivo · Bosque de los Susurros · Mercado de las Linternas
+
+📚 *Consultar el detalle*
+.ctudiario historia cronica
+.ctudiario historia personajes
+.ctudiario historia trazos
+.ctudiario historia decisiones
+.ctudiario historia recuerdos
+.ctudiario historia atlas
+
+👉 .ctuhistoria
+```
+
+## Historia II-01: Mei, Tao y comerciantes legítimos
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA*
+━━━━━━━━━━━━━━
+🎋 *Capítulo II · El Mercado de los Ecos*
+📍 *II-02 · El puesto sin nombre*
+
+📖 Avance: 10/14 misiones
+
+🖋️ Compartes el té antes de preguntar. Mei presenta a Tao, un aprendiz de mensajero: vio una entrega que nadie quiso firmar.
+
+🎁 +20 ChengCoins · +20 XP de Custodio
+✨ Panda Guerrero: +40 XP
+
+Tao os acompaña desde la casa de té. Reconoce el puesto que nadie quiso mencionar durante la entrega.
+En un puesto vacío brilla una carta sin una sola marca de uso. Su dibujo parece perfecto; el espacio del nombre está intacto.
+Lian: «La apariencia puede copiarse. Una identidad tiene origen, huellas y un recorrido que podemos comprobar».
+El registro del puesto no identifica a ninguna criatura. Elegís cómo documentar lo que falta.
+
+🛡️ Equipo preparado: 1/3 compañeros
+
+1. Examinar la inscripción y el sello
+👉 .ctuhistoria elegir 1
+
+2. Investigar su procedencia e historial
+👉 .ctuhistoria elegir 2
+
+📖 .ctudiario historia
+```
+
+## Historia II-02: una identidad auténtica conserva su historial
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA*
+━━━━━━━━━━━━━━
+🎋 *Capítulo II · El Mercado de los Ecos*
+📍 *II-03 · Una oferta imposible*
+
+📖 Avance: 11/14 misiones
+
+🖋️ El vendedor anterior tampoco conocía a su Custodio. Lian anota el hueco: un historial verificable cuenta cambios reales de propietario y conserva la identidad de cada unidad.
+
+🎁 +25 ChengCoins · +20 XP de Custodio
+✨ Panda Guerrero: +55 XP
+🧩 1 fragmento
+
+El vacío en la procedencia vuelve a repetirse en la oferta del desconocido: nadie acredita a su Custodio anterior.
+Un desconocido ofrece una carta invencible a cambio del compañero más querido de tu Custodio. No muestra nombre ni registro.
+Bao deja sobre la mesa una carta de ensayo: «Podemos seguirle el juego para entenderlo. Decide cómo te acercarías».
+🧪 Esta oferta es simulada: tus cartas, propietarios y ChengCoins no se intercambian.
+
+🛡️ Equipo preparado: 1/3 compañeros
+
+1. Aceptar la oferta dentro del relato
+👉 .ctuhistoria elegir 1
+
+2. Rechazar y pedir un registro verificable
+👉 .ctuhistoria elegir 2
+
+📖 .ctudiario historia
+```
+
+## Historia II-03: aceptar una oferta simulada sin mover cartas reales
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA*
+━━━━━━━━━━━━━━
+🎋 *Capítulo II · El Mercado de los Ecos*
+📍 *II-04 · El libro de los ausentes*
+
+📖 Avance: 12/14 misiones
+
+🖋️ Ofreces la carta de ensayo. El desconocido intenta cerrar el trato antes de que puedas mirar la suya; Lian descubre un hilo de tinta hacia un almacén. «Tu audacia mostró la trampa. En un intercambio real, revisa ambas ofertas antes de confirmar».
+
+🎁 +20 ChengCoins · +20 XP de Custodio
+✨ Panda Guerrero: +50 XP
+
+La trampa de la oferta te dejó una pista: el vendedor ocultaba el mismo patrón del tejido.
+Tao deja un libro de entregas sobre la mesa. La Señora Yun extiende a su lado un tejido con los mismos espacios en blanco.
+Yun: «Una marca cuenta dónde estuvo alguien. Otra conserva lo que quería que recordaran de él. Necesitamos leer ambas».
+Lian abre dos páginas del diario. Elige qué pista investigar primero; después revisaréis la otra.
+
+🛡️ Equipo preparado: 1/3 compañeros
+
+1. Revisar primero el libro de entregas
+👉 .ctuhistoria elegir 1
+
+2. Descifrar primero el patrón del tejido
+👉 .ctuhistoria elegir 2
+
+📖 .ctudiario historia
+```
+
+## Historia II-04: primera pista elegida, el libro de entregas
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA*
+━━━━━━━━━━━━━━
+🎋 *Capítulo II · El Mercado de los Ecos*
+📍 *II-04 · El libro de los ausentes*
+
+📖 Avance: 12/14 misiones
+
+🖋️ Tao ordena los recibos mientras Yun sostiene el tejido a contraluz. Empiezas siguiendo los destinos de las cartas.
+
+Tres entregas llegaron al mismo almacén; sus páginas perdieron los nombres después de ser firmadas.
+Tao reconoce una ruta aún utilizada. Lian marca el lugar: «No desaparecieron durante el viaje. Alguien los borró al recibirlos».
+
+🛡️ Equipo preparado: 1/3 compañeros
+
+🔎 *Investigación 1/2*
+Lee esta pista; la siguiente completa la otra parte del hallazgo.
+
+👉 *.ctuhistoria continuar*
+🛡️ .ctuequipo · 📖 .ctudiario historia
+```
+
+## Historia II-04: la segunda pista cambia el orden de la investigación
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA*
+━━━━━━━━━━━━━━
+🎋 *Capítulo II · El Mercado de los Ecos*
+📍 *II-04 · El libro de los ausentes*
+
+📖 Avance: 12/14 misiones
+
+Yun encuentra un hilo que se interrumpe y reaparece junto a otro nombre. La interrupción sigue siempre el mismo patrón.
+«No es un adorno», dice. «Es una petición: que les permitan volver a elegir». Lian conserva la frase en su cuaderno.
+
+🛡️ Equipo preparado: 1/3 compañeros
+
+🔎 *Investigación 2/2*
+Lee esta pista; la siguiente completa la otra parte del hallazgo.
+
+👉 *.ctuhistoria continuar*
+🛡️ .ctuequipo · 📖 .ctudiario historia
+```
+
+## Historia II-04: ambas pistas convergen sin duplicar la decisión
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA*
+━━━━━━━━━━━━━━
+🎋 *Capítulo II · El Mercado de los Ecos*
+📍 *II-05 · Mercader Sin Rostro*
+
+📖 Avance: 13/14 misiones
+
+🖋️ Las dos pistas señalan el mismo almacén. Mei reúne a los comerciantes para que los registros auténticos permanezcan a salvo mientras investigáis.
+
+🎁 +30 ChengCoins · +25 XP de Custodio
+✨ Panda Guerrero: +60 XP
+🧩 1 fragmento
+
+La ruta de entregas del libro termina en este almacén. Tao reconoce las cajas que dejaron los últimos mensajeros.
+El Mercader Sin Rostro despliega cartas enormes. Cada silueta promete una fuerza distinta, pero todas dejan la misma sombra sobre el suelo.
+Mercader: «Si nadie cambia de dueño, nadie volverá a perder lo que ama». Detrás de él, los nombres del libro empiezan a inmovilizarse.
+Lian: «Sus invocaciones no se comportan igual. Observa el patrón antes de gastar tu mejor técnica».
+
+🛡️ Equipo preparado: 1/3 compañeros
+
+👉 *.ctuhistoria continuar*
+🛡️ .ctuequipo · 📖 .ctudiario historia
+```
+
+## Historia II-05: señuelos del Mercader Sin Rostro
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA | T1*
+━━━━━━━━━━━━━━
+🎋 *Capítulo II · El Mercado de los Ecos*
+📍 *II-05 · Mercader Sin Rostro*
+
+📖 Avance: 13/14 misiones
+
+❤️ *EXPEDICIÓN*
+🐼 *Panda Guerrero*
+▓▓▓▓▓▓▓▓▓▓ 128/128 HP
+🛡️ Escudo 12
+
+👁️ *Mercader Sin Rostro*
+▓▓▓▓▓▓▓▓▓▓ 270/270 HP
+Señuelos activos
+
+⚠️ *SEÑAL ENEMIGA*
+🪞 Tres figuras idénticas rodean el puesto. Observa las huellas para reconocer al Mercader real.
+
+🧩 🪞 Señuelos activos: observa para reconocer al original.
+
+🎯 *Tu turno*
+1. Golpe de Bambú · 25 POT
+2. Impacto del Panda · 36 POT
+
+👉 .ctuhistoria atacar 1
+👉 .ctuhistoria atacar 2
+👉 .ctuhistoria defender
+👉 .ctuhistoria habilidad
+👉 .ctuhistoria observar · Revela señuelos y consume el turno
+
+💾 El turno se conserva al salir.
+```
+
+## Historia II-05: observar para revelar al Mercader original
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA | T2*
+━━━━━━━━━━━━━━
+🎋 *Capítulo II · El Mercado de los Ecos*
+📍 *II-05 · Mercader Sin Rostro*
+
+📖 Avance: 13/14 misiones
+
+👁️ Reconoces la única figura que deja huellas. El Mercader real queda revelado hasta que renueve sus ilusiones.
+
+❤️ *EXPEDICIÓN*
+🐼 *Panda Guerrero*
+▓▓▓▓▓▓▓▓▓▓ 128/128 HP
+🛡️ Escudo 12
+
+👁️ *Mercader Sin Rostro*
+▓▓▓▓▓▓▓▓▓▓ 270/270 HP
+Golpe entre sombras
+
+⚠️ *SEÑAL ENEMIGA*
+El Mercader prepara una firma de tinta mientras sus reflejos te distraen.
+
+🧩 👁️ Original revelado: tus ataques pueden alcanzarlo.
+
+🎯 *Tu turno*
+1. Golpe de Bambú · 25 POT
+2. Impacto del Panda · 36 POT
+
+👉 .ctuhistoria atacar 1
+👉 .ctuhistoria atacar 2
+👉 .ctuhistoria defender
+👉 .ctuhistoria habilidad
+
+💾 El turno se conserva al salir.
+```
+
+## Historia II-05: defender la descarga anunciada
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA | T5*
+━━━━━━━━━━━━━━
+🎋 *Capítulo II · El Mercado de los Ecos*
+📍 *II-05 · Mercader Sin Rostro*
+
+📖 Avance: 13/14 misiones
+
+Panda Guerrero se cubre: reduce el próximo daño de este turno un 70%.
+Mercader Sin Rostro usó Cobro del Vacío: 23 de daño.
+🛡️ Tu defensa amortiguó la ofensiva: recibiste 23 de daño.
+
+❤️ *EXPEDICIÓN*
+🐼 *Panda Guerrero*
+▓▓▓▓▓▓▓▓▓▒ 105/128 HP
+
+👁️ *Mercader Sin Rostro*
+▓▓▓▓▓▓▓▓▒▒ 199/270 HP
+Defensas abiertas
+
+⚠️ *SEÑAL ENEMIGA*
+✨ Tras descargar su fuerza, el enemigo queda expuesto: defensa 0 durante tu próxima acción.
+
+🧩 👁️ Original revelado: tus ataques pueden alcanzarlo.
+
+🎯 *Tu turno*
+1. Golpe de Bambú · 25 POT
+2. Impacto del Panda · 36 POT
+
+👉 .ctuhistoria atacar 1
+👉 .ctuhistoria atacar 2
+👉 .ctuhistoria defender
+👉 .ctuhistoria habilidad
+
+💾 El turno se conserva al salir.
+```
+
+## Historia II-05: aprovechar la apertura del enemigo
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA | T6*
+━━━━━━━━━━━━━━
+🎋 *Capítulo II · El Mercado de los Ecos*
+📍 *II-05 · Mercader Sin Rostro*
+
+📖 Avance: 13/14 misiones
+
+Aprovechas la apertura: el Eco tiene la defensa reducida a 0.
+Panda Guerrero usó Impacto del Panda: 61 de daño.
+Panda Guerrero recibe escudo.
+El Eco intenta recuperar el equilibrio.
+
+❤️ *EXPEDICIÓN*
+🐼 *Panda Guerrero*
+▓▓▓▓▓▓▓▓▓▒ 105/128 HP
+🛡️ Escudo 12
+
+👁️ *Mercader Sin Rostro*
+▓▓▓▓▓▓▒▒▒▒ 138/270 HP
+Señuelos activos
+
+⚠️ *SEÑAL ENEMIGA*
+🪞 Tres figuras idénticas rodean el puesto. Observa las huellas para reconocer al Mercader real.
+
+🧩 🪞 Señuelos activos: observa para reconocer al original.
+
+🎯 *Tu turno*
+1. Golpe de Bambú · 25 POT
+2. Impacto del Panda · 36 POT · ⏳ 2T
+
+👉 .ctuhistoria atacar 1
+👉 .ctuhistoria defender
+👉 .ctuhistoria observar · Revela señuelos y consume el turno
+
+💾 El turno se conserva al salir.
+```
+
+## Historia: capítulos I y II completos, Segundo Trazo y recompensa moderada
+
+```text
+🃏 *CHENGDÚ CARDS | HISTORIA | CAPÍTULO II COMPLETO*
+━━━━━━━━━━━━━━
+📖 Avance: 14/14 misiones
+
+Panda Guerrero usó Impacto del Panda: 17 de daño.
+Panda Guerrero recibe escudo.
+Mercader Sin Rostro quedó fuera de combate.
+Las ilusiones se deshacen. Recuperas el registro de los nombres que el Mercader ocultaba.
+
+🌿 *¡Encuentro superado!*
+
+🖋️ Las ilusiones se apagan. El Mercader admite que recibía identidades incompletas de alguien que se hacía llamar un antiguo protector del Archivo.
+Entre los registros aparece el Segundo Trazo. Lian comprende: «No quieren destruir a las criaturas. Quieren impedir que sus vínculos puedan cambiar».
+Tía Mei devuelve el libro a sus comerciantes. Los nombres recuperados vuelven a circular con historias que sus Custodios pueden comprobar.
+
+🎁 +90 ChengCoins · +55 XP de Custodio
+✨ Panda Guerrero: +180 XP
+🧩 1 fragmento · 1 esencia
+📜 Recuerdo: El valor de un nombre
+
+📜 *Dos Trazos, nuevas preguntas.*
+Has completado el prólogo, el Bosque de los Susurros y el Mercado de los Ecos. Tus decisiones y recuerdos quedan guardados.
+
+🔒 La siguiente etapa de tu viaje llegará con los próximos capítulos.
 
 📖 .ctudiario historia
 🎋 .cturecuerdos
@@ -4843,60 +5506,93 @@ Has completado el prólogo y las primeras tres misiones del bosque. Tus decision
 🃏 *CHENGDÚ CARDS | DIARIO DEL CUSTODIO*
 ━━━━━━━━━━━━━━
 📍 *Qué pasó antes*
-Has superado el prólogo y la primera expedición del bosque. La tinta continúa hacia un claro todavía cerrado.
+Has restaurado al Guardián y desenmascarado al Mercader Sin Rostro. Conservas dos Trazos; el viaje hacia el Puente de los Espejos continúa en la próxima fase.
 
-📚 *Crónica*
-*P-01 · Una invitación bajo el bambú*
-Un panda anciano observa una carta a la sombra del bambú. A su espalda se alza el Gran Archivo.
-*P-02 · El primer vínculo*
-Bao despliega los registros de las criaturas que pueden formar su primer vínculo.
-*P-03 · Una sombra en la plaza*
-Una mancha de tinta cruza la plaza. Dentro tiembla una criatura que parece no reconocer el camino.
-*P-04 · Las campanas del Archivo*
-La tinta abandona al Eco, pero las campanas siguen sonando. Lian encuentra una carta completamente blanca.
-*I-01 · Sendero en silencio*
-El sendero conserva el olor de la lluvia, pero no se oye un solo pájaro.
-*I-02 · Una criatura herida*
-Una pequeña criatura tiembla entre hojas manchadas de tinta. Más adelante, las huellas todavía están frescas.
-*I-03 · Huellas en el bambú*
-Dos Ecos retroceden hacia el bambú; un tercero avanza, reuniendo tinta alrededor de sus garras.
+📚 *Últimas escenas*
+*II-04 · El libro de los ausentes*
+Las dos pistas señalan el mismo almacén. Mei reúne a los comerciantes para que los registros auténticos permanezcan a salvo mientras investigáis.
+*II-05 · Mercader Sin Rostro*
+Las ilusiones se apagan. El Mercader admite que recibía identidades incompletas de alguien que se hacía llamar un antiguo protector del Archivo. Entre los registros aparece el Segundo Trazo. Lian comprende: «No quieren destruir a las criaturas. Quieren impedir que sus vínculos puedan cambiar». Tía Mei devuelve el libro a sus comerciantes. Los nombres recuperados vuelven a circular con historias que sus Custodios pueden comprobar.
 
 👥 *Personajes conocidos*
-*Maestro Bao*
-Mentor y antiguo guardián del Archivo. Te ayuda a comprender a tus compañeros.
-*Lian*
-Investiga los nombres borrados y recuerda cómo tratas a los Ecos.
+Maestro Bao · Lian · Guardiana Nube · Guardián Marchito · Tía Mei · Tao · Señora Yun · Mercader Sin Rostro
 
 🖋️ *Trazos y pistas*
 *Trazos de la Primera Carta*
-0 de 5. Aún no has recuperado ninguno.
+2 de 5 recuperados.
+*Primer Trazo*
+Un nombre conserva una memoria, pero también puede convertirse en una cadena. Nube te confió este fragmento cuando el bosque volvió a responder.
+*Segundo Trazo*
+Un vínculo auténtico guarda una historia y permite continuarla. Los registros del mercado muestran que borrar nombres también puede inmovilizar vínculos.
 
-🧭 *Tus decisiones*
-*Una invitación bajo el bambú*
-Preguntar por las criaturas. Bao: «Cada una tiene su nombre y su historia. Ser Custodio es acompañarla, no decidir todo por ella».
-*Sendero en silencio*
-Examinar las marcas del bambú. Los cortes interrumpen viejas inscripciones. Lian copia el patrón: «Alguien está buscando nombres, no madera».
-*Una criatura herida*
-Auxiliar a la criatura. Limpias la tinta de una pata y le dejas espacio. Antes de refugiarse, la criatura señala unos arbustos: te está advirtiendo.
-*Huellas en el bambú*
-Observar y enfrentar solo al Eco hostil. Reconoces al Eco de Tinta por sus garras oscuras y dejas una salida a los otros. Lian anota tu cuidado al elegir el objetivo.
+🧭 *Últimas decisiones*
+*Una oferta imposible*
+Aceptar la oferta dentro del relato. Ofreces la carta de ensayo. El desconocido intenta cerrar el trato antes de que puedas mirar la suya; Lian descubre un hilo de tinta hacia un almacén. «Tu audacia mostró la trampa. En un intercambio real, revisa ambas ofertas antes de confirmar».
+*El libro de los ausentes*
+Revisar primero el libro de entregas. Tao ordena los recibos mientras Yun sostiene el tejido a contraluz. Empiezas siguiendo los destinos de las cartas.
 
 📜 *Recuerdos*
-*Campanas sin manos*
-La primera llamada del Gran Archivo y una carta que había perdido su nombre.
-*La gratitud del bosque*
-Te detuviste a ayudar a una criatura herida cuando las huellas podían desaparecer.
-*La confianza de Lian*
-Distinguiste al Eco hostil de las criaturas asustadas. Lian dejó una nota de confianza en tu cuaderno.
+Campanas sin manos · La gratitud del bosque · La confianza de Lian · El nombre bajo las raíces · El valor de un nombre · La trampa desde dentro
 
 🗺️ *Atlas*
-*Plaza del Archivo*
-El despertar del Custodio
-*Bosque de los Susurros*
-El Bosque que Olvidó su Voz
+Plaza del Archivo · Bosque de los Susurros · Mercado de las Linternas
+
+📚 *Consultar el detalle*
+.ctudiario historia cronica
+.ctudiario historia personajes
+.ctudiario historia trazos
+.ctudiario historia decisiones
+.ctudiario historia recuerdos
+.ctudiario historia atlas
 
 👉 .ctuhistoria
-🗺️ .ctucapitulos
+```
+
+## Diario narrativo: primeras cuatro misiones con páginas numéricas
+
+```text
+🃏 *CHENGDÚ CARDS | DIARIO | CRÓNICA*
+━━━━━━━━━━━━━━
+*P-01 · Una invitación bajo el bambú*
+Un panda anciano observa una carta a la sombra del bambú. A su espalda se alza el Gran Archivo.
+
+*P-02 · El primer vínculo*
+Bao despliega los registros de las criaturas que pueden formar su primer vínculo.
+
+*P-03 · Una sombra en la plaza*
+Una mancha de tinta cruza la plaza. Dentro tiembla una criatura que parece no reconocer el camino.
+
+*P-04 · Las campanas del Archivo*
+La tinta abandona al Eco, pero las campanas siguen sonando. Lian encuentra una carta completamente blanca.
+
+📄 *Página 1 de 4*
+➡️ .ctudiario historia cronica 2
+📖 Resumen: .ctudiario historia
+👉 .ctuhistoria
+```
+
+## Diario narrativo: siguiente página mediante el alias de Historia
+
+```text
+🃏 *CHENGDÚ CARDS | DIARIO | CRÓNICA*
+━━━━━━━━━━━━━━
+*I-01 · Sendero en silencio*
+El sendero conserva el olor de la lluvia, pero no se oye un solo pájaro.
+
+*I-02 · Una criatura herida*
+Una pequeña criatura tiembla entre hojas manchadas de tinta. Más adelante, las huellas todavía están frescas.
+
+*I-03 · Huellas en el bambú*
+Dos Ecos retroceden hacia el bambú; un tercero avanza, reuniendo tinta alrededor de sus garras.
+
+*I-04 · El claro de la tinta*
+Nube retiene la última sílaba y señala las raíces del centro del claro. Allí alguien sigue intentando recordar su deber.
+
+📄 *Página 2 de 4*
+⬅️ .ctudiario historia cronica 1
+➡️ .ctudiario historia cronica 3
+📖 Resumen: .ctudiario historia
+👉 .ctuhistoria
 ```
 
 ## Historia: avance y siguientes misiones bloqueadas
@@ -4904,18 +5600,25 @@ El Bosque que Olvidó su Voz
 ```text
 🃏 *CHENGDÚ CARDS | CAPÍTULOS*
 ━━━━━━━━━━━━━━
-🎋 *El despertar del Custodio*
+✅ *El despertar del Custodio*
 ✅ P-01 · Una invitación bajo el bambú
 ✅ P-02 · El primer vínculo
 ✅ P-03 · Una sombra en la plaza
 ✅ P-04 · Las campanas del Archivo
 
-🎋 *El Bosque que Olvidó su Voz*
+✅ *El Bosque que Olvidó su Voz*
 ✅ I-01 · Sendero en silencio
 ✅ I-02 · Una criatura herida
 ✅ I-03 · Huellas en el bambú
-🔒 I-04 · El claro de la tinta · Próxima fase
-🔒 I-05 · Encuentro del capítulo · Próxima fase
+✅ I-04 · El claro de la tinta
+✅ I-05 · Guardián Marchito
+
+✅ *El Mercado de los Ecos*
+✅ II-01 · Rumores entre faroles
+✅ II-02 · El puesto sin nombre
+✅ II-03 · Una oferta imposible
+✅ II-04 · El libro de los ausentes
+✅ II-05 · Mercader Sin Rostro
 
 👉 .ctuhistoria
 ```
@@ -4923,10 +5626,8 @@ El Bosque que Olvidó su Voz
 ## Historia: recuerdos personales no comerciables
 
 ```text
-🃏 *CHENGDÚ CARDS | RECUERDOS*
+🃏 *CHENGDÚ CARDS | DIARIO | RECUERDOS*
 ━━━━━━━━━━━━━━
-📜 *Memorias del Custodio*
-
 *Campanas sin manos*
 La primera llamada del Gran Archivo y una carta que había perdido su nombre.
 
@@ -4936,6 +5637,12 @@ Te detuviste a ayudar a una criatura herida cuando las huellas podían desaparec
 *La confianza de Lian*
 Distinguiste al Eco hostil de las criaturas asustadas. Lian dejó una nota de confianza en tu cuaderno.
 
+*El nombre bajo las raíces*
+Escuchaste al Guardián Marchito cuando pudo recordar qué protegía. Nube confió a tus cuidados el Primer Trazo.
+
+📄 *Página 1 de 2*
+➡️ .ctudiario historia recuerdos 2
+📖 Resumen: .ctudiario historia
 👉 .ctuhistoria
 ```
 
@@ -4946,7 +5653,7 @@ Distinguiste al Eco hostil de las criaturas asustadas. Lian dejó una nota de co
 ━━━━━━━━━━━━━━
 🪵 0 fragmentos · ✨ 0 esencias · 🔮 0 sellos
 
-🎁 5 recompensas con materiales pendientes
+🎁 9 recompensas con materiales pendientes
 👉 .ctucrafting reclamar
 
 🔨 *Sello de evolución*
@@ -4961,6 +5668,54 @@ Distinguiste al Eco hostil de las criaturas asustadas. Lian dejó una nota de co
 
 🎒 .ctuinventario
 🔮 Evolución: .ctuevolucion ID
+```
+
+## Historia: recoger los materiales ganados en la campaña
+
+```text
+🃏 *CHENGDÚ CARDS | MATERIALES*
+━━━━━━━━━━━━━━
+🎒 ¡Materiales recogidos!
+
+🪵 9 fragmentos · ✨ 3 esencias · 🔮 0 sellos
+
+🔨 .ctucrafting
+```
+
+## Historia: fabricar el sello con materiales y monedas reales
+
+```text
+🃏 *CHENGDÚ CARDS | CRAFTING*
+━━━━━━━━━━━━━━
+🔨 ¡Creación completada!
+sello＿evolucion
+
+🪵 4 fragmentos · ✨ 1 esencias · 🔮 1 sellos
+
+💰 Coste: 100 ChengCoins
+
+🔮 .ctuevolucion ID
+🎒 .ctuinventario
+```
+
+## Historia: consultar la evolución del compañero real tras la campaña
+
+```text
+🃏 *CHENGDÚ CARDS | EVOLUCIÓN*
+━━━━━━━━━━━━━━
+🔮 *Panda Maestro*
+🎴 PAND-000006 · Nv. 5
+
+📋 Requisitos: nivel 5 · 300 ChengCoins · 1 sello
+💰 Tienes 460 · 🔮 1 sellos
+
+✨ Nv. 5: +4% · Nv. 10: +5%
+Bono al cumplir los requisitos: +4% · redondeo hacia abajo.
+🌱 El bono crece con el nivel, sin otro sello ni pago.
+
+✨ Lista para evolucionar.
+
+✅ .ctuevolucion PAND-000006 confirmar
 ```
 
 ## Pruebas de Historia: confirmación del reinicio personal
@@ -4984,7 +5739,7 @@ Tus unidades, XP, monedas y recompensas ya entregadas se conservan. Los premios 
 🎋 *Prólogo · El despertar del Custodio*
 📍 *P-01 · Una invitación bajo el bambú*
 
-📖 Avance: 0/7 misiones
+📖 Avance: 0/14 misiones
 
 🖋️ Campaña reiniciada para pruebas. Tus unidades, XP, monedas y premios anteriores se conservan.
 
@@ -5011,7 +5766,7 @@ Desde la torre suena una campana. Bao levanta la mirada: nadie debería estar to
 🎋 *Prólogo · El despertar del Custodio*
 📍 *P-02 · El primer vínculo*
 
-📖 Avance: 1/7 misiones
+📖 Avance: 1/14 misiones
 
 🖋️ Bao: «Guardamos nombres y vínculos. Cuando las campanas llaman solas, algo ha dejado de estar donde debería».
 

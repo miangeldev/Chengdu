@@ -41,7 +41,7 @@ export function createGame(options = {}) {
     social: createSocialService(storage, clock),
     clans: createClanService(storage, clock),
     acquisition: createAcquisitionService(storage, clock, options.randomDropInt),
-    story: createStoryService(storage, clock, options.randomRoll),
+    story: createStoryService(storage, clock, options.randomRoll, { contentVersion: options.storyContentVersion }),
     validateDatabase: () => storage.validateDatabase(),
     close: () => storage.close()
   };

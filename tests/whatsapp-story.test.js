@@ -147,7 +147,7 @@ test('expected story domain errors guide the next action without debug output', 
 });
 
 test('real story WhatsApp flow resumes, retries and completes phase one without paying twice after reset', async t => {
-  const c = setup(t, { randomRoll: () => 0 });
+  const c = setup(t, { randomRoll: () => 0, storyContentVersion: 1 });
   const user = await register(c.game);
   const replies = [], logs = [];
   const route = createCommandRouter({ game: c.game, prefix: '!', automaticSpawns: false, debug: false, logger: (...args) => logs.push(args) });
@@ -215,7 +215,11 @@ test('real story WhatsApp flow resumes, retries and completes phase one without 
   assert.ok(replies.at(-1).includes(`!ctuevolucion ${finished.team[0].id}`));
   assert.match(await send('!ctumovimientos'), /Misión de Historia/);
   const profile = await c.game.users.getProfile(user.id);
-  assert.match(await send('!ctudiario historia'), /La gratitud del bosque/);
+  const legacyJournal = await send('!ctudiario historia');
+  assert.match(legacyJournal, /La gratitud del bosque/);
+  assert.ok(legacyJournal.length < 4096);
+  assert.match(await send('!ctudiario historia cronica 1'), /P-01.*P-04.*Página 1 de 2/s);
+  assert.match(await send('!ctudiario historia cronica 2'), /I-01.*I-03.*Página 2 de 2/s);
   await send('!ctureiniciarhistoria confirmar');
   const reset = await get();
   assert.equal(reset.progress.run, 2);
@@ -228,7 +232,7 @@ test('real story WhatsApp flow resumes, retries and completes phase one without 
 });
 
 test('story inspection freezes attacks while team clearing and replacement remain locked until reset', async t => {
-  const c = setup(t, { randomRoll: () => 0 });
+  const c = setup(t, { randomRoll: () => 0, storyContentVersion: 1 });
   const user = await register(c.game);
   const unit = (await c.game.starter.claimStarter({ userId: user.id, choice: 'panda' })).unit;
   let sequence = 0;
@@ -256,4 +260,193 @@ test('story inspection freezes attacks while team clearing and replacement remai
   await c.game.teams.updateTeam({ userId: user.id, operation: 'clear' });
   assert.equal((await c.game.teams.getTeam(user.id)).units.length, 0);
   assert.equal((await c.game.validateDatabase()).valid, true);
+});
+
+test('expanded story UI offers roots and decoy tactics while inspection stays free', async () => {
+  const c = fixture();
+  const combat = {
+    status: 'active', encounterId: 'I05', round: 1, tutorial: {}, availableActions: ['attack', 'defend', 'skill', 'break'],
+    team: [{ slot: 1, name: 'Panda Guerrero', hp: 120, maxHp: 126, active: true, attacks: [{ choice: '1', name: 'Golpe de Bambú', power: 25, ready: true }, { choice: '2', name: 'Impacto', power: 36, ready: true }] }],
+    enemy: { name: 'Guardián Marchito', hp: 260, maxHp: 260, phase: 'roots', intent: 'Las raíces se cierran sobre el sendero.', mechanics: 'Barrera de raíces: 50 puntos.' }, lastEvents: []
+  };
+  c.state.current = { ...current(), campaign: { missionCount: 14 }, progress: { ...progress, contentVersion: 2, missionIndex: 8, stage: 'battle' },
+    mission: { code: 'I-05', title: 'Guardián Marchito', chapterTitle: 'El Bosque que Olvidó su Voz' }, battle: combat };
+  const roots = await c.send('!ctuhistoria');
+  assert.match(roots, /8\/14 misiones.*Barrera de raíces: 50 puntos.*!ctuhistoria romper.*consume el turno/s);
+  assert.doesNotMatch(roots, /!ctuhistoria observar/);
+  await c.send('!ctuhistoria romper');
+  assert.equal(c.calls.at(-1).request.action, 'break');
+  c.state.current.mission = { code: 'II-05', title: 'Mercader Sin Rostro', chapterTitle: 'El Mercado de los Ecos' };
+  c.state.current.progress.missionIndex = 13;
+  c.state.current.battle = { ...combat, encounterId: 'II05', availableActions: ['attack', 'defend', 'skill', 'observe'],
+    enemy: { ...combat.enemy, name: 'Mercader Sin Rostro', phase: 'illusions', intent: 'Tres figuras dejan una misma huella.', mechanics: 'Señuelos activos: observa para reconocer al original.' } };
+  const decoys = await c.send('!ctuhistoria');
+  assert.match(decoys, /Capítulo II.*Mercado de los Ecos.*!ctuhistoria observar.*consume el turno/s);
+  assert.doesNotMatch(decoys, /!ctuhistoria romper/);
+  await c.send('!ctuhistoria observar');
+  assert.equal(c.calls.at(-1).request.action, 'observe');
+  await c.send('!ctuhistoria inspeccionar');
+  assert.equal(c.calls.at(-1).method, 'getState');
+});
+
+test('investigation views continue each clue without offering the committed decision twice', () => {
+  const state = { ...current(), campaign: { missionCount: 14 }, progress: { ...progress, contentVersion: 2, missionIndex: 12, stage: 'investigation', sceneStep: 1 },
+    mission: { code: 'II-04', chapterTitle: 'El Mercado de los Ecos', title: 'El libro de los ausentes', scene: ['Yun descubre una petición entre los hilos.'], choices: firstMission.choices } };
+  const first = renderStory(state, cmd);
+  assert.match(first, /Capítulo II.*Investigación 1\/2.*!ctuhistoria continuar/s);
+  assert.doesNotMatch(first, /!ctuhistoria elegir/);
+  const second = renderStory({ ...state, progress: { ...state.progress, sceneStep: 2 }, mission: { ...state.mission, scene: ['Tao reconoce la ruta en los recibos.'] } }, cmd);
+  assert.match(second, /Tao reconoce.*Investigación 2\/2/s);
+  assert.doesNotMatch(second, /Yun descubre|!ctuhistoria elegir/);
+});
+
+test('finished version-one save advertises continuation while version two ends after fourteen missions', () => {
+  const legacy = renderStory({ ...current(), campaign: { missionCount: 7, availableMissionCount: 14, contentVersion: 1 },
+    progress: { ...progress, contentVersion: 1, missionIndex: 7, status: 'complete' }, nextContentAvailable: true }, cmd);
+  assert.match(legacy, /FASE 1 COMPLETA.*7\/7 misiones.*El bosque vuelve a llamarte.*!ctuhistoria continuar/s);
+  const expanded = renderStory({ ...current(), campaign: { missionCount: 14, availableMissionCount: 14, contentVersion: 2 },
+    progress: { ...progress, contentVersion: 2, missionIndex: 14, status: 'complete' }, nextContentAvailable: false }, cmd);
+  assert.match(expanded, /CAPÍTULO II COMPLETO.*14\/14 misiones.*Dos Trazos/s);
+  assert.doesNotMatch(expanded, /FASE 1 COMPLETA|resto del Capítulo I|!ctuhistoria continuar/);
+});
+
+test('expanded story errors explain the available boss mechanics without exposing internals', async () => {
+  const c = fixture({ act: async ({ action }) => { throw new GameError(action === 'break' ? 'STORY_NOT_BREAKABLE' : 'STORY_NOT_OBSERVABLE'); } });
+  assert.match(await c.send('!ctuhistoria romper'), /No hay una barrera/);
+  assert.match(await c.send('!ctuhistoria observar'), /señuelos activos.*gratis/s);
+});
+
+test('real expanded WhatsApp campaign completes fourteen missions, two ordered clues and two Trazos', async t => {
+  const c = setup(t, { randomRoll: () => 0 });
+  const user = await register(c.game);
+  const replies = [], logs = [];
+  const route = createCommandRouter({ game: c.game, prefix: '!', automaticSpawns: false, debug: false, logger: (...args) => logs.push(args) });
+  let sequence = 0;
+  async function send(body) {
+    const before = replies.length;
+    await route({ sendMessage: async (_, payload) => replies.push(payload.text) }, { key: { remoteJid: '521999999999@s.whatsapp.net', id: `expanded-story-ui-${++sequence}` } }, body);
+    assert.equal(replies.length, before + 1);
+    assert.doesNotMatch(replies.at(-1), /No pude confirmar|STB-|STA-|SR:|USR-|@s.whatsapp.net/);
+    assert.equal(logs.length, 0);
+    return replies.at(-1);
+  }
+  await send('!ctustarter panda');
+  await send('!ctuhistoria iniciar');
+  const initialJournal = await send('!ctudiario historia');
+  assert.doesNotMatch(initialJournal, /Tía Mei|Guardiana Nube|Señora Yun|Mercader Sin Rostro|Archivista/);
+  const used = new Set();
+  let firstTraceChecked = false, simulatedChecked = false, investigationFirst = false, investigationSecond = false;
+  for (let step = 0; step < 180; step++) {
+    const state = await c.game.story.getState({ userId: user.id });
+    assert.equal(state.campaign.missionCount, 14);
+    if (state.progress.status === 'complete') break;
+    if (state.mission.code === 'II-01' && !firstTraceChecked) {
+      const diary = await send('!ctudiario historia');
+      assert.match(diary, /1 de 5 recuperados.*Primer Trazo/s);
+      assert.doesNotMatch(diary, /Segundo Trazo|Señora Yun|Archivista/);
+      firstTraceChecked = true;
+    }
+    if (state.progress.stage === 'battle') {
+      const battle = state.battle, active = battle.team.find(unit => unit.active);
+      const tutorial = battle.encounterId === 'P03';
+      const action = tutorial && !battle.tutorial.attack ? 'atacar 1'
+        : battle.enemy.phase === 'unleash' || tutorial && !battle.tutorial.defend ? 'defender'
+          : battle.availableActions.includes('break') ? 'romper'
+            : battle.availableActions.includes('observe') ? 'observar'
+              : active.attacks[1].ready ? 'habilidad' : 'atacar 1';
+      used.add(action);
+      await send(`!ctuhistoria ${action}`);
+    } else if (state.progress.stage === 'choice') {
+      if (state.mission.code === 'II-03') {
+        assert.match(await send('!ctumision'), /oferta es simulada.*no se intercambian/s);
+        const unitsBefore = (await c.game.units.getUserUnits(user.id)).items.map(unit => ({ id: unit.id, ownerId: unit.ownerId, ownershipVersion: unit.ownershipVersion }));
+        await send('!ctuhistoria elegir 2');
+        assert.deepEqual((await c.game.units.getUserUnits(user.id)).items.map(unit => ({ id: unit.id, ownerId: unit.ownerId, ownershipVersion: unit.ownershipVersion })), unitsBefore);
+        simulatedChecked = true;
+      } else await send(`!ctuhistoria elegir ${state.mission.code === 'II-04' ? '2' : '1'}`);
+    } else if (state.progress.stage === 'investigation') {
+      const clue = await send('!ctumision');
+      assert.doesNotMatch(clue, /!ctuhistoria elegir/);
+      if (state.progress.sceneStep === 1) {
+        assert.match(clue, /hilo que se interrumpe.*Investigación 1\/2/s);
+        investigationFirst = true;
+      } else {
+        assert.match(clue, /Tres entregas.*Investigación 2\/2/s);
+        investigationSecond = true;
+      }
+      await send('!ctucontinuar');
+    } else if (state.progress.stage === 'defeated') assert.fail('The full UI route should win when reading each boss signal');
+    else await send('!ctucontinuar');
+  }
+  const finished = await c.game.story.getState({ userId: user.id });
+  assert.equal(finished.progress.status, 'complete');
+  assert.equal(finished.progress.completedMissionIds.length, 14);
+  assert.equal(finished.progress.traces.length, 2);
+  const earnedXp = value => value.xp + value.level * (value.level - 1) * 50;
+  assert.equal(earnedXp(finished.team[0].progress), 1495);
+  assert.ok(firstTraceChecked && simulatedChecked && investigationFirst && investigationSecond);
+  assert.ok(used.has('romper') && used.has('observar'));
+  assert.match(replies.at(-1), /CAPÍTULO II COMPLETO.*Segundo Trazo/s);
+  const beforeJournal = await c.game.users.getUser(user.id);
+  const journal = await send('!ctudiario historia');
+  assert.match(journal, /2 de 5 recuperados.*Segundo Trazo.*Una voz que confía/s);
+  assert.doesNotMatch(journal, /Archivista|Centinela del Espejo/);
+  assert.ok(journal.length < 4096, `The journal summary should fit a compact message: ${journal.length}`);
+  const earliest = await send('!ctudiario historia cronica 1');
+  assert.match(earliest, /P-01.*P-04.*Página 1 de 4/s);
+  assert.doesNotMatch(earliest, /II-05/);
+  assert.match(await send('!ctuhistoria diario cronica 2'), /I-01.*I-04.*Página 2 de 4/s);
+  assert.match(await send('!ctudiario historia cronica 4'), /II-04.*II-05.*Página 4 de 4/s);
+  const beforeReset = await c.game.users.getUser(user.id);
+  assert.deepEqual(beforeReset.economy, beforeJournal.economy);
+  assert.deepEqual(beforeReset.progress, beforeJournal.progress);
+  assert.equal(beforeReset.economy.coins, 560);
+  assert.equal(earnedXp(beforeReset.progress), 455);
+  await send('!ctureiniciarhistoria confirmar');
+  assert.match(await send('!ctuhistoria elegir 1'), /Premio único ya entregado/);
+  const afterReset = await c.game.users.getUser(user.id);
+  assert.deepEqual(afterReset.economy, beforeReset.economy);
+  assert.deepEqual(afterReset.progress, beforeReset.progress);
+});
+
+test('journal summary keeps the latest two entries and full sections use four numeric entries per page', async () => {
+  const rich = { ...journal,
+    chronicle: Array.from({ length: 10 }, (_, index) => ({ title: `Escena ${index + 1}`, text: `Historia antigua ${index + 1}.` })),
+    decisions: Array.from({ length: 6 }, (_, index) => ({ title: `Decisión ${index + 1}`, text: `Elegiste el camino ${index + 1}.` })),
+    characters: Array.from({ length: 6 }, (_, index) => ({ title: `Personaje ${index + 1}`, text: 'Ficha larga del personaje.' })),
+    memories: Array.from({ length: 6 }, (_, index) => ({ title: `Recuerdo ${index + 1}`, text: 'Descripción larga del recuerdo.' })),
+    atlas: Array.from({ length: 6 }, (_, index) => ({ title: `Lugar ${index + 1}`, text: 'Descripción larga del lugar.' })) };
+  let reads = 0;
+  const c = fixture({ getJournal: async () => { reads++; return rich; } });
+  const summary = await c.send('!ctudiario historia', { messageId: null });
+  assert.match(summary, /Escena 9.*Escena 10.*Decisión 5.*Decisión 6/s);
+  assert.doesNotMatch(summary, /Escena 8|Decisión 4|Ficha larga|Descripción larga/);
+  assert.match(summary, /Personaje 1.*Personaje 6.*Recuerdo 1.*Recuerdo 6/s);
+  const page1 = await c.send('!ctudiario historia cronica 1', { messageId: null });
+  assert.match(page1, /Escena 1.*Escena 4.*Página 1 de 3.*!ctudiario historia cronica 2/s);
+  assert.doesNotMatch(page1, /Escena 5|Escena 9/);
+  const page2 = await c.send('!ctudiario historia crónica 2');
+  assert.match(page2, /Escena 5.*Escena 8.*Página 2 de 3.*!ctudiario historia cronica 1.*!ctudiario historia cronica 3/s);
+  assert.equal(await c.send('!ctuhistoria diario cronica 2'), page2);
+  assert.match(await c.send('!ctudiario historia personajes 2'), /Personaje 5.*Ficha larga.*Personaje 6/s);
+  assert.match(await c.send('!cturecuerdos 2'), /Recuerdo 5.*Descripción larga.*Recuerdo 6/s);
+  assert.match(await c.send('!ctudiario historia atlas 2'), /Lugar 5.*Lugar 6/s);
+  assert.ok(reads >= 7);
+  assert.equal(c.calls.filter(call => call.method === 'claimDaily').length, 0);
+});
+
+test('journal rejects unknown sections and invalid pages while every query leaves daily rewards untouched', async () => {
+  let reads = 0;
+  const c = fixture({ getJournal: async () => { reads++; return journal; } });
+  for (const value of ['0', '-1', 'mucho', '1.5', '9007199254740992']) {
+    assert.match(await c.send(`!ctudiario historia cronica ${value}`, { messageId: null }), /página entera desde 1/);
+  }
+  assert.match(await c.send('!ctudiario historia inexistente'), /Elige cronica, personajes/);
+  assert.match(await c.send('!ctudiario historia cronica 1 sobra'), /Elige cronica, personajes/);
+  assert.equal(reads, 0, 'Malformed arguments should not read the journal');
+  assert.match(await c.send('!ctudiario historia cronica 99'), /no tiene tantos resultados/);
+  assert.equal(reads, 1);
+  assert.equal(c.calls.filter(call => call.method === 'claimDaily').length, 0);
+  assert.match(await c.send('!ctudiario'), /\+100 ChengCoins/);
+  assert.equal(c.calls.filter(call => call.method === 'claimDaily').length, 1);
 });

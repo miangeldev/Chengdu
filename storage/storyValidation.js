@@ -1,6 +1,6 @@
 import { equal } from './equality.js';
 import { requireGame } from '../utils/GameError.js';
-import { STORY_CAMPAIGN_ID, STORY_CONTENT_VERSION, getStoryMission } from '../game/story/catalog.js';
+import { STORY_CAMPAIGN_ID, isStoryContentVersion, getStoryMission } from '../game/story/catalog.js';
 import { createStoryBattle, resolveStoryAction } from '../game/story/combat.js';
 import { reduceStoryProgress, storyProgressId, storyRewardId } from '../game/story/progress.js';
 import { storyUnitSnapshot } from '../game/story/snapshot.js';
@@ -12,7 +12,7 @@ const check = (condition, field) => requireGame(condition, 'DATABASE_CORRUPT', {
 const integer = (value, min = 0) => Number.isSafeInteger(value) && value >= min;
 const date = value => typeof value === 'string' && Number.isFinite(Date.parse(value)) && new Date(value).toISOString() === value;
 const text = value => typeof value === 'string' && value.trim() === value && value.length > 0 && value.length <= 200;
-const validCampaign = row => row.campaignId === STORY_CAMPAIGN_ID && row.contentVersion === STORY_CONTENT_VERSION;
+const validCampaign = row => row.campaignId === STORY_CAMPAIGN_ID && isStoryContentVersion(row.contentVersion);
 const mapOf = rows => new Map(rows.map(row => [row.id, row]));
 const ownerAt = (state, unitId, version) => state.eventos.records.find(event => event.unitId === unitId &&
   (event.ownershipVersion ?? 0) === version)?.toOwnerId;
@@ -30,7 +30,7 @@ const sameRefs = (refs, snapshots) => equal(refs, snapshots.map(snapshot => ({ u
 function battleHistory(record) {
   const original = record.combat;
   let combat = createStoryBattle({ id: record.id, encounterId: original.encounterId,
-    units: original.unitSnapshots, now: record.createdAt });
+    units: original.unitSnapshots, now: record.createdAt, version: original.version });
   const prefixes = [combat];
   for (const action of original.actions) {
     combat = resolveStoryAction(combat, { action: action.action, choice: action.choice,
@@ -47,9 +47,9 @@ export function validateStoryData(state) {
   const battles = mapOf(state.combateshistoria.records), rewards = mapOf(state.premioshistoria.records);
   const histories = new Map(), activeUnits = new Set(), activeUsers = new Set();
   for (const battle of battles.values()) {
-    const mission = getStoryMission(battle.missionId);
+    const mission = getStoryMission(battle.missionId, battle.contentVersion);
     check(/^STB-[a-f0-9-]{36}$/.test(battle.id) && users.has(battle.userId) && validCampaign(battle) &&
-      integer(battle.run, 1) && mission?.encounterId === battle.combat?.encounterId &&
+      integer(battle.run, 1) && mission?.encounterId === battle.combat?.encounterId && battle.combat.version === battle.contentVersion &&
       date(battle.createdAt) && date(battle.updatedAt) && Date.parse(battle.updatedAt) >= Date.parse(battle.createdAt), 'battleMetadata');
     const prefixes = battleHistory(battle); histories.set(battle.id, prefixes);
     check(battle.status === battle.combat.status && battle.updatedAt === battle.combat.updatedAt, 'battleStatus');
@@ -108,13 +108,18 @@ export function validateStoryData(state) {
       action.kind === 'choose' ? equal(Object.keys(request), ['choice']) && typeof request.choice === 'string' :
       action.kind === 'act' ? equal(Object.keys(request), ['action', 'choice']) && typeof request.action === 'string' &&
         (request.choice === null || typeof request.choice === 'string') :
-      ['start', 'continue', 'retry', 'reset'].includes(action.kind) && equal(request, {})), 'request');
+      ['start', 'continue', 'retry', 'reset', 'upgrade'].includes(action.kind) && equal(request, {})), 'request');
+    check(!previous || action.kind === 'upgrade' || action.contentVersion === previous.contentVersion, 'actionContentVersion');
+    if (action.kind === 'upgrade') check(previous?.contentVersion === 1 && action.contentVersion === 2 &&
+      action.operationKey === `story-upgrade:${storyProgressId(action.userId)}:1:2`, 'upgradeAuthority');
     const battle = action.battleId ? battles.get(action.battleId) : null;
     const prefix = battle && integer(action.battleActionSeq, 1) ? histories.get(battle.id)[action.battleActionSeq] : null;
     if (battle) {
-      check(battle.userId === action.userId && battle.run === (previous?.run ?? 1) && battle.missionId === getStoryMission(previous?.missionIndex)?.id, 'actionBattleOwner');
+      check(battle.userId === action.userId && battle.run === (previous?.run ?? 1) &&
+        battle.missionId === getStoryMission(previous?.missionIndex, previous?.contentVersion)?.id, 'actionBattleOwner');
       if (action.battleActionSeq === null) {
-        check(['choose', 'continue', 'retry'].includes(action.kind) && !creations.has(battle.id) && battle.createdAt === action.createdAt &&
+        check(['choose', 'continue', 'retry'].includes(action.kind) && action.contentVersion === battle.contentVersion &&
+          !creations.has(battle.id) && battle.createdAt === action.createdAt &&
           (action.kind === 'retry' ? previous?.stage === 'defeated' : !['battle', 'defeated'].includes(previous?.stage)), 'battleStart');
         creations.add(battle.id);
       } else {
@@ -127,17 +132,19 @@ export function validateStoryData(state) {
         steps.add(key);
         stepCounts.set(battle.id, action.battleActionSeq);
       }
-    } else check(action.battleId === null && action.battleActionSeq === null && action.kind !== 'act' && !previous?.activeBattleId, 'missingBattle');
+    } else check(action.battleId === null && action.battleActionSeq === null && action.kind !== 'act' &&
+      (!previous?.activeBattleId || action.kind === 'upgrade'), 'missingBattle');
     const expected = reduceStoryProgress(previous, action, prefix);
     check(equal(action.after, expected) && action.run === expected.run && Array.isArray(action.unitRefs), 'progressReplay');
-    const mission = previous ? getStoryMission(previous.missionIndex) : null;
+    const mission = previous ? getStoryMission(previous.missionIndex, action.contentVersion) : null;
     const completed = previous && expected.missionIndex === previous.missionIndex + 1;
     if (completed) {
       const id = storyRewardId(action.userId, mission.id), reward = rewards.get(id);
       check(action.rewardId === id && reward, 'completionReward');
       if (!firstCompletions.has(id)) {
         firstCompletions.set(id, action);
-        check(reward.actionId === action.id && reward.createdAt === action.createdAt && reward.run === expected.run &&
+        check(reward.actionId === action.id && reward.contentVersion === action.contentVersion &&
+          reward.createdAt === action.createdAt && reward.run === expected.run &&
           (mission.reward.unitXp === 0 ? action.unitRefs.length === 0 : action.unitRefs.length >= 1 && action.unitRefs.length <= 3) &&
           (!battle || sameRefs(action.unitRefs, battle.combat.unitSnapshots)), 'firstReward');
       } else check(action.unitRefs.length === 0, 'replayedReward');
@@ -149,7 +156,7 @@ export function validateStoryData(state) {
   for (const progress of state.historias.records) check(progress.id === storyProgressId(progress.userId) &&
     equal(progress, chains.get(progress.userId)) && (progress.activeBattleId ? battles.get(progress.activeBattleId)?.status === 'active' : !activeUsers.has(progress.userId)), 'savedProgress');
   for (const reward of rewards.values()) {
-    const action = firstCompletions.get(reward.id), mission = getStoryMission(reward.missionId);
+    const action = firstCompletions.get(reward.id), mission = getStoryMission(reward.missionId, reward.contentVersion);
     check(action && mission && validCampaign(reward) && reward.userId === action.userId && reward.missionCode === mission.code &&
       ['coins', 'userXp', 'unitXp', 'materials', 'memory'].every(key => equal(reward[key], mission.reward[key])) &&
       Array.isArray(reward.unitRewards) && reward.unitRewards.length === action.unitRefs.length &&
@@ -175,7 +182,7 @@ export function validateStoryTransition(before, after, context = {}) {
     const user = before.usuarios.records.find(user => user.id === row.userId);
     check(user && Date.parse(row.createdAt) >= Date.parse(user.updatedAt) &&
       (!context.now || Date.parse(row.createdAt) <= Date.parse(context.now)), 'trustedClock');
-    if (row.kind === 'continue' && getStoryMission(row.before?.missionIndex)?.kind === 'starter')
+    if (row.kind === 'continue' && getStoryMission(row.before?.missionIndex, row.contentVersion)?.kind === 'starter')
       check(before.unidades.records.some(unit => unit.ownerId === row.userId), 'starterAuthority');
   }
   for (const progress of after.historias.records) {

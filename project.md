@@ -3018,6 +3018,47 @@ prueba ni operaciones pendientes. La sesión real depende del bot anfitrión.
 
 ---
 
+### Historia 0.12 — Fases 2 y 3
+
+La campaña disponible alcanza **14 misiones**. I-04 e I-05 completan el bosque
+con Nube, una emboscada anunciada y el Guardián Marchito: romper sus raíces,
+defender la descarga y aprovechar la apertura restaura parte de su memoria y
+recupera el Primer Trazo.
+
+II-01 a II-05 introducen a Mei, Tao y Yun; distinguen cartas auténticas de
+imitaciones, presentan una oferta simulada y ordenan dos escenas de investigación
+según la decisión del jugador. La oferta no ejecuta intercambios reales. Observar
+los señuelos del Mercader permite reconocer al original y recuperar el Segundo
+Trazo. Las decisiones del bosque vuelven mediante diálogos y recuerdos.
+
+La versión de contenido 2 reduce un **25%** los premios nuevos del recorrido
+original: 225 ChengCoins, 225 XP de Custodio y 825 XP por compañero elegible.
+El total de las catorce misiones es 560 monedas, 455 XP de Custodio, 1.495 XP de
+unidad, nueve fragmentos y tres esencias. Un compañero nuevo que recorra las
+misiones alcanza nivel 5 tras I-05. Los recibos anteriores conservan sus valores;
+reiniciar la campaña no permite volver a cobrarlos.
+
+El esquema sigue siendo **12**. La continuación actualiza el contenido de una
+campaña antigua mediante una acción auditable y conserva decisiones, propiedad,
+progreso y premios. Se corrige además la validación de evoluciones de emisiones
+antiguas sin `ownershipVersion`, consultando `ownershipAt` y su versión inicial
+0, sin reescribir los JSON.
+
+La [guía de Historia 0.12](docs/story-phases-2-3.md) describe el plan, las
+misiones, la dificultad, el presupuesto y las pruebas. Los capítulos posteriores
+y las misiones opcionales permanecen en el roadmap de la biblia. Los indicadores
+de abandono de jugadores reales corresponden a la operación del bot anfitrión.
+
+Verificación: **924 pruebas aprobadas**, **7.200 simulaciones actuales**,
+**237 ejemplos** y **59 comandos**. El diario se resume y conserva el detalle
+en páginas numéricas de cuatro entradas; los mensajes narrativos de ejemplo
+alcanzan un máximo de 2.409 unidades UTF-16. `npm run story:metrics` informa
+agregados por misión, resultados y señales de inactividad de 48 horas sin
+publicar identidades. La base local sigue válida en esquema 12: 40 archivos y
+44 registros conservados sin reescrituras ni datos de prueba.
+
+---
+
 ## V1.0
 
 ```text

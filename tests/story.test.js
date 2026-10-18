@@ -37,7 +37,7 @@ const stateOf = directory => Object.fromEntries(COLLECTIONS.map(name => [name,
   JSON.parse(fs.readFileSync(path.join(directory, `${name}.json`), 'utf8'))]));
 
 test('phase one persists decisions, accelerates the starter to level five and cannot farm prizes after reset', async t => {
-  const c = setup(t, { clock: () => NOW, randomRoll: () => 30 }); const user = await register(c.game);
+  const c = setup(t, { storyContentVersion: 1, clock: () => NOW, randomRoll: () => 30 }); const user = await register(c.game);
   const a = await reachBoss(c, user);
   assert.equal((await a.get()).team[0].level, 4);
   assert.equal((await a.get()).progress.decisions.forest_clue, 'stream');
@@ -68,7 +68,7 @@ test('phase one persists decisions, accelerates the starter to level five and ca
 });
 
 test('two tactical failures allow unlimited fully healed retries without XP, currency or PvP penalties', async t => {
-  const c = setup(t, { clock: () => NOW, randomRoll: () => 30 }); const user = await register(c.game);
+  const c = setup(t, { storyContentVersion: 1, clock: () => NOW, randomRoll: () => 30 }); const user = await register(c.game);
   const a = await reachBoss(c, user), original = await a.get();
   const profile = await c.game.users.getProfile(user.id);
   for (let i = 0; i < 2; i++) {
@@ -85,7 +85,7 @@ test('two tactical failures allow unlimited fully healed retries without XP, cur
 });
 
 test('story turn survives restarts and weeks of inactivity; operation replay never attacks twice', async t => {
-  let now = NOW; const c = setup(t, { clock: () => now, randomRoll: () => 30 });
+  let now = NOW; const c = setup(t, { storyContentVersion: 1, clock: () => now, randomRoll: () => 30 });
   const user = await register(c.game), a = await reachTutorial(c, user);
   const request = { userId: user.id, action: 'attack', choice: '1', operationKey: 'attack-once' };
   const first = await c.game.story.act(request);
@@ -104,7 +104,7 @@ test('story turn survives restarts and weeks of inactivity; operation replay nev
 });
 
 test('concurrent messages serialize decisions and reject invalid stages without partial payouts', async t => {
-  const c = setup(t, { clock: () => NOW }); const user = await register(c.game), a = api(c, user.id);
+  const c = setup(t, { storyContentVersion: 1, clock: () => NOW }); const user = await register(c.game), a = api(c, user.id);
   await assert.rejects(a.invoke('continue'), { code: 'STORY_NOT_STARTED' });
   await a.invoke('start');
   await assert.rejects(a.invoke('choose', { choice: '999' }), { code: 'STORY_INVALID_CHOICE' });
@@ -118,7 +118,7 @@ test('concurrent messages serialize decisions and reject invalid stages without 
 });
 
 test('saved progress, decisions, rewards and enemy health have independently checked proofs', async t => {
-  const c = setup(t, { clock: () => NOW, randomRoll: () => 30 }); const user = await register(c.game);
+  const c = setup(t, { storyContentVersion: 1, clock: () => NOW, randomRoll: () => 30 }); const user = await register(c.game);
   const a = await reachTutorial(c, user); await a.invoke('act', { action: 'attack', choice: '1' });
   const original = stateOf(c.directory);
   const corruptions = [
@@ -136,13 +136,13 @@ test('saved progress, decisions, rewards and enemy health have independently che
 });
 
 test('a coherent forged combat snapshot cannot replace an authorized saved encounter', async t => {
-  const c = setup(t, { clock: () => NOW, randomRoll: () => 30 }); const user = await register(c.game);
+  const c = setup(t, { storyContentVersion: 1, clock: () => NOW, randomRoll: () => 30 }); const user = await register(c.game);
   await reachTutorial(c, user);
   await assert.rejects(c.storage.withTransaction(async repos => {
     const battle = await repos.storyBattles.findBy('userId', user.id);
     const units = structuredClone(battle.combat.unitSnapshots);
     units[0].attacks[0].power = 999;
-    const combat = createStoryBattle({ id: battle.id, encounterId: battle.combat.encounterId, units, now: NOW });
+    const combat = createStoryBattle({ id: battle.id, encounterId: battle.combat.encounterId, units, now: NOW, version: battle.combat.version });
     await repos.storyBattles.replace({ ...battle, combat });
   }), { code: 'DATABASE_CORRUPT' });
   assert.equal((await c.game.validateDatabase()).valid, true);
@@ -151,7 +151,7 @@ test('a coherent forged combat snapshot cannot replace an authorized saved encou
 for (const stage of ['prepared', 'committed', 'published:usuarios.json', 'published:economia.json',
   'published:historias.json', 'published:accioneshistoria.json', 'published:premioshistoria.json', 'published:_database.json']) {
   test(`story reward and progress recover together at ${stage}`, async t => {
-    const c = setup(t, { clock: () => NOW }); const user = await register(c.game), a = api(c, user.id);
+    const c = setup(t, { storyContentVersion: 1, clock: () => NOW }); const user = await register(c.game), a = api(c, user.id);
     await a.invoke('start'); await c.game.close();
     const failing = c.open({ fault: current => { if (current === stage) throw new Error('story crash'); } }).game;
     const request = { userId: user.id, choice: '1', operationKey: 'recover-story-reward' };

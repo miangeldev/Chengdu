@@ -4,16 +4,12 @@ import { requireGame } from '../utils/GameError.js';
 import { effectiveUnitStats, evolvedStats, evolutionPolicy, EVOLUTION_POLICY_VERSION,
   formForCharacter, validEvolutionShape } from '../game/evolution/rules.js';
 import { effectiveStats } from '../game/progression/rules.js';
+import { ownershipAt } from '../game/units/ownership.js';
 
 const check = (condition, field) => requireGame(condition, 'DATABASE_CORRUPT', { field });
 
 const integer = (value, minimum = 0) => Number.isSafeInteger(value) && value >= minimum;
 const date = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(value) && Number.isFinite(Date.parse(value));
-
-function ownerAtVersion(state, unit, version) {
-  const event = state.eventos.records.find(row => row.unitId === unit.id && row.ownershipVersion === version);
-  return event?.toOwnerId;
-}
 
 export function validateEvolutionData(state) {
   const units = new Map(state.unidades.records.map(unit => [unit.id, unit]));
@@ -25,7 +21,7 @@ export function validateEvolutionData(state) {
     check(/^EVO-[a-f0-9-]{36}$/.test(evolution.id) && unit && form && evolution.policyVersion === policy.version &&
       unit.characterId === evolution.characterId && state.usuarios.records.some(user => user.id === evolution.userId) &&
       integer(evolution.ownershipVersion) && evolution.ownershipVersion <= unit.ownershipVersion &&
-      ownerAtVersion(state, unit, evolution.ownershipVersion) === evolution.userId && date(evolution.createdAt) &&
+      ownershipAt(state, unit.id, evolution.ownershipVersion) === evolution.userId && date(evolution.createdAt) &&
       typeof evolution.operationKey === 'string' && evolution.operationKey.length > 0 && evolution.operationKey.length <= 200 &&
       evolution.operationKey.trim() === evolution.operationKey && !keys.has(evolution.operationKey) && !seenUnits.has(unit.id) &&
       integer(evolution.level, policy.minimumLevel) && evolution.level <= unit.progress.level &&

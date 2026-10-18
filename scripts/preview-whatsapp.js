@@ -381,7 +381,7 @@ try {
   currentTime = '2026-11-13T06:00:00.000Z';
   await send(a, '.ctuclan war G1', 'Guerra: cierre por plazo sin premio personal para inactivos');
   await send(a, '.ctuinventario', 'Inventario ampliado: materiales, sellos e insignia artesanal');
-  // A fresh Custodian follows the entire phase-one story using real rewards.
+  // A fresh Custodian follows all fourteen missions using real rewards.
   const custodian = '521666666666@s.whatsapp.net';
   await send(custodian, '.cturegistro Custodio');
   const storyUser = await game.users.getUserByIdentity({ provider: 'whatsapp', subject: custodian });
@@ -396,11 +396,17 @@ try {
       }
       const active = state.battle.team.find(unit => unit.active);
       const signal = state.battle.enemy.phase;
-      const action = !state.battle.tutorial.attack ? 'atacar 1'
-        : !state.battle.tutorial.defend || signal === 'unleash' ? 'defender'
-          : active.attacks[1].ready ? 'habilidad' : 'atacar 1';
-      const sample = collectSignals && !captured.has(signal) && ['unleash', 'exposed'].includes(signal)
-        ? signal === 'unleash' ? 'Historia: defender la descarga anunciada' : 'Historia: aprovechar la apertura del minijefe' : null;
+      const tutorial = state.battle.encounterId === 'P03';
+      const action = tutorial && !state.battle.tutorial.attack ? 'atacar 1'
+        : signal === 'unleash' || tutorial && !state.battle.tutorial.defend ? 'defender'
+          : state.battle.availableActions.includes('break') ? 'romper'
+            : state.battle.availableActions.includes('observe') ? 'observar'
+              : active.attacks[1].ready ? 'habilidad' : 'atacar 1';
+      const signalText = action === 'romper' ? 'romper la barrera antes de atacar'
+        : action === 'observar' ? 'observar para revelar al Mercader original'
+          : signal === 'unleash' ? 'defender la descarga anunciada'
+            : signal === 'exposed' ? 'aprovechar la apertura del enemigo' : null;
+      const sample = collectSignals && !captured.has(signal) && signalText ? `Historia ${state.mission.code}: ${signalText}` : null;
       await send(custodian, `.ctuhistoria ${action}`, sample);
       if (sample) captured.add(signal);
     }
@@ -422,11 +428,30 @@ try {
   await send(custodian, '.ctuhistoria elegir 1', 'Historia I-03: Eco de Tinta y mecánica de minijefe');
   await send(custodian, '.ctuhistoria rendirse', 'Historia: retirada voluntaria, pista y reintento sin pérdida de cartas');
   await send(custodian, '.ctuhistoria reintentar', 'Historia: nueva expedición con vida restaurada');
-  await finishStoryEncounter('Historia: fase 1 completa y compañero preparado para evolucionar', { collectSignals: true });
+  await finishStoryEncounter('Historia: primer tramo superado y claro disponible', { collectSignals: true });
+  await send(custodian, '.ctucontinuar', 'Historia I-04: Guardiana Nube y emboscada del claro');
+  await finishStoryEncounter('Historia I-04: la memoria del bosque conduce a las raíces');
+  await send(custodian, '.ctucontinuar', 'Historia I-05: Guardián Marchito y barrera de raíces');
+  await finishStoryEncounter('Historia I-05: restauración del Guardián y Primer Trazo', { collectSignals: true });
+  await send(custodian, '.ctudiario historia', 'Diario tras el bosque: un Trazo recuperado y Mercado disponible');
+  await send(custodian, '.ctuhistoria elegir 1', 'Historia II-01: Mei, Tao y comerciantes legítimos');
+  await send(custodian, '.ctuhistoria elegir 2', 'Historia II-02: una identidad auténtica conserva su historial');
+  await send(custodian, '.ctuhistoria elegir 1', 'Historia II-03: aceptar una oferta simulada sin mover cartas reales');
+  await send(custodian, '.ctuhistoria elegir 1', 'Historia II-04: primera pista elegida, el libro de entregas');
+  await send(custodian, '.ctucontinuar', 'Historia II-04: la segunda pista cambia el orden de la investigación');
+  await send(custodian, '.ctucontinuar', 'Historia II-04: ambas pistas convergen sin duplicar la decisión');
+  await send(custodian, '.ctucontinuar', 'Historia II-05: señuelos del Mercader Sin Rostro');
+  await finishStoryEncounter('Historia: capítulos I y II completos, Segundo Trazo y recompensa moderada', { collectSignals: true });
   await send(custodian, '.ctudiario historia', 'Diario narrativo: resumen, crónica y decisiones sin cobrar el diario económico');
+  await send(custodian, '.ctudiario historia cronica 1', 'Diario narrativo: primeras cuatro misiones con páginas numéricas');
+  await send(custodian, '.ctuhistoria diario cronica 2', 'Diario narrativo: siguiente página mediante el alias de Historia');
   await send(custodian, '.ctucapitulos', 'Historia: avance y siguientes misiones bloqueadas');
   await send(custodian, '.cturecuerdos', 'Historia: recuerdos personales no comerciables');
   await send(custodian, '.ctucrafting', 'Historia: materiales auténticos para el primer sello');
+  await send(custodian, '.ctucrafting reclamar', 'Historia: recoger los materiales ganados en la campaña');
+  await send(custodian, '.ctucrafting crear sello_evolucion', 'Historia: fabricar el sello con materiales y monedas reales');
+  const storyUnit = (await storyState()).team[0];
+  await send(custodian, `.ctuevolucion ${storyUnit.id}`, 'Historia: consultar la evolución del compañero real tras la campaña');
   await send(custodian, '.ctureiniciarhistoria', 'Pruebas de Historia: confirmación del reinicio personal');
   await send(custodian, '.ctureiniciarhistoria confirmar', 'Pruebas de Historia: nueva partida conservando premios y unidades');
   await send(custodian, '.ctuhistoria elegir 1', 'Pruebas de Historia: repetir una misión no vuelve a entregar sus monedas');

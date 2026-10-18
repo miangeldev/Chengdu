@@ -1,4 +1,4 @@
-# Chengdú Cards — Historia 0.11
+# Chengdú Cards — Historia 0.12
 
 Módulo de juego para un bot de WhatsApp: registro, perfil, catálogo de diez
 personajes, starter único, colección, equipos de hasta tres unidades y combates
@@ -23,6 +23,10 @@ La versión **0.11.0** abre el modo Historia hasta su fase 1: prólogo, primeras
 tres misiones del bosque, decisiones persistentes, diario y minijefe con ataques
 anunciados. Sus premios únicos aceleran la XP de los compañeros hacia la
 evolución desde nivel 5. [Alcance, dificultad y presupuesto](docs/story-phase-1.md).
+La versión **0.12.0** completa el bosque y el Mercado de los Ecos: **14
+misiones**, Guardián Marchito, Mercader Sin Rostro, investigación con dos pistas
+y los dos primeros Trazos. Reduce un 25% los premios nuevos del tramo inicial,
+conservando los recibos anteriores. [Fases 2 y 3](docs/story-phases-2-3.md).
 Guía: [fases 13–32](docs/fases-13-32.md), [auditoría integral](docs/auditoria-fases-0-32.md)
 y [plan de entrega](docs/plan-fases-13-32.md).
 El balance 0.4.1 distingue la fuerza de las rarezas y limita la emisión global
@@ -66,8 +70,10 @@ no se conectan a WhatsApp ni escriben jugadores de prueba en la base del juego.
 | `.ctuhistoria elegir 1` | Confirmar una decisión entre las opciones de la escena. |
 | `.ctuhistoria atacar 1` / `.ctuhistoria defender` | Resolver el turno leyendo la señal del enemigo. |
 | `.ctuhistoria habilidad` / `.ctuhistoria cambiar 2` | Usar una técnica o entrar con reserva. |
+| `.ctuhistoria romper` / `.ctuhistoria observar` | Romper raíces del Guardián o revelar señuelos del Mercader; consumen el turno. |
 | `.ctuhistoria pista` / `.ctuhistoria reintentar` | Consultar la mecánica gratis o volver tras una derrota. |
 | `.ctudiario historia` / `.ctucapitulos` / `.cturecuerdos` | Crónica, progreso y recuerdos, sin reclamar el diario económico. |
+| `.ctudiario historia cronica 2` | Detalle de cuatro entradas por página; también personajes, trazos, decisiones, recuerdos y atlas. |
 | `.ctuclan` / `.ctuclan ayuda` | Crear clan, invitar, administrar tesorería, roles y guerras. |
 | `.ctuintercambio ayuda` | Ofertas de unidades/monedas con doble confirmación y códigos I1. |
 | `.ctucrafting` | Recoger materiales y crear sellos o insignias. |
@@ -621,6 +627,14 @@ activos, revisar la migración a SQLite prevista en el diseño.
 
 ## Alcance validado
 
+Historia 0.12 pasa **924 pruebas**, mantiene **59 comandos** y genera **237
+ejemplos de WhatsApp**. Se verificaron **7.200 simulaciones** del recorrido
+actual, compatibilidad de acciones y combates antiguos, actualización de
+campañas, recuperación y premios únicos. El diario resumido alcanza como
+máximo **2.409 unidades UTF-16** en los ejemplos narrativos; el detalle completo
+se consulta por secciones y páginas numéricas. La base local sigue en esquema
+12: sus 40 archivos y 44 registros se validaron sin reescribirlos.
+
 Historia 0.11 pasa **871 pruebas**, integra **59 comandos** y genera **213
 mensajes de ejemplo**. Se simularon **18.000 encuentros** del minijefe. La
 migración local 11→12 conserva exactamente los **44 registros** de sus **35
@@ -691,7 +705,10 @@ la llegada del límite de temporada, y se comprueba que recuperación y migraci�
 conserven resultados completos sin mezclar publicaciones parciales.
 
 La Historia añade progreso narrativo, acciones, encuentros y premios únicos.
-Los detalles y los capítulos posteriores están en [la guía de fase 1](docs/story-phase-1.md).
+La versión actual recorre catorce misiones y conserva las partidas antiguas de
+siete. [Fases 2 y 3](docs/story-phases-2-3.md) documenta presupuesto, nuevos
+controles, actualización del contenido y la corrección de propiedad histórica
+para evoluciones con emisiones antiguas sin `ownershipVersion`.
 El modelo conserva progreso, procedencia,
 revisiones de contenido, seriales, stats individuales, traits y variante.
 
@@ -705,5 +722,6 @@ Diseño: [fundación 0.1](docs/mvp-0.1.md), [combate 0.2](docs/mvp-0.2.md),
 [contenido 0.8](docs/beta-0.8.md),
 [competitivo 0.9](docs/beta-0.9.md),
 [historia 0.11](docs/story-phase-1.md),
+[historia 0.12](docs/story-phases-2-3.md),
 [modelo de datos](docs/database.md) y
 [visión completa](project.md).
