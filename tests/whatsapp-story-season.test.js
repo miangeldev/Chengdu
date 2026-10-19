@@ -69,19 +69,28 @@ test('season scenes show their current step and chapter without exposing the ful
   assert.match(c.calls.at(-1).request.operationKey, /^[a-f0-9]{64}$/);
 });
 
-test('mandatory boss recognition is explicit and retirement never promises learning credit', async () => {
+test('boss messages keep tactics visible without exposing required defeats or learning counters', async () => {
   const c = fixture();
   c.state.value.mission = { code: 'V-05', title: 'El Archivista', chapterTitle: 'El Último Nombre' };
   c.state.value.progress.stage = 'battle';
   c.state.value.battle = combat({ required: 4, defeats: 0, remaining: 4, scouting: true });
+  c.state.value.battle.enemy.mechanics = '📖 Reconocimiento obligatorio: faltan 4 derrotas reales antes de que pueda caer. 📜 CONTROL · Sello: 2 turnos';
+  const original = structuredClone(c.state.value.battle);
   const first = await c.send('!ctuhistoria');
-  assert.match(first, /Capítulo V.*0\/4 derrotas.*todavía no puedes vencer.*Rendirse no cuenta/s);
+  assert.match(first, /Capítulo V.*CONTROL · Sello: 2 turnos/s);
+  assert.doesNotMatch(first, /derrotas|reconocimiento|aprendizaje|todavía no puedes vencer|rendirse no cuenta/i);
+  assert.deepEqual(c.state.value.battle, original);
   c.state.value.battle = { ...combat({ required: 4, defeats: 4, remaining: 0, scouting: true }), status: 'lost', finishReason: 'learning' };
+  c.state.value.battle.lastEvents = ['📖 La barrera de reconocimiento desata su furia y derrota al equipo. Este intento cuenta para aprender el patrón; las retiradas no cuentan.'];
   const lost = await c.send('!ctuhistoria');
-  assert.match(lost, /4\/4 derrotas.*Aprendizaje completado.*reintentar/s);
-  assert.doesNotMatch(lost, /Faltan 4/);
+  assert.match(lost, /descarga que supera la defensa.*reintentar/s);
+  assert.doesNotMatch(lost, /4\/4|reconocimiento|aprendizaje|retiradas no cuentan/i);
   c.state.value.battle = { ...combat({ required: 4, defeats: 1, remaining: 3, scouting: true }), status: 'lost', finishReason: 'surrender' };
-  assert.match(await c.send('!ctuhistoria'), /RETIRADA.*1\/4 derrotas.*Rendirse no cuenta/s);
+  c.state.value.battle.lastEvents = ['Te retiras: las retiradas no cuentan como reconocimiento.'];
+  const retired = await c.send('!ctuhistoria');
+  assert.match(retired, /RETIRADA.*Te retiras del encuentro/s);
+  assert.doesNotMatch(retired, /1\/4|reconocimiento|aprendizaje|retiradas no cuentan/i);
+  assert.doesNotMatch(await c.send('!ctuhistoria ayuda'), /derrotas.*obligatorias|reconocimiento|aprendizaje/i);
 });
 
 test('support, purification and protection offer only available tactics and dispatch authenticated mutations', async () => {
@@ -217,7 +226,7 @@ test('real WhatsApp season saves every step, survives required defeats and opens
       if (state.battle.learning?.required) learning.set(state.battle.encounterId, state.battle.learning.defeats);
       await send('!ctuhistoria reintentar');
     } else if (state.progress.stage === 'battle') {
-      if (state.battle.learning?.scouting) assert.match(await send('!ctuhistoria', true), /todavía no puedes vencer.*Rendirse no cuenta/s);
+      if (state.battle.learning?.scouting) assert.doesNotMatch(await send('!ctuhistoria', true), /derrotas reales|reconocimiento|aprendizaje|todavía no puedes vencer|rendirse no cuenta/i);
       const record = await c.storage.withRead(repos => repos.storyBattles.get(state.progress.activeBattleId));
       const tactic = record.combat.encounterId === 'P03' ? storyTacticalAction(record.combat) : storySeasonTacticalAction(record.combat);
       await send(`!ctuhistoria ${names[tactic.action]}${tactic.choice ? ` ${tactic.choice}` : ''}`);

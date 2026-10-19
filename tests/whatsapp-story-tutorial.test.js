@@ -35,7 +35,7 @@ test('a real tutorial victory remains a victory and offers no further combat act
     units: [storyBalanceSnapshot('bruja_lunar', 20)] });
   const opening = renderStory(state(storyBattleView(battle)), cmd);
   assert.match(opening, /opcional/i);
-  assert.doesNotMatch(opening, /Aprendizaje del jefe|todavía no puedes vencer/);
+  assert.doesNotMatch(opening, /Aprendizaje del jefe|todavía no puedes vencer|derrotas obligatorias|derrotas reales|reconocimiento/i);
   for (let turns = 0; turns < 10 && battle.status === 'active'; turns++) {
     battle = resolveStoryAction(battle, { action: 'attack', choice: '1', rolls: [0, 0], now }).battle;
   }

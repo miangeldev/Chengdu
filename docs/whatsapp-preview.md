@@ -682,17 +682,17 @@ Lukas: +15 XP
 🏆 Victoria vs *Lukas*
 📅 11 de octubre de 2026 · 1v1 clásico · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-212cbaee-e5b0-422b-8e43-b64dc3c23648
+🔎 .ctuhistorial BTL-0f170234-b4b1-4630-9791-d732998cb666
 
 🏆 Victoria vs *Lukas*
 📅 11 de octubre de 2026 · 1v1 clásico · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-d932aeb4-aa1b-4b53-8779-1e15eeabe8c6
+🔎 .ctuhistorial BTL-45416013-4459-44c9-b824-19eb28729069
 
 🏆 Victoria vs *Lukas*
 📅 11 de octubre de 2026 · 1v1 clásico · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-f5bca99c-d828-4c48-bad1-ab3d7035ad79
+🔎 .ctuhistorial BTL-8b0711d3-d3a9-4b1c-ae40-8cd0319a5260
 
 📄 *Página 1 de 1*
 👉 Tu saldo: *.ctubalance*
@@ -3317,26 +3317,26 @@ Lukas: +15 XP
 📅 25 de octubre de 2026 · 1v1 · 8 turnos
 🎁 +120 ChengCoins · +35 XP
 🏅 Ranked T1 · 1016 Elo (+16)
-🔎 .ctuhistorial BTL-9af3c68c-5517-456a-a801-a4cd8d25be43
-
-🏆 Victoria vs *Lukas*
-📅 22 de octubre de 2026 · 1v1 clásico · 4 turnos
-🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-84bfa6fc-30d2-40c2-90bc-56c4905b82d6
+🔎 .ctuhistorial BTL-35a671d7-eaed-43ea-a26b-cb39f447d2ca
 
 💔 Derrota vs *Lukas*
 📅 22 de octubre de 2026 · 1v1 clásico · 5 turnos
 🎁 +0 ChengCoins · +15 XP
-🔎 .ctuhistorial BTL-c6c53261-1dc9-4134-90eb-be1abb2be59e
+🔎 .ctuhistorial BTL-995767e2-34c7-4ea2-ae45-143be7ee727f
+
+🏆 Victoria vs *Lukas*
+📅 22 de octubre de 2026 · 1v1 clásico · 4 turnos
+🎁 +120 ChengCoins · +35 XP
+🔎 .ctuhistorial BTL-ab8ccea8-6763-4fbd-897e-910320058401
 
 💔 Derrota vs *Lukas*
 📅 20 de octubre de 2026 · 1v1 · 0 turnos
-🔎 .ctuhistorial BTL-53576d86-2514-4be0-9b5a-6b2994934169
+🔎 .ctuhistorial BTL-cce8457d-83e9-436c-b3f9-c91a7cd3216d
 
 💔 Derrota vs *Lukas*
 📅 20 de octubre de 2026 · 3v3 · 31 turnos
 🎁 +0 ChengCoins · +15 XP
-🔎 .ctuhistorial BTL-7de63045-7e05-4764-a05f-008697f92f6a
+🔎 .ctuhistorial BTL-cd575976-2f28-4e2e-86e6-63d8f80e18ca
 
 📄 *Página 1 de 3*
 ➡️ Siguiente: *.ctuhistorial 2*
@@ -4161,13 +4161,13 @@ Bono al cumplir los requisitos: +4% · redondeo hacia abajo.
 ━━━━━━━━━━━━━━
 🏅 Puntos de la temporada T2: victoria 3 · empate 1
 
-🏯 *[BAM] Casa del Bambú*
-🏅 0 puntos · 👥 3/15
-👉 .ctuclan ver C1
-
 🏯 *[LUNA] Casa Lunar*
 🏅 0 puntos · 👥 3/15
 👉 .ctuclan ver C2
+
+🏯 *[BAM] Casa del Bambú*
+🏅 0 puntos · 👥 3/15
+👉 .ctuclan ver C1
 
 📄 *Página 1 de 1*
 ```
@@ -4519,7 +4519,7 @@ Bao: «Cuando la tinta se concentre, cúbrete. Después de descargarla quedará 
 📖 .ctudiario historia
 ```
 
-## Historia I-03: escena 1
+## Historia I-03: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T3*
@@ -4588,7 +4588,7 @@ Bao: «Mira sus movimientos. Si anuncia el golpe, puedes prepararte antes de rec
 🛡️ .ctuequipo · 📖 .ctudiario historia
 ```
 
-## Historia I-04: escena 1
+## Historia I-04: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T3*
@@ -4657,7 +4657,7 @@ Bao: «Rompe la barrera cuando cierre el paso y defiende cuando concentre la tin
 🛡️ .ctuequipo · 📖 .ctudiario historia
 ```
 
-## Historia I-05: reconocimiento obligatorio
+## Historia I-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T1*
@@ -4676,14 +4676,10 @@ Bao: «Rompe la barrera cuando cierre el paso y defiende cuando concentre la tin
 ▓▓▓▓▓▓▓▓▓▓ 245/245 HP
 Barrera de raíces
 
-📖 *Aprendizaje del jefe: 0/1 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 🌿 Las raíces vuelven a cubrirlo. Romper abre paso al ataque básico; el Guardián responderá.
 
-🧩 📖 Reconocimiento obligatorio: faltan 1 derrotas reales antes de que pueda caer. 🌿 Barrera: 45. La carga y la apertura también causan daño. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 🌿 Barrera: 45. La carga y la apertura también causan daño. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -4699,7 +4695,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia I-05: reconocimiento obligatorio
+## Historia I-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T2*
@@ -4722,14 +4718,10 @@ Guardián Marchito usó Presión de tinta: 0 de daño a Panda Guerrero.
 ▓▓▓▓▓▓▓▓▓▒ 217/245 HP
 Tinta en concentración
 
-📖 *Aprendizaje del jefe: 0/1 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 ⚠️ Carga una descarga y te hostiga mientras la prepara. La próxima señal exigirá defensa.
 
-🧩 📖 Reconocimiento obligatorio: faltan 1 derrotas reales antes de que pueda caer. 🌿 Barrera: 0. La carga y la apertura también causan daño. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 🌿 Barrera: 0. La carga y la apertura también causan daño. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -4744,7 +4736,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia I-05: reconocimiento obligatorio
+## Historia I-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T3*
@@ -4766,14 +4758,10 @@ Guardián Marchito usó Hostigamiento de carga: 0 de daño a Panda Guerrero.
 ▓▓▓▓▓▓▓▓▒▒ 178/245 HP
 Descarga preparada
 
-📖 *Aprendizaje del jefe: 0/1 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 ⚠️ ¡DESCARGA INMINENTE! Defiende para amortiguarla y devolver parte de su fuerza.
 
-🧩 📖 Reconocimiento obligatorio: faltan 1 derrotas reales antes de que pueda caer. 🌿 Barrera: 0. La carga y la apertura también causan daño. Ofensiva seguida: 1/3; alterna acciones para evitar la represalia.
+🧩 🌿 Barrera: 0. La carga y la apertura también causan daño. Ofensiva seguida: 1/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -4786,7 +4774,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia I-05: reconocimiento obligatorio
+## Historia I-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T4*
@@ -4808,14 +4796,10 @@ La respuesta del vínculo causa 16 de daño al enemigo.
 ▓▓▓▓▓▓▓▒▒▒ 162/245 HP
 Defensas abiertas
 
-📖 *Aprendizaje del jefe: 0/1 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 Su defensa cae, pero sigue atacando. Aprovecha la apertura sin descuidar tu vida.
 
-🧩 📖 Reconocimiento obligatorio: faltan 1 derrotas reales antes de que pueda caer. 🌿 Barrera: 0. La carga y la apertura también causan daño. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 🌿 Barrera: 0. La carga y la apertura también causan daño. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -4840,8 +4824,8 @@ Su defensa cae, pero sigue atacando. Aprovecha la apertura sin descuidar tu vida
 
 💥 Rompes las raíces y diriges un ataque básico. El Guardián responderá.
 Panda Guerrero usó Golpe de Bambú: 27 de daño a Guardián Marchito.
-🛡️ La barrera de reconocimiento desvía el remate: el jefe resiste con 1 HP y responde con su furia.
-📖 La barrera de reconocimiento desata su furia y derrota al equipo. Este intento cuenta para aprender el patrón; las retiradas no cuentan.
+🛡️ La barrera desvía el remate: el jefe resiste con 1 HP y responde con su furia.
+💥 El jefe libera una descarga que supera la defensa del equipo.
 Tu equipo cae bajo la presión. Conservas tus cartas y monedas; revisa la señal y prepara el siguiente intento.
 
 ❤️ *EXPEDICIÓN*
@@ -4850,10 +4834,6 @@ Tu equipo cae bajo la presión. Conservas tus cartas y monedas; revisa la señal
 
 👁️ *Guardián Marchito*
 ▓▒▒▒▒▒▒▒▒▒ 1/245 HP
-
-📖 *Aprendizaje del jefe: 1/1 derrotas*
-Aprendizaje completado. Ya puedes disputar la victoria.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
 
 🌧️ *Esta vez la expedición cayó.*
 Tu historia sigue guardada. No pierdes cartas ni monedas; reintentar no duplica los premios.
@@ -4865,7 +4845,7 @@ Tu historia sigue guardada. No pierdes cartas ni monedas; reintentar no duplica 
 🔎 Pista: .ctuhistoria pista
 ```
 
-## Historia I-05: escena 1
+## Historia I-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T3*
@@ -4886,10 +4866,6 @@ Guardián Marchito usó Hostigamiento de carga: 0 de daño a Panda Guerrero.
 👁️ *Guardián Marchito*
 ▓▓▓▓▓▓▓▓▒▒ 178/245 HP
 Descarga preparada
-
-📖 *Aprendizaje del jefe: 1/1 derrotas*
-Aprendizaje completado. Ya puedes disputar la victoria.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
 
 ⚠️ *SEÑAL ENEMIGA*
 ⚠️ ¡DESCARGA INMINENTE! Defiende para amortiguarla y devolver parte de su fuerza.
@@ -5114,7 +5090,7 @@ Lian: «Sus invocaciones no se comportan igual. Observa el patrón antes de gast
 🛡️ .ctuequipo · 📖 .ctudiario historia
 ```
 
-## Historia II-05: reconocimiento obligatorio
+## Historia II-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T1*
@@ -5133,14 +5109,10 @@ Lian: «Sus invocaciones no se comportan igual. Observa el patrón antes de gast
 ▓▓▓▓▓▓▓▓▓▓ 270/270 HP
 Señuelos activos
 
-📖 *Aprendizaje del jefe: 0/2 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 🪞 Renovará sus reflejos. Observar reconoce al original y consume un turno bajo presión.
 
-🧩 📖 Reconocimiento obligatorio: faltan 2 derrotas reales antes de que pueda caer. 🪞 Señuelos activos: observa bajo presión. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 🪞 Señuelos activos: observa bajo presión. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -5156,7 +5128,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia II-05: reconocimiento obligatorio
+## Historia II-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T2*
@@ -5177,14 +5149,10 @@ Mercader Sin Rostro usó Presión de tinta: 0 de daño a Panda Guerrero.
 👁️ *Mercader Sin Rostro*
 ▓▓▓▓▓▓▓▓▓▓ 270/270 HP
 
-📖 *Aprendizaje del jefe: 0/2 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 La tinta prepara un golpe rápido: el enemigo no dejará de presionarte.
 
-🧩 📖 Reconocimiento obligatorio: faltan 2 derrotas reales antes de que pueda caer. 👁️ Original reconocido. El enemigo sigue atacando. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 👁️ Original reconocido. El enemigo sigue atacando. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -5199,7 +5167,7 @@ La tinta prepara un golpe rápido: el enemigo no dejará de presionarte.
 💾 El turno se conserva al salir.
 ```
 
-## Historia II-05: reconocimiento obligatorio
+## Historia II-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T3*
@@ -5221,14 +5189,10 @@ Mercader Sin Rostro usó Presión de tinta: 0 de daño a Panda Guerrero.
 ▓▓▓▓▓▓▓▓▓▒ 229/270 HP
 Tinta en concentración
 
-📖 *Aprendizaje del jefe: 0/2 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 ⚠️ Carga una descarga y te hostiga mientras la prepara. La próxima señal exigirá defensa.
 
-🧩 📖 Reconocimiento obligatorio: faltan 2 derrotas reales antes de que pueda caer. 👁️ Original reconocido. El enemigo sigue atacando. Ofensiva seguida: 1/3; alterna acciones para evitar la represalia.
+🧩 👁️ Original reconocido. El enemigo sigue atacando. Ofensiva seguida: 1/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -5241,7 +5205,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia II-05: reconocimiento obligatorio
+## Historia II-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T4*
@@ -5262,14 +5226,10 @@ Mercader Sin Rostro usó Hostigamiento de carga: 4 de daño a Panda Guerrero.
 ▓▓▓▓▓▓▓▓▒▒ 199/270 HP
 Descarga preparada
 
-📖 *Aprendizaje del jefe: 0/2 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 ⚠️ ¡DESCARGA INMINENTE! Defiende para amortiguarla y devolver parte de su fuerza.
 
-🧩 📖 Reconocimiento obligatorio: faltan 2 derrotas reales antes de que pueda caer. 👁️ Original reconocido. El enemigo sigue atacando. Ofensiva seguida: 2/3; alterna acciones para evitar la represalia.
+🧩 👁️ Original reconocido. El enemigo sigue atacando. Ofensiva seguida: 2/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -5282,7 +5242,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia II-05: reconocimiento obligatorio
+## Historia II-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T5*
@@ -5304,14 +5264,10 @@ La respuesta del vínculo causa 16 de daño al enemigo.
 ▓▓▓▓▓▓▓▒▒▒ 183/270 HP
 Defensas abiertas
 
-📖 *Aprendizaje del jefe: 0/2 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 Su defensa cae, pero sigue atacando. Aprovecha la apertura sin descuidar tu vida.
 
-🧩 📖 Reconocimiento obligatorio: faltan 2 derrotas reales antes de que pueda caer. 👁️ Original reconocido. El enemigo sigue atacando. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 👁️ Original reconocido. El enemigo sigue atacando. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -5326,7 +5282,7 @@ Su defensa cae, pero sigue atacando. Aprovecha la apertura sin descuidar tu vida
 💾 El turno se conserva al salir.
 ```
 
-## Historia II-05: reconocimiento obligatorio
+## Historia II-05: derrota guardada y reintento
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | DERROTA*
@@ -5348,10 +5304,6 @@ Tu equipo cae bajo la presión. Conservas tus cartas y monedas; revisa la señal
 👁️ *Mercader Sin Rostro*
 ▓▓▒▒▒▒▒▒▒▒ 31/270 HP
 
-📖 *Aprendizaje del jefe: 1/2 derrotas*
-Faltan 1 derrotas de aprendizaje antes del intento de victoria.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 🌧️ *Esta vez la expedición cayó.*
 Tu historia sigue guardada. No pierdes cartas ni monedas; reintentar no duplica los premios.
 
@@ -5362,7 +5314,7 @@ Tu historia sigue guardada. No pierdes cartas ni monedas; reintentar no duplica 
 🔎 Pista: .ctuhistoria pista
 ```
 
-## Historia II-05: reconocimiento obligatorio
+## Historia II-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T1*
@@ -5381,14 +5333,10 @@ Tu historia sigue guardada. No pierdes cartas ni monedas; reintentar no duplica 
 ▓▓▓▓▓▓▓▓▓▓ 270/270 HP
 Señuelos activos
 
-📖 *Aprendizaje del jefe: 1/2 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 🪞 Renovará sus reflejos. Observar reconoce al original y consume un turno bajo presión.
 
-🧩 📖 Reconocimiento obligatorio: faltan 1 derrotas reales antes de que pueda caer. 🪞 Señuelos activos: observa bajo presión. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 🪞 Señuelos activos: observa bajo presión. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -5404,7 +5352,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia II-05: reconocimiento obligatorio
+## Historia II-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T2*
@@ -5425,14 +5373,10 @@ Mercader Sin Rostro usó Presión de tinta: 0 de daño a Panda Guerrero.
 👁️ *Mercader Sin Rostro*
 ▓▓▓▓▓▓▓▓▓▓ 270/270 HP
 
-📖 *Aprendizaje del jefe: 1/2 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 La tinta prepara un golpe rápido: el enemigo no dejará de presionarte.
 
-🧩 📖 Reconocimiento obligatorio: faltan 1 derrotas reales antes de que pueda caer. 👁️ Original reconocido. El enemigo sigue atacando. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 👁️ Original reconocido. El enemigo sigue atacando. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -5447,7 +5391,7 @@ La tinta prepara un golpe rápido: el enemigo no dejará de presionarte.
 💾 El turno se conserva al salir.
 ```
 
-## Historia II-05: reconocimiento obligatorio
+## Historia II-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T3*
@@ -5469,14 +5413,10 @@ Mercader Sin Rostro usó Presión de tinta: 0 de daño a Panda Guerrero.
 ▓▓▓▓▓▓▓▓▓▒ 229/270 HP
 Tinta en concentración
 
-📖 *Aprendizaje del jefe: 1/2 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 ⚠️ Carga una descarga y te hostiga mientras la prepara. La próxima señal exigirá defensa.
 
-🧩 📖 Reconocimiento obligatorio: faltan 1 derrotas reales antes de que pueda caer. 👁️ Original reconocido. El enemigo sigue atacando. Ofensiva seguida: 1/3; alterna acciones para evitar la represalia.
+🧩 👁️ Original reconocido. El enemigo sigue atacando. Ofensiva seguida: 1/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -5489,7 +5429,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia II-05: reconocimiento obligatorio
+## Historia II-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T4*
@@ -5510,14 +5450,10 @@ Mercader Sin Rostro usó Hostigamiento de carga: 4 de daño a Panda Guerrero.
 ▓▓▓▓▓▓▓▓▒▒ 199/270 HP
 Descarga preparada
 
-📖 *Aprendizaje del jefe: 1/2 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 ⚠️ ¡DESCARGA INMINENTE! Defiende para amortiguarla y devolver parte de su fuerza.
 
-🧩 📖 Reconocimiento obligatorio: faltan 1 derrotas reales antes de que pueda caer. 👁️ Original reconocido. El enemigo sigue atacando. Ofensiva seguida: 2/3; alterna acciones para evitar la represalia.
+🧩 👁️ Original reconocido. El enemigo sigue atacando. Ofensiva seguida: 2/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -5530,7 +5466,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia II-05: reconocimiento obligatorio
+## Historia II-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T5*
@@ -5552,14 +5488,10 @@ La respuesta del vínculo causa 16 de daño al enemigo.
 ▓▓▓▓▓▓▓▒▒▒ 183/270 HP
 Defensas abiertas
 
-📖 *Aprendizaje del jefe: 1/2 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 Su defensa cae, pero sigue atacando. Aprovecha la apertura sin descuidar tu vida.
 
-🧩 📖 Reconocimiento obligatorio: faltan 1 derrotas reales antes de que pueda caer. 👁️ Original reconocido. El enemigo sigue atacando. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 👁️ Original reconocido. El enemigo sigue atacando. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -5574,7 +5506,7 @@ Su defensa cae, pero sigue atacando. Aprovecha la apertura sin descuidar tu vida
 💾 El turno se conserva al salir.
 ```
 
-## Historia II-05: escena 1
+## Historia II-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T4*
@@ -5594,10 +5526,6 @@ Mercader Sin Rostro usó Hostigamiento de carga: 3 de daño a Panda Guerrero.
 👁️ *Mercader Sin Rostro*
 ▓▓▓▓▓▓▓▓▒▒ 199/270 HP
 Descarga preparada
-
-📖 *Aprendizaje del jefe: 2/2 derrotas*
-Aprendizaje completado. Ya puedes disputar la victoria.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
 
 ⚠️ *SEÑAL ENEMIGA*
 ⚠️ ¡DESCARGA INMINENTE! Defiende para amortiguarla y devolver parte de su fuerza.
@@ -5672,7 +5600,7 @@ Bao recuerda que defender también es una decisión y que una habilidad usada po
 🛡️ .ctuequipo · 📖 .ctudiario historia
 ```
 
-## Historia III-01: escena 2
+## Historia III-01: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T3*
@@ -5981,7 +5909,7 @@ Huan recuerda lo visto en el puente y ofrece una indicación breve: «No confund
 🛡️ .ctuequipo · 📖 .ctudiario historia
 ```
 
-## Historia III-03: escena 3
+## Historia III-03: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T1*
@@ -6019,7 +5947,7 @@ Primer reflejo: demuestra una acción ofensiva; seguirá presionando.
 💾 El turno se conserva al salir.
 ```
 
-## Historia III-03: escena 3
+## Historia III-03: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T4*
@@ -6059,7 +5987,7 @@ Segundo reflejo: defender crea una apertura para el equipo.
 💾 El turno se conserva al salir.
 ```
 
-## Historia III-03: escena 3
+## Historia III-03: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T7*
@@ -6378,7 +6306,7 @@ El tercer Trazo sigue bajo custodia de la construcción. Para recuperarlo habrá
 🛡️ .ctuequipo · 📖 .ctudiario historia
 ```
 
-## Historia III-05: reconocimiento obligatorio
+## Historia III-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T1*
@@ -6398,14 +6326,10 @@ El tercer Trazo sigue bajo custodia de la construcción. Para recuperarlo habrá
 👁️ *Centinela del Espejo*
 ▓▓▓▓▓▓▓▓▓▓ 240/240 HP
 
-📖 *Aprendizaje del jefe: 0/2 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 La tinta prepara un golpe rápido: el enemigo no dejará de presionarte.
 
-🧩 📖 Reconocimiento obligatorio: faltan 2 derrotas reales antes de que pueda caer. 🪞 Guarda la última habilidad destacada y la devolverá. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 🪞 Guarda la última habilidad destacada y la devolverá. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -6420,7 +6344,7 @@ La tinta prepara un golpe rápido: el enemigo no dejará de presionarte.
 💾 El turno se conserva al salir.
 ```
 
-## Historia III-05: reconocimiento obligatorio
+## Historia III-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T2*
@@ -6444,14 +6368,10 @@ Centinela del Espejo usó Presión de tinta: 0 de daño a Panda Guerrero.
 ▓▓▓▓▓▓▓▓▓▒ 201/240 HP
 Reflejo activo
 
-📖 *Aprendizaje del jefe: 0/2 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 🪞 El Centinela copiará tu última habilidad. Defiende o cambia de estrategia antes de repetirla.
 
-🧩 📖 Reconocimiento obligatorio: faltan 2 derrotas reales antes de que pueda caer. 🪞 Copiará Impacto del Panda. Defiende la réplica. Ofensiva seguida: 1/3; alterna acciones para evitar la represalia.
+🧩 🪞 Copiará Impacto del Panda. Defiende la réplica. Ofensiva seguida: 1/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -6464,7 +6384,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia III-05: reconocimiento obligatorio
+## Historia III-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T3*
@@ -6489,14 +6409,10 @@ La respuesta del vínculo causa 16 de daño al enemigo.
 Descarga preparada
 🛡️ Escudo 12
 
-📖 *Aprendizaje del jefe: 0/2 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 ⚠️ ¡DESCARGA INMINENTE! Defiende para amortiguarla y devolver parte de su fuerza.
 
-🧩 📖 Reconocimiento obligatorio: faltan 2 derrotas reales antes de que pueda caer. 🪞 Guarda la última habilidad destacada y la devolverá. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 🪞 Guarda la última habilidad destacada y la devolverá. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -6509,7 +6425,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia III-05: reconocimiento obligatorio
+## Historia III-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T4*
@@ -6534,14 +6450,10 @@ La respuesta del vínculo causa 16 de daño al enemigo.
 Defensas abiertas
 🛡️ Escudo 12
 
-📖 *Aprendizaje del jefe: 0/2 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 Su defensa cae, pero sigue atacando. Aprovecha la apertura sin descuidar tu vida.
 
-🧩 📖 Reconocimiento obligatorio: faltan 2 derrotas reales antes de que pueda caer. 🪞 Guarda la última habilidad destacada y la devolverá. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 🪞 Guarda la última habilidad destacada y la devolverá. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -6556,7 +6468,7 @@ Su defensa cae, pero sigue atacando. Aprovecha la apertura sin descuidar tu vida
 💾 El turno se conserva al salir.
 ```
 
-## Historia III-05: reconocimiento obligatorio
+## Historia III-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T6*
@@ -6581,14 +6493,10 @@ La respuesta del vínculo causa 16 de daño al enemigo.
 Tinta en concentración
 🛡️ Escudo 12
 
-📖 *Aprendizaje del jefe: 0/2 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 ⚠️ Carga una descarga y te hostiga mientras la prepara. La próxima señal exigirá defensa.
 
-🧩 📖 Reconocimiento obligatorio: faltan 2 derrotas reales antes de que pueda caer. 🪞 Guarda la última habilidad destacada y la devolverá. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 🪞 Guarda la última habilidad destacada y la devolverá. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -6601,7 +6509,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia III-05: reconocimiento obligatorio
+## Historia III-05: derrota guardada y reintento
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | DERROTA*
@@ -6625,10 +6533,6 @@ Tu equipo cae bajo la presión. Conservas tus cartas y monedas; revisa la señal
 👁️ *Centinela del Espejo*
 ▓▒▒▒▒▒▒▒▒▒ 15/240 HP
 
-📖 *Aprendizaje del jefe: 1/2 derrotas*
-Faltan 1 derrotas de aprendizaje antes del intento de victoria.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 🌧️ *Esta vez la expedición cayó.*
 Tu historia sigue guardada. No pierdes cartas ni monedas; reintentar no duplica los premios.
 
@@ -6639,7 +6543,7 @@ Tu historia sigue guardada. No pierdes cartas ni monedas; reintentar no duplica 
 🔎 Pista: .ctuhistoria pista
 ```
 
-## Historia III-05: reconocimiento obligatorio
+## Historia III-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T1*
@@ -6659,14 +6563,10 @@ Tu historia sigue guardada. No pierdes cartas ni monedas; reintentar no duplica 
 👁️ *Centinela del Espejo*
 ▓▓▓▓▓▓▓▓▓▓ 240/240 HP
 
-📖 *Aprendizaje del jefe: 1/2 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 La tinta prepara un golpe rápido: el enemigo no dejará de presionarte.
 
-🧩 📖 Reconocimiento obligatorio: faltan 1 derrotas reales antes de que pueda caer. 🪞 Guarda la última habilidad destacada y la devolverá. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 🪞 Guarda la última habilidad destacada y la devolverá. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -6681,7 +6581,7 @@ La tinta prepara un golpe rápido: el enemigo no dejará de presionarte.
 💾 El turno se conserva al salir.
 ```
 
-## Historia III-05: reconocimiento obligatorio
+## Historia III-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T2*
@@ -6705,14 +6605,10 @@ Centinela del Espejo usó Presión de tinta: 0 de daño a Panda Guerrero.
 ▓▓▓▓▓▓▓▓▓▒ 201/240 HP
 Reflejo activo
 
-📖 *Aprendizaje del jefe: 1/2 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 🪞 El Centinela copiará tu última habilidad. Defiende o cambia de estrategia antes de repetirla.
 
-🧩 📖 Reconocimiento obligatorio: faltan 1 derrotas reales antes de que pueda caer. 🪞 Copiará Impacto del Panda. Defiende la réplica. Ofensiva seguida: 1/3; alterna acciones para evitar la represalia.
+🧩 🪞 Copiará Impacto del Panda. Defiende la réplica. Ofensiva seguida: 1/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -6725,7 +6621,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia III-05: reconocimiento obligatorio
+## Historia III-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T3*
@@ -6750,14 +6646,10 @@ La respuesta del vínculo causa 16 de daño al enemigo.
 Descarga preparada
 🛡️ Escudo 12
 
-📖 *Aprendizaje del jefe: 1/2 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 ⚠️ ¡DESCARGA INMINENTE! Defiende para amortiguarla y devolver parte de su fuerza.
 
-🧩 📖 Reconocimiento obligatorio: faltan 1 derrotas reales antes de que pueda caer. 🪞 Guarda la última habilidad destacada y la devolverá. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 🪞 Guarda la última habilidad destacada y la devolverá. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -6770,7 +6662,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia III-05: reconocimiento obligatorio
+## Historia III-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T4*
@@ -6795,14 +6687,10 @@ La respuesta del vínculo causa 16 de daño al enemigo.
 Defensas abiertas
 🛡️ Escudo 12
 
-📖 *Aprendizaje del jefe: 1/2 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 Su defensa cae, pero sigue atacando. Aprovecha la apertura sin descuidar tu vida.
 
-🧩 📖 Reconocimiento obligatorio: faltan 1 derrotas reales antes de que pueda caer. 🪞 Guarda la última habilidad destacada y la devolverá. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 🪞 Guarda la última habilidad destacada y la devolverá. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -6817,7 +6705,7 @@ Su defensa cae, pero sigue atacando. Aprovecha la apertura sin descuidar tu vida
 💾 El turno se conserva al salir.
 ```
 
-## Historia III-05: reconocimiento obligatorio
+## Historia III-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T6*
@@ -6842,14 +6730,10 @@ La respuesta del vínculo causa 16 de daño al enemigo.
 Tinta en concentración
 🛡️ Escudo 12
 
-📖 *Aprendizaje del jefe: 1/2 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 ⚠️ Carga una descarga y te hostiga mientras la prepara. La próxima señal exigirá defensa.
 
-🧩 📖 Reconocimiento obligatorio: faltan 1 derrotas reales antes de que pueda caer. 🪞 Guarda la última habilidad destacada y la devolverá. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 🪞 Guarda la última habilidad destacada y la devolverá. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -6862,7 +6746,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia III-05: escena 5
+## Historia III-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T2*
@@ -6886,10 +6770,6 @@ Centinela del Espejo usó Presión de tinta: 0 de daño a Panda Guerrero.
 ▓▓▓▓▓▓▓▓▓▒ 201/240 HP
 Reflejo activo
 
-📖 *Aprendizaje del jefe: 2/2 derrotas*
-Aprendizaje completado. Ya puedes disputar la victoria.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 🪞 El Centinela copiará tu última habilidad. Defiende o cambia de estrategia antes de repetirla.
 
@@ -6906,7 +6786,7 @@ Aprendizaje completado. Ya puedes disputar la victoria.
 💾 El turno se conserva al salir.
 ```
 
-## Historia III-05: escena 5
+## Historia III-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T3*
@@ -6930,10 +6810,6 @@ La respuesta del vínculo causa 16 de daño al enemigo.
 ▓▓▓▓▓▓▓▓▒▒ 185/240 HP
 Descarga preparada
 🛡️ Escudo 12
-
-📖 *Aprendizaje del jefe: 2/2 derrotas*
-Aprendizaje completado. Ya puedes disputar la victoria.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
 
 ⚠️ *SEÑAL ENEMIGA*
 ⚠️ ¡DESCARGA INMINENTE! Defiende para amortiguarla y devolver parte de su fuerza.
@@ -7133,7 +7009,7 @@ Lian señala las salidas y Bao aparta a una criatura asustada de la trayectoria 
 🛡️ .ctuequipo · 📖 .ctudiario historia
 ```
 
-## Historia IV-02: escena 2
+## Historia IV-02: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T3*
@@ -7200,7 +7076,7 @@ Huan sostiene una barrera de madera que protege a quienes esperan, sin utilizarl
 🛡️ .ctuequipo · 📖 .ctudiario historia
 ```
 
-## Historia IV-02: escena 3
+## Historia IV-02: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T3*
@@ -7267,7 +7143,7 @@ Bao insiste en que nadie necesita destruir el pabellón para resolver la evacuac
 🛡️ .ctuequipo · 📖 .ctudiario historia
 ```
 
-## Historia IV-02: escena 4
+## Historia IV-02: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T3*
@@ -7706,7 +7582,7 @@ Las criaturas no necesitan pertenecer a una rareza o una Casa determinada para s
 🛡️ .ctuequipo · 📖 .ctudiario historia
 ```
 
-## Historia IV-05: reconocimiento obligatorio
+## Historia IV-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T1*
@@ -7726,14 +7602,10 @@ Las criaturas no necesitan pertenecer a una rareza o una Casa determinada para s
 👁️ *Campana del Conflicto*
 ▓▓▓▓▓▓▓▓▓▓ 290/290 HP
 
-📖 *Aprendizaje del jefe: 0/2 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 La tinta prepara un golpe rápido: el enemigo no dejará de presionarte.
 
-🧩 📖 Reconocimiento obligatorio: faltan 2 derrotas reales antes de que pueda caer. 🔔 Tensión: 0/6. Purificar reduce 3 y defender reduce 1. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 🔔 Tensión: 0/6. Purificar reduce 3 y defender reduce 1. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -7749,7 +7621,7 @@ La tinta prepara un golpe rápido: el enemigo no dejará de presionarte.
 💾 El turno se conserva al salir.
 ```
 
-## Historia IV-05: reconocimiento obligatorio
+## Historia IV-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T2*
@@ -7773,14 +7645,10 @@ Campana del Conflicto usó Presión de tinta: 0 de daño a Panda Guerrero.
 ▓▓▓▓▓▓▓▓▓▒ 252/290 HP
 Tinta en concentración
 
-📖 *Aprendizaje del jefe: 0/2 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 ⚠️ Carga una descarga y te hostiga mientras la prepara. La próxima señal exigirá defensa.
 
-🧩 📖 Reconocimiento obligatorio: faltan 2 derrotas reales antes de que pueda caer. 🔔 Tensión: 3/6. Purificar reduce 3 y defender reduce 1. Ofensiva seguida: 1/3; alterna acciones para evitar la represalia.
+🧩 🔔 Tensión: 3/6. Purificar reduce 3 y defender reduce 1. Ofensiva seguida: 1/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -7794,7 +7662,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia IV-05: reconocimiento obligatorio
+## Historia IV-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T3*
@@ -7817,14 +7685,10 @@ Campana del Conflicto usó Hostigamiento de carga: 6 de daño a Panda Guerrero.
 ▓▓▓▓▓▓▓▓▓▒ 252/290 HP
 Descarga preparada
 
-📖 *Aprendizaje del jefe: 0/2 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 ⚠️ ¡DESCARGA INMINENTE! Defiende para amortiguarla y devolver parte de su fuerza.
 
-🧩 📖 Reconocimiento obligatorio: faltan 2 derrotas reales antes de que pueda caer. 🔔 Tensión: 0/6. Purificar reduce 3 y defender reduce 1. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 🔔 Tensión: 0/6. Purificar reduce 3 y defender reduce 1. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -7837,7 +7701,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia IV-05: reconocimiento obligatorio
+## Historia IV-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T4*
@@ -7861,14 +7725,10 @@ La respuesta del vínculo causa 16 de daño al enemigo.
 ▓▓▓▓▓▓▓▓▓▒ 236/290 HP
 Defensas abiertas
 
-📖 *Aprendizaje del jefe: 0/2 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 Su defensa cae, pero sigue atacando. Aprovecha la apertura sin descuidar tu vida.
 
-🧩 📖 Reconocimiento obligatorio: faltan 2 derrotas reales antes de que pueda caer. 🔔 Tensión: 0/6. Purificar reduce 3 y defender reduce 1. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 🔔 Tensión: 0/6. Purificar reduce 3 y defender reduce 1. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -7883,7 +7743,7 @@ Su defensa cae, pero sigue atacando. Aprovecha la apertura sin descuidar tu vida
 💾 El turno se conserva al salir.
 ```
 
-## Historia IV-05: reconocimiento obligatorio
+## Historia IV-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T6*
@@ -7906,14 +7766,10 @@ Campana del Conflicto usó Presión de tinta: 12 de daño a Panda Guerrero.
 ▓▓▓▓▓▓▒▒▒▒ 159/290 HP
 Tensión de la Campana
 
-📖 *Aprendizaje del jefe: 0/2 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 🔔 Tensión crítica. Purifica antes de que la Campana descargue toda la hostilidad.
 
-🧩 📖 Reconocimiento obligatorio: faltan 2 derrotas reales antes de que pueda caer. 🔔 Tensión: 5/6. Purificar reduce 3 y defender reduce 1. Ofensiva seguida: 2/3; alterna acciones para evitar la represalia.
+🧩 🔔 Tensión: 5/6. Purificar reduce 3 y defender reduce 1. Ofensiva seguida: 2/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -7927,7 +7783,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia IV-05: reconocimiento obligatorio
+## Historia IV-05: derrota guardada y reintento
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | DERROTA*
@@ -7951,10 +7807,6 @@ Tu equipo cae bajo la presión. Conservas tus cartas y monedas; revisa la señal
 👁️ *Campana del Conflicto*
 ▓▒▒▒▒▒▒▒▒▒ 27/290 HP
 
-📖 *Aprendizaje del jefe: 1/2 derrotas*
-Faltan 1 derrotas de aprendizaje antes del intento de victoria.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 🌧️ *Esta vez la expedición cayó.*
 Tu historia sigue guardada. No pierdes cartas ni monedas; reintentar no duplica los premios.
 
@@ -7965,7 +7817,7 @@ Tu historia sigue guardada. No pierdes cartas ni monedas; reintentar no duplica 
 🔎 Pista: .ctuhistoria pista
 ```
 
-## Historia IV-05: reconocimiento obligatorio
+## Historia IV-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T1*
@@ -7985,14 +7837,10 @@ Tu historia sigue guardada. No pierdes cartas ni monedas; reintentar no duplica 
 👁️ *Campana del Conflicto*
 ▓▓▓▓▓▓▓▓▓▓ 290/290 HP
 
-📖 *Aprendizaje del jefe: 1/2 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 La tinta prepara un golpe rápido: el enemigo no dejará de presionarte.
 
-🧩 📖 Reconocimiento obligatorio: faltan 1 derrotas reales antes de que pueda caer. 🔔 Tensión: 0/6. Purificar reduce 3 y defender reduce 1. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 🔔 Tensión: 0/6. Purificar reduce 3 y defender reduce 1. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -8008,7 +7856,7 @@ La tinta prepara un golpe rápido: el enemigo no dejará de presionarte.
 💾 El turno se conserva al salir.
 ```
 
-## Historia IV-05: reconocimiento obligatorio
+## Historia IV-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T2*
@@ -8032,14 +7880,10 @@ Campana del Conflicto usó Presión de tinta: 0 de daño a Panda Guerrero.
 ▓▓▓▓▓▓▓▓▓▒ 252/290 HP
 Tinta en concentración
 
-📖 *Aprendizaje del jefe: 1/2 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 ⚠️ Carga una descarga y te hostiga mientras la prepara. La próxima señal exigirá defensa.
 
-🧩 📖 Reconocimiento obligatorio: faltan 1 derrotas reales antes de que pueda caer. 🔔 Tensión: 3/6. Purificar reduce 3 y defender reduce 1. Ofensiva seguida: 1/3; alterna acciones para evitar la represalia.
+🧩 🔔 Tensión: 3/6. Purificar reduce 3 y defender reduce 1. Ofensiva seguida: 1/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -8053,7 +7897,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia IV-05: reconocimiento obligatorio
+## Historia IV-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T3*
@@ -8076,14 +7920,10 @@ Campana del Conflicto usó Hostigamiento de carga: 6 de daño a Panda Guerrero.
 ▓▓▓▓▓▓▓▓▓▒ 252/290 HP
 Descarga preparada
 
-📖 *Aprendizaje del jefe: 1/2 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 ⚠️ ¡DESCARGA INMINENTE! Defiende para amortiguarla y devolver parte de su fuerza.
 
-🧩 📖 Reconocimiento obligatorio: faltan 1 derrotas reales antes de que pueda caer. 🔔 Tensión: 0/6. Purificar reduce 3 y defender reduce 1. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 🔔 Tensión: 0/6. Purificar reduce 3 y defender reduce 1. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -8096,7 +7936,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia IV-05: reconocimiento obligatorio
+## Historia IV-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T4*
@@ -8120,14 +7960,10 @@ La respuesta del vínculo causa 16 de daño al enemigo.
 ▓▓▓▓▓▓▓▓▓▒ 236/290 HP
 Defensas abiertas
 
-📖 *Aprendizaje del jefe: 1/2 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 Su defensa cae, pero sigue atacando. Aprovecha la apertura sin descuidar tu vida.
 
-🧩 📖 Reconocimiento obligatorio: faltan 1 derrotas reales antes de que pueda caer. 🔔 Tensión: 0/6. Purificar reduce 3 y defender reduce 1. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 🔔 Tensión: 0/6. Purificar reduce 3 y defender reduce 1. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -8142,7 +7978,7 @@ Su defensa cae, pero sigue atacando. Aprovecha la apertura sin descuidar tu vida
 💾 El turno se conserva al salir.
 ```
 
-## Historia IV-05: reconocimiento obligatorio
+## Historia IV-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T6*
@@ -8165,14 +8001,10 @@ Campana del Conflicto usó Presión de tinta: 12 de daño a Panda Guerrero.
 ▓▓▓▓▓▓▒▒▒▒ 159/290 HP
 Tensión de la Campana
 
-📖 *Aprendizaje del jefe: 1/2 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 🔔 Tensión crítica. Purifica antes de que la Campana descargue toda la hostilidad.
 
-🧩 📖 Reconocimiento obligatorio: faltan 1 derrotas reales antes de que pueda caer. 🔔 Tensión: 5/6. Purificar reduce 3 y defender reduce 1. Ofensiva seguida: 2/3; alterna acciones para evitar la represalia.
+🧩 🔔 Tensión: 5/6. Purificar reduce 3 y defender reduce 1. Ofensiva seguida: 2/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -8186,7 +8018,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia IV-05: escena 5
+## Historia IV-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T3*
@@ -8209,10 +8041,6 @@ Campana del Conflicto usó Hostigamiento de carga: 5 de daño a Panda Guerrero.
 ▓▓▓▓▓▓▓▓▓▒ 252/290 HP
 Descarga preparada
 
-📖 *Aprendizaje del jefe: 2/2 derrotas*
-Aprendizaje completado. Ya puedes disputar la victoria.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 ⚠️ ¡DESCARGA INMINENTE! Defiende para amortiguarla y devolver parte de su fuerza.
 
@@ -8229,7 +8057,7 @@ Aprendizaje completado. Ya puedes disputar la victoria.
 💾 El turno se conserva al salir.
 ```
 
-## Historia IV-05: escena 5
+## Historia IV-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T6*
@@ -8251,10 +8079,6 @@ Campana del Conflicto usó Presión de tinta: 5 de daño a Panda Guerrero.
 👁️ *Campana del Conflicto*
 ▓▓▓▓▓▓▒▒▒▒ 159/290 HP
 Tensión de la Campana
-
-📖 *Aprendizaje del jefe: 2/2 derrotas*
-Aprendizaje completado. Ya puedes disputar la victoria.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
 
 ⚠️ *SEÑAL ENEMIGA*
 🔔 Tensión crítica. Purifica antes de que la Campana descargue toda la hostilidad.
@@ -8600,7 +8424,7 @@ Lian pide observar qué movimiento repite la orden antigua. Una derrota dejará 
 🛡️ .ctuequipo · 📖 .ctudiario historia
 ```
 
-## Historia V-02: escena 3
+## Historia V-02: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T3*
@@ -9062,7 +8886,7 @@ Bao mantiene abierta la salida que señalaste al defender la elección. La criat
 🛡️ .ctuequipo · 📖 .ctudiario historia
 ```
 
-## Historia V-05: reconocimiento obligatorio
+## Historia V-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T1*
@@ -9083,14 +8907,10 @@ Bao mantiene abierta la salida que señalaste al defender la elección. La criat
 ▓▓▓▓▓▓▓▓▓▓ 360/360 HP
 Memoria
 
-📖 *Aprendizaje del jefe: 0/4 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 📜 MEMORIA: observa qué registro conserva su nombre para atravesar los Ecos.
 
-🧩 📖 Reconocimiento obligatorio: faltan 4 derrotas reales antes de que pueda caer. 📜 MEMORIA · Sello: 0 turnos · Registros reconocidos Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 📜 MEMORIA · Sello: 0 turnos · Registros reconocidos Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -9106,7 +8926,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia V-05: reconocimiento obligatorio
+## Historia V-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T4*
@@ -9129,14 +8949,10 @@ El Archivista usó Presión de tinta: 9 de daño a Panda Guerrero.
 ▓▓▓▓▓▓▓▓▓▒ 295/360 HP
 Descarga preparada
 
-📖 *Aprendizaje del jefe: 0/4 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 ⚠️ ¡DESCARGA INMINENTE! Defiende para amortiguarla y devolver parte de su fuerza.
 
-🧩 📖 Reconocimiento obligatorio: faltan 4 derrotas reales antes de que pueda caer. 📜 MEMORIA · Sello: 0 turnos · Registros reconocidos Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 📜 MEMORIA · Sello: 0 turnos · Registros reconocidos Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -9151,7 +8967,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia V-05: reconocimiento obligatorio
+## Historia V-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T7*
@@ -9175,14 +8991,10 @@ El Archivista entra en CONTROL: sella habilidades durante dos turnos.
 ▓▓▓▓▓▓▒▒▒▒ 214/360 HP
 Control
 
-📖 *Aprendizaje del jefe: 0/4 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 🔒 CONTROL: las habilidades pueden quedar selladas. Purifica o alterna ataques y defensa.
 
-🧩 📖 Reconocimiento obligatorio: faltan 4 derrotas reales antes de que pueda caer. 📜 CONTROL · Sello: 2 turnos · Registros reconocidos Ofensiva seguida: 2/3; alterna acciones para evitar la represalia.
+🧩 📜 CONTROL · Sello: 2 turnos · Registros reconocidos Ofensiva seguida: 2/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -9196,7 +9008,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia V-05: reconocimiento obligatorio
+## Historia V-05: derrota guardada y reintento
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | DERROTA*
@@ -9220,10 +9032,6 @@ Tu equipo cae bajo la presión. Conservas tus cartas y monedas; revisa la señal
 👁️ *El Archivista*
 ▓▓▓▒▒▒▒▒▒▒ 106/360 HP
 
-📖 *Aprendizaje del jefe: 1/4 derrotas*
-Faltan 3 derrotas de aprendizaje antes del intento de victoria.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 🌧️ *Esta vez la expedición cayó.*
 Tu historia sigue guardada. No pierdes cartas ni monedas; reintentar no duplica los premios.
 
@@ -9234,7 +9042,7 @@ Tu historia sigue guardada. No pierdes cartas ni monedas; reintentar no duplica 
 🔎 Pista: .ctuhistoria pista
 ```
 
-## Historia V-05: reconocimiento obligatorio
+## Historia V-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T1*
@@ -9255,14 +9063,10 @@ Tu historia sigue guardada. No pierdes cartas ni monedas; reintentar no duplica 
 ▓▓▓▓▓▓▓▓▓▓ 360/360 HP
 Memoria
 
-📖 *Aprendizaje del jefe: 1/4 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 📜 MEMORIA: observa qué registro conserva su nombre para atravesar los Ecos.
 
-🧩 📖 Reconocimiento obligatorio: faltan 3 derrotas reales antes de que pueda caer. 📜 MEMORIA · Sello: 0 turnos · Registros reconocidos Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 📜 MEMORIA · Sello: 0 turnos · Registros reconocidos Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -9278,7 +9082,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia V-05: reconocimiento obligatorio
+## Historia V-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T4*
@@ -9301,14 +9105,10 @@ El Archivista usó Presión de tinta: 9 de daño a Panda Guerrero.
 ▓▓▓▓▓▓▓▓▓▒ 295/360 HP
 Descarga preparada
 
-📖 *Aprendizaje del jefe: 1/4 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 ⚠️ ¡DESCARGA INMINENTE! Defiende para amortiguarla y devolver parte de su fuerza.
 
-🧩 📖 Reconocimiento obligatorio: faltan 3 derrotas reales antes de que pueda caer. 📜 MEMORIA · Sello: 0 turnos · Registros reconocidos Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 📜 MEMORIA · Sello: 0 turnos · Registros reconocidos Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -9323,7 +9123,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia V-05: reconocimiento obligatorio
+## Historia V-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T7*
@@ -9347,14 +9147,10 @@ El Archivista entra en CONTROL: sella habilidades durante dos turnos.
 ▓▓▓▓▓▓▒▒▒▒ 214/360 HP
 Control
 
-📖 *Aprendizaje del jefe: 1/4 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 🔒 CONTROL: las habilidades pueden quedar selladas. Purifica o alterna ataques y defensa.
 
-🧩 📖 Reconocimiento obligatorio: faltan 3 derrotas reales antes de que pueda caer. 📜 CONTROL · Sello: 2 turnos · Registros reconocidos Ofensiva seguida: 2/3; alterna acciones para evitar la represalia.
+🧩 📜 CONTROL · Sello: 2 turnos · Registros reconocidos Ofensiva seguida: 2/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -9368,7 +9164,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia V-05: reconocimiento obligatorio
+## Historia V-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T1*
@@ -9389,14 +9185,10 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 ▓▓▓▓▓▓▓▓▓▓ 360/360 HP
 Memoria
 
-📖 *Aprendizaje del jefe: 2/4 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 📜 MEMORIA: observa qué registro conserva su nombre para atravesar los Ecos.
 
-🧩 📖 Reconocimiento obligatorio: faltan 2 derrotas reales antes de que pueda caer. 📜 MEMORIA · Sello: 0 turnos · Registros reconocidos Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 📜 MEMORIA · Sello: 0 turnos · Registros reconocidos Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -9412,7 +9204,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia V-05: reconocimiento obligatorio
+## Historia V-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T4*
@@ -9435,14 +9227,10 @@ El Archivista usó Presión de tinta: 9 de daño a Panda Guerrero.
 ▓▓▓▓▓▓▓▓▓▒ 295/360 HP
 Descarga preparada
 
-📖 *Aprendizaje del jefe: 2/4 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 ⚠️ ¡DESCARGA INMINENTE! Defiende para amortiguarla y devolver parte de su fuerza.
 
-🧩 📖 Reconocimiento obligatorio: faltan 2 derrotas reales antes de que pueda caer. 📜 MEMORIA · Sello: 0 turnos · Registros reconocidos Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 📜 MEMORIA · Sello: 0 turnos · Registros reconocidos Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -9457,7 +9245,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia V-05: reconocimiento obligatorio
+## Historia V-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T7*
@@ -9481,14 +9269,10 @@ El Archivista entra en CONTROL: sella habilidades durante dos turnos.
 ▓▓▓▓▓▓▒▒▒▒ 214/360 HP
 Control
 
-📖 *Aprendizaje del jefe: 2/4 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 🔒 CONTROL: las habilidades pueden quedar selladas. Purifica o alterna ataques y defensa.
 
-🧩 📖 Reconocimiento obligatorio: faltan 2 derrotas reales antes de que pueda caer. 📜 CONTROL · Sello: 2 turnos · Registros reconocidos Ofensiva seguida: 2/3; alterna acciones para evitar la represalia.
+🧩 📜 CONTROL · Sello: 2 turnos · Registros reconocidos Ofensiva seguida: 2/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -9502,7 +9286,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia V-05: reconocimiento obligatorio
+## Historia V-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T1*
@@ -9523,14 +9307,10 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 ▓▓▓▓▓▓▓▓▓▓ 360/360 HP
 Memoria
 
-📖 *Aprendizaje del jefe: 3/4 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 📜 MEMORIA: observa qué registro conserva su nombre para atravesar los Ecos.
 
-🧩 📖 Reconocimiento obligatorio: faltan 1 derrotas reales antes de que pueda caer. 📜 MEMORIA · Sello: 0 turnos · Registros reconocidos Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 📜 MEMORIA · Sello: 0 turnos · Registros reconocidos Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -9546,7 +9326,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia V-05: reconocimiento obligatorio
+## Historia V-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T4*
@@ -9569,14 +9349,10 @@ El Archivista usó Presión de tinta: 9 de daño a Panda Guerrero.
 ▓▓▓▓▓▓▓▓▓▒ 295/360 HP
 Descarga preparada
 
-📖 *Aprendizaje del jefe: 3/4 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 ⚠️ ¡DESCARGA INMINENTE! Defiende para amortiguarla y devolver parte de su fuerza.
 
-🧩 📖 Reconocimiento obligatorio: faltan 1 derrotas reales antes de que pueda caer. 📜 MEMORIA · Sello: 0 turnos · Registros reconocidos Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 📜 MEMORIA · Sello: 0 turnos · Registros reconocidos Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -9591,7 +9367,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia V-05: reconocimiento obligatorio
+## Historia V-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T7*
@@ -9615,14 +9391,10 @@ El Archivista entra en CONTROL: sella habilidades durante dos turnos.
 ▓▓▓▓▓▓▒▒▒▒ 214/360 HP
 Control
 
-📖 *Aprendizaje del jefe: 3/4 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 🔒 CONTROL: las habilidades pueden quedar selladas. Purifica o alterna ataques y defensa.
 
-🧩 📖 Reconocimiento obligatorio: faltan 1 derrotas reales antes de que pueda caer. 📜 CONTROL · Sello: 2 turnos · Registros reconocidos Ofensiva seguida: 2/3; alterna acciones para evitar la represalia.
+🧩 📜 CONTROL · Sello: 2 turnos · Registros reconocidos Ofensiva seguida: 2/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -9636,7 +9408,7 @@ Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa su
 💾 El turno se conserva al salir.
 ```
 
-## Historia V-05: escena 6
+## Historia V-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T4*
@@ -9659,10 +9431,6 @@ El Archivista usó Presión de tinta: 8 de daño a Panda Guerrero.
 ▓▓▓▓▓▓▓▓▓▒ 295/360 HP
 Descarga preparada
 
-📖 *Aprendizaje del jefe: 4/4 derrotas*
-Aprendizaje completado. Ya puedes disputar la victoria.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 ⚠️ ¡DESCARGA INMINENTE! Defiende para amortiguarla y devolver parte de su fuerza.
 
@@ -9681,7 +9449,7 @@ Aprendizaje completado. Ya puedes disputar la victoria.
 💾 El turno se conserva al salir.
 ```
 
-## Historia V-05: escena 6
+## Historia V-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T13*
@@ -9706,10 +9474,6 @@ El Archivista entra en ELECCIÓN: protege el vínculo cuando concentre su fuerza
 ▓▓▓▓▒▒▒▒▒▒ 117/360 HP
 Elección
 
-📖 *Aprendizaje del jefe: 4/4 derrotas*
-Aprendizaje completado. Ya puedes disputar la victoria.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
 ⚠️ *SEÑAL ENEMIGA*
 🕊️ ELECCIÓN: protege al equipo cuando el Sello concentre toda su fuerza.
 
@@ -9729,7 +9493,7 @@ Aprendizaje completado. Ya puedes disputar la victoria.
 💾 El turno se conserva al salir.
 ```
 
-## Historia V-05: escena 6
+## Historia V-05: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T15*
@@ -9751,10 +9515,6 @@ El Archivista usó Presión de tinta: 4 de daño a Panda Guerrero.
 👁️ *El Archivista*
 ▓▓▒▒▒▒▒▒▒▒ 52/360 HP
 Protección
-
-📖 *Aprendizaje del jefe: 4/4 derrotas*
-Aprendizaje completado. Ya puedes disputar la victoria.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
 
 ⚠️ *SEÑAL ENEMIGA*
 🛡️ ¡Protege al equipo y a los aliados de la descarga dirigida!
@@ -10478,7 +10238,7 @@ La primera finalización conservará un reconocimiento narrativo y las siguiente
 ↩️ Volver a la campaña: .ctuhistoria volver
 ```
 
-## Historia PRUEBA-1: escena 1
+## Historia PRUEBA-1: turno de combate
 
 ```text
 🃏 *CHENGDÚ CARDS | HISTORIA | T3*

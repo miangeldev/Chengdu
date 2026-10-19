@@ -41,10 +41,10 @@ expedición y 550 ChengCoins; la campaña principal completa suma 3.665 XP y
 ## Jefes y aprendizaje obligatorio
 
 Los jefes tienen encuentros de reconocimiento: **una o dos derrotas obligatorias
-según el jefe y cuatro ante el Archivista**. La interfaz lo anuncia antes de
-actuar, muestra las derrotas completadas y explica que un intento de reconocimiento
-todavía no admite victoria. Después de terminar el aprendizaje se abre el intento
-en el que sí puedes vencer.
+según el jefe y cuatro ante el Archivista**. Este requisito se conserva en el
+motor; la interfaz muestra las señales tácticas, las barreras y los resultados
+narrativos, sin revelar contadores ni avisos de derrotas requeridas. Después de
+terminar el aprendizaje se abre el intento en el que sí puedes vencer.
 
 Las derrotas quedan registradas por encuentro; **rendirse no avanza el requisito**.
 El Guardián exige una; Mercader, Centinela y Campana exigen dos; el Archivista

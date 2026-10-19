@@ -3066,10 +3066,10 @@ epílogo. Las escenas recuerdan decisiones anteriores, desarrollan la relación
 con Huan y Bao, muestran voces a favor del Sello y culminan en tres resoluciones
 personales que conservan los vínculos libres. E-02 otorga Custodio del Alba.
 
-Los jefes introducen reconocimientos obligatorios y transparentes: una o dos
-derrotas de aprendizaje y cuatro ante el Archivista. La interfaz muestra el
-avance, explica cuándo todavía no puede haber victoria y no cuenta las
-rendiciones como aprendizaje. Apoyar, purificar y proteger amplían las
+Los jefes conservan internamente una o dos derrotas de aprendizaje y cuatro
+ante el Archivista; las rendiciones no cuentan. La interfaz presenta señales y
+resultados narrativos, sin mostrar contadores ni avisos de derrotas requeridas.
+Apoyar, purificar y proteger amplían las
 respuestas tácticas; las derrotas no generan premios ni pérdidas de propiedad.
 
 Las rutas opcionales se pausan y conservan el avance principal. La reconstrucción

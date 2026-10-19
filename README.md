@@ -29,8 +29,9 @@ y los dos primeros Trazos. Reduce un 25% los premios nuevos del tramo inicial,
 conservando los recibos anteriores. [Fases 2 y 3](docs/story-phases-2-3.md).
 La versión **0.13.0** cierra la temporada: 32 misiones principales, cinco Trazos,
 tres resoluciones personales y el título Custodio del Alba. Añade rutas
-opcionales, escenas archivadas, pruebas posteriores y jefes con reconocimientos
-obligatorios anunciados en la interfaz. [Temporada completa](docs/story-season.md).
+opcionales, escenas archivadas, pruebas posteriores y jefes con mecánicas propias.
+La interfaz muestra señales y resultados narrativos, sin contadores internos de
+derrotas. [Temporada completa](docs/story-season.md).
 La corrección **0.13.1** permite terminar el tutorial y los Tres Reflejos sin
 obligar a practicar todas las acciones. Los mínimos de derrota quedan reservados
 para los cinco jefes principales. Repara combates ya iniciados sin reiniciar la

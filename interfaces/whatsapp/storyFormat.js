@@ -37,11 +37,23 @@ function hpText(unit, bars) {
   return `${bars ? `${healthBar(unit.hp, unit.maxHp)} ` : ''}${unit.hp}/${unit.maxHp} HP`;
 }
 
+function publicBattleText(value) {
+  // Keep recorded combat events replayable; only their public wording changes.
+  return String(value ?? '')
+    .replace(/📖\s*Reconocimiento obligatorio: faltan \d+ derrotas reales antes de que pueda caer\.\s*/gu, '')
+    .replace('📖 La barrera de reconocimiento desata su furia y derrota al equipo. Este intento cuenta para aprender el patrón; las retiradas no cuentan.',
+      '💥 El jefe libera una descarga que supera la defensa del equipo.')
+    .replace('Te retiras: las retiradas no cuentan como reconocimiento.', 'Te retiras del encuentro.')
+    .replace(/La barrera de reconocimiento/gu, 'La barrera')
+    .replace(/[;.]?\s*El Eco no tiene derrotas obligatorias\./giu, '.')
+    .trim();
+}
+
 function visibleBattleEvents(battle) {
   // Historical tutorial turns can contain a knockout followed by Bao restoring
   // the Eco. Keep the saved events intact, but describe the current HP honestly.
   const prematureKnockout = `${battle.enemy.name} quedó fuera de combate.`;
-  return lines((battle.lastEvents ?? []).filter(event => battle.enemy.hp <= 0 || event !== prematureKnockout));
+  return lines((battle.lastEvents ?? []).filter(event => battle.enemy.hp <= 0 || event !== prematureKnockout).map(publicBattleText));
 }
 
 function rewardText(reward, team = []) {
@@ -102,13 +114,6 @@ export function renderStory(result, cmd, { healthBars = true, inspect = false } 
     const active = battle.team.find(unit => unit.active) ?? battle.team[0];
     body.push(`❤️ *EXPEDICIÓN*\n${characterIcon(active.characterId)} *${safe(active.name)}*\n${hpText(active, healthBars)}${effectsText(active) ? `\n${effectsText(active)}` : ''}${battle.team.filter(unit => !unit.active).map(unit => `\n${unit.slot}. ${safe(unit.name)}: ${unit.hp > 0 ? hpText(unit, false) : '💤 KO'}`).join('')}`);
     body.push(`👁️ *${safe(battle.enemy.name)}*\n${hpText(battle.enemy, healthBars)}${phaseLabels[battle.enemy.phase] ? `\n${phaseLabels[battle.enemy.phase]}` : ''}${effectsText(battle.enemy) ? `\n${effectsText(battle.enemy)}` : ''}`);
-    if (battle.learning?.required > 0) {
-      const learning = battle.learning;
-      body.push(`📖 *Aprendizaje del jefe: ${Math.min(learning.defeats, learning.required)}/${learning.required} derrotas*\n${
-        battle.status === 'active' && learning.scouting ? 'Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.'
-          : learning.remaining > 0 ? `Faltan ${learning.remaining} derrotas de aprendizaje antes del intento de victoria.`
-            : 'Aprendizaje completado. Ya puedes disputar la victoria.'}\n🏳️ Rendirse no cuenta como derrota de aprendizaje.`);
-    }
     if (battle.status === 'lost') {
       const surrender = battle.finishReason === 'surrender';
       const outcome = surrender ? '🏳️ *Te retiraste del encuentro.*' : battle.finishReason === 'protection'
@@ -124,8 +129,8 @@ export function renderStory(result, cmd, { healthBars = true, inspect = false } 
       return card(`HISTORIA | ${surrender ? 'RETIRADA' : 'DERROTA'}`, body, `🔁 *${cmd('ctuhistoria', 'reintentar')}*\n🛡️ Preparar: ${cmd('ctuequipo')}\n🔎 Pista: ${cmd('ctuhistoria', 'pista')}${routeFooter ? `\n${routeFooter}` : ''}`);
     }
     const intent = typeof battle.enemy.intent === 'object' ? battle.enemy.intent.text : battle.enemy.intent;
-    body.push(intent ? `⚠️ *SEÑAL ENEMIGA*\n${safe(intent)}` : null);
-    if (typeof battle.enemy.mechanics === 'string' && battle.enemy.mechanics) body.push(`🧩 ${safe(battle.enemy.mechanics)}`);
+    body.push(intent ? `⚠️ *SEÑAL ENEMIGA*\n${safe(publicBattleText(intent))}` : null);
+    if (typeof battle.enemy.mechanics === 'string' && battle.enemy.mechanics) body.push(`🧩 ${safe(publicBattleText(battle.enemy.mechanics))}`);
     if (inspect) body.push(`🔎 ${safe(result.hint ?? mission?.hint ?? 'Defender reduce el daño recibido. La habilidad y los cambios consumen un turno; revisa la señal antes de actuar.')}`);
     const attacks = (active.attacks ?? []).map(attack => `${attack.choice}. ${safe(attack.name)} · ${attack.power} POT${attack.cooldown ? ` · ⏳ ${attack.cooldown}T` : ''}`).join('\n');
     body.push(`🎯 *Tu turno*${attacks ? `\n${attacks}` : ''}`);
@@ -289,7 +294,7 @@ export const renderStoryHelp = cmd => card('HISTORIA | GUÍA', [
   `📖 ${cmd('ctuhistoria')} · Volver a tu misión\n👉 ${cmd('ctuhistoria', 'continuar')} · Avanzar\n🧭 ${cmd('ctuhistoria', 'elegir 1')} · Elegir una opción`,
   `⚔️ ${cmd('ctuhistoria', 'atacar 1')} · Ataque 1 o 2\n🛡️ ${cmd('ctuhistoria', 'defender')} · Reducir daño\n✨ ${cmd('ctuhistoria', 'habilidad')} · Habilidad con recarga\n🔀 ${cmd('ctuhistoria', 'cambiar 2')} · Entrar con reserva; consume turno\n🔎 ${cmd('ctuhistoria', 'pista')} · Inspección gratuita\n🏳️ ${cmd('ctuhistoria', 'rendirse')} · Terminar el intento`,
   `🌱 ${cmd('ctuhistoria', 'romper')} · Romper barreras de raíces\n👁️ ${cmd('ctuhistoria', 'observar')} · Revelar señuelos\nEstas tácticas aparecen cuando el jefe las necesita y consumen un turno.`,
-  `💚 ${cmd('ctuhistoria', 'apoyar')} · Recuperar vida del equipo\n✨ ${cmd('ctuhistoria', 'purificar')} · Reducir tensión o sellos\n🛡️ ${cmd('ctuhistoria', 'proteger')} · Cuidar aliados en peligro\n📖 Los jefes indican sus derrotas de aprendizaje obligatorias; rendirse no las completa.`,
+  `💚 ${cmd('ctuhistoria', 'apoyar')} · Recuperar vida del equipo\n✨ ${cmd('ctuhistoria', 'purificar')} · Reducir tensión o sellos\n🛡️ ${cmd('ctuhistoria', 'proteger')} · Cuidar aliados en peligro`,
   `🔁 ${cmd('ctuhistoria', 'reintentar')} · Tras una derrota\n🛡️ ${cmd('ctuequipo')} · Preparar 1 a 3 compañeros\n📖 ${cmd('ctudiario', 'historia')} · Diario narrativo\n🗺️ ${cmd('ctucapitulos')} · Misiones y bloqueos\n📜 ${cmd('cturecuerdos')} · Recuerdos`,
   `🌿 ${cmd('ctuhistoria', 'opcionales')} · Rutas adicionales\n↩️ ${cmd('ctuhistoria', 'volver')} · Pausar una ruta sin combate\n📚 ${cmd('ctuhistoria', 'escenas III-04 1')} · Releer una misión completada\n🏛️ ${cmd('ctuhistoria', 'pruebas')} · Entrenar tras el epílogo`,
   '🎁 Los premios de primera finalización aceleran la XP de tus compañeros. Repetir escenas o reintentar no duplica premios.\n🔮 La evolución se abre desde nivel 5; no es obligatoria para avanzar.'

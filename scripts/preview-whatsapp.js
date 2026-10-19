@@ -426,7 +426,7 @@ try {
         ['unleash', 'reflect', 'tension', 'protect', 'choice', 'damage', 'defense', 'support'].includes(state.battle.enemy.phase) || state.battle.learning?.scouting);
       if (sample) {
         capturedStory.add(signal);
-        samples.push({ title: `Historia ${state.mission.code}: ${state.battle?.learning?.scouting ? 'reconocimiento obligatorio' : state.progress.stage === 'defeated' ? 'derrota guardada y reintento' : `escena ${state.mission.stepNumber ?? 1}`}`, text: latest });
+        samples.push({ title: `Historia ${state.mission.code}: ${state.progress.stage === 'defeated' ? 'derrota guardada y reintento' : state.progress.stage === 'battle' ? 'turno de combate' : `escena ${state.mission.stepNumber ?? 1}`}`, text: latest });
       }
       await advanceStory();
     }
