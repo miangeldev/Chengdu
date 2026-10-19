@@ -38,7 +38,7 @@ test('an in-progress version-two boss keeps its exact rules after upgrading the 
 
 test('a mandatory reconnaissance knockout and its learning credit recover atomically at every publication stage', { timeout: 180000 }, async t => {
   const c = await seasonFixture(t);
-  await c.until(state => state.battle?.encounterId === 'I03' && state.battle.status === 'active');
+  await c.until(state => state.battle?.encounterId === 'I05' && state.battle.status === 'active');
   let request;
   for (let turn = 0; turn < 25; turn++) {
     const progress = (await c.get()).progress;
@@ -68,7 +68,7 @@ test('a mandatory reconnaissance knockout and its learning credit recover atomic
     const result = await fork.game.story.act(operation);
     assert.equal(result.alreadyProcessed, stage !== 'prepared');
     assert.equal(result.progress.stage, 'defeated'); assert.equal(result.battle.learning.defeats, 1);
-    assert.equal(readRecords(fork.directory, 'combateshistoria').filter(row => row.combat.encounterId === 'I03' && row.status === 'lost').length, 1);
+    assert.equal(readRecords(fork.directory, 'combateshistoria').filter(row => row.combat.encounterId === 'I05' && row.status === 'lost').length, 1);
     const retry = await fork.invoke('retry'); assert.equal(retry.battle.learning.remaining, 0);
     assert.equal((await fork.game.validateDatabase()).valid, true);
   }

@@ -73,9 +73,9 @@ export function storySeasonTacticalAction(battle) {
 }
 
 export function simulateStorySeason({ encounterId = 'V05', characterId = 'panda_guerrero', level = 8, size = 1,
-  evolved = false, policy = 'tactical', seed = 1, rolls = null, defeats = null, context = {} }) {
-  const now = '2026-10-18T00:00:00.000Z', required = storyCombatPolicy(encounterId).requiredDefeats;
-  let battle = createStoryBattle({ id: 'season-simulation', encounterId, version: 3, now, context,
+  evolved = false, policy = 'tactical', seed = 1, rolls = null, defeats = null, context = {}, version = 4 }) {
+  const now = '2026-10-18T00:00:00.000Z', required = storyCombatPolicy(encounterId, version).requiredDefeats;
+  let battle = createStoryBattle({ id: 'season-simulation', encounterId, version, now, context,
     units: Array.from({ length: size }, (_, index) => storyBalanceSnapshot(characterId, level, evolved, `:${index}`)),
     learning: { defeats: defeats ?? required, required } });
   const random = generator(seed);

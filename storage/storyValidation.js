@@ -2,7 +2,7 @@ import { equal } from './equality.js';
 import { requireGame } from '../utils/GameError.js';
 import { STORY_CAMPAIGN_ID, isStoryContentVersion, getStoryMission, activeStoryMission, currentStoryStep,
   storyEncounterFor, storyTitleReward } from '../game/story/catalog.js';
-import { createStoryBattle, resolveStoryAction, storyCombatPolicy } from '../game/story/combat.js';
+import { storyBattleHistory, storyCombatPolicy, upgradeStoryBattle } from '../game/story/combat.js';
 import { reduceStoryProgress, completedStoryMission, storyProgressId, storyRewardId } from '../game/story/progress.js';
 import { storyLearningDefeats, storyBattleContext } from '../game/story/battlePolicy.js';
 import { storyUnitSnapshot } from '../game/story/snapshot.js';
@@ -31,16 +31,8 @@ const sameRefs = (refs, snapshots) => equal(refs, snapshots.map(snapshot => ({ u
 // older action. A later victory must never turn an earlier attack into a win.
 function battleHistory(record) {
   const original = record.combat;
-  let combat = createStoryBattle({ id: record.id, encounterId: original.encounterId,
-    units: original.unitSnapshots, now: record.createdAt, version: original.version,
-    ...(original.version >= 3 ? { learning: { defeats: original.learning?.defeats, required: original.learning?.required }, context: original.context } : {}) });
-  const prefixes = [combat];
-  for (const action of original.actions) {
-    combat = resolveStoryAction(combat, { action: action.action, choice: action.choice,
-      rolls: action.rolls, now: action.createdAt }).battle;
-    prefixes.push(combat);
-  }
-  check(equal(combat, original), 'combatReplay');
+  const prefixes = storyBattleHistory(original);
+  check(equal(prefixes.at(-1), original), 'combatReplay');
   return prefixes;
 }
 
@@ -70,7 +62,9 @@ export function validateStoryData(state) {
     const mission = getStoryMission(battle.missionId, battle.contentVersion);
     const step = battle.contentVersion >= 3 && mission?.kind === 'sequence' ? mission.steps.find(value => value.id === battle.stepId) : null;
     check(/^STB-[a-f0-9-]{36}$/.test(battle.id) && users.has(battle.userId) && validCampaign(battle) &&
-      integer(battle.run, 1) && (step?.encounterId ?? mission?.encounterId) === battle.combat?.encounterId && battle.combat.version === battle.contentVersion &&
+      integer(battle.run, 1) && (step?.encounterId ?? mission?.encounterId) === battle.combat?.encounterId &&
+      (battle.combat.version === battle.contentVersion || battle.contentVersion === 3 && battle.combat.version === 4 ||
+        battle.combat.version === 4 && battle.combat.combatUpgrade?.fromVersion === battle.contentVersion && battle.combat.encounterId === 'P03') &&
       date(battle.createdAt) && date(battle.updatedAt) && Date.parse(battle.updatedAt) >= Date.parse(battle.createdAt), 'battleMetadata');
     if (battle.contentVersion >= 3) check(mission.kind === 'sequence' ? Boolean(step) : battle.stepId === null, 'battleStepId');
     const prefixes = battleHistory(battle); histories.set(battle.id, prefixes);
@@ -147,13 +141,13 @@ export function validateStoryData(state) {
           !creations.has(battle.id) && battle.createdAt === action.createdAt &&
           (action.kind === 'retry' ? previous?.stage === 'defeated' : !['battle', 'defeated'].includes(previous?.stage)), 'battleStart');
         if (battle.contentVersion >= 3) {
-          const mission = activeStoryMission(previous), step = currentStoryStep(mission, previous);
+          const mission = activeStoryMission(previous), step = currentStoryStep(mission, previous), initial = histories.get(battle.id)[0];
           const closed = [...battles.values()].filter(row => creations.has(row.id) && row.status !== 'active' &&
             row.combat.actions.length > 0 && stepCounts.get(row.id) === row.combat.actions.length);
           const defeats = storyLearningDefeats(closed, { userId: action.userId, run: previous.run, missionId: mission.id, encounterId: battle.combat.encounterId });
           check(battle.stepId === (step?.id ?? null) && battle.combat.encounterId === storyEncounterFor(mission, previous) &&
-            battle.combat.learning.defeats === defeats && battle.combat.learning.required === storyCombatPolicy(battle.combat.encounterId).requiredDefeats &&
-            equal(battle.combat.context, storyBattleContext(previous, step)), 'battleLearningAuthority');
+            initial.learning.defeats === defeats && initial.learning.required === storyCombatPolicy(battle.combat.encounterId, initial.version).requiredDefeats &&
+            equal(initial.context, storyBattleContext(previous, step)), 'battleLearningAuthority');
         }
         creations.add(battle.id);
       } else {
@@ -238,11 +232,16 @@ export function validateStoryTransition(before, after, context = {}) {
     if (equal(previous, battle)) continue;
     check(action?.battleId === battle.id, 'battleAuthority');
     if (previous) {
+      const upgrading = previous.combat.version < 4 && battle.combat.version === 4;
+      if (upgrading) check(previous.status === 'active' && action.kind === 'act' && action.contentVersion >= 3 &&
+        (previous.combat.version === 3 || previous.combat.encounterId === 'P03'), 'battleUpgradeAuthority');
+      const authority = upgrading ? upgradeStoryBattle(previous.combat) : previous.combat;
       check(previous.status === 'active' && battle.combat.actions.length === previous.combat.actions.length + 1 &&
         equal(previous.combat.actions, battle.combat.actions.slice(0, previous.combat.actions.length)) &&
         equal(previous.combat.unitSnapshots, battle.combat.unitSnapshots) &&
         ['userId', 'campaignId', 'contentVersion', 'run', 'missionId', 'stepId', 'createdAt'].every(key => equal(previous[key], battle[key])) &&
-        equal(previous.combat.learning, battle.combat.learning) && equal(previous.combat.context, battle.combat.context), 'battleAppendOnly');
+        authority.version === battle.combat.version && equal(authority.combatUpgrade, battle.combat.combatUpgrade) &&
+        equal(authority.learning, battle.combat.learning) && equal(authority.context, battle.combat.context), 'battleAppendOnly');
     } else {
       check(battle.status === 'active' && battle.combat.actions.length === 0, 'newBattle');
       if (battle.contentVersion >= 3) {
@@ -250,7 +249,7 @@ export function validateStoryTransition(before, after, context = {}) {
         const defeats = storyLearningDefeats(before.combateshistoria.records, { userId: battle.userId, run: battle.run,
           missionId: battle.missionId, encounterId: battle.combat.encounterId });
         check(battle.stepId === (step?.id ?? null) && battle.combat.learning.defeats === defeats &&
-          battle.combat.learning.required === storyCombatPolicy(battle.combat.encounterId).requiredDefeats &&
+          battle.combat.learning.required === storyCombatPolicy(battle.combat.encounterId, battle.combat.version).requiredDefeats &&
           equal(battle.combat.context, storyBattleContext(action.before, step)), 'currentBattleLearning');
       }
       const user = before.usuarios.records.find(row => row.id === battle.userId);

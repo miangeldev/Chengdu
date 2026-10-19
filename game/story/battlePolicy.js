@@ -1,4 +1,4 @@
-// Only closed, played knockouts teach a boss's patterns. Voluntary retreats,
+// Only closed, played defeats teach a boss's patterns. Voluntary retreats,
 // resets and other runs cannot unlock a later attempt.
 export function isLearningDefeat(record) {
   return record.status === 'lost' && record.closeReason !== 'reset' &&

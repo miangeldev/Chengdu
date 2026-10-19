@@ -1,10 +1,12 @@
 import { isDeepStrictEqual } from 'node:util';
 import { requireGame } from '../../utils/GameError.js';
 import { activeUnit, calculateAdvancedDamage, initializeAdvancedBattle, resolveAdvancedAction } from '../battle/advancedEngine.js';
-import { createStoryBattle as createLegacy, resolveStoryAction as resolveLegacy, storyBattleView as legacyView,
-  storyEncounter as legacyEncounter, STORY_ENCOUNTERS as LEGACY_ENCOUNTERS } from './combatV2.js';
+import { createStoryBattle as createLegacy, storyBattleView as legacyView } from './combatV2.js';
+import { createStoryBattle as createV3, resolveStoryAction as resolveV3, storyBattleView as viewV3,
+  storyEncounter as encounterV3, storyCombatPolicy as policyV3 } from './combatV3.js';
 
-export const STORY_COMBAT_VERSION = 3;
+export const STORY_COMBAT_VERSION = 4;
+export const storyCombatVersion = contentVersion => contentVersion < 3 ? contentVersion : STORY_COMBAT_VERSION;
 export const STORY_DEFENSE_PERCENT = 70;
 const PLAYER = 'custodian', ENEMY = 'echo', FAR_FUTURE = '9999-12-31T23:59:59.999Z';
 const integer = (value, min = 0, max = Number.MAX_SAFE_INTEGER) => Number.isSafeInteger(value) && value >= min && value <= max;
@@ -13,7 +15,7 @@ const event = (type, text, extra = {}) => ({ type, text, ...extra });
 const ALIASES = Object.freeze({ TRIAL1: 'I05', TRIAL2: 'III05', TRIAL3: 'V05' });
 const definitions = {
   P03: ['Eco desorientado', 'tutorial', 110, 13, 12, 0],
-  I03: ['Eco de Tinta', 'miniboss', 245, 22, 20, 1],
+  I03: ['Eco de Tinta', 'miniboss', 245, 22, 20, 0],
   I04: ['Acechador de Tinta', 'ambush', 160, 20, 18, 0],
   I05: ['Guardián Marchito', 'roots', 245, 22, 22, 1],
   II05: ['Mercader Sin Rostro', 'illusions', 270, 21, 20, 2],
@@ -34,13 +36,14 @@ export const STORY_ENCOUNTERS = Object.freeze(Object.fromEntries(Object.entries(
     requiredDefeats: Object.hasOwn(ALIASES, id) ? 0 : row[5] })])));
 
 export function storyCombatPolicy(encounterId, version = STORY_COMBAT_VERSION) {
-  if (version < 3) { legacyEncounter(encounterId, version); return { version, requiredDefeats: 0, scoutingTurnLimit: null }; }
-  requireGame(version === 3 && Object.hasOwn(STORY_ENCOUNTERS, encounterId), 'STORY_ENCOUNTER_NOT_FOUND');
-  return { version: 3, requiredDefeats: STORY_ENCOUNTERS[encounterId].requiredDefeats, scoutingTurnLimit: 20 };
+  if (version < STORY_COMBAT_VERSION) return policyV3(encounterId, version);
+  requireGame(version === STORY_COMBAT_VERSION, 'INVALID_STORY_COMBAT_VERSION');
+  requireGame(Object.hasOwn(STORY_ENCOUNTERS, encounterId), 'STORY_ENCOUNTER_NOT_FOUND');
+  return { version: STORY_COMBAT_VERSION, requiredDefeats: STORY_ENCOUNTERS[encounterId].requiredDefeats, scoutingTurnLimit: 20 };
 }
 export function storyEncounter(encounterId, version = STORY_COMBAT_VERSION) {
-  if (version < 3) return legacyEncounter(encounterId, version);
-  requireGame(version === 3, 'INVALID_STORY_COMBAT_VERSION');
+  if (version < STORY_COMBAT_VERSION) return encounterV3(encounterId, version);
+  requireGame(version === STORY_COMBAT_VERSION, 'INVALID_STORY_COMBAT_VERSION');
   requireGame(Object.hasOwn(STORY_ENCOUNTERS, encounterId), 'STORY_ENCOUNTER_NOT_FOUND');
   return structuredClone(STORY_ENCOUNTERS[encounterId]);
 }
@@ -74,6 +77,7 @@ function learningFor(encounterId, learning) {
 function kind(battle) { return STORY_ENCOUNTERS[battle.encounterId].kind; }
 function phaseFor(battle) {
   const round = battle.actions.length + 1, mechanic = kind(battle), boss = activeUnit(battle.core.players[1]);
+  if (mechanic === 'tutorial') return 'tutorial';
   if (mechanic === 'final') {
     const ratio = boss.hp * 100 / boss.stats.hp;
     const chapter = ratio > 66 ? 'memory' : ratio > 33 ? 'control' : 'choice';
@@ -95,6 +99,7 @@ function reflect(battle) {
   if (battle.status !== 'active') { battle.enemyIntent = null; return battle; }
   const type = phaseFor(battle);
   const descriptions = {
+    tutorial: 'El Eco está confundido. Puedes vencer atacando; defender y usar tu habilidad son prácticas opcionales.',
     strike: 'La tinta prepara un golpe rápido: el enemigo no dejará de presionarte.',
     charge: '⚠️ Carga una descarga y te hostiga mientras la prepara. La próxima señal exigirá defensa.',
     unleash: '⚠️ ¡DESCARGA INMINENTE! Defiende para amortiguarla y devolver parte de su fuerza.',
@@ -112,29 +117,46 @@ function reflect(battle) {
     choice: '🕊️ ELECCIÓN: protege al equipo cuando el Sello concentre toda su fuerza.'
   };
   battle.enemyIntent = { type, text: descriptions[type] };
-  battle.pressure = { everyTurn: true, reservePercent: battle.core.players[0].units.length > 1 ? 3 : 0 };
+  battle.pressure = { everyTurn: true, reservePercent: kind(battle) !== 'tutorial' && battle.core.players[0].units.length > 1 ? 3 : 0 };
   return battle;
 }
 
 export function createStoryBattle({ version = STORY_COMBAT_VERSION, learning = {}, context = {}, ...request }) {
-  if (version < 3) return createLegacy({ ...request, version });
-  requireGame(version === 3, 'INVALID_STORY_COMBAT_VERSION');
+  if (version < STORY_COMBAT_VERSION) return createV3({ ...request, version, learning, context });
+  requireGame(version === STORY_COMBAT_VERSION, 'INVALID_STORY_COMBAT_VERSION');
   // Reuse the published snapshot validation without changing its implementation.
   createLegacy({ ...request, encounterId: 'P03', version: 2 });
   const definition = storyEncounter(request.encounterId, version);
   const frozenLearning = learningFor(request.encounterId, learning), frozenContext = normalizeContext(context);
-  if (definition.kind === 'tutorial') return { ...createLegacy({ ...request, version: 2 }), version: 3,
-    learning: frozenLearning, context: frozenContext };
   const core = initializeAdvancedBattle({ id: request.id, rulesVersion: 2, acceptedAt: request.now,
     players: [{ userId: PLAYER, name: 'Custodio', units: structuredClone(request.units) },
       { userId: ENEMY, name: definition.name, units: [opponent(definition, request.units.length)] }] });
   core.turnUserId = PLAYER;
-  return reflect({ version: 3, id: request.id, encounterId: request.encounterId, status: 'active', createdAt: request.now,
+  return reflect({ version: STORY_COMBAT_VERSION, id: request.id, encounterId: request.encounterId, status: 'active', createdAt: request.now,
     updatedAt: request.now, finishedAt: null, finishReason: null, turnNumber: 1, unitSnapshots: structuredClone(request.units),
     players: [], actions: [], tutorial: { attack: false, defend: false, skill: false }, enemyIntent: null, learning: frozenLearning,
-    context: frozenContext, mechanics: { barrier: definition.kind === 'roots' ? 45 : 0, revealed: !['illusions', 'final'].includes(definition.kind) || definition.kind === 'final' && frozenContext.helpedEchoes,
-      copiedSkill: null, tension: 0, recklessStreak: 0, supportCooldown: 0, purifyCooldown: 0, sealTurns: 0, finalPhase: 'memory',
-      lessons: { damage: false, defense: false, support: false }, npcSafety: definition.kind === 'protection' ? 100 : null }, core });
+    context: frozenContext, mechanics: initialMechanics(definition.kind, frozenContext), core });
+}
+
+function initialMechanics(mechanic, context) {
+  return { barrier: mechanic === 'roots' ? 45 : 0,
+    revealed: !['illusions', 'final'].includes(mechanic) || mechanic === 'final' && context.helpedEchoes,
+    copiedSkill: null, tension: 0, recklessStreak: 0, supportCooldown: 0, purifyCooldown: 0, sealTurns: 0, finalPhase: 'memory',
+    lessons: { damage: false, defense: false, support: false }, npcSafety: mechanic === 'protection' ? 100 : null };
+}
+
+// Conversion happens together with the next real action. Published turns remain
+// unchanged and are replayed by their original engine before this boundary.
+export function upgradeStoryBattle(previous) {
+  requireGame(previous && (previous.version === 3 || [1, 2].includes(previous.version) && previous.encounterId === 'P03') &&
+    previous.status === 'active' && !previous.combatUpgrade, 'INVALID_STORY_COMBAT_UPGRADE');
+  const battle = structuredClone(previous);
+  battle.version = STORY_COMBAT_VERSION;
+  battle.combatUpgrade = { fromVersion: previous.version, afterActions: previous.actions.length };
+  battle.learning = learningFor(battle.encounterId, { defeats: previous.learning?.defeats ?? 0 });
+  battle.context ??= normalizeContext({});
+  battle.mechanics ??= initialMechanics(kind(battle), battle.context);
+  return reflect(battle);
 }
 
 function execute(core, userId, type, choice, roll, now) {
@@ -162,7 +184,8 @@ function describe(core, action) {
     if (effect.type === 'effect_tick') events.push(event('effect_tick', `${all.find(unit => unit.id === effect.unitId)?.characterName}: ${effect.effect === 'regeneration' ? '+' : '-'}${effect.amount} HP por ${effect.effect === 'burn' ? 'quemadura' : effect.effect === 'poison' ? 'veneno' : 'regeneración'}.`, effect));
     if (['switch', 'auto_switch'].includes(effect.type)) events.push(event(effect.type, `${all.find(unit => unit.id === effect.unitId)?.characterName} entra al combate.`, effect));
     if (effect.type === 'knockout') events.push(event('knockout', `${all.find(unit => unit.id === effect.unitId)?.characterName} queda fuera de combate.`, effect));
-    if (effect.type === 'stun') events.push(event('stun', 'El aturdimiento impide actuar este turno.', effect));
+    if (effect.type === 'stun') events.push(event('stun', `${all.find(unit => unit.id === effect.unitId)?.characterName} está aturdido y no puede actuar este turno.`, effect));
+    if (effect.type === 'effect_applied' && effect.effect === 'stun') events.push(event('effect_applied', `${all.find(unit => unit.id === effect.unitId)?.characterName} queda aturdido durante ${effect.remaining} turno(s).`, effect));
   }
   return events;
 }
@@ -191,6 +214,7 @@ function restoreShield(core, playerIndex, temporary, action) {
   if (temporary.original && potency > 0 && unit.hp > 0) unit.effects.push({ ...temporary.original, potency });
 }
 function directEnemyDamage(battle, amount, events, source) {
+  if (battle.core.status !== 'active') return;
   const boss = activeUnit(battle.core.players[1]);
   const actual = Math.min(boss.hp, amount);
   boss.hp -= actual;
@@ -200,15 +224,12 @@ function directEnemyDamage(battle, amount, events, source) {
 function finishCore(core, winnerId, reason, now) {
   core.status = 'finished'; core.winnerId = winnerId; core.finishReason = reason; core.finishedAt = now; core.turnUserId = null;
 }
-function enforceReflectionLesson(battle, events) {
-  if (kind(battle) !== 'reflections' || battle.core.status !== 'finished' || battle.core.winnerId !== PLAYER || Object.values(battle.mechanics.lessons).every(Boolean)) return;
-  const enemy = activeUnit(battle.core.players[1]); enemy.hp = 1;
-  battle.core.status = 'active'; battle.core.winnerId = null; battle.core.finishReason = null; battle.core.finishedAt = null;
-  battle.core.turnUserId = battle.core.actions.at(-1)?.actorId === PLAYER ? ENEMY : PLAYER;
-  battle.core.turnNumber = battle.core.actions.length + 1;
-  events.push(event('reflection_lesson', 'El reflejo espera las tres lecciones: ataca, defiende y apoya al equipo para completar la prueba.'));
-}
 function scoutingDefeat(battle, now, events) {
+  const boss = activeUnit(battle.core.players[1]);
+  if (boss.hp === 0) {
+    boss.hp = 1;
+    events.push(event('scouting_barrier', '🛡️ La barrera de reconocimiento desvía el remate: el jefe resiste con 1 HP y responde con su furia.', { unitId: boss.id }));
+  }
   for (const unit of battle.core.players[0].units) { unit.hp = 0; unit.effects = []; unit.cooldowns = {}; }
   finishCore(battle.core, ENEMY, 'knockout', now);
   events.push(event('scouting_defeat', '📖 La barrera de reconocimiento desata su furia y derrota al equipo. Este intento cuenta para aprender el patrón; las retiradas no cuentan.'));
@@ -217,29 +238,28 @@ function visibleMechanics(battle) {
   const m = battle.mechanics, mechanic = kind(battle);
   const learning = battle.learning.scouting ? `📖 Reconocimiento obligatorio: faltan ${battle.learning.remaining} derrotas reales antes de que pueda caer. ` : '';
   const descriptions = {
+    tutorial: 'Puedes vencer atacando. Defender y probar tu habilidad son prácticas opcionales; el Eco no tiene derrotas obligatorias.',
     roots: `🌿 Barrera: ${m.barrier}. La carga y la apertura también causan daño.`,
     illusions: m.revealed ? '👁️ Original reconocido. El enemigo sigue atacando.' : '🪞 Señuelos activos: observa bajo presión.',
-    reflections: `Daño ${m.lessons.damage ? '✓' : '○'} · Defensa ${m.lessons.defense ? '✓' : '○'} · Apoyo ${m.lessons.support ? '✓' : '○'}`,
+    reflections: `Prácticas opcionales: daño ${m.lessons.damage ? '✓' : '○'} · defensa ${m.lessons.defense ? '✓' : '○'} · apoyo ${m.lessons.support ? '✓' : '○'}. Puedes vencer sin completarlas todas.`,
     mirror: m.copiedSkill ? `🪞 Copiará ${m.copiedSkill.name}. Defiende la réplica.` : '🪞 Guarda la última habilidad destacada y la devolverá.',
     protection: `🛡️ Seguridad del aliado: ${m.npcSafety}/100. Proteger evita la próxima presión sobre él.`,
     tension: `🔔 Tensión: ${m.tension}/6. Purificar reduce 3 y defender reduce 1.`,
     final: `📜 ${m.finalPhase === 'memory' ? 'MEMORIA' : m.finalPhase === 'control' ? 'CONTROL' : 'ELECCIÓN'} · Sello: ${m.sealTurns} turnos · ${m.revealed ? 'Registros reconocidos' : 'Observa los registros'}`
   };
+  if (mechanic === 'tutorial') return descriptions.tutorial;
   return learning + (descriptions[mechanic] ?? 'El rival responde en todos los turnos. El apoyo tiene enfriamiento.') + ` Ofensiva seguida: ${m.recklessStreak}/3; alterna acciones para evitar la represalia.`;
 }
 
 export function resolveStoryAction(previous, { action, choice = null, rolls = null, now }) {
-  if (previous?.version < 3) return resolveLegacy(previous, { action, choice, rolls, now });
-  requireGame(previous?.version === 3 && previous.status === 'active', 'STORY_BATTLE_NOT_ACTIVE');
-  if (previous.encounterId === 'P03') {
-    const result = resolveLegacy({ ...previous, version: 2 }, { action, choice, rolls, now });
-    result.battle.version = 3; return result;
-  }
+  if (previous?.version < STORY_COMBAT_VERSION) return resolveV3(previous, { action, choice, rolls, now });
+  requireGame(previous?.version === STORY_COMBAT_VERSION && previous.status === 'active', 'STORY_BATTLE_NOT_ACTIVE');
   requireGame(date(now) && Date.parse(now) >= Date.parse(previous.updatedAt), 'INVALID_TIMESTAMP');
   const random = rolls === null ? [0, 0] : rolls;
   requireGame(Array.isArray(random) && random.length === 2 && random.every(roll => integer(roll, 0, 99)), 'INVALID_RANDOM_ROLL');
   requireGame(['attack', 'defend', 'skill', 'switch', 'surrender', 'break', 'observe', 'support', 'protect', 'purify'].includes(action), 'INVALID_STORY_ACTION');
   const mechanic = kind(previous), phase = previous.enemyIntent.type;
+  requireGame(mechanic !== 'tutorial' || ['attack', 'defend', 'skill', 'switch', 'surrender'].includes(action), 'INVALID_STORY_ACTION');
   requireGame(action !== 'break' || previous.mechanics.barrier > 0, 'STORY_NOT_BREAKABLE');
   requireGame(action !== 'observe' || ['illusions', 'final'].includes(mechanic) && !previous.mechanics.revealed, 'STORY_NOT_OBSERVABLE');
   requireGame(action !== 'protect' || mechanic === 'protection' || mechanic === 'final' && previous.mechanics.finalPhase === 'choice', 'STORY_NOT_PROTECTABLE');
@@ -272,7 +292,7 @@ export function resolveStoryAction(previous, { action, choice = null, rolls = nu
     m.barrier = enemy.effects.find(effect => effect.type === 'shield')?.potency ?? 0;
     restoreShield(battle.core, 1, enemyShield, result.action);
   }
-  if (!decoy) events.push(...describe(battle.core, result.action));
+  if (!decoy || result.action.type === 'skip') events.push(...describe(battle.core, result.action));
   else events.push(event('decoy', '🪞 El golpe se pierde en un registro falso. Observar permite reconocer al original.'));
   if (executed) {
     if (['attack', 'skill', 'break'].includes(action)) { m.lessons.damage = true; battle.tutorial.attack = true; }
@@ -284,7 +304,6 @@ export function resolveStoryAction(previous, { action, choice = null, rolls = nu
     if (mechanic === 'tension') m.tension = Math.min(8, Math.max(0, m.tension + (usedSkill ? 3 : action === 'attack' ? 2 : action === 'defend' ? -1 : 0)));
     if (mechanic === 'reflections' && action === 'support') directEnemyDamage(battle, Math.max(12, Math.floor(actor.stats.attack * 0.8)), events, 'support_counter');
   }
-  enforceReflectionLesson(battle, events);
   if (battle.learning.scouting && battle.core.status === 'finished' && battle.core.winnerId === PLAYER) scoutingDefeat(battle, now, events);
   if (battle.core.status === 'active') {
     const enemy = activeUnit(battle.core.players[1]);
@@ -292,9 +311,9 @@ export function resolveStoryAction(previous, { action, choice = null, rolls = nu
     const strong = ['unleash', 'protect', 'reflect'].includes(phase) || phase === 'tension' && m.tension >= 5;
     const hostileMove = copied && phase === 'reflect' ? { ...copied, id: 'story_pressure', name: `Réplica de ${copied.name}`, cooldown: 0, effects: copied.effects.map(effect => ({ ...effect, target: effect.target })) } :
       attack('story_pressure', phase === 'charge' ? 'Hostigamiento de carga' : phase === 'exposed' ? 'Respuesta expuesta' : strong ? 'Descarga del vínculo' : 'Presión de tinta',
-        strong ? mechanic === 'final' ? 84 : 75 : ['charge', 'exposed'].includes(phase) ? 2 : 6);
+        mechanic === 'tutorial' ? 1 : strong ? mechanic === 'final' ? 84 : 75 : ['charge', 'exposed'].includes(phase) ? 2 : 6);
     if (mechanic === 'tension' && phase === 'tension' && m.tension >= 5) hostileMove.power += m.tension * 5;
-    if (m.recklessStreak >= 3) { hostileMove.power += 45; events.push(event('reckless_counter', '⚠️ Tres ataques seguidos abren tu guardia: el enemigo castiga la ofensiva continua.')); }
+    if (mechanic !== 'tutorial' && m.recklessStreak >= 3) { hostileMove.power += 45; events.push(event('reckless_counter', '⚠️ Tres ataques seguidos abren tu guardia: el enemigo castiga la ofensiva continua.')); }
     if (battle.learning.scouting) hostileMove.power += Math.min(60, previous.actions.length * 3);
     if (battle.context.huanSupport) hostileMove.power = Math.max(1, hostileMove.power - 2);
     enemy.attacks[0] = hostileMove;
@@ -302,7 +321,7 @@ export function resolveStoryAction(previous, { action, choice = null, rolls = nu
     const target = activeUnit(battle.core.players[0]);
     // Corrupted enemies maintain pressure even against a defensive roster;
     // shields and active defense still absorb this physical hit normally.
-    const floorDamage = Math.max(1, Math.floor(target.stats.hp * 7 / 100));
+    const floorDamage = mechanic === 'tutorial' ? 1 : Math.max(1, Math.floor(target.stats.hp * 7 / 100));
     const currentDamage = calculateAdvancedDamage(hostileMove, enemy, target);
     enemy.stats.attack += Math.max(0, floorDamage - currentDamage);
     let guard = null;
@@ -319,7 +338,7 @@ export function resolveStoryAction(previous, { action, choice = null, rolls = nu
     const enemyActed = result.action.type !== 'skip';
     if (enemyActed && battle.core.status === 'active') {
       const party = battle.core.players[0];
-      for (const reserve of party.units.filter(unit => unit.id !== activeUnit(party).id && unit.hp > 0)) {
+      for (const reserve of (mechanic === 'tutorial' ? [] : party.units).filter(unit => unit.id !== activeUnit(party).id && unit.hp > 0)) {
         const amount = Math.min(reserve.hp, Math.max(1, Math.floor(reserve.stats.hp * (action === 'protect' ? 1 : strong ? 5 : 3) / 100)));
         reserve.hp -= amount;
         events.push(event('reserve_pressure', `${reserve.characterName} recibe ${amount} de presión de tinta en reserva.`, { unitId: reserve.id, amount }));
@@ -328,8 +347,9 @@ export function resolveStoryAction(previous, { action, choice = null, rolls = nu
         m.npcSafety = Math.max(0, Math.min(100, m.npcSafety + (action === 'protect' && executed ? 10 : -12)));
         if (m.npcSafety === 0) { finishCore(battle.core, ENEMY, 'protection', now); events.push(event('protection_failed', 'La presión obliga a evacuar al aliado. Puedes reorganizar el equipo y reintentar.')); }
       }
-      if (executed && action === 'defend' && strong) directEnemyDamage(battle, Math.max(10, Math.floor(actor.stats.attack * 0.65)), events, 'guard_counter');
-      if (executed && action === 'protect' && phase === 'protect') directEnemyDamage(battle, Math.max(18, Math.floor(actor.stats.attack * 1.2)), events, 'protect_counter');
+      const counterActor = battle.core.players[0].units.find(unit => unit.id === actorId);
+      if (battle.core.status === 'active' && counterActor.hp > 0 && executed && action === 'defend' && strong) directEnemyDamage(battle, Math.max(10, Math.floor(actor.stats.attack * 0.65)), events, 'guard_counter');
+      if (battle.core.status === 'active' && counterActor.hp > 0 && executed && action === 'protect' && phase === 'protect') directEnemyDamage(battle, Math.max(18, Math.floor(actor.stats.attack * 1.2)), events, 'protect_counter');
       if (mechanic === 'tension' && phase === 'tension' && m.tension >= 5) m.tension = Math.max(0, m.tension - 2);
     }
   }
@@ -337,12 +357,16 @@ export function resolveStoryAction(previous, { action, choice = null, rolls = nu
   if (executed && usedSkill) battle.tutorial.skill = true;
   for (const name of ['supportCooldown', 'purifyCooldown', 'sealTurns']) if (m[name] > 0 && action !== (name === 'supportCooldown' ? 'support' : name === 'purifyCooldown' ? 'purify' : null)) m[name]--;
   if (battle.learning.scouting && battle.core.status === 'finished' && battle.core.winnerId === PLAYER) scoutingDefeat(battle, now, events);
-  enforceReflectionLesson(battle, events);
   if (battle.learning.scouting && battle.core.status === 'active' && previous.actions.length + 1 >= 20) scoutingDefeat(battle, now, events);
   if (battle.core.status === 'finished') {
     battle.status = battle.core.winnerId === PLAYER ? 'won' : 'lost'; battle.finishReason = battle.core.finishReason; battle.finishedAt = now;
-    events.push(event(battle.status, battle.status === 'won' ? 'El vínculo resiste. El enemigo cede ante tu estrategia.' : action === 'surrender' ? 'Te retiras: las retiradas no cuentan como reconocimiento.' : 'Tu equipo cae bajo la presión. Conservas tus cartas y monedas; revisa la señal y prepara el siguiente intento.'));
+    events.push(event(battle.status, battle.status === 'won' ? 'El vínculo resiste. El enemigo cede ante tu estrategia.' : action === 'surrender' ? 'Te retiras: las retiradas no cuentan como reconocimiento.' : battle.finishReason === 'protection' ? 'El aliado tuvo que ser evacuado. Tu expedición conserva la vida restante; reorganiza la protección y vuelve a intentarlo.' : battle.finishReason === 'turn_limit' ? 'El enemigo resiste hasta el límite de turnos. Tu expedición conserva la vida restante y puede reintentar el encuentro.' : 'Tu equipo cae bajo la presión. Conservas tus cartas y monedas; revisa la señal y prepara el siguiente intento.'));
   }
+  // A reconnaissance barrier can deflect a lethal hit. Only report a knockout
+  // when that unit actually remains down in the resulting saved state.
+  const units = battle.core.players.flatMap(player => player.units);
+  for (let index = events.length - 1; index >= 0; index--) if (events[index].type === 'knockout' &&
+    units.find(unit => unit.id === events[index].unitId)?.hp > 0) events.splice(index, 1);
   const entry = { seq: battle.actions.length + 1, action, choice: selectedChoice, rolls: [...random], createdAt: now, events };
   battle.actions.push(entry);
   reflect(battle);
@@ -358,28 +382,43 @@ export function resolveStoryAction(previous, { action, choice = null, rolls = nu
   return { battle, action: entry, events };
 }
 
-export function replayStoryBattle(previous) {
-  if (previous?.version < 3) {
-    let battle = createLegacy({ id: previous.id, encounterId: previous.encounterId, units: previous.unitSnapshots, now: previous.createdAt, version: previous.version });
-    for (const entry of previous.actions) battle = resolveLegacy(battle, { action: entry.action, choice: entry.choice, rolls: entry.rolls, now: entry.createdAt }).battle;
-    return battle;
+export function storyBattleHistory(previous) {
+  requireGame(previous && Array.isArray(previous.actions), 'INVALID_STORY_BATTLE');
+  const marker = previous.combatUpgrade;
+  if (marker !== undefined) requireGame(previous.version === STORY_COMBAT_VERSION && marker &&
+    Object.keys(marker).length === 2 && (marker.fromVersion === 3 || [1, 2].includes(marker.fromVersion) && previous.encounterId === 'P03') && integer(marker.afterActions) &&
+    marker.afterActions < previous.actions.length, 'INVALID_STORY_COMBAT_UPGRADE');
+  const sourceVersion = marker ? marker.fromVersion : previous.version;
+  const sourceLearning = previous.learning ? { defeats: previous.learning.defeats,
+    required: storyCombatPolicy(previous.encounterId, sourceVersion).requiredDefeats } : undefined;
+  let battle = createStoryBattle({ id: previous.id, encounterId: previous.encounterId, units: previous.unitSnapshots,
+    now: previous.createdAt, version: sourceVersion, ...(sourceLearning ? { learning: sourceLearning, context: previous.context } : {}) });
+  const history = [battle];
+  for (let index = 0; index < previous.actions.length; index++) {
+    if (marker && index === marker.afterActions) battle = upgradeStoryBattle(battle);
+    const entry = previous.actions[index];
+    battle = resolveStoryAction(battle, { action: entry.action, choice: entry.choice, rolls: entry.rolls, now: entry.createdAt }).battle;
+    history.push(battle);
   }
-  let battle = createStoryBattle({ id: previous.id, encounterId: previous.encounterId, units: previous.unitSnapshots, now: previous.createdAt,
-    version: previous.version, learning: { defeats: previous.learning.defeats, required: previous.learning.required }, context: previous.context });
-  for (const entry of previous.actions) battle = resolveStoryAction(battle, { action: entry.action, choice: entry.choice, rolls: entry.rolls, now: entry.createdAt }).battle;
-  return battle;
+  return history;
 }
+export function replayStoryBattle(previous) { return storyBattleHistory(previous).at(-1); }
 export function validateStoryBattle(battle) { try { return isDeepStrictEqual(battle, replayStoryBattle(battle)); } catch { return false; } }
 export function storyBattleView(battle) {
-  if (battle.version < 3 || battle.encounterId === 'P03') return { ...legacyView(battle), ...(battle.learning ? { learning: structuredClone(battle.learning) } : {}) };
+  if (battle.version < STORY_COMBAT_VERSION) return viewV3(battle);
   const view = legacyView(battle), m = battle.mechanics, mechanic = kind(battle);
   const available = ['attack', 'defend', 'switch', 'surrender'];
   if (m.sealTurns === 0) available.push('skill');
-  if (m.supportCooldown === 0) available.push('support');
+  if (mechanic !== 'tutorial' && m.supportCooldown === 0) available.push('support');
   if (m.barrier > 0) available.push('break');
   if (['illusions', 'final'].includes(mechanic) && !m.revealed) available.push('observe');
   if (['tension', 'final'].includes(mechanic) && m.purifyCooldown === 0) available.push('purify');
   if (mechanic === 'protection' || mechanic === 'final' && m.finalPhase === 'choice') available.push('protect');
+  if (battle.combatUpgrade) {
+    const visibleEvents = (battle.actions.at(-1)?.events ?? []).filter(entry => entry.type !== 'tutorial_guidance' &&
+      !(entry.type === 'knockout' && battle.core.players.flatMap(player => player.units).find(unit => unit.id === entry.unitId)?.hp > 0));
+    view.lastEvents = visibleEvents.map(entry => entry.text).filter(Boolean);
+  }
   view.availableActions = available;
   view.enemy.phase = battle.enemyIntent?.type ?? 'finished'; view.enemy.mechanics = visibleMechanics(battle);
   view.learning = structuredClone(battle.learning); view.pressure = structuredClone(battle.pressure);

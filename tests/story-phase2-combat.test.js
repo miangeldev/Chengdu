@@ -122,7 +122,7 @@ test('historia v2: el replay rechaza manipular barreras, revelados y acciones es
 
 test('historia v2: valida versión, contexto de mecánica y rolls incluso detrás de señuelos', () => {
   code(() => create('I05', 'panda_guerrero', 1), 'STORY_ENCOUNTER_NOT_FOUND');
-  code(() => storyEncounter('I05', 4), 'INVALID_STORY_COMBAT_VERSION');
+  code(() => storyEncounter('I05', 5), 'INVALID_STORY_COMBAT_VERSION');
   code(() => act(create('I05'), 'observe'), 'STORY_NOT_OBSERVABLE');
   code(() => act(create('II05'), 'break'), 'STORY_NOT_BREAKABLE');
   code(() => act(create('II05'), 'skill', null, [100, 0]), 'INVALID_RANDOM_ROLL');

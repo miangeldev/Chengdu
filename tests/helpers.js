@@ -14,7 +14,8 @@ export function setup(t, options = {}) {
     stores.push(storage);
     return { storage, game: createGame({ storage, randomRoll: overrides.randomRoll ?? options.randomRoll,
       randomDropInt: overrides.randomDropInt ?? options.randomDropInt,
-      storyContentVersion: overrides.storyContentVersion ?? options.storyContentVersion }) };
+      storyContentVersion: overrides.storyContentVersion ?? options.storyContentVersion,
+      storyCombatVersion: overrides.storyCombatVersion ?? options.storyCombatVersion }) };
   }
   const context = { directory, open, ...open() };
   t.after(async () => {

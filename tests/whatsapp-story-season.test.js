@@ -236,7 +236,7 @@ test('real WhatsApp season saves every step, survives required defeats and opens
   assert.equal(seen.size, 32);
   assert.equal(final.progress.traces.length, 5);
   assert.ok(communitySeen);
-  assert.deepEqual([...learning.entries()].sort(), [['I03',1],['I05',1],['II05',2],['III05',2],['IV05',2],['V05',4]].sort());
+  assert.deepEqual([...learning.entries()].sort(), [['I05',1],['II05',2],['III05',2],['IV05',2],['V05',4]].sort());
   assert.match(replies.at(-1), /TEMPORADA COMPLETA.*Custodio del Alba/s);
   const stored = Object.fromEntries(COLLECTIONS.map(name => [name,
     JSON.parse(fs.readFileSync(path.join(c.directory, `${name}.json`), 'utf8'))]));

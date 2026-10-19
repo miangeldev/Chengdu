@@ -1,4 +1,4 @@
-# Chengdú Cards — Historia 0.13
+# Chengdú Cards — Historia 0.13.1
 
 Módulo de juego para un bot de WhatsApp: registro, perfil, catálogo de diez
 personajes, starter único, colección, equipos de hasta tres unidades y combates
@@ -31,6 +31,10 @@ La versión **0.13.0** cierra la temporada: 32 misiones principales, cinco Trazo
 tres resoluciones personales y el título Custodio del Alba. Añade rutas
 opcionales, escenas archivadas, pruebas posteriores y jefes con reconocimientos
 obligatorios anunciados en la interfaz. [Temporada completa](docs/story-season.md).
+La corrección **0.13.1** permite terminar el tutorial y los Tres Reflejos sin
+obligar a practicar todas las acciones. Los mínimos de derrota quedan reservados
+para los cinco jefes principales. Repara combates ya iniciados sin reiniciar la
+campaña y evita KO falsos y victorias después de fallar una protección.
 Guía: [fases 13–32](docs/fases-13-32.md), [auditoría integral](docs/auditoria-fases-0-32.md)
 y [plan de entrega](docs/plan-fases-13-32.md).
 El balance 0.4.1 distingue la fuerza de las rarezas y limita la emisión global

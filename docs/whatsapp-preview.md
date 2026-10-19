@@ -682,17 +682,17 @@ Lukas: +15 XP
 🏆 Victoria vs *Lukas*
 📅 11 de octubre de 2026 · 1v1 clásico · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-58c99fc3-2396-4f63-a3e2-ac150a54354b
+🔎 .ctuhistorial BTL-212cbaee-e5b0-422b-8e43-b64dc3c23648
 
 🏆 Victoria vs *Lukas*
 📅 11 de octubre de 2026 · 1v1 clásico · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-6fee275b-f63c-4430-a18f-4fd4fe21636c
+🔎 .ctuhistorial BTL-d932aeb4-aa1b-4b53-8779-1e15eeabe8c6
 
 🏆 Victoria vs *Lukas*
 📅 11 de octubre de 2026 · 1v1 clásico · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-78bcf291-a725-4f47-bd82-9569fd190ae2
+🔎 .ctuhistorial BTL-f5bca99c-d828-4c48-bad1-ab3d7035ad79
 
 📄 *Página 1 de 1*
 👉 Tu saldo: *.ctubalance*
@@ -3317,26 +3317,26 @@ Lukas: +15 XP
 📅 25 de octubre de 2026 · 1v1 · 8 turnos
 🎁 +120 ChengCoins · +35 XP
 🏅 Ranked T1 · 1016 Elo (+16)
-🔎 .ctuhistorial BTL-ff0506df-472a-4110-b539-f5bb4de0996d
-
-💔 Derrota vs *Lukas*
-📅 22 de octubre de 2026 · 1v1 clásico · 5 turnos
-🎁 +0 ChengCoins · +15 XP
-🔎 .ctuhistorial BTL-acd26ce6-718e-41d1-94d9-1fb263904b3a
+🔎 .ctuhistorial BTL-9af3c68c-5517-456a-a801-a4cd8d25be43
 
 🏆 Victoria vs *Lukas*
 📅 22 de octubre de 2026 · 1v1 clásico · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-f18dff87-5b8c-434d-8551-4e4866d9b4c5
+🔎 .ctuhistorial BTL-84bfa6fc-30d2-40c2-90bc-56c4905b82d6
+
+💔 Derrota vs *Lukas*
+📅 22 de octubre de 2026 · 1v1 clásico · 5 turnos
+🎁 +0 ChengCoins · +15 XP
+🔎 .ctuhistorial BTL-c6c53261-1dc9-4134-90eb-be1abb2be59e
+
+💔 Derrota vs *Lukas*
+📅 20 de octubre de 2026 · 1v1 · 0 turnos
+🔎 .ctuhistorial BTL-53576d86-2514-4be0-9b5a-6b2994934169
 
 💔 Derrota vs *Lukas*
 📅 20 de octubre de 2026 · 3v3 · 31 turnos
 🎁 +0 ChengCoins · +15 XP
-🔎 .ctuhistorial BTL-37e61168-bbe2-40a4-a9e6-d2ef368de68f
-
-💔 Derrota vs *Lukas*
-📅 20 de octubre de 2026 · 1v1 · 0 turnos
-🔎 .ctuhistorial BTL-ed16bfff-9a00-43b5-8511-59c95c84ecae
+🔎 .ctuhistorial BTL-7de63045-7e05-4764-a05f-008697f92f6a
 
 📄 *Página 1 de 3*
 ➡️ Siguiente: *.ctuhistorial 2*
@@ -4402,9 +4402,9 @@ Bao: «Es un Eco: una identidad dañada. Vamos a detenerlo sin hacerle más dañ
 
 📖 Avance: 3/32 misiones
 
-Panda Guerrero usó Golpe de Bambú: 23 de daño.
-Eco desorientado quedó fuera de combate.
-El Eco se serena. Tu vínculo resistió la tinta.
+Panda Guerrero usó Golpe de Bambú: 23 de daño a Eco desorientado.
+Eco desorientado queda fuera de combate.
+El vínculo resiste. El enemigo cede ante tu estrategia.
 
 🌿 *¡Encuentro superado!*
 
@@ -4519,211 +4519,6 @@ Bao: «Cuando la tinta se concentre, cúbrete. Después de descargarla quedará 
 📖 .ctudiario historia
 ```
 
-## Historia I-03: reconocimiento obligatorio
-
-```text
-🃏 *CHENGDÚ CARDS | HISTORIA | T1*
-━━━━━━━━━━━━━━
-🎋 *Capítulo I · El Bosque que Olvidó su Voz*
-📍 *I-03 · Huellas en el bambú*
-
-📖 Avance: 6/32 misiones
-
-🖋️ Reconoces al Eco de Tinta por sus garras oscuras y dejas una salida a los otros. Lian anota tu cuidado al elegir el objetivo.
-
-❤️ *EXPEDICIÓN*
-🐼 *Panda Guerrero*
-▓▓▓▓▓▓▓▓▓▓ 124/124 HP
-🛡️ Escudo 12
-
-👁️ *Eco de Tinta*
-▓▓▓▓▓▓▓▓▓▓ 245/245 HP
-
-📖 *Aprendizaje del jefe: 0/1 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
-⚠️ *SEÑAL ENEMIGA*
-La tinta prepara un golpe rápido: el enemigo no dejará de presionarte.
-
-🧩 📖 Reconocimiento obligatorio: faltan 1 derrotas reales antes de que pueda caer. El rival responde en todos los turnos. El apoyo tiene enfriamiento. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
-
-🎯 *Tu turno*
-1. Golpe de Bambú · 25 POT
-2. Impacto del Panda · 36 POT
-
-👉 .ctuhistoria atacar 1
-👉 .ctuhistoria atacar 2
-👉 .ctuhistoria defender
-👉 .ctuhistoria habilidad
-👉 .ctuhistoria apoyar · Recupera vida del equipo
-
-💾 El turno se conserva al salir.
-```
-
-## Historia I-03: reconocimiento obligatorio
-
-```text
-🃏 *CHENGDÚ CARDS | HISTORIA | T2*
-━━━━━━━━━━━━━━
-🎋 *Capítulo I · El Bosque que Olvidó su Voz*
-📍 *I-03 · Huellas en el bambú*
-
-📖 Avance: 6/32 misiones
-
-Panda Guerrero usó Impacto del Panda: 41 de daño a Eco de Tinta.
-Eco de Tinta usó Presión de tinta: 0 de daño a Panda Guerrero.
-
-❤️ *EXPEDICIÓN*
-🐼 *Panda Guerrero*
-▓▓▓▓▓▓▓▓▓▓ 124/124 HP
-🛡️ Escudo 4
-
-👁️ *Eco de Tinta*
-▓▓▓▓▓▓▓▓▓▒ 204/245 HP
-Tinta en concentración
-
-📖 *Aprendizaje del jefe: 0/1 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
-⚠️ *SEÑAL ENEMIGA*
-⚠️ Carga una descarga y te hostiga mientras la prepara. La próxima señal exigirá defensa.
-
-🧩 📖 Reconocimiento obligatorio: faltan 1 derrotas reales antes de que pueda caer. El rival responde en todos los turnos. El apoyo tiene enfriamiento. Ofensiva seguida: 1/3; alterna acciones para evitar la represalia.
-
-🎯 *Tu turno*
-1. Golpe de Bambú · 25 POT
-2. Impacto del Panda · 36 POT · ⏳ 2T
-
-👉 .ctuhistoria atacar 1
-👉 .ctuhistoria defender
-👉 .ctuhistoria apoyar · Recupera vida del equipo
-
-💾 El turno se conserva al salir.
-```
-
-## Historia I-03: reconocimiento obligatorio
-
-```text
-🃏 *CHENGDÚ CARDS | HISTORIA | T3*
-━━━━━━━━━━━━━━
-🎋 *Capítulo I · El Bosque que Olvidó su Voz*
-📍 *I-03 · Huellas en el bambú*
-
-📖 Avance: 6/32 misiones
-
-Panda Guerrero usó Golpe de Bambú: 30 de daño a Eco de Tinta.
-Eco de Tinta usó Hostigamiento de carga: 4 de daño a Panda Guerrero.
-
-❤️ *EXPEDICIÓN*
-🐼 *Panda Guerrero*
-▓▓▓▓▓▓▓▓▓▓ 120/124 HP
-
-👁️ *Eco de Tinta*
-▓▓▓▓▓▓▓▓▒▒ 174/245 HP
-Descarga preparada
-
-📖 *Aprendizaje del jefe: 0/1 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
-⚠️ *SEÑAL ENEMIGA*
-⚠️ ¡DESCARGA INMINENTE! Defiende para amortiguarla y devolver parte de su fuerza.
-
-🧩 📖 Reconocimiento obligatorio: faltan 1 derrotas reales antes de que pueda caer. El rival responde en todos los turnos. El apoyo tiene enfriamiento. Ofensiva seguida: 2/3; alterna acciones para evitar la represalia.
-
-🎯 *Tu turno*
-1. Golpe de Bambú · 25 POT
-2. Impacto del Panda · 36 POT · ⏳ 1T
-
-👉 .ctuhistoria atacar 1
-👉 .ctuhistoria defender
-👉 .ctuhistoria apoyar · Recupera vida del equipo
-
-💾 El turno se conserva al salir.
-```
-
-## Historia I-03: reconocimiento obligatorio
-
-```text
-🃏 *CHENGDÚ CARDS | HISTORIA | T4*
-━━━━━━━━━━━━━━
-🎋 *Capítulo I · El Bosque que Olvidó su Voz*
-📍 *I-03 · Huellas en el bambú*
-
-📖 Avance: 6/32 misiones
-
-🛡️ Defiendes la ofensiva sin detener la presión enemiga.
-Eco de Tinta usó Descarga del vínculo: 24 de daño a Panda Guerrero.
-La respuesta del vínculo causa 16 de daño al enemigo.
-
-❤️ *EXPEDICIÓN*
-🐼 *Panda Guerrero*
-▓▓▓▓▓▓▓▓▒▒ 96/124 HP
-
-👁️ *Eco de Tinta*
-▓▓▓▓▓▓▓▒▒▒ 158/245 HP
-Defensas abiertas
-
-📖 *Aprendizaje del jefe: 0/1 derrotas*
-Este intento es de reconocimiento: todavía no puedes vencer al jefe. Observa sus patrones; necesitas completar las derrotas de aprendizaje.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
-⚠️ *SEÑAL ENEMIGA*
-Su defensa cae, pero sigue atacando. Aprovecha la apertura sin descuidar tu vida.
-
-🧩 📖 Reconocimiento obligatorio: faltan 1 derrotas reales antes de que pueda caer. El rival responde en todos los turnos. El apoyo tiene enfriamiento. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
-
-🎯 *Tu turno*
-1. Golpe de Bambú · 25 POT
-2. Impacto del Panda · 36 POT
-
-👉 .ctuhistoria atacar 1
-👉 .ctuhistoria atacar 2
-👉 .ctuhistoria defender
-👉 .ctuhistoria habilidad
-👉 .ctuhistoria apoyar · Recupera vida del equipo
-
-💾 El turno se conserva al salir.
-```
-
-## Historia I-03: derrota guardada y reintento
-
-```text
-🃏 *CHENGDÚ CARDS | HISTORIA | DERROTA*
-━━━━━━━━━━━━━━
-🎋 *Capítulo I · El Bosque que Olvidó su Voz*
-📍 *I-03 · Huellas en el bambú*
-
-📖 Avance: 6/32 misiones
-
-Panda Guerrero usó Golpe de Bambú: 6 de daño a Eco de Tinta.
-Eco de Tinta queda fuera de combate.
-📖 La barrera de reconocimiento desata su furia y derrota al equipo. Este intento cuenta para aprender el patrón; las retiradas no cuentan.
-Tu equipo cae bajo la presión. Conservas tus cartas y monedas; revisa la señal y prepara el siguiente intento.
-
-❤️ *EXPEDICIÓN*
-🐼 *Panda Guerrero*
-▒▒▒▒▒▒▒▒▒▒ 0/124 HP
-
-👁️ *Eco de Tinta*
-▒▒▒▒▒▒▒▒▒▒ 0/245 HP
-
-📖 *Aprendizaje del jefe: 1/1 derrotas*
-Aprendizaje completado. Ya puedes disputar la victoria.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
-
-🌧️ *Esta vez la expedición cayó.*
-Tu historia sigue guardada. No pierdes cartas ni monedas; reintentar no duplica los premios.
-
-💡 Observa la señal enemiga: defender antes de un golpe cargado puede cambiar el combate. Prepara tu equipo y vuelve a intentarlo.
-
-🔁 *.ctuhistoria reintentar*
-🛡️ Preparar: .ctuequipo
-🔎 Pista: .ctuhistoria pista
-```
-
 ## Historia I-03: escena 1
 
 ```text
@@ -4744,10 +4539,6 @@ Eco de Tinta usó Hostigamiento de carga: 4 de daño a Panda Guerrero.
 👁️ *Eco de Tinta*
 ▓▓▓▓▓▓▓▓▒▒ 174/245 HP
 Descarga preparada
-
-📖 *Aprendizaje del jefe: 1/1 derrotas*
-Aprendizaje completado. Ya puedes disputar la victoria.
-🏳️ Rendirse no cuenta como derrota de aprendizaje.
 
 ⚠️ *SEÑAL ENEMIGA*
 ⚠️ ¡DESCARGA INMINENTE! Defiende para amortiguarla y devolver parte de su fuerza.
@@ -5049,7 +4840,7 @@ Su defensa cae, pero sigue atacando. Aprovecha la apertura sin descuidar tu vida
 
 💥 Rompes las raíces y diriges un ataque básico. El Guardián responderá.
 Panda Guerrero usó Golpe de Bambú: 27 de daño a Guardián Marchito.
-Guardián Marchito queda fuera de combate.
+🛡️ La barrera de reconocimiento desvía el remate: el jefe resiste con 1 HP y responde con su furia.
 📖 La barrera de reconocimiento desata su furia y derrota al equipo. Este intento cuenta para aprender el patrón; las retiradas no cuentan.
 Tu equipo cae bajo la presión. Conservas tus cartas y monedas; revisa la señal y prepara el siguiente intento.
 
@@ -5058,7 +4849,7 @@ Tu equipo cae bajo la presión. Conservas tus cartas y monedas; revisa la señal
 ▒▒▒▒▒▒▒▒▒▒ 0/126 HP
 
 👁️ *Guardián Marchito*
-▒▒▒▒▒▒▒▒▒▒ 0/245 HP
+▓▒▒▒▒▒▒▒▒▒ 1/245 HP
 
 📖 *Aprendizaje del jefe: 1/1 derrotas*
 Aprendizaje completado. Ya puedes disputar la victoria.
@@ -6213,7 +6004,7 @@ Huan recuerda lo visto en el puente y ofrece una indicación breve: «No confund
 ⚠️ *SEÑAL ENEMIGA*
 Primer reflejo: demuestra una acción ofensiva; seguirá presionando.
 
-🧩 Daño ○ · Defensa ○ · Apoyo ○ Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 Prácticas opcionales: daño ○ · defensa ○ · apoyo ○. Puedes vencer sin completarlas todas. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -6254,7 +6045,7 @@ Los Tres Reflejos usó Presión de tinta: 9 de daño a Panda Guerrero.
 ⚠️ *SEÑAL ENEMIGA*
 Segundo reflejo: defender crea una apertura para el equipo.
 
-🧩 Daño ✓ · Defensa ○ · Apoyo ✓ Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
+🧩 Prácticas opcionales: daño ✓ · defensa ○ · apoyo ✓. Puedes vencer sin completarlas todas. Ofensiva seguida: 0/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT
@@ -6293,7 +6084,7 @@ Los Tres Reflejos usó Presión de tinta: 6 de daño a Panda Guerrero.
 ⚠️ *SEÑAL ENEMIGA*
 Tercer reflejo: apoyar restaura el vínculo y daña el reflejo.
 
-🧩 Daño ✓ · Defensa ✓ · Apoyo ✓ Ofensiva seguida: 2/3; alterna acciones para evitar la represalia.
+🧩 Prácticas opcionales: daño ✓ · defensa ✓ · apoyo ✓. Puedes vencer sin completarlas todas. Ofensiva seguida: 2/3; alterna acciones para evitar la represalia.
 
 🎯 *Tu turno*
 1. Golpe de Bambú · 25 POT

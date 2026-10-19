@@ -2,13 +2,14 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createStoryBattle, resolveStoryAction, replayStoryBattle, storyBattleView, validateStoryBattle, storyCombatPolicy } from '../game/story/combat.js';
 import { createStoryBattle as legacyCreate, resolveStoryAction as legacyResolve } from '../game/story/combatV2.js';
-import { storyBalanceSnapshot, simulateStorySeason, storySeasonTacticalAction } from '../scripts/simulate-story-balance.js';
+import { storyBalanceSnapshot, simulateStorySeason as simulateSeason, storySeasonTacticalAction } from '../scripts/simulate-story-balance.js';
 
+const simulateStorySeason = request => simulateSeason({ ...request, version: 3 });
 const NOW = '2026-10-18T00:00:00.000Z';
 const bosses = ['I03', 'I05', 'II05', 'III05', 'IV05', 'V05'];
 const levels = { I03: 3, I05: 4, II05: 5, III05: 6, IV05: 7, V05: 8 };
 function create(encounterId, { characterId = 'panda_guerrero', level = levels[encounterId] ?? 7, size = 1, defeats = null, context = {} } = {}) {
-  const required = storyCombatPolicy(encounterId).requiredDefeats;
+  const required = storyCombatPolicy(encounterId, 3).requiredDefeats;
   return createStoryBattle({ id: 'season-test', encounterId, version: 3, now: NOW, context,
     units: Array.from({ length: size }, (_, index) => storyBalanceSnapshot(characterId, level, false, `:${index}`)),
     learning: { defeats: defeats ?? required, required } });
@@ -30,9 +31,9 @@ for (const version of [1, 2]) test(`temporada: el wrapper conserva íntegra la h
 });
 
 test('temporada: los mínimos obligatorios son explícitos, finitos y no permiten una victoria anticipada', () => {
-  assert.deepEqual(bosses.map(id => storyCombatPolicy(id).requiredDefeats), [1, 1, 2, 2, 2, 4]);
+  assert.deepEqual(bosses.map(id => storyCombatPolicy(id, 3).requiredDefeats), [1, 1, 2, 2, 2, 4]);
   for (const encounterId of bosses) {
-    const required = storyCombatPolicy(encounterId).requiredDefeats;
+    const required = storyCombatPolicy(encounterId, 3).requiredDefeats;
     for (let defeats = 0; defeats < required; defeats++) {
       const result = simulateStorySeason({ encounterId, characterId: 'panda_guerrero', level: levels[encounterId], size: 3, defeats, rolls: [0, 0] });
       assert.equal(result.status, 'lost', encounterId);

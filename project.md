@@ -3093,6 +3093,25 @@ de 2.957 unidades UTF-16. Los 40 JSON locales siguen intactos y válidos en esqu
 
 ---
 
+### Historia 0.13.1 — Coherencia de tutoriales y jefes
+
+El tutorial P-03 y los Tres Reflejos dejan de revivir enemigos a 1 HP para exigir
+acciones de práctica. El Eco de Tinta pierde su derrota obligatoria: los mínimos
+quedan exclusivamente en Guardián Marchito (1), Mercader (2), Centinela (2),
+Campana (2) y Archivista (4). La barrera de esos jefes ya no muestra un KO falso.
+
+Se corrigen contraataques desde KO y una evacuación que podía ser sobrescrita
+por una victoria. La interfaz identifica pérdidas por protección o límite de
+turnos y filtra anuncios históricos de KO que contradicen los HP actuales.
+El motor 4 conserva el replay exacto de 1/2/3 y actualiza los combates activos
+afectados junto con la siguiente acción, sin reiniciar ni duplicar premios.
+La narrativa sigue en versión 3 y el esquema de datos sigue en 12.
+
+Verificación: suite de 992 pruebas aprobada y dos regresiones adicionales de
+interfaz. Los tutoriales antiguos 1/2/3 se actualizan y completan sin repetir
+premios, incluso tras seis interrupciones del guardado. Se ejecutaron 1.680
+simulaciones del motor 4; la vista previa renovada reúne 400 ejemplos.
+
 ## V1.0
 
 ```text

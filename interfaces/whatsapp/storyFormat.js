@@ -37,6 +37,13 @@ function hpText(unit, bars) {
   return `${bars ? `${healthBar(unit.hp, unit.maxHp)} ` : ''}${unit.hp}/${unit.maxHp} HP`;
 }
 
+function visibleBattleEvents(battle) {
+  // Historical tutorial turns can contain a knockout followed by Bao restoring
+  // the Eco. Keep the saved events intact, but describe the current HP honestly.
+  const prematureKnockout = `${battle.enemy.name} quedó fuera de combate.`;
+  return lines((battle.lastEvents ?? []).filter(event => battle.enemy.hp <= 0 || event !== prematureKnockout));
+}
+
 function rewardText(reward, team = []) {
   if (!reward) return null;
   const sections = [];
@@ -91,7 +98,7 @@ export function renderStory(result, cmd, { healthBars = true, inspect = false } 
   if (battle?.status !== 'won') body.push(result.consequence ? `🖋️ ${safe(result.consequence)}` : null);
   if (result.community) body.push(`🤝 *Aportación guardada*\n${result.community.mode === 'clan' ? 'Tu aportación forma parte de la reconstrucción con tu clan.' : 'La ruta individual conserva la misma progresión principal.'}`);
   if (battle?.status === 'active' || battle?.status === 'lost' && !battle.acceptedDefeat) {
-    if (battle.lastEvents?.length && !result.alreadyProcessed) body.push(lines(battle.lastEvents));
+    if (battle.lastEvents?.length && !result.alreadyProcessed) body.push(visibleBattleEvents(battle));
     const active = battle.team.find(unit => unit.active) ?? battle.team[0];
     body.push(`❤️ *EXPEDICIÓN*\n${characterIcon(active.characterId)} *${safe(active.name)}*\n${hpText(active, healthBars)}${effectsText(active) ? `\n${effectsText(active)}` : ''}${battle.team.filter(unit => !unit.active).map(unit => `\n${unit.slot}. ${safe(unit.name)}: ${unit.hp > 0 ? hpText(unit, false) : '💤 KO'}`).join('')}`);
     body.push(`👁️ *${safe(battle.enemy.name)}*\n${hpText(battle.enemy, healthBars)}${phaseLabels[battle.enemy.phase] ? `\n${phaseLabels[battle.enemy.phase]}` : ''}${effectsText(battle.enemy) ? `\n${effectsText(battle.enemy)}` : ''}`);
@@ -104,8 +111,13 @@ export function renderStory(result, cmd, { healthBars = true, inspect = false } 
     }
     if (battle.status === 'lost') {
       const surrender = battle.finishReason === 'surrender';
-      body.push(`${surrender ? '🏳️ *Te retiraste del encuentro.*' : '🌧️ *Esta vez la expedición cayó.*'}\nTu historia sigue guardada. No pierdes cartas ni monedas; reintentar no duplica los premios.`);
-      const encounterHint = battle.encounterId === 'II05' ? 'Observa los señuelos para revelar al original antes de atacar. Cuando anuncie una descarga, defiende; las técnicas también se gastan si alcanzan una ilusión.'
+      const outcome = surrender ? '🏳️ *Te retiraste del encuentro.*' : battle.finishReason === 'protection'
+        ? '🛡️ *El aliado tuvo que ser evacuado.*' : battle.finishReason === 'turn_limit'
+          ? '⏳ *El enemigo resistió hasta el límite de turnos.*' : '🌧️ *Esta vez la expedición cayó.*';
+      body.push(`${outcome}\nTu historia sigue guardada. No pierdes cartas ni monedas; reintentar no duplica los premios.`);
+      const encounterHint = battle.finishReason === 'protection' ? 'Vigila la seguridad del aliado y usa proteger antes de que llegue a cero; vencer al enemigo después de la evacuación no recupera el objetivo.'
+        : battle.finishReason === 'turn_limit' ? 'Aprovecha las aperturas para causar daño y alterna los ataques con el apoyo necesario; el encuentro debe terminar antes del límite de turnos.'
+        : battle.encounterId === 'II05' ? 'Observa los señuelos para revelar al original antes de atacar. Cuando anuncie una descarga, defiende; las técnicas también se gastan si alcanzan una ilusión.'
         : battle.encounterId === 'I05' ? 'Rompe la barrera de raíces antes de gastar tus técnicas y defiende cuando anuncie la descarga. La apertura posterior es tu oportunidad.'
           : 'Observa la señal enemiga: defender antes de un golpe cargado puede cambiar el combate. Prepara tu equipo y vuelve a intentarlo.';
       body.push(`💡 ${safe(result.hint ?? mission?.hint ?? encounterHint)}`);
@@ -136,12 +148,12 @@ export function renderStory(result, cmd, { healthBars = true, inspect = false } 
   }
 
   if (battle?.status === 'won') {
-    if (battle.lastEvents?.length && !result.alreadyProcessed) body.push(lines(battle.lastEvents));
+    if (battle.lastEvents?.length && !result.alreadyProcessed) body.push(visibleBattleEvents(battle));
     body.push('🌿 *¡Encuentro superado!*');
     body.push(result.consequence ? `🖋️ ${safe(result.consequence)}` : null);
   }
   if (battle?.acceptedDefeat) {
-    if (battle.lastEvents?.length && !result.alreadyProcessed) body.push(lines(battle.lastEvents));
+    if (battle.lastEvents?.length && !result.alreadyProcessed) body.push(visibleBattleEvents(battle));
     body.push('🤝 *Duelo amistoso concluido.*\nLa historia continúa tras el duelo. Lo aprendido con Huan queda guardado.');
   }
   body.push(rewardText(reward, result.team));

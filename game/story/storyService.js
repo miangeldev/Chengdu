@@ -8,7 +8,7 @@ import { validContentKey } from '../content/rewards.js';
 import { STORY_CAMPAIGN_ID, STORY_CAMPAIGN_TITLE, STORY_CONTENT_VERSION, STORY_TRACES,
   STORY_MEMORIES, STORY_SIDE_MISSIONS, STORY_TRIALS, STORY_ENDINGS, activeStoryMission, currentStoryStep, storyEncounterFor,
   getStoryMission, storyScene, storyMissions, storyChapters, isStoryContentVersion } from './catalog.js';
-import { createStoryBattle, resolveStoryAction, storyBattleView, storyCombatPolicy } from './combat.js';
+import { createStoryBattle, resolveStoryAction, storyBattleView, storyCombatPolicy, storyCombatVersion, upgradeStoryBattle } from './combat.js';
 import { reduceStoryProgress, completedStoryMission, storyProgressId, storyRewardId } from './progress.js';
 import { storyLearningDefeats, storyBattleContext, isLearningDefeat } from './battlePolicy.js';
 import { rewardStoryMission } from './rewards.js';
@@ -40,7 +40,7 @@ async function expedition(repos, userId, now, { lockedBattleId = null } = {}) {
 }
 const references = units => units.map(unit => ({ unitId: unit.id, ownershipVersion: unit.ownershipVersion }));
 
-async function startBattle(repos, userId, mission, progress, now, contentVersion) {
+async function startBattle(repos, userId, mission, progress, now, contentVersion, combatVersion) {
   const units = await expedition(repos, userId, now), snapshots = [];
   for (const unit of units) {
     const character = await repos.characters.get(unit.characterId);
@@ -50,8 +50,8 @@ async function startBattle(repos, userId, mission, progress, now, contentVersion
   const id = `STB-${randomUUID()}`;
   const encounterId = storyEncounterFor(mission, progress), step = currentStoryStep(mission, progress);
   const learning = contentVersion >= 3 ? { defeats: storyLearningDefeats(await repos.storyBattles.filterBy('userId', userId),
-    { userId, run: progress.run, missionId: mission.id, encounterId }), required: storyCombatPolicy(encounterId).requiredDefeats } : undefined;
-  const combat = createStoryBattle({ id, encounterId, units: snapshots, now, version: contentVersion,
+    { userId, run: progress.run, missionId: mission.id, encounterId }), required: storyCombatPolicy(encounterId, combatVersion).requiredDefeats } : undefined;
+  const combat = createStoryBattle({ id, encounterId, units: snapshots, now, version: combatVersion,
     ...(contentVersion >= 3 ? { learning, context: storyBattleContext(progress, step) } : {}) });
   const record = { id, userId, campaignId: STORY_CAMPAIGN_ID, contentVersion, run: progress.run,
     ...(contentVersion >= 3 ? { stepId: step?.id ?? null } : {}),
@@ -59,8 +59,12 @@ async function startBattle(repos, userId, mission, progress, now, contentVersion
   for (const unit of units) await repos.units.replace({ ...unit, lock: { type: 'story', referenceId: id }, updatedAt: now });
   await repos.storyBattles.insert(record); return record;
 }
-function presentBattle(record) {
-  const result = storyBattleView(record.combat);
+function presentBattle(record, availableCombatVersion = storyCombatVersion(STORY_CONTENT_VERSION)) {
+  const canUpgrade = availableCombatVersion >= 4 && (record.combat.version === 3 || record.combat.encounterId === 'P03' && record.combat.version < 4);
+  const projected = record.status === 'active' && canUpgrade ? upgradeStoryBattle(record.combat) : record.combat;
+  const result = storyBattleView(projected);
+  if (availableCombatVersion >= 4 && result.learning && storyCombatPolicy(record.combat.encounterId).requiredDefeats === 0)
+    result.learning = { ...result.learning, required: 0, remaining: 0, scouting: false };
   if (record.combat.version >= 3 && isLearningDefeat(record)) {
     const defeats = result.learning.defeats + 1;
     result.learning = { ...result.learning, defeats, remaining: Math.max(0, result.learning.required - defeats),
@@ -75,7 +79,7 @@ async function unlock(repos, battle, now) {
     await repos.units.replace({ ...unit, lock: null, updatedAt: now });
   }
 }
-async function savedView(repos, userId, extras = {}, availableVersion = STORY_CONTENT_VERSION) {
+async function savedView(repos, userId, extras = {}, availableVersion = STORY_CONTENT_VERSION, availableCombatVersion = storyCombatVersion(availableVersion)) {
   const user = await registeredUser(repos, userId), progress = await repos.storyProgress.get(storyProgressId(userId));
   const version = progress?.contentVersion ?? availableVersion;
   const definition = activeStoryMission(progress), step = currentStoryStep(definition, progress ?? {});
@@ -98,12 +102,13 @@ async function savedView(repos, userId, extras = {}, availableVersion = STORY_CO
     returnAvailable: Boolean(progress?.activityId && !progress.activeBattleId),
     seasonComplete: version >= 3 && progress?.missionIndex === storyMissions(version).length,
     ending: STORY_ENDINGS[progress?.decisions.archive_ending] ?? null,
-    battle: record ? presentBattle(record) : null, reward: null, ...extras };
+    battle: record ? presentBattle(record, availableCombatVersion) : null, reward: null, ...extras };
 }
 
-export function createStoryService(storage, clock, randomRoll = () => randomInt(100), { contentVersion = STORY_CONTENT_VERSION } = {}) {
+export function createStoryService(storage, clock, randomRoll = () => randomInt(100), { contentVersion = STORY_CONTENT_VERSION, combatVersion = storyCombatVersion(contentVersion) } = {}) {
   requireGame(isStoryContentVersion(contentVersion), 'STORY_INVALID_ACTION');
-  const view = (repos, userId, extras = {}) => savedView(repos, userId, extras, contentVersion);
+  requireGame(contentVersion < 3 ? combatVersion === contentVersion : [3, 4].includes(combatVersion), 'INVALID_STORY_COMBAT_VERSION');
+  const view = (repos, userId, extras = {}) => savedView(repos, userId, extras, contentVersion, combatVersion);
   async function mutate({ userId, operationKey, ...request }, kind) {
     validContentKey(operationKey);
     const normalized = kind === 'choose' ? { choice: String(request.choice ?? '') } : kind === 'act' ?
@@ -143,7 +148,7 @@ export function createStoryService(storage, clock, randomRoll = () => randomInt(
         (kind === 'choose' && before?.stage === 'choice' && (step?.choices ?? mission?.choices ?? []).some(c => c.id === normalized.choice) &&
           storyEncounterFor(mission, { ...before, decisions: { ...before.decisions,
             [(step?.choices ?? mission.choices).find(c => c.id === normalized.choice).key]: (step?.choices ?? mission.choices).find(c => c.id === normalized.choice).value } }));
-      if (begin) battle = await startBattle(repos, userId, mission, before, now, contentVersion);
+      if (begin) battle = await startBattle(repos, userId, mission, before, now, contentVersion, combatVersion);
       let sequence = null;
       if (kind === 'act' || kind === 'reset' && before?.activeBattleId) {
         const id = before?.activeBattleId; requireGame(id, 'STORY_BATTLE_NOT_ACTIVE');
@@ -151,7 +156,10 @@ export function createStoryService(storage, clock, randomRoll = () => randomInt(
         const action = kind === 'reset' ? 'surrender' : normalized.action;
         let result;
         try {
-          result = resolveStoryAction(battle.combat, { action, choice: normalized.choice ?? null,
+          const currentCombat = kind === 'act' && combatVersion >= 4 &&
+            (battle.combat.version === 3 || battle.combat.encounterId === 'P03' && battle.combat.version < 4)
+            ? upgradeStoryBattle(battle.combat) : battle.combat;
+          result = resolveStoryAction(currentCombat, { action, choice: normalized.choice ?? null,
             rolls: action === 'surrender' ? null : [randomRoll(), randomRoll()], now });
         } catch (error) {
           const codes = { INVALID_STORY_ACTION: 'STORY_INVALID_ACTION', INVALID_ATTACK: 'STORY_INVALID_ACTION',
@@ -200,7 +208,7 @@ export function createStoryService(storage, clock, randomRoll = () => randomInt(
       return view(repos, userId, { reward, alreadyProcessed: false, consequence: action.after.lastConsequence,
         ...(community ? { community } : {}),
         ...(kind === 'act' && battle?.status !== 'active' && action.after.stage !== 'defeated'
-          ? { battle: { ...presentBattle(battle), acceptedDefeat: battle.status === 'lost' && Boolean(step?.acceptDefeat) } } : {}) });
+          ? { battle: { ...presentBattle(battle, combatVersion), acceptedDefeat: battle.status === 'lost' && Boolean(step?.acceptDefeat) } } : {}) });
     });
     if (outcome.upgradedStory) return mutate({ userId, operationKey, ...request }, kind);
     return outcome;

@@ -18,7 +18,7 @@ test('the complete season preserves rewards, mandatory reconnaissance, four side
   await c.invoke('start');
   await assert.rejects(c.invoke('startTrial', { number: 1 }), { code: 'STORY_SEASON_REQUIRED' });
   await assert.rejects(c.game.story.getScenes({ userId: c.user.id, code: 'V-06' }), { code: 'STORY_SCENE_LOCKED' });
-  await c.until(state => state.battle?.encounterId === 'I03' && state.battle.status === 'active');
+  await c.until(state => state.battle?.encounterId === 'I05' && state.battle.status === 'active');
   assert.equal((await c.get()).battle.learning.required, 1);
   await c.invoke('act', { action: 'surrender' });
   let state = await c.invoke('retry'); assert.equal(state.battle.learning.defeats, 0);
@@ -75,7 +75,7 @@ test('the complete season preserves rewards, mandatory reconnaissance, four side
     assert.equal((await context.game.validateDatabase()).valid, true);
   }
   const allBattles = readRecords(c.directory, 'combateshistoria');
-  for (const [encounterId, required] of [['I03',1],['I05',1],['II05',2],['III05',2],['IV05',2],['V05',4]]) {
+  for (const [encounterId, required] of [['I05',1],['II05',2],['III05',2],['IV05',2],['V05',4]]) {
     const won = allBattles.find(row => row.combat.encounterId === encounterId && row.status === 'won');
     assert.ok(won, encounterId); assert.ok(won.combat.learning.defeats >= required, encounterId);
   }

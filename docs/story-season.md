@@ -1,4 +1,4 @@
-# Historia 0.13 — temporada completa, fases 4 a 7
+# Historia 0.13.1 — temporada completa, fases 4 a 7
 
 **Las Cartas Sin Nombre** continúa hasta el cierre de **Los Nombres Perdidos**:
 32 misiones principales, cinco Trazos y el epílogo del Archivo Abierto. Las
@@ -47,8 +47,9 @@ todavía no admite victoria. Después de terminar el aprendizaje se abre el inte
 en el que sí puedes vencer.
 
 Las derrotas quedan registradas por encuentro; **rendirse no avanza el requisito**.
-El Eco de Tinta y el Guardián exigen una; Mercader, Centinela y Campana exigen
-dos; el Archivista exige cuatro. Cada reconocimiento termina en un máximo de
+El Guardián exige una; Mercader, Centinela y Campana exigen dos; el Archivista
+exige cuatro. El Eco desorientado, el Eco de Tinta, los duelos amistosos y las
+pruebas de práctica no exigen derrotas previas. Cada reconocimiento termina en un máximo de
 20 acciones. Reiniciar la historia abre otro recorrido y vuelve a comenzar el
 aprendizaje, conservando los premios ya entregados.
 Perder no retira unidades, monedas ni XP, y los intentos no crean premios nuevos.
@@ -141,13 +142,34 @@ intentos y no confunden una prueba activa con una campaña principal pendiente.
 La duración humana, retención y satisfacción se deben
 contrastar con partidas reales del bot anfitrión.
 
-### Balance reproducible
+### Corrección de combate 0.13.1
 
-Se comprobaron 3.600 duelos con los tres starters comunes, solos y en equipos
+El Eco del prólogo ya puede ser derrotado atacando: defender y usar la técnica
+son prácticas opcionales. Los Tres Reflejos tampoco recuperan 1 HP para forzar
+una lección pendiente. Un KO verdadero termina el encuentro.
+
+Los cinco jefes conservan sus mínimos explícitos. Si la barrera de reconocimiento
+desvía un remate, el jefe conserva HP y el resultado no anuncia su KO. Un aliado
+evacuado mantiene la misión perdida aunque un contraataque pudiera vencer al
+enemigo; los personajes caídos no contraatacan. Las derrotas por evacuación o
+límite de turnos explican su causa sin afirmar que todos los compañeros cayeron.
+
+El contenido narrativo continúa en versión 3 y el motor pasa a versión 4. Las
+versiones anteriores siguen disponibles para reproducir sus turnos guardados.
+Los combates activos del motor 3 y los tutoriales activos 1/2 se actualizan
+junto con la siguiente acción real; conservan ID, HP, equipo y eventos
+anteriores. Leer el estado no reescribe archivos y reintentar una operación no
+duplica premios. No hace falta utilizar el reinicio de historia.
+
+### Referencia de balance 0.13.0
+
+Para la versión original del motor 3 se comprobaron 3.600 duelos con los tres starters comunes, solos y en equipos
 de tres, a los niveles anteriores al premio de cada jefe. La tabla muestra el
 rango de victorias de la política táctica en 50 semillas por combinación,
 **después de cumplir las derrotas obligatorias**. No representa resultados de
 jugadores reales ni mezcla el reconocimiento con intentos que permiten ganar.
+Son cifras históricas; los cambios del motor 4 cuentan con sus pruebas de
+regresión y simulaciones adicionales.
 
 | Encuentro | Nivel probado | Reconocimientos exigidos | Victoria táctica |
 | --- | --- | --- | --- |
@@ -164,7 +186,7 @@ encuentros intermedios, los tres vecinos y las pruebas posteriores. Todos los
 casos fijos terminaron en victoria sin evolución; las pruebas finales conservan
 derrotas posibles y un límite de 50 turnos.
 
-La vista previa generada contiene 405 ejemplos, incluidos 210 mensajes de
+La vista previa generada contiene 400 ejemplos, incluidos 205 mensajes de
 Historia y diario, con un máximo de 2.957 unidades UTF-16 y ninguno por encima
 del presupuesto de lectura de 4.096. Los 40 JSON locales conservaron sus hashes
 tras validar la base en esquema 12; los ejemplos y las pruebas usan otras bases.
@@ -174,3 +196,10 @@ dirigida del recorrido completo, incluidos los tres finales, las cuatro rutas
 opcionales, las tres pruebas, el título persistente y el reinicio sin duplicar
 premios. Las pruebas de recuperación cubren seis puntos de interrupción del
 guardado de una derrota de reconocimiento.
+
+Para 0.13.1, la suite general aprobó **992 pruebas**. Otras dos regresiones de
+interfaz verifican que las derrotas por evacuación y límite de turnos no anuncien
+un KO del equipo. La reparación de tutoriales activos se comprobó con guardados
+1/2/3 y seis interrupciones del guardado; los turnos previos y los premios ya
+entregados permanecen intactos. Se ejecutaron además 1.680 simulaciones del
+motor 4 para jefes y encuentros intermedios.
