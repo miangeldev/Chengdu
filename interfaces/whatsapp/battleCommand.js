@@ -33,7 +33,7 @@ export function defineBattleCommand(command, kind) {
       result = await game.battle.challenge({ ...request, opponentId: opponent.id, mode: mode === 'clásico' ? 'classic' : mode,
         ...(kind === 'ranked' ? { ranked: true } : {}) });
     } else if (kind === 'attack') {
-      requireGame(args.length === 1 && ['1', '2'].includes(args[0]), 'INVALID_ATTACK');
+      requireGame(args.length === 1 && ['1', '2', '3'].includes(args[0]), 'INVALID_ATTACK');
       result = await game.battle.attack({ ...request, choice: args[0] });
     } else if (kind === 'switch') {
       requireGame(args.length === 1 && ['1', '2', '3'].includes(args[0]), 'INVALID_SWITCH');

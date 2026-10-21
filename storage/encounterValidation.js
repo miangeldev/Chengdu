@@ -10,6 +10,9 @@ import { activeCampaign, bossContributions, encounterDeadline, resolveBossAttack
 import { ownershipAt } from '../game/units/ownership.js';
 import { effectiveStats } from '../game/progression/rules.js';
 import { advancedAttack } from '../game/battle/combatContent.js';
+import { SPIRITS_BOSS_ID, spiritsBossDefinition } from '../game/content/spiritsCatalog.js';
+import { fatalityEnabled, fatalityProfile, validateFatality } from '../game/battle/fatality.js';
+import { revengeCampaignIds, spawnSelectionProof, spawnWeights, SPAWN_SELECTION_VERSION } from '../game/content/eventPolicy.js';
 
 const check = (condition, field) => requireGame(condition, 'DATABASE_CORRUPT', { field });
 
@@ -34,8 +37,23 @@ export function validateEncounterData(state) {
         Array.isArray(d.eligibleCharacterIds) && new Set(d.eligibleCharacterIds).size === d.eligibleCharacterIds.length &&
         (d.selectionRoll === null || integer(d.selectionRoll) && d.selectionRoll < d.eligibleCharacterIds.length) &&
         (!previous || Date.parse(action.createdAt) >= Date.parse(nextCheck(previous.createdAt))), 'encounter.spawnCheck');
-      check(Array.isArray(d.eligibleCharacterWeights) && d.eligibleCharacterWeights.length === d.eligibleCharacterIds.length &&
-        d.eligibleCharacterWeights.every(weight => Object.values(SPAWN_POLICY.rarityWeights).includes(weight)), 'encounter.spawnWeights');
+      if (d.selectionVersion === undefined) {
+        check(Array.isArray(d.eligibleCharacterWeights) && d.eligibleCharacterWeights.length === d.eligibleCharacterIds.length &&
+          d.eligibleCharacterWeights.every(weight => Object.values(SPAWN_POLICY.rarityWeights).includes(weight)), 'encounter.spawnWeights');
+      } else {
+        check(d.selectionVersion === SPAWN_SELECTION_VERSION && equal(d.revengeCampaignIds, revengeCampaignIds(state.campanas.records, action.createdAt)) &&
+          Array.isArray(d.eligibleCharacterRarities) && d.eligibleCharacterRarities.length === d.eligibleCharacterIds.length &&
+          Array.isArray(d.eligibleCharacterRevisions) && d.eligibleCharacterRevisions.length === d.eligibleCharacterIds.length, 'encounter.spawnPolicy');
+        const pool = d.eligibleCharacterIds.map((id, index) => {
+          const character = state.personajes.records.find(row => row.id === id);
+          const campaign = character?.eventId ? state.campanas.records.find(row => row.id === character.eventId) : null;
+          check(character && (!character.eventId || activeCampaign(campaign, action.createdAt)) &&
+            Object.hasOwn(SPAWN_POLICY.rarityWeights, d.eligibleCharacterRarities[index]) &&
+            integer(d.eligibleCharacterRevisions[index], 1) && d.eligibleCharacterRevisions[index] <= character.revision, 'encounter.spawnCandidate');
+          return { eventId: character.eventId, rarity: d.eligibleCharacterRarities[index] };
+        });
+        check(equal(d.eligibleCharacterWeights, spawnWeights(pool, d.revengeCampaignIds)), 'encounter.revengeWeights');
+      }
       if (d.selectionRoll !== null) {
         const lower = d.eligibleCharacterWeights.slice(0, d.selectionRoll).reduce((sum, weight) => sum + weight, 0);
         check(integer(d.weightRoll) && d.weightRoll >= lower && d.weightRoll < lower + d.eligibleCharacterWeights[d.selectionRoll], 'encounter.weightedSelection');
@@ -59,14 +77,18 @@ export function validateEncounterData(state) {
       Date.parse(encounter.expiresAt) > Date.parse(encounter.createdAt) && encounter.snapshot, 'encounter.metadata');
     const actions = actionsByEncounter.get(encounter.id) ?? [];
     if (encounter.kind === 'boss') {
-      const template = BOSSES.find(boss => boss.id === encounter.snapshot.id);
-      check(template && equal(template, encounter.snapshot) && encounter.chatId === null && encounter.expiresAt === encounterDeadline(encounter.createdAt, template.durationMs), 'encounter.bossDefinition');
+      const template = encounter.snapshot.id === SPIRITS_BOSS_ID ? spiritsBossDefinition() : BOSSES.find(boss => boss.id === encounter.snapshot.id);
+      const campaign = template?.eventId ? state.campanas.records.find(row => row.id === template.eventId) : null;
+      const naturalDeadline = template ? encounterDeadline(encounter.createdAt, template.durationMs) : null;
+      const deadline = campaign && Date.parse(campaign.endsAt) < Date.parse(naturalDeadline) ? campaign.endsAt : naturalDeadline;
+      check(template && equal(template, encounter.snapshot) && encounter.chatId === null && encounter.expiresAt === deadline &&
+        (!template.eventId || activeCampaign(campaign, encounter.createdAt)), 'encounter.bossDefinition');
       const previousBoss = latestBosses.get(template.id);
       check(!previousBoss || previousBoss.status !== 'active' && Date.parse(encounter.createdAt) >= Date.parse(previousBoss.createdAt) + previousBoss.snapshot.respawnMs &&
         Date.parse(previousBoss.endedAt) <= Date.parse(encounter.createdAt), 'encounter.bossSequence');
       latestBosses.set(template.id, encounter);
-      let hp = template.hp, lastTime = encounter.createdAt;
-      const own = new Map();
+      let hp = template.hp, lastTime = encounter.createdAt, attackCount = 0;
+      const own = new Map(), fatalityStates = new Map();
       for (const action of actions) {
         const d = action.details, unit = state.unidades.records.find(row => row.id === d.unitSnapshot?.id);
         const snapshot = d.unitSnapshot;
@@ -81,9 +103,16 @@ export function validateEncounterData(state) {
           Array.isArray(snapshot.attacks) && snapshot.attacks.length === 2 && snapshot.attacks.every(attack => typeof attack.name === 'string' && integer(attack.power, 1) && attack.power <= 10000 && integer(attack.accuracy, 1) && attack.accuracy <= 100 &&
             integer(attack.revision, 1) && attack.revision <= (state.ataques.records.find(row => row.id === attack.id)?.revision ?? 0)), 'encounter.bossUnit');
         const previous = own.get(action.userId) ?? { attacks: 0, last: null };
+        check(validateFatality(snapshot, action.createdAt), 'encounter.fatalityDefinition');
+        if (snapshot.fatality) {
+          const seen = fatalityStates.get(snapshot.id);
+          check(seen ? equal(snapshot.fatality, seen) : snapshot.fatality.used === false, 'encounter.fatalityOpening');
+          if (d.choice === '3') check(snapshot.fatality.unlocked && !snapshot.fatality.used, 'encounter.fatalityOnce');
+          fatalityStates.set(snapshot.id, { ...snapshot.fatality, used: snapshot.fatality.used || d.choice === '3' });
+        } else check(d.choice !== '3' && !fatalityStates.has(snapshot.id), 'encounter.fatalityRequired');
         check(previous.attacks < template.maxAttacks && (previous.last === null || Date.parse(action.createdAt) >= Date.parse(previous.last) + template.cooldownMs), 'encounter.bossCooldown');
-        const result = resolveBossAttack(template, snapshot, d.choice, d.roll, hp);
-        check(['hit', 'critical', 'damage', 'hpBefore', 'hpAfter', 'attackName'].every(field => equal(d[field], result[field])), 'encounter.bossReplay');
+        const result = resolveBossAttack(template, snapshot, d.choice, d.roll, hp, attackCount++);
+        check(Object.keys(result).every(field => equal(d[field], result[field])), 'encounter.bossReplay');
         hp = result.hpAfter; lastTime = action.createdAt;
         own.set(action.userId, { attacks: previous.attacks + 1, last: action.createdAt });
       }
@@ -152,7 +181,16 @@ export function validateEncounterTransition(before, after) {
         encounter.snapshot.characterName === character.name && encounter.snapshot.rarity === character.rarity, 'encounter.spawnAvailable');
     }
   }
-  for (const action of after.accionescontenido.records.slice(before.accionescontenido.records.length)) if (action.kind === 'boss_attack') {
+  for (const action of after.accionescontenido.records.slice(before.accionescontenido.records.length)) if (action.kind === 'spawn_check') {
+    const d = action.details;
+    check(d.selectionVersion === SPAWN_SELECTION_VERSION, 'encounter.currentSpawnPolicy');
+    const counters = new Map(before.estado.records.filter(row => row.kind === 'mintCounter').map(row => [row.characterId, row]));
+    const pool = d.roll !== null && d.roll <= SPAWN_POLICY.chancePercent ? before.personajes.records.filter(character =>
+      character.obtainable && character.supply.grandfatheredIssued === undefined && counters.get(character.id)?.issuedCount < character.supply.max &&
+      (!character.eventId || activeCampaign(before.campanas.records.find(row => row.id === character.eventId), action.createdAt))) : [];
+    const proof = spawnSelectionProof(pool, before.campanas.records, action.createdAt);
+    check(Object.keys(proof).every(field => equal(d[field], proof[field])), 'encounter.spawnPoolAuthority');
+  } else if (action.kind === 'boss_attack') {
     const user = before.usuarios.records.find(row => row.id === action.userId), s = action.details.unitSnapshot;
     const unit = before.unidades.records.find(row => row.id === s.id);
     const character = before.personajes.records.find(row => row.id === unit?.characterId);
@@ -160,5 +198,6 @@ export function validateEncounterTransition(before, after) {
     check(user?.team[0] === unit?.id && unit.ownerId === action.userId && unit.ownershipVersion === s.ownershipVersion &&
       (unit.lock === null || expired) && equal(unit.progress, s.progress) && s.characterName === displayUnitCharacterName(unit, character) && equal(s.evolution ?? null, unit.evolution ?? null) &&
       equal(s.attacks, character.attackIds.map(id => advancedAttack(before.ataques.records.find(row => row.id === id)))), 'encounter.attackSource');
+    if (fatalityProfile(unit.characterId) && fatalityEnabled(action.createdAt)) check(s.fatality, 'encounter.fatalitySnapshotRequired');
   }
 }

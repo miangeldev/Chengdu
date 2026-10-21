@@ -115,8 +115,11 @@ test('battle UI shows enemy warning, compact HP and all tactical actions without
   assert.equal(c.calls.at(-1).request.action, 'surrender');
   const before = c.calls.filter(call => call.method === 'act').length;
   assert.match(await c.send('!ctuhistoria elegir 99'), /opción no está disponible/);
-  assert.match(await c.send('!ctuhistoria atacar 3'), /acción no está disponible/);
+  assert.match(await c.send('!ctuhistoria atacar 4'), /acción no está disponible/);
   assert.equal(c.calls.filter(call => call.method === 'act').length, before);
+  await c.send('!ctuhistoria atacar 3');
+  assert.equal(c.calls.at(-1).request.action, 'attack');
+  assert.equal(c.calls.at(-1).request.choice, '3');
 });
 
 test('a defeat explains retry and preparation while inspection stays read-only', async () => {

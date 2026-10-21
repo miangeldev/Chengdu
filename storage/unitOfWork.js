@@ -17,8 +17,10 @@ import { migrateCombatV8 } from './migrations/008-combat.js';
 import { migrateContentV9 } from './migrations/009-content.js';
 import { migrateCommunityV11 } from './migrations/011-community.js';
 import { migrateStoryV12 } from './migrations/012-story.js';
+import { migrateSpiritsV13 } from './migrations/013-spirits.js';
 import { migrateCompetitiveV10 } from './migrations/010-competitive.js';
 import { seedCampaigns, seedEventAttacks, seedEventCharacters } from '../game/content/catalog.js';
+import { seedSpiritsAttacks, seedSpiritsCampaign, seedSpiritsCharacters } from '../game/content/spiritsCatalog.js';
 import { progressionBaseline } from '../game/progression/rules.js';
 import { seedAttacks } from '../game/battle/attacks.js';
 import { seedPacks } from '../game/packs/catalog.js';
@@ -54,10 +56,10 @@ function envelope(records = []) {
 
 function initialState() {
   const state = Object.fromEntries(COLLECTIONS.map(name => [name, envelope()]));
-  state.personajes.records = [...seedCharacters(), ...seedEventCharacters()];
-  state.ataques.records = [...seedAttacks(), ...seedEventAttacks()];
+  state.personajes.records = [...seedCharacters(), ...seedEventCharacters(), ...seedSpiritsCharacters()];
+  state.ataques.records = [...seedAttacks(), ...seedEventAttacks(), ...seedSpiritsAttacks()];
   state.sobres.records = seedPacks();
-  state.campanas.records = seedCampaigns();
+  state.campanas.records = [...seedCampaigns(), seedSpiritsCampaign(seedCampaigns()[0].endsAt)];
   state.estado.records = state.personajes.records.map(c => ({ id: `mint:${c.id}`, kind: 'mintCounter', characterId: c.id, lastSerial: 0, issuedCount: 0 }));
   return state;
 }
@@ -435,7 +437,7 @@ export class JsonUnitOfWork {
         if (version < SCHEMA_VERSION) {
           let state = decode(raw, version);
           const migrations = [null, null, migrateBattlesV2, migrateProgressionV3, migrateCollectionV4,
-            migrateBalanceV5, migrateEconomyV6, migrateMarketV7, migrateCombatV8, migrateContentV9, migrateCompetitiveV10, migrateCommunityV11, migrateStoryV12];
+            migrateBalanceV5, migrateEconomyV6, migrateMarketV7, migrateCombatV8, migrateContentV9, migrateCompetitiveV10, migrateCommunityV11, migrateStoryV12, migrateSpiritsV13];
           const now = this.clock();
           for (let next = version + 1; next <= SCHEMA_VERSION; next++) state = migrations[next](state, now);
           this.#commit(raw, state);

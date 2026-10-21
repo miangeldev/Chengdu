@@ -11,7 +11,7 @@ export const displayName = name => String(name).replace(/[*_~`]/g, c => ({ '*': 
 export const rarityName = rarity => ({ common: 'Común', rare: 'Raro', epic: 'Épico', legendary: 'Legendario', mythic: 'Mítico' })[rarity] ?? rarity;
 export const rarityIcon = rarity => ({ common: '⚪', rare: '🔵', epic: '🟣', legendary: '🟡', mythic: '🔴' })[rarity] ?? '🎴';
 export const roleName = role => ({ tank: 'Tanque', attacker: 'Atacante', speed: 'Velocista', balanced: 'Equilibrado', control: 'Control', support: 'Soporte' })[role] ?? role;
-export const characterIcon = id => ({ panda_guerrero: '🐼', mago_carmesi: '🔥', lobo_sombrio: '🐺', monje_celestial: '🧘', guardian_jade: '🛡️', bruja_lunar: '🌙', dragon_carmesi: '🐉', espiritu_bambu: '🎋', zorro_faroles: '🦊', guardian_espectral: '👻' })[id] ?? '🎴';
+export const characterIcon = id => ({ panda_guerrero: '🐼', mago_carmesi: '🔥', lobo_sombrio: '🐺', monje_celestial: '🧘', guardian_jade: '🛡️', bruja_lunar: '🌙', dragon_carmesi: '🐉', espiritu_bambu: '🎋', zorro_faroles: '🦊', guardian_espectral: '👻', guardian_mil_mascaras: '🎭', zorro_llamas_errantes: '🦊' })[id] ?? '🎴';
 export const statsText = stats => `❤️ Vida: ${stats.hp}\n⚔️ Ataque: ${stats.attack}\n🛡️ Defensa: ${stats.defense}\n💨 Velocidad: ${stats.speed}`;
 export const serialText = serial => String(serial).padStart(4, '0');
 export const dateText = date => date ? new Date(date).toLocaleDateString('es-MX', { timeZone: 'America/Mexico_City', day: 'numeric', month: 'long', year: 'numeric' }) : 'Fecha no registrada';

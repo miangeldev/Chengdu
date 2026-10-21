@@ -65,7 +65,7 @@ async function v11Fixture(t) {
   }
   await context.game.close();
   const payload = structuredClone(historicalPayload);
-  for (const name of STORY_COLLECTIONS) {
+  for (const name of COLLECTIONS.filter(name => !V11_COLLECTIONS.includes(name))) {
     const filename = path.join(context.directory, `${name}.json`);
     if (!fs.existsSync(filename)) continue;
     assert.deepEqual(JSON.parse(fs.readFileSync(filename, 'utf8')).records, [], name);

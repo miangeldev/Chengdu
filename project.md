@@ -3112,6 +3112,70 @@ interfaz. Los tutoriales antiguos 1/2/3 se actualizan y completan sin repetir
 premios, incluso tras seis interrupciones del guardado. Se ejecutaron 1.680
 simulaciones del motor 4; la vista previa renovada reúne 400 ejemplos.
 
+### Espíritus 0.14 — Evento, revancha y Fatality
+
+Estado implementado: **0.14.0**, esquema **13**, con las etapas de calendario,
+colección, progreso, jefe comunitario, combate e interfaz integradas. La Noche de
+los Espíritus es una aventura ficticia inspirada en máscaras y teatro de Sichuan;
+no sustituye al Festival de Zhongyuan ni presenta Halloween como una tradición
+china. El alcance y los comandos están en [la guía del evento](docs/spirits-event.md).
+
+Calendario en Ciudad de México:
+
+- Faroles activa su revancha el **24 de octubre de 2026 a las 00:00**.
+- Espíritus abre **al terminar Faroles: 25 de octubre a las 00:00**.
+- Su revancha empieza el **1 de noviembre a las 00:00**.
+- Espíritus cierra el **2 de noviembre a las 00:00**.
+
+El inicio se deriva del cierre persistido de Faroles. Las mecánicas comprueban
+el reloj, sin necesitar un comando administrativo de activación. Antes de abrir,
+no se generan fragmentos ni aparecen los exclusivos; tampoco se pueden reclamar
+sellos, canjear cartas o crear el jefe. La ventana incluye el inicio y excluye
+el cierre. Los encuentros y apariciones del evento vencen como máximo al cerrar.
+
+La revancha asigna el **75%** del peso de selección a las cartas disponibles
+del evento durante sus últimas 24 horas. Conserva la separación de una hora
+entre apariciones, los tickets y los límites de emisión. Si se agota el evento,
+la selección continúa con personajes normales. La política de selección 2 guarda
+candidatos, rarezas, revisiones y pesos; los recibos anteriores conservan sus reglas.
+
+Los sellos reúnen tres actividades: 6 fragmentos por PvP válido, 100 de daño
+contra al menos dos máscaras y participar con daño en una victoria comunitaria.
+Los fragmentos aportan 3 por victoria y 2 por derrota, una vez por rival y día,
+con un máximo de tres duelos diarios. Las retiradas y los combates sin recompensa
+no cuentan. El Guardián comunitario comparte sus 1.800 HP entre grupos, cambia
+de máscara cada tres ataques y conserva sus límites de 30 segundos y 20 ataques.
+
+El Zorro de las Llamas Errantes es épico, con **20 unidades globales**, y se
+canjea con Luz y Máscaras. El Guardián de las Mil Máscaras es legendario, con
+**10 unidades globales**, y requiere los tres sellos. Cada cuenta tiene un canje
+por personaje; capturas y canjes comparten el mismo stock. Los exclusivos no
+entran en sobres ni en premios genéricos. Los sellos no añaden monedas ni XP.
+
+Ambos compañeros estrenan **Fatality**: una tirada del 10% por unidad al comenzar
+un combate permite un tercer ataque de un solo uso. Potencias 52/50, precisión
+90%, consume turno incluso al fallar y respeta las reglas de cada modo. La tirada
+y el uso quedan guardados en PvP, Historia y encuentros comunitarios; consultar,
+cambiar de unidad, repetir mensajes o reiniciar no vuelve a tirarlos. En jefes,
+el primer ataque normal confirma la apertura antes de ofrecer la opción 3.
+Las cartas obtenidas conservan esta capacidad después del evento. El Guardián
+jugable rota entre escudo 6, ataque +6% y curación 4% en combate avanzado e Historia.
+
+La migración añade `accionesespiritus`, dos personajes, cuatro ataques, dos
+contadores y una campaña: **40 colecciones y 41 archivos**. Conserva los datos
+anteriores y los respaldos de migración. Los sellos y canjes tienen evidencia
+inmutable; una interrupción no puede separar una carta de su recibo. La interfaz
+reutiliza `.ctuevento espiritus`, códigos cortos de jefe y la opción 3 cuando
+corresponde, sin añadir comandos raíz ni contadores internos de derrotas.
+
+Verificación final: **1.093 pruebas aprobadas**, **36.000 duelos de balance**
+y **412 ejemplos de WhatsApp** regenerados. La base local se migró al esquema
+13 con respaldo previo completo: sus 44 registros anteriores conservan el
+mismo contenido y se añadieron nueve definiciones/contadores, sin cuentas ni
+unidades de prueba. Al verificarla el 20 de octubre de 2026, Espíritus figura
+como próximo y sus actividades, apariciones exclusivas y revancha siguen cerradas.
+El informe de balance y sus límites están en [spirits-balance.md](docs/spirits-balance.md).
+
 ## V1.0
 
 ```text

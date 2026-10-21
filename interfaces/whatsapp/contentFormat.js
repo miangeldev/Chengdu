@@ -46,19 +46,21 @@ export function renderBoss(boss, cmd, { action = null, duplicate = false, reward
   const contribution = boss.myContribution;
   const sections = [
     `👹 *${displayName(snapshot.name)}* · ${boss.code}\n❤️ ${healthBar(boss.hp, maxHp)} ${boss.hp}/${maxHp} HP`,
-    action ? `${duplicate ? '🔁 Ataque ya confirmado; se conserva el resultado original.\n' : ''}⚔️ ${displayName(action.details.attackName)}\n${damage > 0 ? `${action.details.critical ? '🔥 ¡CRÍTICO! ' : '💥 '}*${damage} de daño*` : '💨 Tu ataque falló.'}` : null,
+    action ? `${duplicate ? '🔁 Ataque ya confirmado; se conserva el resultado original.\n' : ''}${String(action.details.choice) === '3' ? '💀 *¡FATALITY!*\n' : ''}⚔️ ${displayName(action.details.attackName)}\n${damage > 0 ? `${action.details.critical ? '🔥 ¡CRÍTICO! ' : '💥 '}*${damage} de daño*` : '💨 Tu ataque falló.'}` : null,
+    action?.details?.maskName ? `🎭 Ataque resuelto ante: ${displayName(action.details.maskName)}` : null,
     `🤝 ${boss.participants.length} ${boss.participants.length === 1 ? 'participante' : 'participantes'} · 💥 ${boss.totalDamage} de daño conjunto`,
     isActive ? `⌛ Termina: ${contentDate(boss.expiresAt)}` : boss.status === 'defeated' ? '🏆 *¡Boss derrotado!*\nLos premios de participación, mayor daño y último golpe se entregaron automáticamente.' : '⌛ El encuentro venció.',
     isActive ? '🛡️ Resiste los efectos de estado.' : null,
+    isActive && boss.mask ? `🎭 *${displayName(boss.mask.name)}*\n${displayName(boss.mask.description ?? boss.mask.ability ?? '')}${boss.nextMaskAtAttack ? `\n🔄 Próximo cambio en el ataque conjunto ${boss.nextMaskAtAttack}.` : ''}` : null,
     contribution ? `🙌 Tu aporte: *${contribution.damage} de daño* · ${contribution.attacks} ataques` : null,
     ownReward ? prizeText(ownReward) : null,
     !isActive && boss.nextEncounterAt ? `🌅 Próximo encuentro desde: ${contentDate(boss.nextEncounterAt)}` : null,
     isActive && boss.cooldownUntil ? `⏳ Puedes volver a atacar: ${contentTime(boss.cooldownUntil)} (CDMX)` : null,
     isActive && boss.attacksRemaining !== undefined ? `⚔️ Te quedan ${boss.attacksRemaining} ataques en este encuentro.` : null,
-    canAttack ? boss.availableAttacks.map(attack => `${attack.choice === '1' ? '1️⃣' : '2️⃣'} ${displayName(attack.name)} · ${attack.power} POT`).join('\n') : null
+    canAttack ? boss.availableAttacks.map(attack => `${String(attack.choice) === '3' ? '💀 3️⃣' : String(attack.choice) === '1' ? '1️⃣' : '2️⃣'} ${displayName(attack.name)} · ${attack.power} POT${attack.fatality ? ' · Un uso' : ''}`).join('\n') : null
   ];
-  return card(isActive ? 'BOSS MUNDIAL' : 'BOSS | RESULTADO', sections,
-    [canAttack ? `👉 Atacar: *${cmd('ctubossatacar', `1 ${boss.code}`)}* / *${cmd('ctubossatacar', `2 ${boss.code}`)}*` : null,
+  return card(isActive ? boss.mask ? 'TEATRO EMBRUJADO' : 'BOSS MUNDIAL' : 'BOSS | RESULTADO', sections,
+    [canAttack ? `👉 Atacar: ${boss.availableAttacks.map(attack => `*${cmd('ctubossatacar', `${attack.choice} ${boss.code}`)}*`).join(' / ')}` : null,
       `🏅 Aportaciones: ${cmd('ctubosstop', boss.code)}`,
       isActive && !boss.availableAttacks?.length ? `🛡️ Prepara tu equipo: ${cmd('ctuequipo')}` : null].filter(Boolean).join('\n'));
 }

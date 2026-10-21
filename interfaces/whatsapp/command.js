@@ -125,6 +125,13 @@ const messages = {
   EVENT_NOT_ACTIVE: '🏮 Ese evento aún no empieza o ya terminó.\nConsulta .ctueventos para ver las fechas.',
   EVENT_NOT_STARTED: '🏮 Ese evento aún no empieza.\nConsulta .ctueventos para ver las fechas.',
   EVENT_CLOSED: '🏮 El evento terminó; sus personajes existentes conservan su progreso y pueden comerciarse.\nConsulta .ctueventos',
+  INVALID_EVENT_ACTION: '🏮 Consulta .ctuevento espiritus\n✨ Luz: .ctuevento espiritus fragmentos\n🧧 Misiones: .ctuevento espiritus sellos\n🎭 Teatro: .ctuevento espiritus jefe\n🎴 Canjear: .ctuevento espiritus reclamar zorro o guardian',
+  SPIRITS_SEAL_NOT_READY: '🧧 Aún falta completar ese sello. Consulta tus objetivos con .ctuevento espiritus sellos',
+  SPIRITS_SEAL_NOT_FOUND: '🧧 Elige un sello: luz, mascaras o nombre. Consulta .ctuevento espiritus sellos',
+  SPIRITS_SEALS_REQUIRED: '🧧 Necesitas recuperar más sellos para ese compañero. Consulta .ctuevento espiritus sellos',
+  SPIRITS_CHARACTER_NOT_FOUND: '🎴 Elige el compañero: .ctuevento espiritus reclamar zorro o .ctuevento espiritus reclamar guardian',
+  FATALITY_NOT_AVAILABLE: '💀 Esa técnica no está disponible en este combate o ya fue utilizada. Consulta las acciones de .ctucombate o .ctuhistoria',
+  FATALITY_ALREADY_USED: '💀 La tercera técnica ya se utilizó en este combate. Elige otro ataque disponible.',
   CAMPAIGN_CLOSED: '🏮 La emisión de personajes de ese evento está cerrada.\nConsulta .ctueventos',
   INSUFFICIENT_TICKETS: '🎟️ Necesitas un ticket para capturar.\nGánalos con .ctumisiones, .ctulogros o la bienvenida de .ctuevento faroles reclamar',
   BOSS_NOT_FOUND: '👹 Ese boss no existe.\nConsulta .ctuboss niebla o .ctuboss dragon',
@@ -133,7 +140,7 @@ const messages = {
   BOSS_ATTACK_LIMIT: '👹 Ya alcanzaste tu límite de ataques en este encuentro.\nConsulta tus aportaciones con .ctubosstop',
   BOSS_ATTACK_COOLDOWN: '⏳ Tu ataque al boss aún se está recuperando.\nConsulta .ctuboss para ver cuándo puedes volver.',
   BOSS_COOLDOWN: '⏳ Tu ataque al boss aún se está recuperando.\nConsulta .ctuboss para ver cuándo puedes volver.',
-  INVALID_BOSS_ATTACK: '⚔️ Elige el ataque 1 o 2.\nEjemplo: .ctubossatacar 1 B1',
+  INVALID_BOSS_ATTACK: '⚔️ Elige un ataque disponible del encuentro.\nEjemplo: .ctubossatacar 1 B1\nLa opción 3 aparece cuando se activa Fatality.',
   SPAWN_NOT_FOUND: '🎴 No hay una aparición disponible en este grupo.\nConsulta .ctuspawn o usa .ctuexplorar',
   SPAWN_NOT_ACTIVE: '🎴 Esa aparición ya fue capturada o venció.\nConsulta .ctuspawn',
   SPAWN_EXPIRED: '⌛ Esa aparición venció.\nConsulta .ctuspawn',
@@ -201,7 +208,7 @@ const messages = {
   BATTLE_NOT_PARTICIPANT: '👤 No participas en ese combate.',
   CHALLENGE_NOT_YOURS: '📣 Sólo el jugador desafiado puede aceptar o rechazar; sólo el creador puede retirar el desafío.',
   NOT_YOUR_TURN: '⏳ Aún no es tu turno. Consulta .ctucombate para ver quién debe atacar.',
-  INVALID_ATTACK: '⚔️ Elige uno de los dos ataques de tu personaje.\nUsa .ctuatacar 1 o .ctuatacar 2.'
+  INVALID_ATTACK: '⚔️ Elige un ataque disponible.\nUsa .ctuatacar 1 o .ctuatacar 2; la opción 3 aparece cuando se activa Fatality.'
 };
 
 export function identityFor(sock, msg) {

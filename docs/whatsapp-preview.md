@@ -223,7 +223,7 @@ Fallar y cambiar consumen el turno. Los efectos avanzan sólo mientras la unidad
 🔵 Raro · Tanque
 ↳ .ctuficha guardian_jade
 
-📄 *Página 1 de 2*
+📄 *Página 1 de 3*
 ➡️ Siguiente: *.ctucatalogo 2*
 🎁 Elegir starter: .ctustarter
 ```
@@ -233,6 +233,10 @@ Fallar y cambiar consumen el turno. Los efectos avanzan sólo mientras la unidad
 ```text
 🃏 *CHENGDÚ CARDS | CATÁLOGO*
 ━━━━━━━━━━━━━━
+🎭 *Guardián de las Mil Máscaras*
+🟡 Legendario · Tanque · ⏳ Próximo evento
+↳ .ctuficha guardian_mil_mascaras
+
 🐺 *Lobo Sombrío*
 ⚪ Común · Velocista · 🎁 Starter
 ↳ .ctuficha lobo_sombrio
@@ -249,12 +253,9 @@ Fallar y cambiar consumen el turno. Los efectos avanzan sólo mientras la unidad
 ⚪ Común · Tanque · 🎁 Starter
 ↳ .ctuficha panda_guerrero
 
-🦊 *Zorro de los Faroles*
-🔵 Raro · Velocista · 🏮 Evento
-↳ .ctuficha zorro_faroles
-
-📄 *Página 2 de 2*
+📄 *Página 2 de 3*
 ⬅️ Anterior: *.ctucatalogo 1*
+➡️ Siguiente: *.ctucatalogo 3*
 🎁 Elegir starter: .ctustarter
 ```
 
@@ -283,7 +284,7 @@ Fallar y cambiar consumen el turno. Los efectos avanzan sólo mientras la unidad
 🔵 Raro · Tanque
 ↳ .ctuficha guardian_jade
 
-📄 *Página 1 de 2*
+📄 *Página 1 de 3*
 ➡️ Siguiente: *.ctucatalogo 2*
 🎁 Elegir starter: .ctustarter
 ```
@@ -298,7 +299,7 @@ Fallar y cambiar consumen el turno. Los efectos avanzan sólo mientras la unidad
 .ctustarter · Primer personaje
 
 📖 *Historia del Custodio*
-.ctuhistoria · Prólogo, Bosque y Mercado de los Ecos
+.ctuhistoria · Temporada 1: cinco capítulos y epílogo
 .ctuhistoria ayuda · Decisiones, combates y reintentos
 .ctudiario historia · Tu crónica, pistas y recuerdos
 
@@ -379,6 +380,9 @@ Los listados muestran Anterior y Siguiente.
 .ctucapturar S1 · Capturar por un ticket
 .ctueventos · Calendario
 .ctuevento faroles reclamar · Bienvenida del festival
+.ctuevento espiritus · Noche de los Espíritus
+.ctuevento espiritus sellos · Misiones y canjes
+.ctuevento espiritus jefe · Teatro comunitario
 
 ⚔️ *Combate en grupo*
 .ctupelea @jugador · Mismo tamaño de equipos
@@ -387,6 +391,7 @@ Los listados muestran Anterior y Siguiente.
 .ctuaceptar / .cturechazar · Responder
 .ctucancelar · Retirar desafío
 .ctuatacar 1 / .ctuatacar 2 · Atacar
+.ctuatacar 3 · Fatality, si se activa al inicio
 .ctucambiar 2 · Entrar con reserva; consume turno
 .ctucombate · Ver turno
 .cturendirse · Rendirse
@@ -682,17 +687,17 @@ Lukas: +15 XP
 🏆 Victoria vs *Lukas*
 📅 11 de octubre de 2026 · 1v1 clásico · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-0f170234-b4b1-4630-9791-d732998cb666
+🔎 .ctuhistorial BTL-0b269e98-e025-4fa0-9fa6-3d109bf90e59
 
 🏆 Victoria vs *Lukas*
 📅 11 de octubre de 2026 · 1v1 clásico · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-45416013-4459-44c9-b824-19eb28729069
+🔎 .ctuhistorial BTL-17f6926e-d8e1-49d6-b78a-38ffce398099
 
 🏆 Victoria vs *Lukas*
 📅 11 de octubre de 2026 · 1v1 clásico · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-8b0711d3-d3a9-4b1c-ae40-8cd0319a5260
+🔎 .ctuhistorial BTL-cf394aa4-5f29-4df9-8ad9-901e5ec0687c
 
 📄 *Página 1 de 1*
 👉 Tu saldo: *.ctubalance*
@@ -2645,6 +2650,11 @@ Primer filo
 🎴 2 personajes exclusivos
 👉 *.ctuevento faroles*
 
+🏮 *La Noche de los Espíritus* · ⏳ Próximamente
+📅 25 oct 2026, 00:00 → 2 nov 2026, 00:00
+🎴 2 personajes exclusivos
+👉 *.ctuevento espiritus*
+
 📄 *Página 1 de 1*
 📍 Horarios de Ciudad de México.
 ```
@@ -2673,6 +2683,39 @@ Un premio por jugador.
 🌿 Los personajes del festival pueden aparecer en los grupos; necesitas tickets para capturarlos.
 
 👉 Reclamar: *.ctuevento faroles reclamar*
+```
+
+## Espíritus: calendario visible y mecánicas cerradas antes de su apertura
+
+```text
+🃏 *CHENGDÚ CARDS | ESPÍRITUS*
+━━━━━━━━━━━━━━
+🏮 *La Noche de los Espíritus*
+⏳ Próximamente
+
+📅 25 oct 2026, 00:00 → 2 nov 2026, 00:00
+📍 Horarios de Ciudad de México.
+
+🔒 Fragmentos, sellos, canjes y teatro se abrirán automáticamente cuando termine el Festival de los Faroles.
+
+Una niebla de tinta recorre el bambú. En un antiguo teatro, las máscaras de una compañía olvidada han despertado. Recupera tres sellos para devolverles sus nombres. Una aventura ficticia de fantasía inspirada en el arte de las máscaras de Sichuan; no representa el Festival de Zhongyuan.
+
+✨ Luz espiritual: *0 fragmentos*
+🧧 Sellos recuperados: *0/3*
+
+🦊 *Zorro de las Llamas Errantes*
+🟣 Épico · 0/20 emitidos
+🔒 Canjes cerrados.
+
+🎭 *Guardián de las Mil Máscaras*
+🟡 Legendario · 0/10 emitidos
+🔒 Canjes cerrados.
+
+💀 *Fatality*
+Estos dos compañeros tienen un 10% de despertar una tercera técnica al iniciar un combate. Se usa una vez en ese combate; puede fallar y respeta defensas. Consulta sus detalles con la ficha.
+
+📅 .ctueventos
+🎴 Tus compañeros: .ctupersonajes
 ```
 
 ## Bienvenida del festival: una vez por jugador
@@ -3011,6 +3054,36 @@ Primer filo
 ↩️ Retirar: .cturetirar M6
 ```
 
+## Faroles: revancha automática con 75% de selección de personajes del evento
+
+```text
+🃏 *CHENGDÚ CARDS | EVENTO*
+━━━━━━━━━━━━━━
+🏮 *Festival de los Faroles*
+🟢 ¡El festival está abierto!
+
+📅 11 oct 2026, 00:00 → 25 oct 2026, 00:00
+📍 Hora de Ciudad de México.
+
+🎴 *Personajes exclusivos*
+🔵 Zorro de los Faroles · Raro
+↳ 0/35 emitidos · Disponible
+🟣 Guardián Espectral · Épico
+↳ 1/20 emitidos · Disponible
+
+🎁 *Bienvenida*
+💰 +25 ChengCoins · ✨ +10 XP de jugador · 🎟️ +1 ticket
+✅ Ya reclamaste este premio.
+
+🔥 *¡Revancha activa!*
+🎴 75% de las apariciones eligen personajes del evento mientras quede emisión.
+🎟️ Capturar sigue costando un ticket. La revancha no crea stock adicional.
+
+🌿 Los personajes del festival pueden aparecer en los grupos; necesitas tickets para capturarlos.
+
+📅 Calendario: .ctueventos
+```
+
 ## Festival terminado: emisión cerrada y unidades conservadas
 
 ```text
@@ -3076,6 +3149,300 @@ Saldo restante: *436 ChengCoins*
 
 🔎 Stats y ataques: *.ctuficha ESPE-000001*
 📜 Propietarios: .ctupropiedad ESPE-000001
+```
+
+## Espíritus: apertura automática al cerrar Faroles
+
+```text
+🃏 *CHENGDÚ CARDS | ESPÍRITUS*
+━━━━━━━━━━━━━━
+🏮 *La Noche de los Espíritus*
+🟢 ¡El teatro ha despertado!
+
+📅 25 oct 2026, 00:00 → 2 nov 2026, 00:00
+📍 Horarios de Ciudad de México.
+
+Una niebla de tinta recorre el bambú. En un antiguo teatro, las máscaras de una compañía olvidada han despertado. Recupera tres sellos para devolverles sus nombres. Una aventura ficticia de fantasía inspirada en el arte de las máscaras de Sichuan; no representa el Festival de Zhongyuan.
+
+✨ Luz espiritual: *0 fragmentos*
+🧧 Sellos recuperados: *0/3*
+
+🦊 *Zorro de las Llamas Errantes*
+🟣 Épico · 0/20 emitidos
+🧧 Requiere 2 sellos
+Completa y reclama sus sellos para desbloquear el canje.
+
+🎭 *Guardián de las Mil Máscaras*
+🟡 Legendario · 0/10 emitidos
+🧧 Requiere 3 sellos
+Completa y reclama sus sellos para desbloquear el canje.
+
+💀 *Fatality*
+Estos dos compañeros tienen un 10% de despertar una tercera técnica al iniciar un combate. Se usa una vez en ese combate; puede fallar y respeta defensas. Consulta sus detalles con la ficha.
+
+✨ .ctuevento espiritus fragmentos
+🧧 .ctuevento espiritus sellos
+🎭 .ctuevento espiritus jefe
+🎁 Bienvenida: .ctuevento espiritus reclamar
+🎟️ Capturas: .ctuspawn
+```
+
+## Espíritus: bienvenida con un ticket para capturar
+
+```text
+🃏 *CHENGDÚ CARDS | EVENTO | BIENVENIDA*
+━━━━━━━━━━━━━━
+🎁 *¡Premio reclamado!*
+
+💰 +25 ChengCoins · ✨ +10 XP de jugador · 🎟️ +1 ticket
+
+💰 Saldo actual: *668 ChengCoins*
+🎟️ Tickets disponibles: *3*
+
+🏮 Ver evento: *.ctuevento espiritus*
+🎴 Apariciones: .ctuspawn
+```
+
+## Espíritus: tres misiones y contadores de luz, máscaras y victoria
+
+```text
+🃏 *CHENGDÚ CARDS | ESPÍRITUS*
+━━━━━━━━━━━━━━
+🏮 *La Noche de los Espíritus*
+🟢 ¡El teatro ha despertado!
+
+📅 25 oct 2026, 00:00 → 2 nov 2026, 00:00
+📍 Horarios de Ciudad de México.
+
+🔒 *Sello de la Luz Errante*
+Reúne 6 fragmentos de luz en combates PvP válidos.
+📍 0/6
+
+🔒 *Sello de las Máscaras*
+Inflige 100 de daño al teatro y alcanza al menos dos máscaras distintas.
+📍 0/100 · 🎭 0/2 máscaras
+
+🔒 *Sello del Nombre Recobrado*
+Participa con daño en una victoria comunitaria contra el Guardián.
+📍 0/1
+
+✨ .ctuevento espiritus fragmentos
+🧧 .ctuevento espiritus sellos
+🎭 .ctuevento espiritus jefe
+🎁 Bienvenida: .ctuevento espiritus reclamar
+🎟️ Capturas: .ctuspawn
+```
+
+## Espíritus: un sello incompleto ofrece el siguiente paso
+
+```text
+🃏 *CHENGDÚ CARDS | ERROR*
+━━━━━━━━━━━━━━
+🧧 Aún falta completar ese sello. Consulta tus objetivos con .ctuevento espiritus sellos
+```
+
+## Guardián de las Mil Máscaras: ficha de técnicas y precisión de Fatality
+
+```text
+🃏 *CHENGDÚ CARDS | FICHA*
+━━━━━━━━━━━━━━
+🎭 *Guardián de las Mil Máscaras*
+🆔 guardian_mil_mascaras
+🟡 Legendario · Tanque
+📦 Emisión: 10 unidades como máximo
+🏮 Personaje exclusivo del festival.
+📚 Estadísticas base
+❤️ Vida: 134/134 HP
+⚔️ Ataque: 26 · 🛡️ Defensa: 25 · 💨 Velocidad: 9
+
+☀️ Luz
+✨ *Rostro Cambiante*
+Entra con 6 de escudo. Al comenzar cada turno propio alterna Jade (6 de escudo), Carmesí (+6% de ataque) y Azul (regenera 4% de vida). Conserva su postura al cambiar.
+
+1️⃣ *Golpe del Abanico* · Físico
+Potencia: 25 POT · Precisión: 100%
+☀️ Luz · Sin recarga
+
+2️⃣ *Danza de las Mil Caras* · Físico
+Potencia: 34 POT · Precisión: 85%
+☀️ Luz · Recarga: 2 turnos propios
+🛡️ Escudo 8 puntos · 2 turnos propios
+
+💀 3️⃣ *Mil Rostros, un Destino* · Físico
+Potencia: 52 POT · Precisión: 90%
+☀️ Luz · Sin recarga
+
+💀 *Fatality*
+10% de despertar al iniciar el combate · Un uso por combate. Fallar también la consume; respeta defensas y efectos.
+
+💡 Daño base: potencia + ataque − defensa; después se aplican efectos y elemento.
+🔥 Fuego → 🌿 Naturaleza → 💧 Agua → 🔥 Fuego
+☀️ Luz ↔ 🌙 Oscuridad · Ventaja +25%; resistencia −20%.
+Fallar y cambiar consumen el turno. Los efectos avanzan sólo mientras la unidad está activa.
+```
+
+## Teatro embrujado: máscara actual y vida comunitaria
+
+```text
+🃏 *CHENGDÚ CARDS | TEATRO EMBRUJADO*
+━━━━━━━━━━━━━━
+👹 *Guardián de las Mil Máscaras* · B3
+❤️ ▓▓▓▓▓▓▓▓▓▓ 1800/1800 HP
+
+🤝 0 participantes · 💥 0 de daño conjunto
+
+⌛ Termina: 26 oct 2026, 00:00
+
+🛡️ Resiste los efectos de estado.
+
+🎭 *Máscara de Jade*
+Su defensa aumenta 20. La magia atraviesa parte del bastión.
+🔄 Próximo cambio en el ataque conjunto 4.
+
+🙌 Tu aporte: *0 de daño* · 0 ataques
+
+⚔️ Te quedan 20 ataques en este encuentro.
+
+1️⃣ Ascua Errante · 25 POT
+2️⃣ Ilusión de Fuego · 33 POT
+
+👉 Atacar: *.ctubossatacar 1 B3* / *.ctubossatacar 2 B3*
+🏅 Aportaciones: .ctubosstop B3
+```
+
+## Teatro: primer ataque abre la oportunidad de Fatality
+
+```text
+🃏 *CHENGDÚ CARDS | TEATRO EMBRUJADO*
+━━━━━━━━━━━━━━
+👹 *Guardián de las Mil Máscaras* · B3
+❤️ ▓▓▓▓▓▓▓▓▓▓ 1738/1800 HP
+
+⚔️ Ascua Errante
+🔥 ¡CRÍTICO! *62 de daño*
+
+🎭 Ataque resuelto ante: Máscara de Jade
+
+🤝 1 participante · 💥 62 de daño conjunto
+
+⌛ Termina: 26 oct 2026, 00:00
+
+🛡️ Resiste los efectos de estado.
+
+🎭 *Máscara de Jade*
+Su defensa aumenta 20. La magia atraviesa parte del bastión.
+🔄 Próximo cambio en el ataque conjunto 4.
+
+🙌 Tu aporte: *62 de daño* · 1 ataques
+
+⏳ Puedes volver a atacar: 00:00:30 (CDMX)
+
+⚔️ Te quedan 19 ataques en este encuentro.
+
+1️⃣ Ascua Errante · 25 POT
+2️⃣ Ilusión de Fuego · 33 POT
+💀 3️⃣ Última Llama del Umbral · 50 POT · Un uso
+
+👉 Atacar: *.ctubossatacar 1 B3* / *.ctubossatacar 2 B3* / *.ctubossatacar 3 B3*
+🏅 Aportaciones: .ctubosstop B3
+```
+
+## Teatro: tercera técnica consumida una vez ante la máscara actual
+
+```text
+🃏 *CHENGDÚ CARDS | TEATRO EMBRUJADO*
+━━━━━━━━━━━━━━
+👹 *Guardián de las Mil Máscaras* · B3
+❤️ ▓▓▓▓▓▓▓▓▓▓ 1648/1800 HP
+
+💀 *¡FATALITY!*
+⚔️ Última Llama del Umbral
+🔥 ¡CRÍTICO! *90 de daño*
+
+🎭 Ataque resuelto ante: Máscara de Jade
+
+🤝 1 participante · 💥 152 de daño conjunto
+
+⌛ Termina: 26 oct 2026, 00:00
+
+🛡️ Resiste los efectos de estado.
+
+🎭 *Máscara de Jade*
+Su defensa aumenta 20. La magia atraviesa parte del bastión.
+🔄 Próximo cambio en el ataque conjunto 4.
+
+🙌 Tu aporte: *152 de daño* · 2 ataques
+
+⏳ Puedes volver a atacar: 00:01:00 (CDMX)
+
+⚔️ Te quedan 18 ataques en este encuentro.
+
+1️⃣ Ascua Errante · 25 POT
+2️⃣ Ilusión de Fuego · 33 POT
+
+👉 Atacar: *.ctubossatacar 1 B3* / *.ctubossatacar 2 B3*
+🏅 Aportaciones: .ctubosstop B3
+```
+
+## Fatality: despertar de la tercera técnica al iniciar PvP
+
+```text
+🃏 *CHENGDÚ CARDS | INICIO | T1*
+━━━━━━━━━━━━━━
+⚔️ *Miguel* vs *Lukas* · *1v1*
+🦊 *Zorro de las Llamas Errantes* toma la iniciativa.
+
+💀 🦊 Zorro de las Llamas Errantes: *Fatality disponible* · Un uso en este combate
+✨ 🦊 Zorro de las Llamas Errantes: *Fuego Espectral*
+🔥 Quemadura → 🐺 Lobo Sombrío · 2 turnos
+✨ 🐺 Lobo Sombrío: *Mirada Nocturna*
+🛡️ Defensa reducida → 🦊 Zorro de las Llamas Errantes · 2 turnos
+🛡️ Escudo → 🐺 Lobo Sombrío · 2 turnos
+
+❤️ *ESTADO*
+🦊 *Miguel* · Zorro de las Llamas Errantes
+▓▓▓▓▓▓▓▓▓▓ 110/110 HP
+🛡️ Defensa reducida 2T
+
+🐺 *Lukas* · Lobo Sombrío
+▓▓▓▓▓▓▓▓▓▓ 97/97 HP
+🔥 Quemadura 2T · 🛡️ Escudo 10
+
+🎯 *Turno de Miguel*
+1️⃣ Ascua Errante · 25 POT
+2️⃣ Ilusión de Fuego · 33 POT
+💀 3️⃣ Última Llama del Umbral · 50 POT · Un uso
+
+👉 *.ctuatacar 1* o *.ctuatacar 2* o *.ctuatacar 3*
+🔎 Detalles: .ctuficha
+```
+
+## Fatality: ataque especial y siguiente turno en un único mensaje
+
+```text
+🃏 *CHENGDÚ CARDS | T2*
+━━━━━━━━━━━━━━
+🦊 *Zorro de las Llamas Errantes* usó _Última Llama del Umbral_
+💀 *¡FATALITY!*
+💥 *52 de daño* a Lobo Sombrío
+🛡️ 🐺 Lobo Sombrío bloqueó 10 de daño
+🛡️ Escudo terminó en 🐺 Lobo Sombrío
+
+❤️ *ESTADO*
+🦊 *Miguel* · Zorro de las Llamas Errantes
+▓▓▓▓▓▓▓▓▓▓ 110/110 HP
+🛡️ Defensa reducida 1T
+
+🐺 *Lukas* · Lobo Sombrío
+▓▓▓▓▓▒▒▒▒▒ 45/97 HP
+🔥 Quemadura 2T
+
+🎯 *Turno de Lukas*
+1️⃣ Garra Sombría · 25 POT
+2️⃣ Colmillo Nocturno · 35 POT
+
+👉 *.ctuatacar 1* o *.ctuatacar 2*
+🔎 Detalles: .ctuficha
 ```
 
 ## Competitivo: Elo inicial y requisitos de colocación
@@ -3263,7 +3630,6 @@ El podio recibe un extra; no se emiten personajes.
 🎁 *RECOMPENSAS*
 Miguel: +120 ChengCoins · +35 XP
 🐼 Panda Guerrero: +35 XP
-🌱 Miguel subió al nivel 3
 Lukas: +15 XP
 🐺 Lobo Sombrío: +15 XP
 
@@ -3296,7 +3662,6 @@ Lukas: +15 XP
 🎁 *RECOMPENSAS*
 Miguel: +120 ChengCoins · +35 XP
 🐼 Panda Guerrero: +35 XP
-🌱 Miguel subió al nivel 3
 Lukas: +15 XP
 🐺 Lobo Sombrío: +15 XP
 
@@ -3314,29 +3679,28 @@ Lukas: +15 XP
 🃏 *CHENGDÚ CARDS | HISTORIAL*
 ━━━━━━━━━━━━━━
 🏆 Victoria vs *Lukas*
+📅 25 de octubre de 2026 · 1v1 · 1 turnos
+🔎 .ctuhistorial BTL-0443dbb5-6fe9-4cf9-bc8d-b391713b282e
+
+🏆 Victoria vs *Lukas*
 📅 25 de octubre de 2026 · 1v1 · 8 turnos
 🎁 +120 ChengCoins · +35 XP
 🏅 Ranked T1 · 1016 Elo (+16)
-🔎 .ctuhistorial BTL-35a671d7-eaed-43ea-a26b-cb39f447d2ca
+🔎 .ctuhistorial BTL-24b51c68-2f12-4edf-a4ab-041c8b63cb71
 
 💔 Derrota vs *Lukas*
 📅 22 de octubre de 2026 · 1v1 clásico · 5 turnos
 🎁 +0 ChengCoins · +15 XP
-🔎 .ctuhistorial BTL-995767e2-34c7-4ea2-ae45-143be7ee727f
+🔎 .ctuhistorial BTL-13e7079c-8bc7-49f8-a8ec-a3757efaa0b3
 
 🏆 Victoria vs *Lukas*
 📅 22 de octubre de 2026 · 1v1 clásico · 4 turnos
 🎁 +120 ChengCoins · +35 XP
-🔎 .ctuhistorial BTL-ab8ccea8-6763-4fbd-897e-910320058401
+🔎 .ctuhistorial BTL-974ce145-5b04-49b4-bf89-3117cae92b05
 
 💔 Derrota vs *Lukas*
 📅 20 de octubre de 2026 · 1v1 · 0 turnos
-🔎 .ctuhistorial BTL-cce8457d-83e9-436c-b3f9-c91a7cd3216d
-
-💔 Derrota vs *Lukas*
-📅 20 de octubre de 2026 · 3v3 · 31 turnos
-🎁 +0 ChengCoins · +15 XP
-🔎 .ctuhistorial BTL-cd575976-2f28-4e2e-86e6-63d8f80e18ca
+🔎 .ctuhistorial BTL-778c46f3-f7b1-4497-a975-a5fd27d8ff38
 
 📄 *Página 1 de 3*
 ➡️ Siguiente: *.ctuhistorial 2*
@@ -3493,7 +3857,7 @@ Consulta la fecha con .ctutemporada
 💰 +1450 ChengCoins
 🎖️ Plata de Chengdú · T1
 
-💳 Saldo actual: *2693 ChengCoins*
+💳 Saldo actual: *2718 ChengCoins*
 
 🎒 Tus títulos: .ctuinventario
 🌍 Clasificación final: .ctutop T1
@@ -3512,7 +3876,7 @@ Consulta la fecha con .ctutemporada
 💰 +1450 ChengCoins
 🎖️ Plata de Chengdú · T1
 
-💳 Saldo tras ese reclamo: *2693 ChengCoins*
+💳 Saldo tras ese reclamo: *2718 ChengCoins*
 
 🎒 Tus títulos: .ctuinventario
 🌍 Clasificación final: .ctutop T1
@@ -3524,7 +3888,7 @@ Consulta la fecha con .ctutemporada
 🃏 *CHENGDÚ CARDS | INVENTARIO*
 ━━━━━━━━━━━━━━
 👤 *Miguel*
-🎟️ *2 tickets de captura*
+🎟️ *3 tickets de captura*
 
 🎖️ *Títulos*
 Primer filo · Plata de Chengdú · T1
@@ -3643,7 +4007,7 @@ Completa ambos requisitos para entrar al ranking oficial.
 🃏 *CHENGDÚ CARDS | PERFIL PÚBLICO*
 ━━━━━━━━━━━━━━
 👤 *Miguel* · Nv. 3
-🎴 3 unidades · 🏆 12 victorias
+🎴 4 unidades · 🏆 13 victorias
 
 ❤️ Favorito: *Panda Guerrero* · Nv. 3
 
@@ -3665,7 +4029,7 @@ Completa ambos requisitos para entrar al ranking oficial.
 🃏 *CHENGDÚ CARDS | PERFIL PÚBLICO*
 ━━━━━━━━━━━━━━
 👤 *Miguel* · Nv. 3
-🎴 3 unidades · 🏆 12 victorias
+🎴 4 unidades · 🏆 13 victorias
 
 💬 Coleccionista de bambú
 
@@ -3696,7 +4060,7 @@ Completa ambos requisitos para entrar al ranking oficial.
 ━━━━━━━━━━━━━━
 👤 *Miguel* · Nv. 3
 🏅 Plata de Chengdú · T1
-🎴 3 unidades · 🏆 12 victorias
+🎴 4 unidades · 🏆 13 victorias
 
 💬 Coleccionista de bambú
 
@@ -3713,7 +4077,7 @@ Completa ambos requisitos para entrar al ranking oficial.
 ━━━━━━━━━━━━━━
 👤 *Miguel* · Nv. 3
 🏅 Plata de Chengdú · T1
-🎴 3 unidades · 🏆 12 victorias
+🎴 4 unidades · 🏆 13 victorias
 
 💬 Coleccionista de bambú
 
@@ -3739,6 +4103,9 @@ Completa ambos requisitos para entrar al ranking oficial.
 🔵 *Monje Celestial* · Nv. 1
 🔎 .ctuficha MONJ-000001
 
+🟣 *Zorro de las Llamas Errantes* · Nv. 1
+🔎 .ctuficha ERRA-000001
+
 📄 *Página 1 de 1*
 ```
 
@@ -3752,8 +4119,8 @@ Completa ambos requisitos para entrar al ranking oficial.
 ❤️ Favorito: *Panda Guerrero* · Nv. 3
 
 💎 Más rara
-🔵 *Monje Celestial* · Nv. 1
-🏆 0 victorias
+🟣 *Zorro de las Llamas Errantes* · Nv. 1
+🏆 1 victorias
 
 🌱 Primera unidad
 ⚪ *Panda Guerrero* · Nv. 3
@@ -3795,7 +4162,7 @@ Común · LOBO-000001
 ━━━━━━━━━━━━━━
 🪵 0 fragmentos · ✨ 0 esencias · 🔮 0 sellos
 
-🎁 17 recompensas con materiales pendientes
+🎁 18 recompensas con materiales pendientes
 👉 .ctucrafting reclamar
 
 🔨 *Sello de evolución*
@@ -3819,7 +4186,7 @@ Común · LOBO-000001
 ━━━━━━━━━━━━━━
 🎒 ¡Materiales recogidos!
 
-🪵 36 fragmentos · ✨ 3 esencias · 🔮 0 sellos
+🪵 37 fragmentos · ✨ 3 esencias · 🔮 0 sellos
 
 🔨 .ctucrafting
 ```
@@ -3832,7 +4199,7 @@ Común · LOBO-000001
 🔨 ¡Creación completada!
 insignia＿bambu
 
-🪵 33 fragmentos · ✨ 3 esencias · 🔮 0 sellos
+🪵 34 fragmentos · ✨ 3 esencias · 🔮 0 sellos
 
 💰 Coste: 50 ChengCoins
 
@@ -3848,7 +4215,7 @@ insignia＿bambu
 🔨 ¡Creación completada!
 sello＿evolucion
 
-🪵 28 fragmentos · ✨ 1 esencias · 🔮 1 sellos
+🪵 29 fragmentos · ✨ 1 esencias · 🔮 1 sellos
 
 💰 Coste: 100 ChengCoins
 
@@ -3865,7 +4232,7 @@ sello＿evolucion
 🎴 PAND-000001 · Nv. 3
 
 📋 Requisitos: nivel 5 · 300 ChengCoins · 1 sello
-💰 Tienes 2543 · 🔮 1 sellos
+💰 Tienes 2568 · 🔮 1 sellos
 
 ✨ Nv. 5: +4% · Nv. 10: +5%
 Bono al cumplir los requisitos: +4% · redondeo hacia abajo.
@@ -4263,7 +4630,7 @@ Lukas · Camila · Ana
 🃏 *CHENGDÚ CARDS | INVENTARIO*
 ━━━━━━━━━━━━━━
 👤 *Miguel*
-🎟️ *2 tickets de captura*
+🎟️ *3 tickets de captura*
 
 🎖️ *Títulos*
 Primer filo · Plata de Chengdú · T1
@@ -4271,7 +4638,7 @@ Primer filo · Plata de Chengdú · T1
 🏵️ *Insignias*
 ⚔️
 
-🪵 28 fragmentos · ✨ 1 esencias · 🔮 1 sellos
+🪵 29 fragmentos · ✨ 1 esencias · 🔮 1 sellos
 🔨 .ctucrafting
 
 🪵 Insignia: Artesano del Bambú

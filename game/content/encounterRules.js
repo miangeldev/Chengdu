@@ -1,6 +1,8 @@
 import { requireGame } from '../../utils/GameError.js';
 import { dailyTimestamp } from '../economy/dailyPolicy.js';
 import { safeAdd } from '../progression/rules.js';
+import { SPIRITS_BOSS_ID, spiritsMaskAt } from './spiritsCatalog.js';
+import { fatalityAttack } from '../battle/fatality.js';
 
 export function encounterDeadline(now, milliseconds) {
   const timestamp = safeAdd(dailyTimestamp(now), milliseconds);
@@ -12,16 +14,21 @@ export function encounterDeadline(now, milliseconds) {
 
 // Boss combat deliberately keeps its own, frozen policy. It never changes a
 // unit's PvP HP, cooldowns, statistics or progression.
-export function resolveBossAttack(snapshot, unitSnapshot, choice, roll, hp) {
-  requireGame(['1', '2'].includes(String(choice)), 'INVALID_ATTACK');
+export function resolveBossAttack(snapshot, unitSnapshot, choice, roll, hp, attackCount = 0) {
+  requireGame(['1', '2', '3'].includes(String(choice)), 'INVALID_ATTACK');
   requireGame(Number.isSafeInteger(roll) && roll >= 1 && roll <= 100, 'INVALID_RANDOM_ROLL');
-  const attack = unitSnapshot.attacks[Number(choice) - 1];
+  const attack = String(choice) === '3' ? fatalityAttack(unitSnapshot, choice) : unitSnapshot.attacks[Number(choice) - 1];
   requireGame(attack && Number.isSafeInteger(hp) && hp > 0, 'INVALID_ATTACK');
-  const hit = roll <= attack.accuracy;
+  const mask = snapshot.id === SPIRITS_BOSS_ID ? spiritsMaskAt(attackCount) : null;
+  const magic = attack.type === 'magic';
+  const accuracy = Math.max(1, Math.min(100, attack.accuracy + (mask && !(mask.id === 'azul' && magic) ? mask.accuracy : 0)));
+  const defense = Math.max(0, snapshot.defense + (mask ? magic ? mask.magicDefense : mask.defense : 0));
+  const hit = roll <= accuracy;
   const critical = hit && roll <= 5;
-  const raw = Math.max(1, Math.round((unitSnapshot.stats.attack + attack.power) * 100 / (100 + snapshot.defense)));
+  const raw = Math.max(1, Math.round((unitSnapshot.stats.attack + attack.power) * 100 / (100 + defense)));
   const damage = hit ? Math.min(hp, critical ? Math.round(raw * 1.5) : raw) : 0;
-  return { hit, critical, damage, hpBefore: hp, hpAfter: hp - damage, attackName: attack.name };
+  return { hit, critical, damage, hpBefore: hp, hpAfter: hp - damage, attackName: attack.name,
+    ...(mask ? { maskId: mask.id, maskName: mask.name, maskAbility: mask.ability, effectiveDefense: defense, effectiveAccuracy: accuracy } : {}) };
 }
 
 export function bossContributions(actions) {

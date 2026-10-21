@@ -7,6 +7,7 @@ import { effectiveStats } from '../game/progression/rules.js';
 import { ownershipAt } from '../game/units/ownership.js';
 import { validateAdvancedBattle, validateAdvancedBattleTransition } from './advancedBattleValidation.js';
 import { validateAttackCombatProfile } from '../game/battle/combatContent.js';
+import { fatalityEnabled, fatalityProfile, immutableFatality, validateFatality } from '../game/battle/fatality.js';
 
 const check = (value, field) => requireGame(value, 'DATABASE_CORRUPT', { field });
 
@@ -74,6 +75,7 @@ export function validateBattleData(state, schemaVersion = 3) {
       }
       for (const key of ['hp', 'attack', 'defense', 'speed']) check(integer(u.stats?.[key], key === 'defense' ? 0 : 1), 'battle.snapshotStats');
       check(integer(u.hp) && u.hp <= u.stats.hp && Array.isArray(u.attacks) && u.attacks.length === 2 && u.attacks[0].id !== u.attacks[1].id, 'battle.snapshotHp');
+      check(validateFatality(u, battle.acceptedAt), 'battle.fatality');
       for (const attack of u.attacks) {
         check(attacks.has(attack.id) && integer(attack.revision, 1) && attack.revision <= attacks.get(attack.id).revision && text(attack.name) && integer(attack.power, 1) && attack.power <= 10000 && integer(attack.accuracy, 1) && attack.accuracy <= 100 && attack.type === 'physical', 'battle.snapshotAttack');
       }
@@ -88,6 +90,7 @@ export function validateBattleData(state, schemaVersion = 3) {
     } else {
       check(['active', 'finished', 'expired'].includes(battle.status) && battle.turnNumber >= 1, 'battle.acceptedState');
       const hp = new Map(battle.players.map(p => [p.userId, p.unit.stats.hp]));
+      const fatalityUsed = new Set();
       let nextTurn = firstPlayer(battle.players);
       let terminal = false;
       for (let i = 0; i < battle.actions.length; i++) {
@@ -102,7 +105,13 @@ export function validateBattleData(state, schemaVersion = 3) {
           terminal = true;
           continue;
         }
-        const attack = attacker.unit.attacks.find(a => a.id === action.attackId);
+        const special = attacker.unit.fatality;
+        const attack = attacker.unit.attacks.find(a => a.id === action.attackId) ??
+          (special?.unlocked && special.attack.id === action.attackId ? special.attack : null);
+        if (attack?.fatality) {
+          check(!fatalityUsed.has(attacker.unit.id), 'battle.fatalitySingleUse');
+          fatalityUsed.add(attacker.unit.id);
+        }
         check(action.actorId === nextTurn && action.targetId === defender.userId && attack && typeof action.hit === 'boolean', 'battle.actionTurn');
         check(attack.accuracy !== 100 || action.hit, 'battle.accuracy');
         const beforeHp = hp.get(defender.userId);
@@ -113,6 +122,7 @@ export function validateBattleData(state, schemaVersion = 3) {
         terminal = action.afterHp === 0 || action.seq >= MAX_TURNS;
       }
       for (const p of battle.players) check(p.unit.hp === hp.get(p.userId), 'battle.hpHistory');
+      for (const p of battle.players) if (p.unit.fatality) check(p.unit.fatality.used === fatalityUsed.has(p.unit.id), 'battle.fatalityHistory');
       if (battle.status === 'active') {
         check(!terminal && battle.turnUserId === nextTurn && battle.turnNumber === battle.actions.length + 1 && battle.winnerId === null, 'battle.turn');
       } else if (battle.status === 'finished') {
@@ -167,14 +177,16 @@ export function validateBattleTransition(before, after) {
           player.unit.traitVersion === unit.traitVersion && equal(player.unit.traits, unit.traits) && player.unit.variant === unit.variant && equal(player.unit.evolution ?? null, unit.evolution ?? null), 'battle.snapshotLevel');
         if (unit.ownershipVersion !== undefined) check(player.unit.ownershipVersion === unit.ownershipVersion, 'battle.snapshotCurrentOwnership');
         check(before.usuarios.records.find(u => u.id === player.userId).team[0] === unit.id, 'battle.snapshotTeam');
+        check(Boolean(player.unit.fatality) === Boolean(fatalityProfile(player.unit.characterId) && fatalityEnabled(updated.acceptedAt)), 'battle.fatalityAuthority');
       }
     }
     if (battle.status === 'active') {
       check(updated.status !== 'pending' && updated.acceptedAt === battle.acceptedAt && updated.acceptKey === battle.acceptKey, 'battle.activeTransition');
       for (let i = 0; i < 2; i++) {
-        const { hp: oldHp, ...oldUnit } = battle.players[i].unit;
-        const { hp: newHp, ...newUnit } = updated.players[i].unit;
-        check(equal(oldUnit, newUnit), 'battle.snapshotImmutable');
+        const { hp: oldHp, fatality: oldFatality, ...oldUnit } = battle.players[i].unit;
+        const { hp: newHp, fatality: newFatality, ...newUnit } = updated.players[i].unit;
+        check(equal({ ...oldUnit, ...immutableFatality(battle.players[i].unit) },
+          { ...newUnit, ...immutableFatality(updated.players[i].unit) }), 'battle.snapshotImmutable');
         if (updated.status === 'active') {
           const userId = battle.players[i].userId;
           check(equal(before.usuarios.records.find(u => u.id === userId).team, after.usuarios.records.find(u => u.id === userId).team), 'battle.teamLocked');

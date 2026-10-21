@@ -1,6 +1,6 @@
-# Chengdú Cards — Historia 0.13.1
+# Chengdú Cards — Espíritus 0.14.0
 
-Módulo de juego para un bot de WhatsApp: registro, perfil, catálogo de diez
+Módulo de juego para un bot de WhatsApp: registro, perfil, catálogo de doce
 personajes, starter único, colección, equipos de hasta tres unidades y combates
 1v1, 2v2 y 3v3 por turnos. Incluye elementos, pasivas, estados, cambios de unidad,
 XP, niveles independientes de jugador/unidad, ChengCoins e historial.
@@ -38,10 +38,16 @@ para los cinco jefes principales. Repara combates ya iniciados sin reiniciar la
 campaña y evita KO falsos y victorias después de fallar una protección.
 Guía: [fases 13–32](docs/fases-13-32.md), [auditoría integral](docs/auditoria-fases-0-32.md)
 y [plan de entrega](docs/plan-fases-13-32.md).
+El evento **La Noche de los Espíritus** abre automáticamente al cerrar Faroles,
+con fragmentos de luz, tres sellos, un teatro comunitario de máscaras cambiantes
+y dos personajes exclusivos. Ambos eventos tienen una revancha final de 24 horas;
+los nuevos compañeros estrenan Fatality, una tercera técnica que puede despertar
+al comenzar un combate. [Calendario, comandos y reglas](docs/spirits-event.md).
 El balance 0.4.1 distingue la fuerza de las rarezas y limita la emisión global
 de cada personaje, conservando las unidades y partidas anteriores.
 Toda la interfaz usa mensajes compactos, emojis, negritas y un siguiente paso
-claro. Los combates muestran barras de vida de texto y dos ataques por turno.
+claro. Los combates muestran barras de vida de texto y dos ataques por turno;
+la tercera técnica aparece cuando Fatality está disponible.
 Los datos persisten en varios JSON, con repositorios, servicios y commits recuperables.
 
 Requiere Node.js 22 o superior en Linux; verificado con Node.js 26.8.2. No tiene dependencias
@@ -569,7 +575,7 @@ independientes; rechaza modificaciones directas de colecciones administradas.
 
 ## Persistencia y recuperación
 
-Las 39 colecciones del esquema 12 incluyen versión y revisión; su contrato está
+Las 40 colecciones del esquema 13 incluyen versión y revisión; su contrato está
 en [docs/database.md](docs/database.md). `_database.json` identifica la instalación.
 `_journal.json` existe mientras hay un commit pendiente. Cada operación que cambia
 datos guarda previamente una copia coherente en `backups/<id-operación>/`.

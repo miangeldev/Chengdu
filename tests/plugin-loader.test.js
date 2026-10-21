@@ -102,7 +102,7 @@ test('direct plugin run exports share one database and complete the game flow', 
     await run('ctueventos');
     await run('ctuevento', alice, ['faroles']);
     assert.deepEqual(await game.validateDatabase(), {
-      valid: true, schemaVersion: SCHEMA_VERSION, users: 2, characters: 10, units: 4, claims: 2
+      valid: true, schemaVersion: SCHEMA_VERSION, users: 2, characters: 12, units: 4, claims: 2
     });
     assert.equal(replies.length, 63);
     assert.equal(new Set(commands.map(plugin => plugin.command)).size, commands.length);

@@ -57,9 +57,9 @@ function preserved(c) {
   for (const name of COLLECTIONS.filter(name => !V8_COLLECTIONS.includes(name) && !CONTENT_COLLECTIONS.includes(name))) {
     assert.deepEqual(readRecords(c.directory, name), [], name);
   }
-  assert.equal(readRecords(c.directory, 'campanas').length, 1);
-  assert.equal(readRecords(c.directory, 'personajes').length, c.state.personajes.records.length + 2);
-  assert.equal(readRecords(c.directory, 'ataques').length, c.state.ataques.records.length + 4);
+  assert.equal(readRecords(c.directory, 'campanas').length, 2);
+  assert.equal(readRecords(c.directory, 'personajes').length, c.state.personajes.records.length + 4);
+  assert.equal(readRecords(c.directory, 'ataques').length, c.state.ataques.records.length + 8);
 }
 
 test('schema 8 upgrades to content without resetting market aliases, owners, XP, supply or historical awards', async t => {

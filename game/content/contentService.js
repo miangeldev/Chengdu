@@ -6,6 +6,7 @@ import { ACHIEVEMENTS, CONTENT_POLICY_VERSION, MISSIONS } from './catalog.js';
 import { achievementProgress, contentPeriod, missionProgress, nextMissionReset, objectiveState } from './objectives.js';
 import { grantContentReward, ticketBalance, validContentKey } from './rewards.js';
 import { activeCampaign } from './encounterRules.js';
+import { eventRevenge } from './eventPolicy.js';
 
 async function userFor(repos, userId) {
   const user = await repos.users.get(userId);
@@ -41,7 +42,7 @@ async function eventView(repos, campaign, now, userId = null) {
       max: character.supply.max, available: active && character.obtainable && character.supply.grandfatheredIssued === undefined && counter.issuedCount < character.supply.max };
   }));
   const welcomeClaimed = userId !== null && Boolean(await repos.contentRewards.findBy('kind', 'event', reward => reward.sourceId === campaign.id && reward.userId === userId));
-  return { ...campaign, status, characters, welcomeClaimed };
+  return { ...campaign, status, characters, welcomeClaimed, revenge: eventRevenge(campaign, now) };
 }
 
 export function createContentService(storage, clock) {

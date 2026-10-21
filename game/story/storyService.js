@@ -14,6 +14,7 @@ import { storyLearningDefeats, storyBattleContext, isLearningDefeat } from './ba
 import { rewardStoryMission } from './rewards.js';
 import { storyUnitSnapshot } from './snapshot.js';
 import { displayUnitCharacterName } from '../evolution/rules.js';
+import { attachFatality } from '../battle/fatality.js';
 
 async function registeredUser(repos, userId) {
   const user = await repos.users.get(userId); requireGame(user, 'USER_NOT_FOUND'); return user;
@@ -40,12 +41,13 @@ async function expedition(repos, userId, now, { lockedBattleId = null } = {}) {
 }
 const references = units => units.map(unit => ({ unitId: unit.id, ownershipVersion: unit.ownershipVersion }));
 
-async function startBattle(repos, userId, mission, progress, now, contentVersion, combatVersion) {
+async function startBattle(repos, userId, mission, progress, now, contentVersion, combatVersion, randomRoll) {
   const units = await expedition(repos, userId, now), snapshots = [];
   for (const unit of units) {
     const character = await repos.characters.get(unit.characterId);
     const attacks = await Promise.all(character.attackIds.map(id => repos.attacks.get(id)));
-    snapshots.push(storyUnitSnapshot(unit, character, attacks));
+    const snapshot = storyUnitSnapshot(unit, character, attacks);
+    snapshots.push(combatVersion >= 4 ? attachFatality(snapshot, now, randomRoll) : snapshot);
   }
   const id = `STB-${randomUUID()}`;
   const encounterId = storyEncounterFor(mission, progress), step = currentStoryStep(mission, progress);
@@ -148,7 +150,7 @@ export function createStoryService(storage, clock, randomRoll = () => randomInt(
         (kind === 'choose' && before?.stage === 'choice' && (step?.choices ?? mission?.choices ?? []).some(c => c.id === normalized.choice) &&
           storyEncounterFor(mission, { ...before, decisions: { ...before.decisions,
             [(step?.choices ?? mission.choices).find(c => c.id === normalized.choice).key]: (step?.choices ?? mission.choices).find(c => c.id === normalized.choice).value } }));
-      if (begin) battle = await startBattle(repos, userId, mission, before, now, contentVersion, combatVersion);
+      if (begin) battle = await startBattle(repos, userId, mission, before, now, contentVersion, combatVersion, randomRoll);
       let sequence = null;
       if (kind === 'act' || kind === 'reset' && before?.activeBattleId) {
         const id = before?.activeBattleId; requireGame(id, 'STORY_BATTLE_NOT_ACTIVE');

@@ -1,4 +1,5 @@
 import { requireGame } from '../../utils/GameError.js';
+import { fatalityAttack } from './fatality.js';
 
 export const MAX_TURNS = 50;
 export const CHALLENGE_TTL_MS = 5 * 60 * 1000;
@@ -10,6 +11,8 @@ export function firstPlayer(players) {
 }
 
 export function selectedAttack(player, choice) {
+  const fatality = fatalityAttack(player.unit, choice);
+  if (fatality) return fatality;
   const index = typeof choice === 'string' ? ['1', '2'].indexOf(choice) : -1;
   const attack = index >= 0 ? player.unit.attacks[index] : player.unit.attacks.find(a => a.id === choice);
   requireGame(attack, 'INVALID_ATTACK');
@@ -31,6 +34,7 @@ export function resolveAttack(previous, { userId, choice, operationKey = null, n
   const attacker = battle.players.find(p => p.userId === userId);
   const defender = battle.players.find(p => p.userId !== userId);
   const attack = selectedAttack(attacker, choice);
+  if (attack.fatality) attacker.unit.fatality.used = true;
   const hit = roll < attack.accuracy;
   const beforeHp = defender.unit.hp;
   const damage = hit ? Math.min(beforeHp, calculateDamage(attack, attacker.unit.stats, defender.unit.stats)) : 0;

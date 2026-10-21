@@ -138,7 +138,7 @@ test('event interface distinguishes upcoming and closed calendars and never offe
   const ended = await c.send('!ctuevento faroles');
   assert.match(ended, /Evento finalizado/);
   assert.doesNotMatch(ended, /👉 Reclamar/);
-  assert.match(await c.send('!ctucatalogo 2'), /Evento cerrado/);
+  assert.match(await c.send('!ctuficha zorro_faroles'), /Evento cerrado/);
 });
 
 test('the boss interface stops offering attacks once the player reaches the encounter limit', async t => {

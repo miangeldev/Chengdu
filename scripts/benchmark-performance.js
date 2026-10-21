@@ -8,6 +8,7 @@ import { COLLECTIONS, SCHEMA_VERSION, validateDatabase } from '../storage/valida
 import { createGame } from '../game/createGame.js';
 import { seedCharacters } from '../game/characters/catalog.js';
 import { seedCampaigns, seedEventAttacks, seedEventCharacters } from '../game/content/catalog.js';
+import { seedSpiritsAttacks, seedSpiritsCampaign, seedSpiritsCharacters } from '../game/content/spiritsCatalog.js';
 import { seedAttacks } from '../game/battle/attacks.js';
 import { seedPacks } from '../game/packs/catalog.js';
 import { progressionBaseline } from '../game/progression/rules.js';
@@ -44,10 +45,10 @@ function fixture() {
   const state = Object.fromEntries(COLLECTIONS.map(name => [name, {
     _meta: { schemaVersion: SCHEMA_VERSION, revision: 0, updatedAt: null }, records: []
   }]));
-  state.personajes.records = [...seedCharacters(), ...seedEventCharacters()];
-  state.ataques.records = [...seedAttacks(), ...seedEventAttacks()];
+  state.personajes.records = [...seedCharacters(), ...seedEventCharacters(), ...seedSpiritsCharacters()];
+  state.ataques.records = [...seedAttacks(), ...seedEventAttacks(), ...seedSpiritsAttacks()];
   state.sobres.records = seedPacks();
-  state.campanas.records = seedCampaigns();
+  state.campanas.records = [...seedCampaigns(), seedSpiritsCampaign(seedCampaigns()[0].endsAt)];
   state.estado.records = state.personajes.records.map(character => ({
     id: `mint:${character.id}`, kind: 'mintCounter', characterId: character.id, lastSerial: 0, issuedCount: 0
   }));

@@ -246,6 +246,7 @@ try {
   await send(a, '.ctuinventario', 'Inventario: tickets y títulos desbloqueados');
   await send(a, '.ctueventos', 'Calendario: festival con fechas y personajes exclusivos');
   await send(a, '.ctuevento faroles', 'Festival: supply global y bienvenida');
+  await send(a, '.ctuevento espiritus', 'Espíritus: calendario visible y mecánicas cerradas antes de su apertura');
   await send(a, '.ctuevento faroles reclamar', 'Bienvenida del festival: una vez por jugador');
   await send(b, '.ctuevento faroles reclamar');
   contentRoll = upper => upper === 100 ? 0 : upper - 1;
@@ -277,10 +278,33 @@ try {
   await send(a, '.ctuperfil', 'Perfil: logros y tickets integrados con el progreso');
   await send(a, `.ctuvender ${eventUnit.id} 20`, 'Mercado: un personaje exclusivo también se puede vender');
   const eventListing = (await game.market.listListings({ sellerId: user.id })).items.find(listing => listing.unitId === eventUnit.id);
+  currentTime = '2026-10-24T06:00:00.000Z';
+  await send(a, '.ctuevento faroles', 'Faroles: revancha automática con 75% de selección de personajes del evento');
   currentTime = '2026-10-25T06:00:00.000Z';
   await send(a, '.ctuevento faroles', 'Festival terminado: emisión cerrada y unidades conservadas');
   await send(b, `.ctucomprar ${eventListing.code}`, 'Después del festival: comercio sin nueva emisión');
   await send(b, `.ctuunidad ${eventUnit.id}`, 'Unidad histórica: conserva el festival después de cambiar de dueño');
+  await send(a, '.ctuevento espiritus', 'Espíritus: apertura automática al cerrar Faroles');
+  await send(a, '.ctuevento espiritus reclamar', 'Espíritus: bienvenida con un ticket para capturar');
+  await send(a, '.ctuevento espiritus sellos', 'Espíritus: tres misiones y contadores de luz, máscaras y victoria');
+  await send(a, '.ctuevento espiritus sello luz', 'Espíritus: un sello incompleto ofrece el siguiente paso');
+  await send(a, '.ctuficha guardian_mil_mascaras', 'Guardián de las Mil Máscaras: ficha de técnicas y precisión de Fatality');
+  const spectralFox = await game.units.createUnit({ ownerId: user.id, characterId: 'zorro_llamas_errantes',
+    origin: { type: 'test_reward', sourceId: 'preview-spirits-fatality' }, operationKey: 'preview-spirits-fatality' });
+  await send(a, `.ctuequipo usar ${spectralFox.id}`);
+  await send(a, '.ctuevento espiritus jefe', 'Teatro embrujado: máscara actual y vida comunitaria');
+  const theatre = await game.encounters.getBoss({ bossId: 'mil_mascaras', userId: user.id });
+  contentRoll = upper => upper === 100 ? 0 : upper - 1;
+  await send(a, `.ctubossatacar 1 ${theatre.code}`, 'Teatro: primer ataque abre la oportunidad de Fatality');
+  currentTime = new Date(Date.parse(currentTime) + 30_000).toISOString();
+  await send(a, `.ctubossatacar 3 ${theatre.code}`, 'Teatro: tercera técnica consumida una vez ante la máscara actual');
+  await send(a, '.ctupelea @Lukas 1v1', null, [b]);
+  await send(b, '.ctuaceptar', 'Fatality: despertar de la tercera técnica al iniciar PvP');
+  let spiritsBattle = await game.battle.getMyBattle({ userId: user.id, chatId });
+  if (spiritsBattle.turnUserId !== user.id) await send(b, '.ctuatacar 1');
+  await send(a, '.ctuatacar 3', 'Fatality: ataque especial y siguiente turno en un único mensaje');
+  spiritsBattle = await game.battle.getMyBattle({ userId: user.id, chatId });
+  if (spiritsBattle?.status === 'active') await send(b, '.cturendirse');
   // Competitive examples use the same temporary players and real game actions.
   await send(a, '.ctuequipo usar PAND-000001');
   await send(b, '.ctuequipo usar LOBO-000001');

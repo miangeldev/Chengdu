@@ -7,6 +7,8 @@ import { ownershipAt } from '../game/units/ownership.js';
 import { advancedAttack, validateCombatProfile, validateAttackCombatProfile } from '../game/battle/combatContent.js';
 import { replayAdvancedBattle, MAX_ADVANCED_TURNS } from '../game/battle/advancedEngine.js';
 import { CHALLENGE_TTL_MS, deadline } from '../game/battle/engine.js';
+import { fatalityEnabled, fatalityProfile, immutableFatality, validateFatality } from '../game/battle/fatality.js';
+import { validateGuardianMask } from '../game/battle/masks.js';
 
 const check = (condition, field) => requireGame(condition, 'DATABASE_CORRUPT', { field });
 
@@ -19,8 +21,8 @@ const date = value => {
 };
 const open = battle => ['pending', 'active'].includes(battle.status);
 const immutableSnapshot = unit => {
-  const { hp, effects, cooldowns, abilityUsed, participated, ...snapshot } = unit;
-  return snapshot;
+  const { hp, effects, cooldowns, abilityUsed, participated, fatality, mask, ...snapshot } = unit;
+  return { ...snapshot, ...immutableFatality(unit) };
 };
 
 function profileOf(unit) {
@@ -49,6 +51,8 @@ function validateSnapshot(state, player, unit, battle, activeUnits) {
     typeof unit.abilityUsed === 'boolean' && typeof unit.participated === 'boolean', 'battle.advancedRuntime');
   check(Array.isArray(unit.attacks) && unit.attacks.length === 2 && unit.attacks[0].id !== unit.attacks[1].id, 'battle.advancedAttacks');
   check(unit.attacks[0].cooldown === 0, 'battle.advancedBasicAttackAvailable');
+  check(validateFatality(unit, battle.acceptedAt), 'battle.fatality');
+  check(validateGuardianMask(unit, battle.acceptedAt), 'battle.guardianMask');
   for (const attack of unit.attacks) {
     const currentAttack = state.ataques.records.find(record => record.id === attack.id);
     check(currentAttack && integer(attack.revision, 1) && attack.revision <= currentAttack.revision && text(attack.name) &&
@@ -166,6 +170,7 @@ export function validateAdvancedBattleTransition(before, after, battle, updated)
           snapshot.element === character.combat.element && equal(snapshot.ability, character.combat.ability) &&
           equal(snapshot.attacks, character.attackIds.map(id => advancedAttack(before.ataques.records.find(attack => attack.id === id)))),
         'battle.advancedSnapshotAuthority');
+        check(Boolean(snapshot.fatality) === Boolean(fatalityProfile(snapshot.characterId) && fatalityEnabled(updated.acceptedAt)), 'battle.fatalityAuthority');
       }
     }
   }

@@ -16,12 +16,14 @@ import { createPackService } from './packs/packService.js';
 import { createMarketService } from './market/marketService.js';
 import { createContentService } from './content/contentService.js';
 import { createEncounterService } from './content/encounterService.js';
+import { createSpiritsService } from './content/spiritsService.js';
 import { createCompetitiveService } from './competitive/competitiveService.js';
 import { createStoryService } from './story/storyService.js';
 
 export function createGame(options = {}) {
   const storage = options.storage ?? new JsonUnitOfWork(options);
   const clock = options.clock ?? storage.clock ?? (() => new Date().toISOString());
+  const encounters = createEncounterService(storage, clock, options.randomDropInt);
   return {
     users: createUserService(storage, clock),
     characters: createCharacterService(storage, clock),
@@ -33,7 +35,8 @@ export function createGame(options = {}) {
     packs: createPackService(storage, clock, options.randomDropInt),
     market: createMarketService(storage, clock),
     content: createContentService(storage, clock),
-    encounters: createEncounterService(storage, clock, options.randomDropInt),
+    encounters,
+    spirits: createSpiritsService(storage, clock),
     competitive: createCompetitiveService(storage, clock),
     trades: createTradeService(storage, clock),
     crafting: createCraftingService(storage, clock),

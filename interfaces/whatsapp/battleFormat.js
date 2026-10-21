@@ -1,7 +1,11 @@
 import { card, characterIcon, displayName, healthBar } from './format.js';
 import { competitiveBattleOpening, competitiveBattleResult, seasonEndedBattle } from './competitiveFormat.js';
+import { visibleBattleAttacks } from '../../game/battle/fatality.js';
+import { GUARDIAN_MASKS } from '../../game/battle/masks.js';
 
 const timeText = date => new Date(date).toLocaleTimeString('es-MX', { timeZone: 'America/Mexico_City', hour: '2-digit', minute: '2-digit', hour12: false });
+const attackIcon = attack => attack.fatality ? '💀 3️⃣' : attack.slot === 1 ? '1️⃣' : '2️⃣';
+const findAttack = (unit, attackId) => [...unit.attacks, ...(unit.fatality?.attack ? [unit.fatality.attack] : [])].find(attack => attack.id === attackId);
 
 function message(label, sections) {
   return card(label, sections);
@@ -13,9 +17,9 @@ export function actionText(battle, action) {
   const player = battle.players.find(p => p.userId === action.actorId);
   if (action.type === 'surrender') return `🏳️ ${displayName(player.name)} se rindió.`;
   const target = battle.players.find(p => p.userId === action.targetId);
-  const attack = player.unit.attacks.find(a => a.id === action.attackId);
+  const attack = findAttack(player.unit, action.attackId);
   return `${characterIcon(player.unit.characterId)} *${displayName(player.unit.characterName)}* usó _${displayName(attack.name)}_\n` +
-    (action.hit ? `💥 *${action.damage} de daño* a ${displayName(target.unit.characterName)}` : '💨 ¡El ataque falló!');
+    `${attack.fatality ? '💀 *¡FATALITY!*\n' : ''}` + (action.hit ? `💥 *${action.damage} de daño* a ${displayName(target.unit.characterName)}` : '💨 ¡El ataque falló!');
 }
 
 function statusText(battle, bars) {
@@ -75,10 +79,11 @@ export function renderBattle(result, cmd, { healthBars = true } = {}) {
     const opening = battle.actions.length === 0;
     if (opening) body.push(`⚔️ *${names[0]}* vs *${names[1]}*\n${characterIcon(player.unit.characterId)} *${displayName(player.unit.characterName)}* toma la iniciativa.`);
     body.push(statusText(battle, healthBars));
-    body.push(`🎯 *Turno de ${displayName(player.name)}*\n` + player.unit.attacks.map((attack, i) =>
-      `${i === 0 ? '1️⃣' : '2️⃣'} ${displayName(attack.name)} · ${attack.power} POT`
+    const availableAttacks = visibleBattleAttacks(player.unit);
+    body.push(`🎯 *Turno de ${displayName(player.name)}*\n` + availableAttacks.map(attack =>
+      `${attackIcon(attack)} ${displayName(attack.name)} · ${attack.power} POT${attack.fatality ? ' · Un uso' : ''}`
     ).join('\n'));
-    body.push(`👉 *${cmd('ctuatacar', '1')}* o *${cmd('ctuatacar', '2')}*\n🔎 Detalles: ${cmd('ctuficha')}`);
+    body.push(`👉 ${availableAttacks.map(attack => `*${cmd('ctuatacar', String(attack.slot))}*`).join(' o ')}\n🔎 Detalles: ${cmd('ctuficha')}`);
     return message(opening ? 'INICIO | T1' : `T${battle.turnNumber}`, body);
   }
 
@@ -125,6 +130,8 @@ export function eventText(battle, event) {
   if (event.type === 'knockout') return `💤 ${title} quedó fuera de combate`;
   if (event.type === 'auto_switch') return `⚔️ ${title} entra al combate`;
   if (event.type === 'stun') return `❄️ ${title} no pudo actuar`;
+  if (event.type === 'fatality_ready') return `💀 ${title}: *Fatality disponible* · Un uso en este combate`;
+  if (event.type === 'mask_changed') return `🎭 ${title}: *${displayName(event.maskName)}*`;
   return null;
 }
 
@@ -139,9 +146,9 @@ function advancedActionText(battle, action) {
   } else if (action.type === 'attack') {
     const unit = unitFor(battle, action.actorUnitId) ?? player.units.find(value => value.attacks.some(attack => attack.id === action.attackId)) ?? active(player);
     const target = unitFor(battle, action.targetUnitId) ?? active(battle.players.find(p => p.userId === action.targetId));
-    const attack = unit.attacks.find(value => value.id === action.attackId);
+    const attack = findAttack(unit, action.attackId);
     primary = `${characterIcon(unit.characterId)} *${displayName(unit.characterName)}* usó _${displayName(attack.name)}_\n` +
-      (action.hit ? `${action.critical ? '🔥 *¡CRÍTICO!*' : '💥'} *${action.damage} de daño* a ${displayName(target.characterName)}` : '💨 ¡El ataque falló!');
+      `${attack.fatality ? '💀 *¡FATALITY!*\n' : ''}` + (action.hit ? `${action.critical ? '🔥 *¡CRÍTICO!*' : '💥'} *${action.damage} de daño* a ${displayName(target.characterName)}` : '💨 ¡El ataque falló!');
   }
   const events = (action.events ?? []).map(event => eventText(battle, event)).filter(Boolean);
   return [primary, ...events].filter(Boolean).join('\n') || null;
@@ -152,9 +159,10 @@ function advancedStatusText(battle, bars) {
     const unit = active(player);
     const hp = `${unit.hp}/${unit.stats.hp} HP`;
     const effects = unit.effects?.map(effect => `${effectName(effect.type)}${effect.type === 'shield' ? ` ${effect.potency}` : ` ${effect.remaining}T`}`).join(' · ');
+    const mask = unit.mask?.index >= 0 ? `Máscara ${GUARDIAN_MASKS[unit.mask.index]?.name ?? ''}` : null;
     const reserve = player.units.map((value, index) => ({ value, index })).filter(({ index }) => index !== player.activeIndex)
       .map(({ value, index }) => `${index + 1} ${characterIcon(value.characterId)} ${displayName(value.characterName)}: ${value.hp > 0 ? `${value.hp}/${value.stats.hp} HP` : '💤 KO'}`).join('\n');
-    return `${characterIcon(unit.characterId)} *${displayName(player.name)}* · ${displayName(unit.characterName)}\n${bars ? `${healthBar(unit.hp, unit.stats.hp)} ` : ''}${hp}${effects ? `\n${effects}` : ''}${reserve ? `\n🪑 ${reserve}` : ''}`;
+    return `${characterIcon(unit.characterId)} *${displayName(player.name)}* · ${displayName(unit.characterName)}\n${bars ? `${healthBar(unit.hp, unit.stats.hp)} ` : ''}${hp}${mask ? `\n🎭 ${mask}` : ''}${effects ? `\n${effects}` : ''}${reserve ? `\n🪑 ${reserve}` : ''}`;
   }).join('\n\n');
 }
 
@@ -182,11 +190,12 @@ function renderAdvancedBattle(result, cmd, { healthBars }) {
       body.push((battle.openingEvents ?? []).map(event => eventText(battle, event)).filter(Boolean).join('\n'));
     }
     body.push(advancedStatusText(battle, healthBars));
-    body.push(`🎯 *Turno de ${displayName(player.name)}*\n` + unit.attacks.map((attack, index) => {
+    const availableAttacks = visibleBattleAttacks(unit);
+    body.push(`🎯 *Turno de ${displayName(player.name)}*\n` + availableAttacks.map(attack => {
       const wait = unit.cooldowns?.[attack.id] ?? 0;
-      return `${index === 0 ? '1️⃣' : '2️⃣'} ${displayName(attack.name)} · ${attack.power} POT${wait ? ` · ⏳ ${wait}T` : ''}`;
+      return `${attackIcon(attack)} ${displayName(attack.name)} · ${attack.power} POT${attack.fatality ? ' · Un uso' : ''}${wait ? ` · ⏳ ${wait}T` : ''}`;
     }).join('\n'));
-    const attacks = unit.attacks.flatMap((attack, index) => (unit.cooldowns?.[attack.id] ?? 0) === 0 ? [`*${cmd('ctuatacar', String(index + 1))}*`] : []);
+    const attacks = availableAttacks.flatMap(attack => (unit.cooldowns?.[attack.id] ?? 0) === 0 ? [`*${cmd('ctuatacar', String(attack.slot))}*`] : []);
     const reserves = player.units.flatMap((value, index) => index !== player.activeIndex && value.hp > 0 ? [`*${cmd('ctucambiar', String(index + 1))}*`] : []);
     body.push(`${attacks.length ? `👉 ${attacks.join(' o ')}\n` : ''}${reserves.length ? `🔀 ${reserves.join(' / ')} · Consume turno\n` : ''}🔎 Detalles: ${cmd('ctuficha')}`);
     return message(opening ? 'INICIO | T1' : `T${battle.turnNumber}`, body);

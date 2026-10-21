@@ -1,6 +1,8 @@
 import { card, characterIcon, displayName, healthBar } from './format.js';
 import { STORY_MEMORIES } from '../../game/story/catalog.js';
 import { requireGame } from '../../utils/GameError.js';
+import { visibleBattleAttacks } from '../../game/battle/fatality.js';
+import { GUARDIAN_MASKS } from '../../game/battle/masks.js';
 
 const safe = value => displayName(value ?? '');
 const lines = value => (Array.isArray(value) ? value : [value]).filter(Boolean).map(safe).join('\n');
@@ -15,6 +17,7 @@ const completed = progress => progress?.status === 'complete';
 const phaseLabels = { charge: 'Tinta en concentración', unleash: 'Descarga preparada', exposed: 'Defensas abiertas', roots: 'Barrera de raíces', illusions: 'Señuelos activos', trick_strike: 'Golpe entre sombras', reflect: 'Reflejo activo', tension: 'Tensión de la Campana', memory: 'Memoria', control: 'Control', choice: 'Elección', protect: 'Protección' };
 const effectLabels = { poison: '☠️ Veneno', burn: '🔥 Quemadura', stun: '💫 Aturdido', shield: '🛡️ Escudo', regeneration: '💚 Regeneración', attack_up: '⚔️ Ataque aumentado', defense_down: '🛡️ Defensa reducida' };
 const effectsText = unit => (unit.effects ?? []).map(effect => effectLabels[effect.type] ? `${effectLabels[effect.type]}${effect.type === 'shield' ? ` ${effect.potency}` : effect.remaining ? ` ${effect.remaining}T` : ''}` : null).filter(Boolean).join(' · ');
+const maskText = unit => unit.mask?.index >= 0 ? `Máscara ${GUARDIAN_MASKS[unit.mask.index]?.name ?? ''}` : null;
 
 function battleView(battle) {
   if (!battle?.players) return battle;
@@ -27,8 +30,8 @@ function battleView(battle) {
     enemy: { name: enemy.characterName, hp: enemy.hp, maxHp: enemy.stats.hp, intent: battle.enemyIntent?.text, phase: battle.enemyIntent?.type ?? battle.enemyPhase ?? null, mechanics: battle.enemyMechanics ?? null },
     team: player.units.map((unit, index) => ({ slot: index + 1, name: unit.characterName, characterId: unit.characterId,
       hp: unit.hp, maxHp: unit.stats.hp, level: unit.level, active: index === player.activeIndex,
-      effects: unit.effects, attacks: unit.attacks.map((attack, attackIndex) => ({ choice: attackIndex + 1, name: attack.name,
-        power: attack.power, cooldown: unit.cooldowns?.[attack.id] ?? 0, ready: (unit.cooldowns?.[attack.id] ?? 0) === 0 })) })),
+      effects: unit.effects, mask: unit.mask, attacks: visibleBattleAttacks(unit).map(attack => ({ choice: attack.slot, name: attack.name,
+        power: attack.power, fatality: Boolean(attack.fatality), cooldown: unit.cooldowns?.[attack.id] ?? 0, ready: (unit.cooldowns?.[attack.id] ?? 0) === 0 })) })),
     lastEvents: (battle.actions.at(-1)?.events ?? []).map(event => event.text).filter(Boolean)
   };
 }
@@ -112,7 +115,7 @@ export function renderStory(result, cmd, { healthBars = true, inspect = false } 
   if (battle?.status === 'active' || battle?.status === 'lost' && !battle.acceptedDefeat) {
     if (battle.lastEvents?.length && !result.alreadyProcessed) body.push(visibleBattleEvents(battle));
     const active = battle.team.find(unit => unit.active) ?? battle.team[0];
-    body.push(`❤️ *EXPEDICIÓN*\n${characterIcon(active.characterId)} *${safe(active.name)}*\n${hpText(active, healthBars)}${effectsText(active) ? `\n${effectsText(active)}` : ''}${battle.team.filter(unit => !unit.active).map(unit => `\n${unit.slot}. ${safe(unit.name)}: ${unit.hp > 0 ? hpText(unit, false) : '💤 KO'}`).join('')}`);
+    body.push(`❤️ *EXPEDICIÓN*\n${characterIcon(active.characterId)} *${safe(active.name)}*\n${hpText(active, healthBars)}${maskText(active) ? `\n🎭 ${maskText(active)}` : ''}${effectsText(active) ? `\n${effectsText(active)}` : ''}${battle.team.filter(unit => !unit.active).map(unit => `\n${unit.slot}. ${safe(unit.name)}: ${unit.hp > 0 ? hpText(unit, false) : '💤 KO'}`).join('')}`);
     body.push(`👁️ *${safe(battle.enemy.name)}*\n${hpText(battle.enemy, healthBars)}${phaseLabels[battle.enemy.phase] ? `\n${phaseLabels[battle.enemy.phase]}` : ''}${effectsText(battle.enemy) ? `\n${effectsText(battle.enemy)}` : ''}`);
     if (battle.status === 'lost') {
       const surrender = battle.finishReason === 'surrender';
@@ -132,7 +135,7 @@ export function renderStory(result, cmd, { healthBars = true, inspect = false } 
     body.push(intent ? `⚠️ *SEÑAL ENEMIGA*\n${safe(publicBattleText(intent))}` : null);
     if (typeof battle.enemy.mechanics === 'string' && battle.enemy.mechanics) body.push(`🧩 ${safe(publicBattleText(battle.enemy.mechanics))}`);
     if (inspect) body.push(`🔎 ${safe(result.hint ?? mission?.hint ?? 'Defender reduce el daño recibido. La habilidad y los cambios consumen un turno; revisa la señal antes de actuar.')}`);
-    const attacks = (active.attacks ?? []).map(attack => `${attack.choice}. ${safe(attack.name)} · ${attack.power} POT${attack.cooldown ? ` · ⏳ ${attack.cooldown}T` : ''}`).join('\n');
+    const attacks = (active.attacks ?? []).map(attack => `${attack.fatality ? '💀 ' : ''}${attack.choice}. ${safe(attack.name)} · ${attack.power} POT${attack.fatality ? ' · Un uso' : ''}${attack.cooldown ? ` · ⏳ ${attack.cooldown}T` : ''}`).join('\n');
     body.push(`🎯 *Tu turno*${attacks ? `\n${attacks}` : ''}`);
     const ready = (active.attacks ?? []).filter(attack => attack.ready !== false && !attack.cooldown);
     const allowed = action => !Array.isArray(battle.availableActions) || battle.availableActions.includes(action);

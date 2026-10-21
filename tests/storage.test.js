@@ -116,7 +116,7 @@ for (const stage of ['prepared', 'committed', 'published:usuarios.json']) {
     await assert.rejects(context.game.validateDatabase(), { code: 'STORAGE_WRITE_FAILED' });
     await context.game.close();
     const recovered = context.open({ fault: () => {} }).game;
-    assert.deepEqual(await recovered.validateDatabase(), { valid: true, schemaVersion: SCHEMA_VERSION, users: 0, characters: 10, units: 0, claims: 0 });
+    assert.deepEqual(await recovered.validateDatabase(), { valid: true, schemaVersion: SCHEMA_VERSION, users: 0, characters: 12, units: 0, claims: 0 });
     assert.equal(fs.existsSync(path.join(context.directory, '_journal.json')), false);
   });
 }

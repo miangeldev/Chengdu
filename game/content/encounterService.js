@@ -11,13 +11,16 @@ import { effectiveStats } from '../progression/rules.js';
 import { advancedAttack } from '../battle/combatContent.js';
 import { createUnitInTransaction } from '../units/unitGenerator.js';
 import { BOSSES, CONTENT_POLICY_VERSION, SPAWN_POLICY } from './catalog.js';
+import { spawnSelectionProof } from './eventPolicy.js';
 import { grantContentReward } from './rewards.js';
 import { activeCampaign, bossContributions, bossRewardFor, encounterCodeAt, encounterDeadline, resolveBossAttack } from './encounterRules.js';
+import { SPIRITS_BOSS_ID, spiritsBossDefinition, spiritsMaskAt } from './spiritsCatalog.js';
+import { attachFatality } from '../battle/fatality.js';
 
 const checkKey = key => requireGame(typeof key === 'string' && key.length > 0 && key.length <= 200 && key.trim() === key, 'INVALID_OPERATION_KEY');
 const checkMessageId = messageId => requireGame(typeof messageId === 'string' && messageId.length > 0 && messageId.length <= 200, 'INVALID_OPERATION_KEY');
 const group = chatId => requireGame(typeof chatId === 'string' && chatId.length <= 200 && /^[^\s]+@g\.us$/.test(chatId), 'CONTENT_GROUP_ONLY');
-const bossTemplate = id => (Array.isArray(BOSSES) ? BOSSES : Object.values(BOSSES)).find(boss => boss.id === id);
+const bossTemplate = id => id === SPIRITS_BOSS_ID ? spiritsBossDefinition() : (Array.isArray(BOSSES) ? BOSSES : Object.values(BOSSES)).find(boss => boss.id === id);
 const activityId = chatId => `group:${createHash('sha256').update(chatId).digest('hex')}`;
 const checkOperationKey = (chatId, messageId) => `spawn-check:${createHash('sha256').update(JSON.stringify([chatId, messageId])).digest('hex')}`;
 const noSpawn = () => ({ spawn: null, spawned: false, alreadyChecked: false });
@@ -50,8 +53,16 @@ async function view(repos, encounter, userId = null) {
   result.participants = contributions.map(({ first, ...contribution }) => ({ ...contribution, name: users.get(contribution.userId) }));
   result.totalDamage = encounter.snapshot.hp - encounter.hp;
   result.totalAttacks = actions.length;
+  if (encounter.snapshot.id === SPIRITS_BOSS_ID) {
+    result.mask = structuredClone(spiritsMaskAt(actions.length));
+    result.nextMaskAtAttack = (Math.floor(actions.length / 3) + 1) * 3 + 1;
+  }
   result.winnerName = encounter.winnerId === null ? null : users.get(encounter.winnerId);
   result.nextEncounterAt = encounterDeadline(encounter.createdAt, encounter.snapshot.respawnMs);
+  if (encounter.snapshot.eventId) {
+    const campaign = await repos.campaigns.get(encounter.snapshot.eventId);
+    if (campaign && Date.parse(result.nextEncounterAt) >= Date.parse(campaign.endsAt)) result.nextEncounterAt = null;
+  }
   if (userId !== null) {
     const user = await participant(repos, userId);
     result.myContribution = result.participants.find(contribution => contribution.userId === userId) ?? { userId, name: user.name, damage: 0, attacks: 0 };
@@ -64,6 +75,11 @@ async function view(repos, encounter, userId = null) {
       const attack = advancedAttack(await repos.attacks.get(id));
       return { choice: String(index + 1), name: attack.name, power: attack.power };
     })) : [];
+    if (unit && character) {
+      const first = actions.find(action => action.details.unitSnapshot.id === unit.id)?.details.unitSnapshot.fatality;
+      const used = actions.some(action => action.details.unitSnapshot.id === unit.id && action.details.choice === '3');
+      if (first?.unlocked && !used) result.availableAttacks.push({ choice: '3', name: first.attack.name, power: first.attack.power, fatality: true });
+    }
   }
   return result;
 }
@@ -144,9 +160,11 @@ export function createEncounterService(storage, clock, randomDropInt = upper => 
   }
 
   async function ensureBoss(repos, bossId, now) {
-    const normalized = { guardian: 'niebla', 'guardián': 'niebla', 'dragón': 'dragon' }[bossId] ?? bossId;
+    const normalized = { guardian: 'niebla', 'guardián': 'niebla', 'dragón': 'dragon', mascaras: SPIRITS_BOSS_ID, máscaras: SPIRITS_BOSS_ID, espiritus: SPIRITS_BOSS_ID }[bossId] ?? bossId;
     const template = bossTemplate(normalized);
     requireGame(template, 'BOSS_NOT_FOUND');
+    const campaign = template.eventId ? await repos.campaigns.get(template.eventId) : null;
+    requireGame(!template.eventId || activeCampaign(campaign, now), 'EVENT_NOT_ACTIVE');
     const latest = await repos.encounters.lastBy('bossId', template.id);
     if (latest) {
       requireGame(dailyTimestamp(now) >= dailyTimestamp(latest.updatedAt), 'INVALID_CLOCK');
@@ -154,7 +172,7 @@ export function createEncounterService(storage, clock, randomDropInt = upper => 
     }
     return repos.encounters.insert({
       id: `ENC-${randomUUID()}`, kind: 'boss', policyVersion: CONTENT_POLICY_VERSION, chatId: null,
-      createdAt: now, expiresAt: encounterDeadline(now, template.durationMs), updatedAt: now, endedAt: null,
+      createdAt: now, expiresAt: campaign && Date.parse(campaign.endsAt) < Date.parse(encounterDeadline(now, template.durationMs)) ? campaign.endsAt : encounterDeadline(now, template.durationMs), updatedAt: now, endedAt: null,
       status: 'active', snapshot: structuredClone(template), hp: template.hp, winnerId: null
     });
   }
@@ -214,7 +232,8 @@ export function createEncounterService(storage, clock, randomDropInt = upper => 
     const active = (await repos.encounters.filterBy('status', 'active', encounter => encounter.kind === 'spawn' && encounter.chatId === chatId))[0];
     const rolled = gapAvailable && !active ? roll(100) + 1 : null;
     const pool = rolled !== null && rolled <= SPAWN_POLICY.chancePercent ? await eligibleCharacters(repos, now) : [];
-    const eligibleCharacterWeights = pool.map(character => SPAWN_POLICY.rarityWeights[character.rarity]);
+    const selection = spawnSelectionProof(pool, await repos.campaigns.all(), now);
+    const { eligibleCharacterWeights } = selection;
     const totalWeight = eligibleCharacterWeights.reduce((sum, weight) => sum + weight, 0);
     const weightRoll = totalWeight ? roll(totalWeight) : null;
     let selectionRoll = null;
@@ -228,7 +247,7 @@ export function createEncounterService(storage, clock, randomDropInt = upper => 
     const spawn = pool.length ? await insertSpawn(repos, pool[selectionRoll], chatId, now) : null;
     await repos.contentActions.insert({
       id: `ACT-${randomUUID()}`, kind: 'spawn_check', encounterId: null, userId, operationKey, createdAt: now,
-      details: { chatId, roll: rolled, selectionRoll, weightRoll, eligibleCharacterWeights, eligibleCharacterIds: pool.map(character => character.id), spawnId: spawn?.id ?? null }
+      details: { chatId, roll: rolled, selectionRoll, weightRoll, ...selection, spawnId: spawn?.id ?? null }
     });
     const nextCheckAt = new Date((Math.floor(Date.parse(now) / SPAWN_POLICY.checkIntervalMs) + 1) * SPAWN_POLICY.checkIntervalMs).toISOString();
     dailyTimestamp(nextCheckAt);
@@ -255,20 +274,28 @@ export function createEncounterService(storage, clock, randomDropInt = upper => 
     async attackBoss({ userId, chatId, code = null, choice = '1', operationKey }) {
       checkKey(operationKey);
       group(chatId);
-      requireGame(['1', '2'].includes(String(choice)), 'INVALID_ATTACK');
+      requireGame(['1', '2', '3'].includes(String(choice)), 'INVALID_ATTACK');
       const result = await storage.withTransaction(async repos => {
         await participant(repos, userId);
         const previous = await repos.contentActions.findBy('operationKey', operationKey);
         if (previous) {
           requireGame(previous.kind === 'boss_attack' && previous.userId === userId && previous.details.chatId === chatId &&
             previous.details.choice === String(choice) && await referenceMatches(repos, previous.encounterId, code, 'boss'), 'OPERATION_CONFLICT');
-          const boss = await repos.encounters.get(previous.encounterId);
+          let boss = await repos.encounters.get(previous.encounterId);
+          const replayNow = clock();
+          let replayTime = null;
+          try { replayTime = dailyTimestamp(replayNow); }
+          catch (error) { if (error.code !== 'INVALID_CLOCK') throw error; }
+          if (boss.status === 'active' && replayTime !== null && replayTime >= Date.parse(boss.expiresAt)) {
+            boss = await repos.encounters.replace({ ...boss, status: 'expired', updatedAt: replayNow, endedAt: replayNow });
+          }
           return { boss: await view(repos, boss, userId), action: previous, duplicate: true,
             rewards: await repos.contentRewards.filterBy('sourceId', boss.id, reward => reward.kind === 'boss' && reward.userId === userId) };
         }
         await availableKey(repos, operationKey);
         const now = await refresh(repos);
         const boss = code === null ? await ensureBoss(repos, 'niebla', now) : await findEncounter(repos, code, 'boss');
+        if (boss.snapshot.eventId) requireGame(activeCampaign(await repos.campaigns.get(boss.snapshot.eventId), now), 'EVENT_NOT_ACTIVE');
         if (boss.status === 'expired') return { failure: 'BOSS_EXPIRED' };
         requireGame(boss.status === 'active', 'BOSS_NOT_ACTIVE');
         requireGame(dailyTimestamp(now) >= dailyTimestamp(boss.updatedAt), 'INVALID_CLOCK');
@@ -279,11 +306,17 @@ export function createEncounterService(storage, clock, randomDropInt = upper => 
         requireGame(!last || Date.parse(now) >= Date.parse(last.createdAt) + boss.snapshot.cooldownMs,
           'BOSS_COOLDOWN', { availableAt: last ? encounterDeadline(last.createdAt, boss.snapshot.cooldownMs) : null });
         const user = await participant(repos, userId);
-        const snapshot = await unitSnapshot(repos, user);
+        let snapshot = await unitSnapshot(repos, user);
+        const first = actions.find(action => action.details.unitSnapshot.id === snapshot.id)?.details.unitSnapshot.fatality;
+        // An uncommitted third-attack request must never reroll the opening.
+        // The first normal attack publishes that opening before it can be used.
+        if (String(choice) === '3') requireGame(first, 'FATALITY_NOT_AVAILABLE');
+        if (first) snapshot.fatality = { ...structuredClone(first), used: actions.some(action => action.details.unitSnapshot.id === snapshot.id && action.details.choice === '3') };
+        else snapshot = attachFatality(snapshot, now, () => roll(100));
         const unit = await repos.units.get(snapshot.id);
         requireGame(dailyTimestamp(now) >= dailyTimestamp(unit.updatedAt), 'INVALID_CLOCK');
         const rolled = roll(100) + 1;
-        const damage = resolveBossAttack(boss.snapshot, snapshot, String(choice), rolled, boss.hp);
+        const damage = resolveBossAttack(boss.snapshot, snapshot, String(choice), rolled, boss.hp, actions.length);
         const action = await repos.contentActions.insert({
           id: `ACT-${randomUUID()}`, kind: 'boss_attack', encounterId: boss.id, userId, operationKey, createdAt: now,
           details: { unitSnapshot: snapshot, choice: String(choice), roll: rolled, ...damage, chatId }

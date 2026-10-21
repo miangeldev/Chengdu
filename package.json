@@ -1,6 +1,6 @@
 {
   "name": "chengdu-cards",
-  "version": "0.13.1",
+  "version": "0.14.0",
   "private": true,
   "type": "module",
   "engines": { "node": ">=22" },
@@ -11,6 +11,7 @@
     "balance:simulate": "node scripts/simulate-balance.js",
     "balance:advanced": "node scripts/simulate-advanced-balance.js",
     "balance:content": "node scripts/simulate-content-balance.js",
+    "balance:spirits": "node scripts/simulate-spirits-balance.js",
     "balance:evolution": "node scripts/simulate-evolution-balance.js",
     "balance:story": "node scripts/simulate-story-balance.js",
     "balance:story:chapters": "node scripts/simulate-story-balance.js --chapters",

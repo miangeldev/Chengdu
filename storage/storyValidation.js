@@ -9,6 +9,7 @@ import { storyUnitSnapshot } from '../game/story/snapshot.js';
 import { effectiveUnitStats, displayUnitCharacterName } from '../game/evolution/rules.js';
 import { advancedAttack } from '../game/battle/combatContent.js';
 import { expiredStoredLock } from './lockProof.js';
+import { attachFatality, validateFatality } from '../game/battle/fatality.js';
 
 const check = (condition, field) => requireGame(condition, 'DATABASE_CORRUPT', { field: `story.${field}` });
 const integer = (value, min = 0) => Number.isSafeInteger(value) && value >= min;
@@ -75,6 +76,7 @@ export function validateStoryData(state) {
     check(battle.combat.id === battle.id, 'battleId');
     for (const snapshot of battle.combat.unitSnapshots) {
       const unit = units.get(snapshot.id);
+      check(validateFatality(snapshot, battle.createdAt) && (!snapshot.fatality || !snapshot.fatality.used && battle.combat.version >= 4), 'snapshotFatality');
       check(unit && unit.characterId === snapshot.characterId && unit.serial === snapshot.serial &&
         snapshot.ownerId === battle.userId && integer(snapshot.ownershipVersion) && snapshot.ownershipVersion <= unit.ownershipVersion &&
         ownerAt(state, unit.id, snapshot.ownershipVersion) === battle.userId &&
@@ -259,8 +261,11 @@ export function validateStoryTransition(before, after, context = {}) {
         const unit = before.unidades.records.find(row => row.id === snapshot.id);
         const character = before.personajes.records.find(row => row.id === unit?.characterId);
         const attacks = character?.attackIds.map(id => before.ataques.records.find(row => row.id === id));
+        const baseSnapshot = unit && character ? storyUnitSnapshot(unit, character, attacks) : null;
+        const expectedSnapshot = baseSnapshot && battle.combat.version >= 4
+          ? attachFatality(baseSnapshot, battle.createdAt, () => snapshot.fatality?.roll) : baseSnapshot;
         check(unit && unit.ownerId === battle.userId && expiredStoredLock(before, after, unit, battle.createdAt) &&
-          Date.parse(battle.createdAt) >= Date.parse(unit.updatedAt) && equal(snapshot, storyUnitSnapshot(unit, character, attacks)), 'snapshotAuthority');
+          Date.parse(battle.createdAt) >= Date.parse(unit.updatedAt) && equal(snapshot, expectedSnapshot), 'snapshotAuthority');
       }
     }
   }

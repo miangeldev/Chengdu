@@ -1,6 +1,6 @@
-# Modelo de datos — Historia 0.12
+# Modelo de datos — Espíritus 0.14
 
-Estado: contrato implementado hasta 0.12 (esquema 12), basado en `../project.md`.
+Estado: contrato implementado hasta 0.14 (esquema 13), basado en `../project.md`.
 Los mecanismos descritos como futuros aún requieren servicios y migraciones.
 El alcance se divide en [fundación 0.1](mvp-0.1.md), [combate 0.2](mvp-0.2.md),
 [progresión 0.3](mvp-0.3.md), [colección 0.4](alpha-0.4.md),
@@ -73,6 +73,37 @@ detener todas las instancias, ejecutar `npm run db:unlock` y luego
 `npm run db:validate` desde su directorio, y arrancar sólo si la validación tiene
 éxito. No borrar `_journal.json`: identifica la operación que debe completarse o
 descartarse y evita mezclar saldos y recibos de estados distintos.
+
+## Espíritus y compatibilidad 12→13
+
+El esquema 13 contiene 40 colecciones y el manifest: 41 archivos. La migración
+añade `accionesespiritus`, dos personajes, sus cuatro ataques normales, dos
+contadores nuevos y la campaña `espiritus_2026`. Conserva todos los registros
+anteriores sin modificar sus cargas; sólo avanzan sus metadatos de esquema.
+El inicio de la nueva campaña toma exactamente el cierre persistido de Faroles.
+
+`accionesespiritus` conserva sellos y canjes con evidencia de combates y ataques
+comunitarios. Los fragmentos se derivan de recibos PvP válidos y no se guardan
+como un saldo independiente. Los canjes crean unidades con origen `spirits`
+vinculado a su acción; el stock comparte el contador global de capturas y canjes.
+Cada sello y cada canje son únicos por cuenta. No se conceden monedas ni XP al
+reclamar sellos. La apertura, los objetivos y los nuevos canjes exigen la ventana
+de campaña; los recibos ya publicados conservan su validez al finalizar.
+
+Las nuevas comprobaciones de apariciones usan `selectionVersion: 2` y conservan
+los candidatos, rarezas, revisiones y pesos de selección. La revancha distribuye
+un 75% del peso al grupo del evento durante sus últimas 24 horas, si queda stock,
+y mantiene los pesos relativos de rareza dentro de cada grupo. Las comprobaciones
+históricas sin esa versión conservan su política original. Las capturas siguen
+costando un ticket y los plazos se limitan al cierre de la campaña.
+
+Fatality se conserva como metadata separada de los dos ataques normales. La
+tirada de apertura, la técnica y su único uso forman parte de los snapshots y
+replays PvP, Historia y jefes. Las partidas anteriores conservan sus reglas.
+El perfil Fatality v1 publicado queda congelado: un ajuste futuro de potencia o
+precisión debe crear otra versión y conservar la definición anterior para replay.
+La recuperación de la migración y de acciones nuevas utiliza los mismos
+respaldos completos, journal y escritor único del resto del juego.
 
 ## Historia y compatibilidad 0.11→0.12
 

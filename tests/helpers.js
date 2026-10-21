@@ -56,12 +56,12 @@ export async function updateCharacter(storage, characterId, changes) {
 export function stripBetaContentFixture(directory) {
   for (const name of ['campanas', 'premioscontenido', 'logros', 'encuentros', 'accionescontenido', 'actividad',
     'temporadas', 'clasificacion', 'resultadoscompetitivos', 'premiostemporada', 'intercambios', 'accionesintercambio', 'artesania', 'evoluciones', 'perfilessociales', 'accionessociales', 'clanes', 'accionesclan', 'guerrasclan', 'accionesguerra', 'obtenciones',
-    'historias', 'accioneshistoria', 'combateshistoria', 'premioshistoria']) {
+    'historias', 'accioneshistoria', 'combateshistoria', 'premioshistoria', 'accionesespiritus']) {
     fs.rmSync(path.join(directory, `${name}.json`), { force: true });
   }
   const characterFile = path.join(directory, 'personajes.json');
   const characters = JSON.parse(fs.readFileSync(characterFile, 'utf8'));
-  const removed = new Set(characters.records.filter(character => character.eventId === 'faroles_2026').map(character => character.id));
+  const removed = new Set(characters.records.filter(character => ['faroles_2026', 'espiritus_2026'].includes(character.eventId)).map(character => character.id));
   characters.records = characters.records.filter(character => !removed.has(character.id));
   fs.writeFileSync(characterFile, JSON.stringify(characters, null, 2) + '\n');
   const attackFile = path.join(directory, 'ataques.json');

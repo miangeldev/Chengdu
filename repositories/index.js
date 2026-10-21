@@ -60,6 +60,7 @@ export function createRepositories(state, writable = false, { beforeWrite, onWri
     storyProgress: repository('historias'),
     storyActions: repository('accioneshistoria'),
     storyBattles: repository('combateshistoria'),
-    storyRewards: repository('premioshistoria')
+    storyRewards: repository('premioshistoria'),
+    spiritsActions: repository('accionesespiritus')
   };
 }

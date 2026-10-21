@@ -50,17 +50,21 @@ test('WhatsApp catalogue can go forward and back before registration and rejects
   const { game, directory } = setup(t);
   const send = messaging(game);
   const first = await send('!ctucatalogo');
-  assert.match(first, /Página 1 de 2/);
+  assert.match(first, /Página 1 de 3/);
   assert.match(first, /Siguiente: \*!ctucatalogo 2\*/);
   assert.doesNotMatch(first, /Anterior:/);
   const second = await send('!ctucatalogo 2');
-  assert.match(second, /Página 2 de 2/);
+  assert.match(second, /Página 2 de 3/);
   assert.match(second, /Anterior: \*!ctucatalogo 1\*/);
-  assert.doesNotMatch(second, /Siguiente:/);
+  assert.match(second, /Siguiente: \*!ctucatalogo 3\*/);
+  const third = await send('!ctucatalogo 3');
+  assert.match(third, /Página 3 de 3/);
+  assert.match(third, /Anterior: \*!ctucatalogo 2\*/);
+  assert.doesNotMatch(third, /Siguiente:/);
   const all = (await game.characters.listCharacters()).items;
-  assert.ok(all.every(character => first.includes(character.name) || second.includes(character.name)));
+  assert.ok(all.every(character => first.includes(character.name) || second.includes(character.name) || third.includes(character.name)));
   assert.equal(await send('!ctucatalogo 1'), first);
-  for (const value of ['0', '-1', '1.5', 'NaN', 'Infinity', '9007199254740992', '2 extra', '3']) {
+  for (const value of ['0', '-1', '1.5', 'NaN', 'Infinity', '9007199254740992', '2 extra', '4']) {
     assert.match(await send('!ctucatalogo ' + value), /página no es válida/);
   }
   const legacyCursor = (await game.characters.listCharacters({ limit: 5 })).nextCursor;

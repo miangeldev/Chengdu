@@ -39,7 +39,7 @@ test('schema 1 upgrade preserves users, owned units, serials, claims, balances a
   assert.deepEqual(await game.users.getUser(c.user.id), c.user);
   assert.deepEqual(readRecords(c.directory, 'unidades')[0], c.unit);
   assert.equal((await game.users.getProfile(c.user.id)).starterClaim.unitId, c.unit.id);
-  assert.equal(readRecords(c.directory, 'ataques').length, 22);
+  assert.equal(readRecords(c.directory, 'ataques').length, 26);
   assert.deepEqual(readRecords(c.directory, 'combates'), []);
   assert.equal((await game.characters.getCharacter('panda_guerrero')).revision, 3);
   assert.equal(readRecords(c.directory, 'personajes')[0].attackIds.length, 2);

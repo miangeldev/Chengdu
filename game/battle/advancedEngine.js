@@ -1,6 +1,8 @@
 import { requireGame } from '../../utils/GameError.js';
 import { BATTLE_IDLE_MS, deadline } from './engine.js';
 import { COMBAT_EFFECTS, COMBAT_ELEMENTS } from './combatContent.js';
+import { fatalityAttack, fatalityEnabled, validateFatality } from './fatality.js';
+import { GUARDIAN_MASKS, hasMaskRotation } from './masks.js';
 
 export const MAX_ADVANCED_TURNS = 100;
 export const battleUnits = player => player.units ?? (player.unit ? [player.unit] : []);
@@ -44,6 +46,8 @@ export function calculateAdvancedDamage(attack, attacker, defender) {
 
 export function selectedAdvancedAttack(player, choice) {
   const unit = activeUnit(player);
+  const fatality = fatalityAttack(unit, choice);
+  if (fatality) return fatality;
   const index = ['1', '2'].indexOf(String(choice));
   const attack = index >= 0 ? unit.attacks[index] : unit.attacks.find(a => a.id === choice);
   requireGame(attack, 'INVALID_ATTACK');
@@ -84,6 +88,10 @@ export function initializeAdvancedBattle(previous) {
   for (const player of battle.players) {
     player.activeIndex = 0;
     for (const unit of player.units) {
+      requireGame(validateFatality(unit, battle.acceptedAt), 'INVALID_FATALITY');
+      if (unit.fatality) unit.fatality.used = false;
+      if (hasMaskRotation(unit) && fatalityEnabled(battle.acceptedAt)) unit.mask = { index: -1, turns: 0 };
+      else delete unit.mask;
       unit.hp = unit.stats.hp;
       unit.effects = [];
       unit.cooldowns = {};
@@ -93,6 +101,9 @@ export function initializeAdvancedBattle(previous) {
   }
   battle.actions = [];
   battle.openingEvents = [];
+  for (const player of battle.players) for (const unit of player.units) {
+    if (unit.fatality?.unlocked) battle.openingEvents.push(event('fatality_ready', { unitId: unit.id }));
+  }
   battle.status = 'active';
   battle.turnNumber = 1;
   battle.turnUserId = activeUnit(battle.players[1]).stats.speed > activeUnit(battle.players[0]).stats.speed ? battle.players[1].userId : battle.players[0].userId;
@@ -111,7 +122,17 @@ function removeEffect(unit, effect, events) {
   events.push(event('effect_expired', { unitId: unit.id, sourceUnitId: effect.sourceUnitId, effect: effect.type }));
 }
 
-function startTurn(unit, events) {
+function startTurn(unit, events, turn) {
+  if (hasMaskRotation(unit) && unit.mask && unit.hp > 0) {
+    if (unit.mask.index === 1) {
+      for (const effect of [...unit.effects]) if (effect.type === 'attack_up' && effect.sourceUnitId === unit.id && effect.potency === 6) removeEffect(unit, effect, events);
+    }
+    unit.mask.index = unit.mask.turns % GUARDIAN_MASKS.length;
+    unit.mask.turns += 1;
+    const stance = GUARDIAN_MASKS[unit.mask.index];
+    events.push(event('mask_changed', { unitId: unit.id, maskId: stance.id, maskName: stance.name }));
+    applyEffect(unit, unit, stance.effect, turn, events);
+  }
   let stunned = false;
   for (const effect of [...unit.effects]) {
     if (unit.hp === 0) break;
@@ -207,7 +228,7 @@ export function resolveAdvancedAction(previous, { userId, type = 'attack', choic
   let usedAttackId = null;
   if (type === 'surrender') finish(battle, opponent.userId, 'surrender', now);
   else {
-    const stunned = startTurn(actor, action.events);
+    const stunned = startTurn(actor, action.events, action.turnNumber);
     if (actor.hp === 0) {
       action.type = 'skip';
       knockout(battle, player, opponent, action.turnNumber, now, action.events);
@@ -218,6 +239,10 @@ export function resolveAdvancedAction(previous, { userId, type = 'attack', choic
       action.events.push(event('switch', { unitId: activeUnit(player).id, sourceUnitId: actor.id, fromIndex: previousIndex, toIndex: switchIndex }));
       enter(player, opponent, action.turnNumber, action.events);
     } else {
+      if (attack.fatality) {
+        actor.fatality.used = true;
+        action.events.push(event('fatality_used', { unitId: actor.id }));
+      }
       action.attackId = attack.id;
       action.hit = roll < attack.accuracy;
       action.beforeHp = target.hp;

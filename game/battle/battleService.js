@@ -6,6 +6,7 @@ import { requireGame } from '../../utils/GameError.js';
 import { BATTLE_IDLE_MS, CHALLENGE_TTL_MS, deadline, firstPlayer, resolveAttack, selectedAttack } from './engine.js';
 import { initializeAdvancedBattle, resolveAdvancedAction } from './advancedEngine.js';
 import { advancedAttack } from './combatContent.js';
+import { attachFatality, fatalityAttack } from './fatality.js';
 import { expireBattles, isOpenBattle, settleBattle } from './lifecycle.js';
 import { expireListings } from '../market/lifecycle.js';
 import { dailyTimestamp } from '../economy/dailyPolicy.js';
@@ -73,12 +74,12 @@ function advancedClock(battle, now) {
   if (battle.rulesVersion === 2) requireGame(dailyTimestamp(now) >= dailyTimestamp(battle.updatedAt), 'INVALID_CLOCK');
 }
 
-async function snapshotFor(repos, unit, advanced) {
+async function snapshotFor(repos, unit, advanced, now, randomRoll) {
   const character = await repos.characters.get(unit.characterId);
   const definitions = await Promise.all(character.attackIds.map(id => repos.attacks.get(id)));
   requireGame(definitions.length === 2 && definitions.every(Boolean), 'DATABASE_CORRUPT');
   const stats = effectiveUnitStats(unit);
-  return {
+  return attachFatality({
     id: unit.id, characterId: unit.characterId, characterRevision: character.revision,
     characterName: displayUnitCharacterName(unit, character), evolution: evolutionSnapshot(unit), serial: unit.serial, level: unit.progress.level, ownershipVersion: unit.ownershipVersion,
     statsVersion: unit.statGrowthVersion, traitVersion: unit.traitVersion, traits: [...unit.traits], variant: unit.variant,
@@ -86,7 +87,7 @@ async function snapshotFor(repos, unit, advanced) {
     attacks: advanced ? definitions.map(advancedAttack) : definitions,
     ...(advanced ? { profileVersion: character.combat.version, element: character.combat.element,
       ability: structuredClone(character.combat.ability), effects: [], cooldowns: {}, abilityUsed: false, participated: false } : {})
-  };
+  }, now, randomRoll);
 }
 
 async function findBattle(repos, { userId, chatId, battleId = null }, statuses = ['pending', 'active'], missingOkay = false) {
@@ -189,7 +190,7 @@ export function createBattleService(storage, clock, randomRoll = () => randomInt
           const snapshots = [];
           for (const unit of units) {
             if (battle.rulesVersion === 2) requireGame(dailyTimestamp(now) >= dailyTimestamp(unit.updatedAt), 'INVALID_CLOCK');
-            snapshots.push(await snapshotFor(repos, unit, battle.rulesVersion === 2));
+            snapshots.push(await snapshotFor(repos, unit, battle.rulesVersion === 2, now, randomRoll));
             await repos.units.replace({ ...unit, lock: { type: 'battle', referenceId: battle.id }, updatedAt: now });
           }
           if (battle.rulesVersion === 2) p.units = snapshots;
@@ -215,7 +216,8 @@ export function createBattleService(storage, clock, randomRoll = () => randomInt
         const replay = await replayAction(repos, { userId, chatId, battleId, operationKey }, 'attack');
         if (replay) {
           requireGame(replay.battle.rulesVersion === 2 ? replay.action.choice === String(choice)
-            : selectedAttack(replay.battle.players.find(p => p.userId === userId), choice).id === replay.action.attackId, 'OPERATION_CONFLICT');
+            : (fatalityAttack(replay.battle.players.find(p => p.userId === userId).unit, choice, { allowUsed: true }) ??
+              selectedAttack(replay.battle.players.find(p => p.userId === userId), choice)).id === replay.action.attackId, 'OPERATION_CONFLICT');
           return replay;
         }
         await assertKeyAvailable(repos, operationKey);

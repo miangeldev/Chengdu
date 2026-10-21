@@ -103,7 +103,7 @@ test('players can compare catalog stats and live attack definitions before regis
   await route(sock, msg, '.ctuficha desconocido_personaje');
   assert.match(reply, /personaje no existe/);
   assert.deepEqual(await game.validateDatabase(), {
-    valid: true, schemaVersion: SCHEMA_VERSION, users: 0, characters: 10, units: 0, claims: 0
+    valid: true, schemaVersion: SCHEMA_VERSION, users: 0, characters: 12, units: 0, claims: 0
   });
 });
 

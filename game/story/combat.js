@@ -176,7 +176,7 @@ function describe(core, action) {
   const all = core.players.flatMap(player => player.units), actor = all.find(unit => unit.id === action.actorUnitId), target = all.find(unit => unit.id === action.targetUnitId);
   const events = [];
   if (action.attackId && action.attackId !== 'story_wait') {
-    const move = actor?.attacks.find(move => move.id === action.attackId)?.name ?? 'Ofensiva';
+    const move = (actor?.attacks.find(move => move.id === action.attackId) ?? actor?.fatality?.attack)?.name ?? 'Ofensiva';
     events.push(event(action.hit ? 'attack' : 'miss', action.hit ? `${actor.characterName} usó ${move}: ${action.damage} de daño a ${target.characterName}.` : `${actor.characterName} usó ${move}, pero falló.`,
       { unitId: target.id, sourceUnitId: actor.id, amount: action.damage, attackName: move }));
   }
@@ -185,6 +185,7 @@ function describe(core, action) {
     if (['switch', 'auto_switch'].includes(effect.type)) events.push(event(effect.type, `${all.find(unit => unit.id === effect.unitId)?.characterName} entra al combate.`, effect));
     if (effect.type === 'knockout') events.push(event('knockout', `${all.find(unit => unit.id === effect.unitId)?.characterName} queda fuera de combate.`, effect));
     if (effect.type === 'stun') events.push(event('stun', `${all.find(unit => unit.id === effect.unitId)?.characterName} está aturdido y no puede actuar este turno.`, effect));
+    if (effect.type === 'mask_changed') events.push(event('mask_changed', `🎭 ${all.find(unit => unit.id === effect.unitId)?.characterName} adopta la Máscara ${effect.maskName}.`, effect));
     if (effect.type === 'effect_applied' && effect.effect === 'stun') events.push(event('effect_applied', `${all.find(unit => unit.id === effect.unitId)?.characterName} queda aturdido durante ${effect.remaining} turno(s).`, effect));
   }
   return events;
@@ -267,17 +268,19 @@ export function resolveStoryAction(previous, { action, choice = null, rolls = nu
   requireGame(action !== 'purify' || previous.mechanics.purifyCooldown === 0, 'STORY_ACTION_COOLDOWN');
   requireGame(action !== 'support' || previous.mechanics.supportCooldown === 0, 'STORY_ACTION_COOLDOWN');
   const selectedChoice = action === 'skill' ? '2' : action === 'attack' ? String(choice ?? '1') : action === 'switch' ? String(choice) : null;
-  requireGame(action !== 'skill' && !(action === 'attack' && selectedChoice === '2') || previous.mechanics.sealTurns === 0, 'STORY_SKILL_SEALED');
+  const usesFatality = action === 'attack' && (selectedChoice === '3' || selectedChoice === activeUnit(previous.core.players[0]).fatality?.attack.id);
+  requireGame(action !== 'skill' && !(action === 'attack' && selectedChoice === '2') && !usesFatality || previous.mechanics.sealTurns === 0, 'STORY_SKILL_SEALED');
   const battle = structuredClone(previous), events = [], m = battle.mechanics;
   battle.updatedAt = now;
   const player = battle.core.players[0], boss = activeUnit(battle.core.players[1]), actor = activeUnit(player);
-  const actorId = actor.id, originalAttacks = structuredClone(actor.attacks), bossDefense = boss.stats.defense;
-  const usedSkill = action === 'skill' || action === 'attack' && selectedChoice === '2';
+  const actorId = actor.id, originalAttacks = structuredClone(actor.attacks), originalFatalityAttack = actor.fatality ? structuredClone(actor.fatality.attack) : null, bossDefense = boss.stats.defense;
+  const usedSkill = action === 'skill' || action === 'attack' && selectedChoice === '2' || usesFatality;
   if (phase === 'exposed') boss.stats.defense = Math.max(0, boss.stats.defense - 12);
   let barrier = m.barrier;
   if (action === 'break') { barrier = 0; m.barrier = 0; events.push(event('roots_broken', '💥 Rompes las raíces y diriges un ataque básico. El Guardián responderá.')); }
   const decoy = ['illusions', 'final'].includes(mechanic) && !m.revealed && ['attack', 'skill'].includes(action);
   if (decoy) actor.attacks = actor.attacks.map(attack => ({ ...attack, accuracy: 1 }));
+  if (decoy && actor.fatality) actor.fatality.attack.accuracy = 1;
   const enemyShield = barrier > 0 ? temporaryShield(boss, barrier) : null;
   let result;
   if (['defend', 'observe', 'support', 'protect', 'purify'].includes(action)) result = wait(battle.core, PLAYER, now);
@@ -285,6 +288,7 @@ export function resolveStoryAction(previous, { action, choice = null, rolls = nu
     action === 'break' ? '1' : selectedChoice, decoy ? 99 : random[0], now);
   battle.core = result.battle;
   battle.core.players[0].units.find(unit => unit.id === actorId).attacks = originalAttacks;
+  if (originalFatalityAttack) battle.core.players[0].units.find(unit => unit.id === actorId).fatality.attack = originalFatalityAttack;
   activeUnit(battle.core.players[1]).stats.defense = bossDefense;
   const executed = result.action.type !== 'skip' && action !== 'surrender';
   if (enemyShield) {
@@ -309,7 +313,7 @@ export function resolveStoryAction(previous, { action, choice = null, rolls = nu
     const enemy = activeUnit(battle.core.players[1]);
     const copied = mechanic === 'mirror' ? previous.mechanics.copiedSkill : null;
     const strong = ['unleash', 'protect', 'reflect'].includes(phase) || phase === 'tension' && m.tension >= 5;
-    const hostileMove = copied && phase === 'reflect' ? { ...copied, id: 'story_pressure', name: `Réplica de ${copied.name}`, cooldown: 0, effects: copied.effects.map(effect => ({ ...effect, target: effect.target })) } :
+    const hostileMove = copied && phase === 'reflect' ? { ...copied, ...(copied.fatality ? { fatality: false } : {}), id: 'story_pressure', name: `Réplica de ${copied.name}`, cooldown: 0, effects: copied.effects.map(effect => ({ ...effect, target: effect.target })) } :
       attack('story_pressure', phase === 'charge' ? 'Hostigamiento de carga' : phase === 'exposed' ? 'Respuesta expuesta' : strong ? 'Descarga del vínculo' : 'Presión de tinta',
         mechanic === 'tutorial' ? 1 : strong ? mechanic === 'final' ? 84 : 75 : ['charge', 'exposed'].includes(phase) ? 2 : 6);
     if (mechanic === 'tension' && phase === 'tension' && m.tension >= 5) hostileMove.power += m.tension * 5;
@@ -353,7 +357,7 @@ export function resolveStoryAction(previous, { action, choice = null, rolls = nu
       if (mechanic === 'tension' && phase === 'tension' && m.tension >= 5) m.tension = Math.max(0, m.tension - 2);
     }
   }
-  if (mechanic === 'mirror') m.copiedSkill = executed && usedSkill ? structuredClone(originalAttacks[1]) : null;
+  if (mechanic === 'mirror') m.copiedSkill = executed && usedSkill ? structuredClone(usesFatality ? originalFatalityAttack : originalAttacks[1]) : null;
   if (executed && usedSkill) battle.tutorial.skill = true;
   for (const name of ['supportCooldown', 'purifyCooldown', 'sealTurns']) if (m[name] > 0 && action !== (name === 'supportCooldown' ? 'support' : name === 'purifyCooldown' ? 'purify' : null)) m[name]--;
   if (battle.learning.scouting && battle.core.status === 'finished' && battle.core.winnerId === PLAYER) scoutingDefeat(battle, now, events);
@@ -407,6 +411,14 @@ export function validateStoryBattle(battle) { try { return isDeepStrictEqual(bat
 export function storyBattleView(battle) {
   if (battle.version < STORY_COMBAT_VERSION) return viewV3(battle);
   const view = legacyView(battle), m = battle.mechanics, mechanic = kind(battle);
+  for (const [index, unit] of battle.players[0].units.entries()) {
+    if (unit.mask) view.team[index].mask = structuredClone(unit.mask);
+    if (unit.fatality?.unlocked && !unit.fatality.used) {
+      const attack = unit.fatality.attack;
+      view.team[index].attacks.push({ choice: '3', name: attack.name, power: attack.power, accuracy: attack.accuracy,
+        cooldown: 0, ready: unit.hp > 0 && m.sealTurns === 0, fatality: true, singleUse: true, sealed: m.sealTurns > 0 });
+    }
+  }
   const available = ['attack', 'defend', 'switch', 'surrender'];
   if (m.sealTurns === 0) available.push('skill');
   if (mechanic !== 'tutorial' && m.supportCooldown === 0) available.push('support');

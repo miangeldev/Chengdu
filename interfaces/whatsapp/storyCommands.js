@@ -25,7 +25,7 @@ export async function storyCommand({ game, identity, args, context, cmd, battleO
     result = await game.story.choose({ ...operation('choose'), choice: rest[0] });
   } else if (['atacar', 'defender', 'habilidad', 'cambiar', 'rendirse', 'observar', 'romper', 'apoyar', 'purificar', 'proteger'].includes(sub)) {
     const requiresChoice = ['atacar', 'cambiar'].includes(sub);
-    requireGame(requiresChoice ? rest.length === 1 && (sub === 'atacar' ? /^[12]$/ : /^[1-3]$/).test(rest[0]) : rest.length === 0, sub === 'cambiar' ? 'STORY_INVALID_SWITCH' : 'STORY_INVALID_ACTION');
+    requireGame(requiresChoice ? rest.length === 1 && /^[1-3]$/.test(rest[0]) : rest.length === 0, sub === 'cambiar' ? 'STORY_INVALID_SWITCH' : 'STORY_INVALID_ACTION');
     const action = { atacar: 'attack', defender: 'defend', habilidad: 'skill', cambiar: 'switch', rendirse: 'surrender', observar: 'observe', romper: 'break', apoyar: 'support', purificar: 'purify', proteger: 'protect' }[sub];
     result = await game.story.act({ ...operation('act'), action, ...(requiresChoice ? { choice: rest[0] } : {}) });
   } else if (['diario', 'recuerdos'].includes(sub)) {
